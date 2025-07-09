@@ -794,14 +794,14 @@ int32_t CallRequestProcess::HandleDialFail()
     while (!isFirstDialCallAdded_) {
         if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == std::cv_status::timeout) {
             TELEPHONY_LOGE("CarrierDialProcess call is not added");
-            SelectDialFailCall(call);
+            GetDialingCall(call);
             if (call != nullptr) {
                 DealFailDial(call);
             }
             return CALL_ERR_DIAL_FAILED;
         }
     }
-    SelectDialFailCall(call);
+    GetDialingCall(call);
     if (call != nullptr) {
         return DealFailDial(call);
     }
@@ -809,17 +809,17 @@ int32_t CallRequestProcess::HandleDialFail()
     return CALL_ERR_CALL_STATE;
 }
 
-void CallRequestProcess::SelectDialFailCall(sptr<CallBase> &call)
+void CallRequestProcess::GetDialingCall(sptr<CallBase> &call)
 {
-    call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CREATE);
+    call = GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_CREATE);
     if (call != nullptr) {
         return;
     }
-    call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
+    call = GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
     if (call != nullptr) {
         return;
     }
-    call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    call = GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
     return;
 }
 
