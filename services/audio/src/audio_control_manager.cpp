@@ -660,7 +660,7 @@ int32_t AudioControlManager::HandleWirelessAudioDevice(const AudioDevice &device
     return TELEPHONY_SUCCESS;
 }
 
-bool PlayRingtoneForVideoRingFail()
+bool AudioControlManager::PlayRingtoneForVideoRingFail()
 {
     int32_t ret;
     ring_ = std::make_unique<Ring>();
@@ -676,9 +676,9 @@ bool PlayRingtoneForVideoRingFail()
     CallAttributeInfo info;
     incomingCall->GetCallAttributeBaseInfo(info);
     if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
-        ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST);
+        ret = ring_->Play(info.accountId, "", Media::HapticStartupMode::FAST);
     } else {
-        ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::DEFAULT);
+        ret = ring_->Play(info.accountId, "", Media::HapticStartupMode::DEFAULT);
     }
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play ringtone failed");
