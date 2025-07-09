@@ -1708,7 +1708,8 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
             return TELEPHONY_ERR_FAIL;
         }
         ContactInfo contactInfo = incomingCall->GetCallerInfo();
-        if (memset_s(&contactInfo.ringtonePath, sizeof(contactInfo.ringtonePath), 0, sizeof(contactInfo.ringtonePath))) {
+        if (memset_s(&contactInfo.ringtonePath, sizeof(contactInfo.ringtonePath), 0, sizeof(contactInfo.ringtonePath))
+            != EOK) {
             TELEPHONY_LOGE("memset_s fail.");
         }
         incomingCall->SetCallerInfo(contactInfo);
