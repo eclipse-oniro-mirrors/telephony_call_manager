@@ -384,15 +384,14 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_005, Function | MediumTes
     imsCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
     CallObjectManager::AddOneCallObject(imsCall);
     callRequestProcess->HandleDialFail();
-    CallDetailInfo callDetatilInfo;
-    callDetatilInfo.callType = imsCall->GetCallType();
-    callDetatilInfo.accountId = imsCall->GetSlotId();
-    callDetatilInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
-    callDetatilInfo.voiceDomain = static_cast<int32_t>(imsCall->GetCallType());
+    CallDetailInfo callDetailInfo;
+    callDetailInfo.callType = imsCall->GetCallType();
+    callDetailInfo.accountId = imsCall->GetSlotId();
+    callDetailInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
+    callDetailInfo.voiceDomain = static_cast<int32_t>(imsCall->GetCallType());
     std::shared_ptr<CallStatusManager> callStatusManagerPtr = std::make_shared<CallStatusManager>();
     callStatusManagerPtr->DisconnectedHandle(callDetailInfo);
     EXPECT_FALSE(CallObjectManager::HasCellularCallExist());
-
 }
 
 /**
