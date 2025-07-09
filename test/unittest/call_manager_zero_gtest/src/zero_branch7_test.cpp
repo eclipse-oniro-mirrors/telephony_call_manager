@@ -215,6 +215,8 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_001, Function | MediumTes
     std::string eventName = "ABC";
     int32_t callId = 0;
     EXPECT_EQ(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
+    eventName = "EVENT_INVALID_VIDEO_FD";
+    EXPECT_EQ(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
     callManagerService->dealCeliaCallEvent(1);
     std::string number = "123456";
     EXPECT_NE(callManagerService->MakeCall(number), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);

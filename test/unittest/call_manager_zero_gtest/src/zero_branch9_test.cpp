@@ -357,6 +357,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_DealVideoRingPath_001, TestSize.Level0)
 HWTEST_F(ZeroBranch9Test, Telephony_PlayRingtone_001, Function | MediumTest | Level3)
 {
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    ASSERT_FALSE(audioControl->PlayRingtoneForVideoRingFail());
     ASSERT_FALSE(audioControl->PlayRingtone());
     DialParaInfo info;
     sptr<CallBase> ringingCall = new IMSCall(info);
@@ -373,6 +374,9 @@ HWTEST_F(ZeroBranch9Test, Telephony_PlayRingtone_001, Function | MediumTest | Le
     ASSERT_TRUE(audioControl->PlayRingtone());
     ringingCall->SetCrsType(CRS_TYPE);
     ASSERT_FALSE(audioControl->PlayRingtone());
+    ASSERT_TRUE(audioControl->PlayRingtoneForVideoRingFail());
+    ringingCall->SetCallType(CallType::TYPE_BLUETOOTH);
+    ASSERT_TRUE(audioControl->PlayRingtoneForVideoRingFail());
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 }

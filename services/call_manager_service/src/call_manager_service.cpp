@@ -43,6 +43,7 @@
 #include "bluetooth_call_connection.h"
 #include "interoperable_communication_manager.h"
 #include "voip_call_connection.h"
+#include "audio_control_manager.h"
 
 #ifdef SUPPORT_MUTE_BY_DATABASE
 #include "interoperable_settings_handler.h"
@@ -1700,6 +1701,8 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         return HandleCeliaAutoAnswerCall(callId, eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_ON");
     } else if (eventName == "EVENT_VOIP_CALL_SUCCESS" || eventName == "EVENT_VOIP_CALL_FAILED") {
         HandleVoIPCallEvent(callId, eventName);
+    } else if (eventName == "EVENT_INVALID_VIDEO_FD") {
+        DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtoneForVideoRingFail();
     }
     return TELEPHONY_SUCCESS;
 }

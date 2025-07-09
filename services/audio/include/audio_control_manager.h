@@ -40,6 +40,7 @@ public:
     void UnInit();
     int32_t SetAudioDevice(const AudioDevice &device);
     int32_t SetAudioDevice(const AudioDevice &device, bool isByUser);
+    bool PlayRingtoneForVideoRingFail();
     bool PlayRingtone(); // plays the default ringtone
     bool StopRingtone();
     int32_t PlayRingback();
