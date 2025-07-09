@@ -1280,6 +1280,40 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_012, Function | MediumTes
 }
 
 /**
+ * @tc.number   Telephony_CallStatusManager_016
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_016, TestSize.Level0)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    DialParaInfo info;
+    CallObjectManager::callObjectPtrList_.clear();
+    sptr<CallBase> imsCall = new IMSCall(info);
+    imsCall->SetCallIndex(0);
+    imsCall->SetSlotId(0);
+    imsCall->SetCallType(CallType::TYPE_IMS);
+    imsCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
+    CallObjectManager::AddOneCallObject(imsCall);
+    EXPECT_TRUE(CallObjectManager::HasCellularCallExist());
+
+    CallDetailInfo callDetailInfo;
+    std::string number = "10086";
+    memcpy_s(&callDetailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
+    callDetailInfo.callType = CallType::TYPE_IMS;
+    callDetailInfo.callMode = VideoStateType::TYPE_VOICE;
+    callDetailInfo.index = 2;
+    callStatusManager->IncomingHandle(callDetailInfo);
+    sptr<CallBase> incomingCall = callStatusManager->CreateNewCall(callDetailInfo, CallDirection::CALL_DIRECTION_OUT);
+    CallObjectManager::AddOneCallObject(incomingCall);
+    EXPECT_TRUE(CallObjectManager::HasCellularCallExist());
+
+    CallObjectManager::DeleteOneCallObject(incomingCall);
+    EXPECT_FALSE(CallObjectManager::HasCellularCallExist());
+}
+
+/**
  * @tc.number   Telephony_CallStatusManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test

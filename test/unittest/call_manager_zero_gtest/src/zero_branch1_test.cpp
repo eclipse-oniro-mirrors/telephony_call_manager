@@ -366,6 +366,35 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_004, Function | MediumTes
 }
 
 /**
+ * @tc.number   Telephony_CallRequestProcess_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_005, Function | MediumTest | Level1)
+{
+    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
+    callRequestProcess->isFirstDialCallAdded_ = false;
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo info;
+    sptr<CallBase> imsCall = new IMSCall(info);
+    imsCall->SetCallType(CallType::TYPE_IMS);
+    imsCall->SetCallIndex(0);
+    imsCall->SetCallId(VALID_CALLID);
+    imsCall->SetSlotId(0);
+    imsCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
+    CallObjectManager::AddOneCallObject(imsCall);
+    callRequestProcess->HandleDialFail();
+    CallDetailInfo callDetailInfo;
+    callDetailInfo.callType = imsCall->GetCallType();
+    callDetailInfo.accountId = imsCall->GetSlotId();
+    callDetailInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
+    callDetailInfo.voiceDomain = static_cast<int32_t>(imsCall->GetCallType());
+    std::shared_ptr<CallStatusManager> callStatusManagerPtr = std::make_shared<CallStatusManager>();
+    callStatusManagerPtr->DisconnectedHandle(callDetailInfo);
+    EXPECT_FALSE(CallObjectManager::HasCellularCallExist());
+}
+
+/**
  * @tc.number   Telephony_CallObjectManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
