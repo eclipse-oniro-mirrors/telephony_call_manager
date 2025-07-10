@@ -22,14 +22,14 @@
 namespace OHOS {
 namespace Telephony {
 
-enum EDMPolicyFlag : int32_t {
+enum EdmPolicyFlag : int32_t {
     POLICY_FLAG_NONE = -1,  // 无策略
     POLICY_FLAG_BLOCK = 0,  // 黑名单
     POLICY_FLAG_TRUST = 1,  // 白名单
 };
 
 struct EdmCallPolicyList {
-    EDMPolicyFlag policyFlag { EDMPolicyFlag::POLICY_FLAG_NONE };
+    EdmPolicyFlag policyFlag { EdmPolicyFlag::POLICY_FLAG_NONE };
     std::unordered_set<std::string> numberList {};
 };
 
@@ -37,8 +37,8 @@ class EdmCallPolicy {
 public:
     EdmCallPolicy();
     ~EdmCallPolicy();
-    int32_t SetCallPolicy(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
-        int32_t incomingPolicy, const std::vector<std::string> &incomingList);
+    int32_t SetCallPolicy(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
+        bool isIncomingTrustlist, const std::vector<std::string> &incomingList);
     bool IsDialingEnable(const std::string &phoneNum);
     bool IsIncomingEnable(const std::string &phoneNum);
 

@@ -313,7 +313,7 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, TestSize.Level0
     ASSERT_EQ(client->SendUssdResponse(SIM1_SLOTID, content), TELEPHONY_ERR_UNINIT);
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
-    ASSERT_EQ(client->SetCallPolicyInfo(0, dialingList, 0, incomingList), TELEPHONY_ERR_UNINIT);
+    ASSERT_EQ(client->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_ERR_UNINIT);
 }
 
 /**

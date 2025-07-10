@@ -683,14 +683,14 @@ public:
 
     /**
      * @brief set telephony call trust/block list policy
-     * @param dialingPolicy[in], dialing policy flag, 0 is block, 1 is trust.
+     * @param isDialingTrustlist[in], dialing policy flag, false is block, true is trust.
      * @param dialingList[in], dialing trust/block number list.
-     * @param incomingPolicy[in], incoming policy flag, 0 is block, 1 is trust.
+     * @param isIncomingTrustlist[in], incoming policy flag, false is block, true is trust.
      * @param incomingList[in], incoming trust/block number list.
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetCallPolicyInfo(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
-        int32_t incomingPolicy, const std::vector<std::string> &incomingList);
+    int32_t SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
+        bool isIncomingTrustlist, const std::vector<std::string> &incomingList);
 };
 } // namespace Telephony
 } // namespace OHOS

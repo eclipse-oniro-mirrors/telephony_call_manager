@@ -1494,14 +1494,14 @@ int32_t CallManagerServiceStub::OnSendUssdResponse(MessageParcel &data, MessageP
 int32_t CallManagerServiceStub::OnSetCallPolicyInfo(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    int32_t dialingPolicy = data.ReadInt32();
+    bool isDialingTrustlist = data.ReadBool();
     std::vector<std::string> dialingList;
     data.ReadStringVector(&dialingList);
-    int32_t incomingPolicy = data.ReadInt32();
+    bool isIncomingTrustlist = data.ReadBool();
     std::vector<std::string> incomingList;
     data.ReadStringVector(&incomingList);
 
-    result = SetCallPolicyInfo(dialingPolicy, dialingList, incomingPolicy, incomingList);
+    result = SetCallPolicyInfo(isDialingTrustlist, dialingList, isIncomingTrustlist, incomingList);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("SetCallPolicyInfo fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
