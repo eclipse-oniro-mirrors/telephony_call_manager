@@ -1,0 +1,271 @@
+@!sts_inject_into_module("import Context from 'application,Context';")
+@!namespace("@ohos.telephony.call", "call")
+@!sts_inject("""static { loadLibrary("telephony_call_taihe_native.z") } 
+""")
+
+@gen_async("makeCall")
+@gen_promise("makeCall")
+function makeCallSync(phoneNumber: String): void;
+
+@gen_promise("makeCall")
+function makeCallSync2(context: @sts_type("Context") Opaque, phoneNumber: String): void;
+
+function hasVoiceCapability(): bool;
+
+@gen_async("formatPhoneNumber")
+@gen_promise("formatPhoneNumber")
+function formatPhoneNumberSync(phoneNumber: String, options: NumberFormatOptions): void;
+
+@gen_async("formatPhoneNumber")
+function formatPhoneNumberSync2(phoneNumber: String): void;
+
+function getCallStateSync(): CallState;
+
+function hasCallSync(): bool;
+
+enum CallState: i32 {
+    CALL_STATE_UNKNOWN = -1,
+    CALL_STATE_IDLE = 0,
+    CALL_STATE_RINGING = 1,
+    CALL_STATE_OFFHOOK = 2,
+    CALL_STATE_ANSWERED = 3
+}
+
+
+enum DetailedCallState: i32 {
+     CALL_STATUS_ACTIVE = 0,
+    CALL_STATUS_HOLDING = 1,
+    CALL_STATUS_DIALING = 2,
+    CALL_STATUS_ALERTING = 3,
+    CALL_STATUS_INCOMING = 4,
+    CALL_STATUS_WAITING = 5,
+    CALL_STATUS_DISCONNECTED = 6,
+    CALL_STATUS_DISCONNECTING = 7,
+    CALL_STATUS_IDLE = 8
+}
+
+enum CallType: i32 {
+    TYPE_CS = 0,
+    TYPE_IMS = 1,
+    TYPE_OTT = 2,
+    TYPE_ERR_CALL = 3,
+    TYPE_VOIP = 4,
+}
+
+struct CallAttributeOptions {
+    callType: CallType;
+    callId: i32;
+    callState: DetailedCallState;
+}
+
+struct PeerDimensionsDetail {
+    callId: i32;
+}
+
+struct CameraCapabilities {
+    callId: i32;
+}
+
+struct ImsCallModeInfo {
+    callId: i32;
+}
+
+struct CallSessionEvent {
+    callId: i32;
+}
+
+struct NumberFormatOptions {
+    countryCode: String;
+}
+
+@on_off("CallDetailsChange")
+function onCallDetailsChange(callback: (data: CallAttributeOptions) => void): void;
+
+@on_off("CallDetailsChange")
+function offCallDetailsChange(callback: Optional<(data: CallAttributeOptions) => void>): void;
+
+struct CallEventOptions {
+    eventId: CallAbilityEventId;
+}
+
+enum CallAbilityEventId: i32 {
+    EVENT_DIAL_NO_CARRIER = 1,
+    EVENT_INVALID_FDN_NUMBER = 2,
+    EVENT_HOLD_CALL_FAILED = 3,
+    EVENT_SWAP_CALL_FAILED = 4,
+    EVENT_COMBINE_CALL_FAILED = 5,
+    EVENT_SPLIT_CALL_FAILED = 6,
+    EVENT_SHOW_FULL_SCREEN = 7,
+    EVENT_SHOW_FLOAT_WINDOW = 8,
+}
+
+@on_off("callEventChange)
+function onCallEventChange(callback: (data: CallEventOptions) => void): void;
+
+@on_off("callEventChange)
+function offCallEventChange(callback: Optional<(data: CallEventOptions) => void)>: void;
+
+struct DisconnectedDetails {
+    reason: DisconnectedReason;
+    message: String;
+}
+
+enum DisconnectedReason: i32 {
+    UNASSIGNED_NUMBER = 1,
+    NO_ROUTE_TO_DESTINATION = 3,
+    CHANNEL_UNACCEPTABLE = 6,
+    OPERATOR_DETERMINED_BARRING = 8,
+    CALL_COMPLETED_ELSEWHERE = 13,
+    NORMAL_CALL_CLEARING = 16,
+    USER_BUSY = 17,
+    NO_USER_RESPONDING = 18,
+    USER_ALERTING_NO_ANSWER = 19,
+    CALL_REJECTED = 21,
+    NUMBER_CHANGED = 22,
+    CALL_REJECTED_DUE_TO_FEATURE_AT_THE_DESTINATION = 24,
+    FAILED_PRE_EMPTION = 25,
+    NON_SELECTED_USER_CLEARING = 26,
+    DESTINATION_OUT_OF_ORDER = 27,
+    INVALID_NUMBER_FORMAT = 28,
+    FACILITY_REJECTED = 29,
+    RESPONSE_TO_STATUS_ENQUIRY = 30,
+    NORMAL_UNSPECIFIED = 31,
+    NO_CIRCUIT_CHANNEL_AVAILABLE = 34,
+    NETWORK_OUT_OF_ORDER = 38,
+    TEMPORARY_FAILURE = 41,
+    SWITCHING_EQUIPMENT_CONGESTION = 42,
+    ACCESS_INFORMATION_DISCARDED = 43,
+    REQUEST_CIRCUIT_CHANNEL_NOT_AVAILABLE = 44,
+    RESOURCES_UNAVAILABLE_UNSPECIFIED = 47,
+    QUALITY_OF_SERVICE_UNAVAILABLE = 49,
+    REQUESTED_FACILITY_NOT_SUBSCRIBED = 50,
+    INCOMING_CALLS_BARRED_WITHIN_THE_CUG = 55,
+    BEARER_CAPABILITY_NOT_AUTHORIZED = 57,
+    BEARER_CAPABILITY_NOT_PRESENTLY_AVAILABLE = 58,
+    SERVICE_OR_OPTION_NOT_AVAILABLE_UNSPECIFIED = 63,
+    BEARER_SERVICE_NOT_IMPLEMENTED = 65,
+    ACM_EQUALTO_OR_GREATER_THAN_THE_MAXIMUM_VALUE = 68,
+    REQUESTED_FACILITY_NOT_IMPLEMENTED = 69,
+    ONLY_RESTRICTED_DIGITAL_INFO_BEARER_CAPABILITY_IS_AVAILABLE = 70,
+    SERVICE_OR_OPTION_NOT_IMPLEMENTED_UNSPECIFIED = 79,
+    INVALID_TRANSACTION_IDENTIFIER_VALUE = 81,
+    USER_NOT_MEMBER_OF_CUG = 87,
+    INCOMPATIBLE_DESTINATION = 88,
+    INVALID_TRANSIT_NETWORK_SELECTION = 91,
+    SEMANTICALLY_INCORRECT_MESSAGE = 95,
+    INVALID_MANDATORY_INFORMATION = 96,
+    MESSAGE_TYPE_NON_EXISTENT_OR_NOT_IMPLEMENTED = 97,
+    MESSAGE_TYPE_NOT_COMPATIBLE_WITH_PROTOCOL_STATE = 98,
+    INFORMATION_ELEMENT_NON_EXISTENT_OR_NOT_IMPLEMENTED = 99,
+    CONDITIONAL_IE_ERROR = 100,
+    MESSAGE_NOT_COMPATIBLE_WITH_PROTOCOL_STATE = 101,
+    RECOVERY_ON_TIMER_EXPIRED = 102,
+    PROTOCOL_ERROR_UNSPECIFIED = 111,
+    INTERWORKING_UNSPECIFIED = 127,
+    CALL_BARRED = 240,
+    FDN_BLOCKED = 241,
+    IMSI_UNKNOWN_IN_VLR = 242,
+    IMEI_NOT_ACCEPTED = 243,
+    DIAL_MODIFIED_TO_USSD = 244,
+    DIAL_MODIFIED_TO_SS = 245,
+    DIAL_MODIFIED_TO_DIAL = 246,
+    RADIO_OFF = 247,
+    OUT_OF_SERVICE = 248,
+    NO_VALID_SIM = 249,
+    RADIO_INTERNAL_ERROR = 250,
+    NETWORK_RESP_TIMEOUT = 251,
+    NETWORK_REJECT = 252,
+    RADIO_ACCESS_FAILURE = 253,
+    RADIO_LINK_FAILURE = 254,
+    RADIO_LINK_LOST = 255,
+    RADIO_UPLINK_FAILURE = 256,
+    RADIO_SETUP_FAILURE = 257,
+    RADIO_RELEASE_NORMAL = 258,
+    RADIO_RELEASE_ABNORMAL = 259,
+    ACCESS_CLASS_BLOCKED = 260,
+    NETWORK_DETACH = 261,
+    INVALID_PARAMETER = 1025,
+    SIM_NOT_EXIT = 1026,
+    SIM_PIN_NEED = 1027,
+    CALL_NOT_ALLOW = 1029,
+    SIM_INVALID = 1045,
+    UNKNOWN = 1279
+}
+
+@on_off("callDisconnectedCause")
+function onCallDisconnectedCauses(callback: (data: DisconnectedDetails) => void): void;
+
+@on_off("callDisconnectedCause")
+function offCallDisconnectedCauses(callback: Optional<(data: DisconnectedDetails) => void)>: void;
+
+struct MmiCodeResults {
+    result: MmiCodeResult;
+    message: String;
+}
+
+enmu MmiCodeResult: i32 {
+    MMI_CODE_SUCCESS = 0,
+    MMI_CODE_FAILED = 1
+}
+
+@on_off("mmiCodeResult")
+function onMmiCodeResult(callback: (data: MmiCodeResults) => void): void;
+
+@on_off("mmiCodeResult")
+function offMmiCodeResult(callback: Optional<(data: MmiCodeResults) => void>): void;
+
+struct AudioDeviceCallbackInfo {
+    audioDeviceList: Array<AudioDevice>;
+    currentAudioDevice: AudioDevice;
+    isMuted: bool;
+}
+
+struct AudioDevice {
+    deviceType: AudioDeviceType;
+    address: Optional<String>;
+    deviceName: Optional<String>;
+}
+
+enum AudioDeviceType: i32 {
+    DEVICE_EARPIECE,
+    DEVICE_SPEAKER,
+    DEVICE_WIRED_HEADSET,
+    DEVICE_BLUETOOTH_SCO,
+    DEVICE_DISTRIBUTED_AUTOMOTIVE
+}
+
+@on_off("audioDeviceChange")
+function onAudioDeviceChange(callback: (data: AudioDeviceCallbackInfo) => void): void;
+
+@on_off("audioDeviceChange")
+function offAudioDeviceChange(callback: Optional<(data: AudioDeviceCallbackInfo) => void>): void;
+
+@on_off("postDialDelay")
+function onPostDialDelay(callback: (data: String) => void): void;
+
+@on_off("postDialDelay")
+function offPostDialDelay(callback: Optional<(data: String) => void>): void;
+
+@on_off("imsCallModeChange")
+function onImsCallModeChange(callback: (data: ImsCallModeInfo) => void): void;
+
+@on_off("imsCallModeChange")
+function offImsCallModeChange(callback: Optional<(data: ImsCallModeInfo) => void>): void;
+
+@on_off("callSessionEvent")
+function onCallSessionEvent(callback: (data: CallSessionEvent) => void): void;
+
+@on_off("callSessionEvent")
+function offCallSessionEvent(callback: Optional<(data: CallSessionEvent) => void>): void;
+
+@on_off("peerDimensionsChange")
+function onPeerDimensionsChange(callback: (data: PeerDimensionsDetail) => void): void;
+
+@on_off("peerDimensionsChange")
+function offPeerDimensionsChange(callback: Optional<(data: PeerDimensionsDetail) => void>): void;
+
+@on_off("cameraCapabilitiesChange")
+function onCameraCapabilitiesChange(callback: (data: CameraCapabilities) => void): void;
+
+@on_off("cameraCapabilitiesChange")
+function offCameraCapabilitiesChange(callback: Optional<(data: CameraCapabilities) => void>): void;
