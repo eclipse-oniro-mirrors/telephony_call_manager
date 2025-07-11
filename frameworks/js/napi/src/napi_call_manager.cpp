@@ -42,6 +42,8 @@ static constexpr const char *OBSERVER_OFF_JS_PERMISSION_ERROR_STRING =
     "BusinessError 201: Permission denied. An attempt was made to Off forbidden by permission: "
     "ohos.permission.SET_TELEPHONY_STATE.";
 int32_t NapiCallManager::registerStatus_ = TELEPHONY_ERROR;
+constexpr int32_t INVALID_ACCOUNT_ID = -1;
+constexpr int32_t MAX_ACCOUNT_ID = 1;
 
 NapiCallManager::NapiCallManager() {}
 
@@ -3805,7 +3807,9 @@ void NapiCallManager::NativeDialCall(napi_env env, void *data)
         return;
     }
     auto asyncContext = (DialAsyncContext *)data;
-    if (!IsValidSlotId(asyncContext->accountId) && asyncContext->accountId != -1) {
+    if (!IsValidSlotId(asyncContext->accountId) && asyncContext->accountId != INVALID_ACCOUNT_ID &&
+        (asyncContext->dialType != static_cast<int32_t>(DialType::DIAL_BLUETOOTH_TYPE) ||
+        asyncContext->accountId > MAX_ACCOUNT_ID)) {
         TELEPHONY_LOGE("NativeDialCall slotId is invalid");
         asyncContext->errorCode = SLOT_ID_INVALID;
         return;

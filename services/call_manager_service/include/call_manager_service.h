@@ -830,6 +830,7 @@ private:
     int32_t HandleDisplaySpecifiedCallPage(int32_t callId);
     int32_t HandleCeliaAutoAnswerCall(int32_t callId, bool enable);
     int32_t HandleVoIPCallEvent(int32_t callId, std::string &eventName);
+    void BtCallWaitSlotId(AppExecFwk::PacMap &dialInfo, const std::u16string &number);
 
 private:
     enum ServiceRunningState {

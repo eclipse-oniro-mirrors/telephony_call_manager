@@ -25,13 +25,19 @@ namespace OHOS {
 namespace Telephony {
 constexpr const char* DATA_TYPE = "dataType";
 constexpr const char* INTEROPERABLE_ITEM_MUTE = "mute";
+constexpr const char* INTEROPERABLE_ITEM_SLOT = "slotId";
+constexpr const char* INTEROPERABLE_ITEM_PHONE_NUMBER = "phoneNumber";
+constexpr const char* INTEROPERABLE_ITEM_CALL_TYPE = "callType";
 constexpr uint32_t INTEROPERABLE_MAX_RECV_DATA_LEN = 2048;
+constexpr int32_t DEFAULT_SLOT_ID = 0;
 constexpr int32_t QOS_BW_BT = 4 * 64 * 1024;    // 小于384*1024才可选路蓝牙，优先wifi，可选蓝牙
  
 enum class InteroperableMsgType : int32_t {
     DATA_TYPE_UNKNOWN = -1,
+    DATA_TYPE_REQUISITES = 0,
     DATA_TYPE_MUTE_RINGER = 102,
     DATA_TYPE_MUTE = 104,
+    DATA_TYPE_QUERY_REQUISITES_DATA = 105,
 };
  
 class InteroperableDataController : public IInteroperableDeviceStateCallback, public ISessionCallback {
@@ -41,13 +47,23 @@ public:
     void OnReceiveMsg(const char* data, uint32_t dataLen) override;
     void SetMuted(bool isMute);
     void MuteRinger();
+    void SendRequisiteDataQueryToPeer(const std::string &phoneNum);
+    void SendRequisiteDataToPeer(int32_t slotId, const std::string &phoneNum);
+    void DeleteBtSlotIdByPhoneNumber(const std::string &phoneNum);
+    void WaitForBtSlotId(const std::string &phoneNum);
+    int32_t GetBtSlotIdByPhoneNumber(const std::string &phoneNum);
  
     virtual void OnCallCreated(const sptr<CallBase> &call, const std::string &networkId) = 0;
     virtual void OnCallDestroyed() = 0;
+    virtual void HandleSpecificMsg(int32_t msgType, const cJSON *msg) = 0;
+    virtual void CallCreated(const sptr<CallBase> &call, const std::string &networkId) = 0;
  
 protected:
     bool GetInt32Value(const cJSON *msg, const std::string &name, int32_t &value);
     bool GetBoolValue(const cJSON *msg, const std::string &name, bool &value);
+    bool GetStringValue(const cJSON *msg, const std::string &name, std::string &value);
+    std::string CreateQueryRequisitesDataMsg(InteroperableMsgType msgType, const std::string &phoneNum);
+    void ClearBtSlotId();
  
     std::shared_ptr<SessionAdapter> session_{nullptr};
  
@@ -56,6 +72,15 @@ private:
     void HandleMuteRinger();
     std::string CreateMuteMsg(InteroperableMsgType msgType, bool isMute);
     std::string CreateMuteRingerMsg(InteroperableMsgType msgType);
+    void HandleRequisitesData(const cJSON *msg);
+    std::string CreateRequisitesDataMsg(InteroperableMsgType msgType, int32_t slotId,
+        const std::string &phoneNum);
+    void SaveBtSlotId(const std::string &phoneNum, int32_t slotId);
+
+private:
+    ffrt::mutex slotIdMutex_{};
+    ffrt::condition_variable slotIdCv_{};
+    std::map<std::string, int32_t> slotIdMap_{};
 };
 }
 }

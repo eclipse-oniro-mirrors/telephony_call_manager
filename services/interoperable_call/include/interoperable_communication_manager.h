@@ -39,6 +39,9 @@ public:
     void SetMuted(bool isMute);
     void MuteRinger();
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
+    void NewCallCreated(sptr<CallBase> &call) override;
+    void CallDestroyed(const DisconnectedDetails &details) override {}
+    int32_t GetBtCallSlotId(const std::string &phoneNum);
  
 private:
     ffrt::mutex mutex_{};

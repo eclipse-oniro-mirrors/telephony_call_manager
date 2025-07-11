@@ -463,7 +463,14 @@ void CallBase::SetNumberLocation(std::string numberLocation)
 
 int32_t CallBase::GetAccountId()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     return accountId_;
+}
+
+void CallBase::SetAccountId(int32_t accountId)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    accountId_ = accountId;
 }
 
 std::string CallBase::GetNumberLocation()
@@ -705,6 +712,11 @@ CallDirection CallBase::GetCallDirection()
 void CallBase::SetPhoneOrWatchDial(int32_t phoneOrWatch)
 {
     phoneOrWatch_ = phoneOrWatch;
+}
+
+int32_t CallBase::GetPhoneOrWatchDial()
+{
+    return phoneOrWatch_;
 }
 
 void CallBase::SetAiAutoAnswer(bool isAiAutoAnswer)

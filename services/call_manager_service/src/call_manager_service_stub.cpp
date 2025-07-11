@@ -19,7 +19,6 @@
 
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
-#include "telephony_cust_wrapper.h"
 
 #include "message_option.h"
 #include "message_parcel.h"
@@ -355,13 +354,10 @@ int32_t CallManagerServiceStub::OnDialCall(MessageParcel &data, MessageParcel &r
     dialInfo.PutIntValue("callType", data.ReadInt32());
     dialInfo.PutStringValue("extraParams", data.ReadString());
     dialInfo.PutStringValue("bundleName", data.ReadString());
+    dialInfo.PutBooleanValue("btSlotIdUnknown", data.ReadBool());
     if (callNumber.length() > ACCOUNT_NUMBER_MAX_LENGTH) {
         TELEPHONY_LOGE("the account number length exceeds the limit");
         return CALL_ERR_NUMBER_OUT_OF_RANGE;
-    }
-    if (TELEPHONY_CUST_WRAPPER.isChangeDialNumberToTwEmc_ != nullptr
-        && TELEPHONY_CUST_WRAPPER.isChangeDialNumberToTwEmc_(callNumber, dialInfo.GetIntValue("accountId"))) {
-        TELEPHONY_LOGI("changed dial num to tw emc");
     }
     result = DialCall(callNumber, dialInfo);
     TELEPHONY_LOGI("result:%{public}d", result);
