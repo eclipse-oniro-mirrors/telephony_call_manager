@@ -229,8 +229,10 @@ bool AudioSceneProcessor::SwitchIncoming()
         } else {
             TELEPHONY_LOGI("isStartBroadcast: %{public}d, isNeedSilent: %{public}d, isNotWearWatch: %{public}d",
                 isStartBroadcast, isNeedSilent, isNotWearWatch);
-            DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
-            DelayedSingleton<AudioControlManager>::GetInstance()->PlayForNoRing();
+            if (system::GetParameter("const.product.devicetype", "") == "wearable") {
+                DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
+                DelayedSingleton<AudioControlManager>::GetInstance()->PlayForNoRing();
+            }
         }
         DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_RINGING);
     }

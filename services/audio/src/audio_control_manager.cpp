@@ -708,6 +708,10 @@ bool AudioControlManager::PlayRingtone()
 
 bool AudioControlManager::PlayForNoRing()
 {
+    if (isPlayForNoRing_) {
+        TELEPHONY_LOGI("isPlayForNoRing_ is true,return");
+        return true;
+    }    
     AudioStandard::AudioRendererParams rendererParams;
     rendererParams.sampleFormat = AudioStandard::SAMPLE_S24LE;
     rendererParams.channelCount = AudioStandard::STEREO;
@@ -720,7 +724,7 @@ bool AudioControlManager::PlayForNoRing()
     }
     int32_t audioRet = audioRenderer_->SetParams(rendererParams);
     bool isStarted = audioRenderer_->Start();
-    TELEPHONY_LOGI("play for no ring isStarted : %{public}d, audioRet: %{public}d", isStarted, audioRet);
+    TELEPHONY_LOGI("PlayForNoRing isStarted : %{public}d, audioRet: %{public}d", isStarted, audioRet);
     isPlayForNoRing_ = true;
     return isStarted;
 }

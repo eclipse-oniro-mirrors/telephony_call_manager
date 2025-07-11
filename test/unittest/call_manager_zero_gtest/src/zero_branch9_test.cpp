@@ -271,6 +271,9 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_006, TestSize.Level0)
     audioControl->soundState_ = SoundState::STOPPED;
     audioControl->isCrsVibrating_ =true;
     ASSERT_FALSE(audioControl->PlayRingtone());
+    ASSERT_FALSE(audioControl->StopForNoRing());
+    ASSERT_TRUE(audioControl->PlayForNoRing());
+    ASSERT_TRUE(audioControl->StopForNoRing());
 }
 
 /**
