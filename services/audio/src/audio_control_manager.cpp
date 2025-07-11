@@ -711,7 +711,7 @@ bool AudioControlManager::PlayForNoRing()
     if (isPlayForNoRing_) {
         TELEPHONY_LOGI("isPlayForNoRing_ is true,return");
         return true;
-    }    
+    }
     AudioStandard::AudioRendererParams rendererParams;
     rendererParams.sampleFormat = AudioStandard::SAMPLE_S24LE;
     rendererParams.channelCount = AudioStandard::STEREO;
