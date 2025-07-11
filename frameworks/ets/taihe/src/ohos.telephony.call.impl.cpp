@@ -233,7 +233,7 @@ TH_EXPORT_CPP_API_FormatPhoneNumberSync(FormatPhoneNumberSync);
 TH_EXPORT_CPP_API_FormatPhoneNumberSync2(FormatPhoneNumberSync2);
 TH_EXPORT_CPP_API_GetCallStateSync(GetCallStateSync);
 TH_EXPORT_CPP_API_HasCallSync(HasCallSync);
-TH_EXPORT_CPP_API_OnCallDetailsChange(OnCallDetailsChange);M
+TH_EXPORT_CPP_API_OnCallDetailsChange(OnCallDetailsChange);
 TH_EXPORT_CPP_API_OffCallDetailsChange(OffCallDetailsChange);
 TH_EXPORT_CPP_API_OnCallEventChange(OnCallEventChange);
 TH_EXPORT_CPP_API_OffCallEventChange(OffCallEventChange);
