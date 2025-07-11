@@ -575,7 +575,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerClient_001, Function | MediumTest
     EXPECT_NE(callManagerClient->SendUssdResponse(slotId, content), TELEPHONY_ERR_UNINIT);
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
-    EXPECT_NE(callManagerClient->SetCallPolicyInfo(0, dialingList, 0, incomingList), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_ERR_UNINIT);
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_CallStatusCallback_001, Function | MediumTest | Level1)

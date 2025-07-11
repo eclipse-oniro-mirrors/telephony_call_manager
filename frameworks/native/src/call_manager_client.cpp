@@ -828,11 +828,12 @@ int32_t CallManagerClient::SendUssdResponse(int32_t slotId, std::string &content
     }
 }
 
-int32_t CallManagerClient::SetCallPolicyInfo(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
-    int32_t incomingPolicy, const std::vector<std::string> &incomingList)
+int32_t CallManagerClient::SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
+    bool isIncomingTrustlist, const std::vector<std::string> &incomingList)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->SetCallPolicyInfo(dialingPolicy, dialingList, incomingPolicy, incomingList);
+        return g_callManagerProxy->SetCallPolicyInfo(isDialingTrustlist,
+            dialingList, isIncomingTrustlist, incomingList);
     }
     TELEPHONY_LOGE("init first please!");
     return TELEPHONY_ERR_UNINIT;

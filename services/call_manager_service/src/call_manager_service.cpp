@@ -1809,12 +1809,12 @@ int32_t CallManagerService::SendUssdResponse(int32_t slotId, const std::string &
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerService::SetCallPolicyInfo(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
-    int32_t incomingPolicy, const std::vector<std::string> &incomingList)
+int32_t CallManagerService::SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
+    bool isIncomingTrustlist, const std::vector<std::string> &incomingList)
 {
-    TELEPHONY_LOGI("SetCallPolicyInfo dialingPolicy:%{public}d, dialingList size:%{public}u, "
-        "incomingPolicy:%{public}d, incomingList size:%{public}u", dialingPolicy, dialingList.size(),
-        incomingPolicy, incomingList.size());
+    TELEPHONY_LOGI("SetCallPolicyInfo isDialingTrustlist:%{public}d, dialingList size:%{public}u, "
+        "isIncomingTrustlist:%{public}d, incomingList size:%{public}u", isDialingTrustlist, dialingList.size(),
+        isIncomingTrustlist, incomingList.size());
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -1825,8 +1825,8 @@ int32_t CallManagerService::SetCallPolicyInfo(int32_t dialingPolicy, const std::
     }
     int32_t uid = IPCSkeleton::GetCallingUid();
     if (uid == EDM_UID) {
-        return callControlManagerPtr_->SetEdmPolicy(dialingPolicy, dialingList,
-            incomingPolicy, incomingList);
+        return callControlManagerPtr_->SetEdmPolicy(isDialingTrustlist, dialingList,
+            isIncomingTrustlist, incomingList);
     } else {
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
