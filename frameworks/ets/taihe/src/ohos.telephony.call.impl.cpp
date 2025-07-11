@@ -13,19 +13,19 @@
  * limitations under the License.
  */
 
- #include "ohos.telephony.call.proj.hpp"
- #include "ohos.telephony.call.impl.hpp"
- #include "taihe/runtime.hpp"
- #include "stdexcept"
+#include "ohos.telephony.call.proj.hpp"
+#include "ohos.telephony.call.impl.hpp"
+#include "taihe/runtime.hpp"
+#include "stdexcept"
 
- #include "call_manager_client.h"
- #include "telephony_errors.h"
- #include "telephony_log_wrapper.h"
- #include <string_ex.h>
+#include "call_manager_client.h"
+#include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
+#include <string_ex.h>
 
- using namespace taihe;
- using namespace OHOS::Telephony;
- namespace{
+using namespace taihe;
+using namespace OHOS::Telephony;
+namespace {
 // To be implemented.
 
 void makeCallSync(::taihe::string_view phoneNumber)
