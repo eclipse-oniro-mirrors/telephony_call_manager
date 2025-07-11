@@ -18,23 +18,23 @@
 
 @gen_async("makeCall")
 @gen_promise("makeCall")
-function makeCallSync(phoneNumber: String): void;
+function MakeCallSync(phoneNumber: String): void;
 
 @gen_promise("makeCall")
-function makeCallSync2(context: @sts_type("Context") Opaque, phoneNumber: String): void;
+function MakeCallSync2(context: @sts_type("Context") Opaque, phoneNumber: String): void;
 
-function hasVoiceCapability(): bool;
+function HasVoiceCapability(): bool;
 
 @gen_async("formatPhoneNumber")
 @gen_promise("formatPhoneNumber")
-function formatPhoneNumberSync(phoneNumber: String, options: NumberFormatOptions): void;
+function FormatPhoneNumberSync(phoneNumber: String, options: NumberFormatOptions): void;
 
 @gen_async("formatPhoneNumber")
-function formatPhoneNumberSync2(phoneNumber: String): void;
+function FormatPhoneNumberSync2(phoneNumber: String): void;
 
-function getCallStateSync(): CallState;
+function GetCallStateSync(): CallState;
 
-function hasCallSync(): bool;
+function HasCallSync(): bool;
 
 enum CallState: i32 {
     CALL_STATE_UNKNOWN = -1,
@@ -92,10 +92,10 @@ struct NumberFormatOptions {
 }
 
 @on_off("CallDetailsChange")
-function onCallDetailsChange(callback: (data: CallAttributeOptions) => void): void;
+function OnCallDetailsChange(callback: (data: CallAttributeOptions) => void): void;
 
 @on_off("CallDetailsChange")
-function offCallDetailsChange(callback: Optional<(data: CallAttributeOptions) => void>): void;
+function OffCallDetailsChange(callback: Optional<(data: CallAttributeOptions) => void>): void;
 
 struct CallEventOptions {
     eventId: CallAbilityEventId;
@@ -113,10 +113,10 @@ enum CallAbilityEventId: i32 {
 }
 
 @on_off("callEventChange)
-function onCallEventChange(callback: (data: CallEventOptions) => void): void;
+function OnCallEventChange(callback: (data: CallEventOptions) => void): void;
 
 @on_off("callEventChange)
-function offCallEventChange(callback: Optional<(data: CallEventOptions) => void)>: void;
+function OffCallEventChange(callback: Optional<(data: CallEventOptions) => void)>: void;
 
 struct DisconnectedDetails {
     reason: DisconnectedReason;
@@ -206,10 +206,10 @@ enum DisconnectedReason: i32 {
 }
 
 @on_off("callDisconnectedCause")
-function onCallDisconnectedCauses(callback: (data: DisconnectedDetails) => void): void;
+function OnCallDisconnectedCauses(callback: (data: DisconnectedDetails) => void): void;
 
 @on_off("callDisconnectedCause")
-function offCallDisconnectedCauses(callback: Optional<(data: DisconnectedDetails) => void)>: void;
+function OffCallDisconnectedCauses(callback: Optional<(data: DisconnectedDetails) => void)>: void;
 
 struct MmiCodeResults {
     result: MmiCodeResult;
@@ -222,10 +222,10 @@ enmu MmiCodeResult: i32 {
 }
 
 @on_off("mmiCodeResult")
-function onMmiCodeResult(callback: (data: MmiCodeResults) => void): void;
+function OnMmiCodeResult(callback: (data: MmiCodeResults) => void): void;
 
 @on_off("mmiCodeResult")
-function offMmiCodeResult(callback: Optional<(data: MmiCodeResults) => void>): void;
+function OffMmiCodeResult(callback: Optional<(data: MmiCodeResults) => void>): void;
 
 struct AudioDeviceCallbackInfo {
     audioDeviceList: Array<AudioDevice>;
@@ -248,37 +248,37 @@ enum AudioDeviceType: i32 {
 }
 
 @on_off("audioDeviceChange")
-function onAudioDeviceChange(callback: (data: AudioDeviceCallbackInfo) => void): void;
+function OnAudioDeviceChange(callback: (data: AudioDeviceCallbackInfo) => void): void;
 
 @on_off("audioDeviceChange")
-function offAudioDeviceChange(callback: Optional<(data: AudioDeviceCallbackInfo) => void>): void;
+function OffAudioDeviceChange(callback: Optional<(data: AudioDeviceCallbackInfo) => void>): void;
 
 @on_off("postDialDelay")
-function onPostDialDelay(callback: (data: String) => void): void;
+function OnPostDialDelay(callback: (data: String) => void): void;
 
 @on_off("postDialDelay")
-function offPostDialDelay(callback: Optional<(data: String) => void>): void;
+function OffPostDialDelay(callback: Optional<(data: String) => void>): void;
 
 @on_off("imsCallModeChange")
-function onImsCallModeChange(callback: (data: ImsCallModeInfo) => void): void;
+function OnImsCallModeChange(callback: (data: ImsCallModeInfo) => void): void;
 
 @on_off("imsCallModeChange")
-function offImsCallModeChange(callback: Optional<(data: ImsCallModeInfo) => void>): void;
+function OffImsCallModeChange(callback: Optional<(data: ImsCallModeInfo) => void>): void;
 
 @on_off("callSessionEvent")
-function onCallSessionEvent(callback: (data: CallSessionEvent) => void): void;
+function OnCallSessionEvent(callback: (data: CallSessionEvent) => void): void;
 
 @on_off("callSessionEvent")
-function offCallSessionEvent(callback: Optional<(data: CallSessionEvent) => void>): void;
+function OffCallSessionEvent(callback: Optional<(data: CallSessionEvent) => void>): void;
 
 @on_off("peerDimensionsChange")
-function onPeerDimensionsChange(callback: (data: PeerDimensionsDetail) => void): void;
+function OnPeerDimensionsChange(callback: (data: PeerDimensionsDetail) => void): void;
 
 @on_off("peerDimensionsChange")
-function offPeerDimensionsChange(callback: Optional<(data: PeerDimensionsDetail) => void>): void;
+function OffPeerDimensionsChange(callback: Optional<(data: PeerDimensionsDetail) => void>): void;
 
 @on_off("cameraCapabilitiesChange")
-function onCameraCapabilitiesChange(callback: (data: CameraCapabilities) => void): void;
+function OnCameraCapabilitiesChange(callback: (data: CameraCapabilities) => void): void;
 
 @on_off("cameraCapabilitiesChange")
-function offCameraCapabilitiesChange(callback: Optional<(data: CameraCapabilities) => void>): void;
+function OffCameraCapabilitiesChange(callback: Optional<(data: CameraCapabilities) => void>): void;
