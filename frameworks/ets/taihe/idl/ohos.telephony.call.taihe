@@ -118,7 +118,7 @@ enum CallAbilityEventId: i32 {
 function OnCallEventChange(callback: (data: CallEventOptions) => void): void;
 
 @on_off("callEventChange")
-function OffCallEventChange(callback: Optional<(data: CallEventOptions) => void)>: void;
+function OffCallEventChange(callback: Optional<(data: CallEventOptions) => void>): void;
 
 struct DisconnectedDetails {
     reason: DisconnectedReason;
