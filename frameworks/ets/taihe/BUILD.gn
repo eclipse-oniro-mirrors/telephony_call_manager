@@ -16,7 +16,7 @@ import("//build/ohos.gni")
 import("//build/ohos/taihe_idl/taihe.gni")
 
 copy_taihe_idl("copy_telephonycall") {
-  sources = [ "idl/ohos.telephony.call.taihe" ] 
+  sources = [ "idl/ohos.telephony.call.taihe" ]
 }
 
 subsystem_name = "telephony"
@@ -75,11 +75,11 @@ generate_static_abc("telephony_call_abc") {
   files = [ "$taihe_generated_file_path/@ohos.telephony.call.ets" ]
   is_boot_abc = "True"
   device_dst_file = "/system/framework/telephony_call_abc.abc"
-  dependencies = [ ":run_taihe" ]                                                                                                                                                                                                                                           
+  dependencies = [ ":run_taihe" ]
 }
 
 ohos_prebuilt_etc("telephony_call_etc") {
-  source = "$target_out_dir/telehpony_call_abc.abc"           
+  source = "$target_out_dir/telephony_call_abc.abc"
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
