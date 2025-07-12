@@ -99,10 +99,10 @@ enum CallAbilityEventId: i32 {
     EVENT_SHOW_FLOAT_WINDOW = 8,
 }
 
-@on_off("callEventChange)
+@on_off("callEventChange")
 function OnCallEventChange(callback: (data: CallEventOptions) => void): void;
 
-@on_off("callEventChange)
+@on_off("callEventChange")
 function OffCallEventChange(callback: Optional<(data: CallEventOptions) => void)>: void;
 
 struct DisconnectedDetails {
