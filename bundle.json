@@ -108,7 +108,7 @@
                     "name":"//base/telephony/call_manager/frameworks/cj:cj_telephony_call_ffi"
                 },
                 {
-                    "name":"//base/telephony/call_manager/frameworks/ets/taihe:copy_telephonycall"
+                    "name":"//base/telephony/call_manager/frameworks/taihe:copy_telephonycall"
                 }
             ],
             "test": [
