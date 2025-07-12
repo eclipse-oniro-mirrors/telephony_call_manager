@@ -26,6 +26,7 @@
 #include "telephony_log_wrapper.h"
 #include "voip_call.h"
 #include "fold_status_manager.h"
+#include "audio_control_manager.h"
 
 namespace OHOS {
 namespace Telephony {
