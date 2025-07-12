@@ -691,8 +691,9 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(int32
         std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
         for (; it != callObjectPtrList_.end(); ++it) {
             if ((*it)->GetCallType() == CallType::TYPE_BLUETOOTH && (*it)->GetCallIndex() == index &&
-                (*it)->GetSlotId() == slotId) {
-                    return (*it);
+                ((*it)->GetSlotId() == slotId || (*it)->GetPhoneOrWatchDial() ==
+                    static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL))) {
+                return (*it);
             }
         }
     } else {
@@ -973,6 +974,7 @@ CellularCallInfo CallObjectManager::GetDialCallInfo()
 
 int32_t CallObjectManager::DealFailDial(sptr<CallBase> call)
 {
+    TELEPHONY_LOGI("DealFailDial");
     CallDetailInfo callDetatilInfo;
     if (memset_s(&callDetatilInfo, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo)) != EOK) {
         TELEPHONY_LOGE("memset_s callDetatilInfo fail");

@@ -287,7 +287,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, TestSize.Level1)
     ASSERT_EQ(callManagerService->SendUssdResponse(slotId, content), TELEPHONY_SUCCESS);
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
-    ASSERT_NE(callManagerService->SetCallPolicyInfo(0, dialingList, 0, incomingList), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -335,7 +335,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, TestSize.Level1)
     ASSERT_NE(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
-    ASSERT_NE(callManagerService->SetCallPolicyInfo(0, dialingList, 0, incomingList), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -799,6 +799,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_009, TestSize.Level0
     data.WriteInt32(defaultNumber);
     data.WriteInt32(defaultNumber);
     data.WriteString(bundleName);
+    callManagerService->OnDialCall(data, reply);
+    data.WriteBool(true);
     callManagerService->OnDialCall(data, reply);
 
     MessageParcel data12;

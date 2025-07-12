@@ -76,6 +76,7 @@ int32_t CallManagerServiceProxy::DialCall(std::u16string number, AppExecFwk::Pac
     dataParcel.WriteInt32(extras.GetIntValue("dialType"));
     dataParcel.WriteInt32(extras.GetIntValue("callType"));
     dataParcel.WriteString(extras.GetStringValue("extraParams"));
+    dataParcel.WriteBool(extras.GetBooleanValue("btSlotIdUnknown", false));
     MessageParcel replyParcel;
     int32_t error = SendRequest(INTERFACE_DIAL_CALL, dataParcel, replyParcel);
     if (error != TELEPHONY_SUCCESS) {
@@ -1438,17 +1439,17 @@ int32_t CallManagerServiceProxy::SendUssdResponse(int32_t slotId, const std::str
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::SetCallPolicyInfo(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
-    int32_t incomingPolicy, const std::vector<std::string> &incomingList)
+int32_t CallManagerServiceProxy::SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
+    bool isIncomingTrustlist, const std::vector<std::string> &incomingList)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    dataParcel.WriteInt32(dialingPolicy);
+    dataParcel.WriteBool(isDialingTrustlist);
     dataParcel.WriteStringVector(dialingList);
-    dataParcel.WriteInt32(incomingPolicy);
+    dataParcel.WriteBool(isIncomingTrustlist);
     dataParcel.WriteStringVector(incomingList);
     MessageParcel replyParcel;
     int32_t error = SendRequest(INTERFACE_SET_CALL_POLICY_INFO, dataParcel, replyParcel);

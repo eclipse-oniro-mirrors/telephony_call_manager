@@ -89,6 +89,7 @@ int32_t BluetoothCallClient::UnRegisterCallBack()
 int32_t BluetoothCallClient::DialCall(std::u16string number, AppExecFwk::PacMap &extras)
 {
     if (g_callManagerProxyPtr != nullptr) {
+        extras.PutBooleanValue("btSlotIdUnknown", true);
         return g_callManagerProxyPtr->DialCall(number, extras);
     } else {
         TELEPHONY_LOGE("init first please!");

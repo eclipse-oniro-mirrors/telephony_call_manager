@@ -706,6 +706,29 @@ bool AudioControlManager::PlayRingtone()
     return true;
 }
 
+bool AudioControlManager::PlayForNoRing()
+{
+    if (isPlayForNoRing_) {
+        TELEPHONY_LOGI("isPlayForNoRing_ is true,return");
+        return true;
+    }
+    AudioStandard::AudioRendererParams rendererParams;
+    rendererParams.sampleFormat = AudioStandard::SAMPLE_S24LE;
+    rendererParams.channelCount = AudioStandard::STEREO;
+    if (audioRenderer_ == nullptr) {
+        audioRenderer_ = AudioStandard::AudioRenderer::Create(AudioStandard::AudioStreamType::STREAM_VOICE_RING);
+    }
+    if (audioRenderer_ == nullptr) {
+        TELEPHONY_LOGE("audioRenderer_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t audioRet = audioRenderer_->SetParams(rendererParams);
+    bool isStarted = audioRenderer_->Start();
+    TELEPHONY_LOGI("PlayForNoRing isStarted : %{public}d, audioRet: %{public}d", isStarted, audioRet);
+    isPlayForNoRing_ = true;
+    return isStarted;
+}
+
 bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &ringMode)
 {
     if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
@@ -721,6 +744,7 @@ bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &rin
             return true;
         }
         AdjustVolumesForCrs();
+        TELEPHONY_LOGE("play soundtone fail.");
         return false;
     }
     TELEPHONY_LOGI("type_crs but not play ringtone");
@@ -819,6 +843,9 @@ bool AudioControlManager::StopSoundtone()
 
 bool AudioControlManager::StopRingtone()
 {
+    if (isPlayForNoRing_) {
+        return StopForNoRing();
+    }
     if (ringState_ == RingState::STOPPED) {
         TELEPHONY_LOGI("ringtone already stopped");
         return true;
@@ -833,6 +860,20 @@ bool AudioControlManager::StopRingtone()
     }
     ring_->ReleaseRenderer();
     TELEPHONY_LOGI("stop ringtone success");
+    return true;
+}
+
+bool AudioControlManager::StopForNoRing()
+{
+    isPlayForNoRing_ = false;
+    if (audioRenderer_ == nullptr) {
+        TELEPHONY_LOGE("audioRenderer_ is nullptr");
+        return false;
+    }
+    audioRenderer_->Stop();
+    audioRenderer_->Release();
+    audioRenderer_ = nullptr;
+    TELEPHONY_LOGI("StopForNoRing success");
     return true;
 }
 

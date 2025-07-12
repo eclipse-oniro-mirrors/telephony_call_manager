@@ -35,6 +35,8 @@ void InteroperableClientManager::OnCallDestroyed()
         session_.reset();
         session_ = nullptr;
     }
+    std::unique_lock<ffrt::mutex> lock(mutex_);
+    phoneNum_ = "";
 }
  
 void InteroperableClientManager::ConnectRemote(const std::string &networkId)
@@ -47,6 +49,41 @@ void InteroperableClientManager::ConnectRemote(const std::string &networkId)
     if (session_ != nullptr) {
         TELEPHONY_LOGI("connect session_");
         session_->Connect(networkId, SOFTNET_SESSION_NAME, SOFTNET_SESSION_NAME, QOS_BW_BT);
+    }
+}
+
+void InteroperableClientManager::OnConnected()
+{
+    TELEPHONY_LOGI("client on connected");
+    std::string phoneNum = "";
+    std::unique_lock<ffrt::mutex> lock(mutex_);
+    phoneNum = phoneNum_;
+    lock.unlock();
+
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(phoneNum);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGE("client connect, get call failed");
+        return;
+    }
+    TELEPHONY_LOGI("phoneOrWatchDial[%{public}d]", callPtr->GetPhoneOrWatchDial());
+    if (callPtr->GetCallDirection() == CallDirection::CALL_DIRECTION_OUT &&
+        callPtr->GetPhoneOrWatchDial() == static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL)) {
+        SendRequisiteDataToPeer(callPtr->GetAccountId(), callPtr->GetAccountNumber());
+    } else {
+        SendRequisiteDataQueryToPeer(phoneNum);
+    }
+}
+
+void InteroperableClientManager::CallCreated(const sptr<CallBase> &call, const std::string &networkId)
+{
+    TELEPHONY_LOGI("client mgr call created");
+    std::unique_lock<ffrt::mutex> lock(mutex_);
+    phoneNum_ = call->GetAccountNumber();
+    lock.unlock();
+    ConnectRemote(networkId);
+    if (call->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
+        call->GetTelCallState() == TelCallState::CALL_STATUS_WAITING) {
+        SendRequisiteDataQueryToPeer(call->GetAccountNumber()); // multi-call
     }
 }
 } // namespace Telephony

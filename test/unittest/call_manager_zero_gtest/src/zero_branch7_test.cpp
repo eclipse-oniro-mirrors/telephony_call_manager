@@ -207,13 +207,20 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_001, Function | MediumTes
     std::u16string test = u"";
     callManagerService->OnAddSystemAbility(systemAbilityId, deviceId);
     EXPECT_NE(systemAbilityId, AUDIO_POLICY_SERVICE_ID);
+    std::string eventName = "EVENT_INVALID_VIDEO_FD";
+    int32_t callId = 0;
+    EXPECT_EQ(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_ERR_FAIL);
+    DialParaInfo info;
+    sptr<CallBase> ringingCall = new IMSCall(info);
+    ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    CallObjectManager::AddOneCallObject(ringingCall);
+    EXPECT_EQ(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
     int32_t slotId = 0;
     EXPECT_NE(callManagerService->CloseUnFinishedUssd(slotId), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callManagerService->SetVoIPCallState(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_TRUE(TelephonyPermission::CheckCallerIsSystemApp());
     EXPECT_TRUE(TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE));
-    std::string eventName = "ABC";
-    int32_t callId = 0;
+    eventName = "ABC";
     EXPECT_EQ(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
     callManagerService->dealCeliaCallEvent(1);
     std::string number = "123456";
@@ -568,7 +575,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerClient_001, Function | MediumTest
     EXPECT_NE(callManagerClient->SendUssdResponse(slotId, content), TELEPHONY_ERR_UNINIT);
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
-    EXPECT_NE(callManagerClient->SetCallPolicyInfo(0, dialingList, 0, incomingList), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_ERR_UNINIT);
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_CallStatusCallback_001, Function | MediumTest | Level1)

@@ -19,6 +19,7 @@
 #include "call_object_manager.h"
 #include "transmission_manager.h"
 #include "interoperable_data_controller.h"
+#include "ims_call.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -69,5 +70,46 @@ HWTEST_F(InteroperableClientManagerTest, Telephony_InteroperableClientManagerTes
     ASSERT_NO_THROW(controller->ConnectRemote(devId)); // check session is not null
 }
  
+/**
+
+ * @tc.number   Telephony_InteroperableClientManagerTest_004
+ * @tc.name     test on connected
+ * @tc.desc     Function test
+ */
+HWTEST_F(InteroperableClientManagerTest, Telephony_InteroperableClientManagerTest_004, Function | MediumTest | Level1)
+{
+    auto controller = std::make_shared<InteroperableClientManager>();
+    DialParaInfo info;
+    std::string accountNumber = "12345678";
+    sptr<CallBase> call = new IMSCall(info);
+    EXPECT_NO_THROW(controller->OnConnected());
+
+    controller->phoneNum_ = accountNumber;
+    call->SetAccountNumber(accountNumber);
+    CallObjectManager::callObjectPtrList_.push_back(call);
+    EXPECT_NO_THROW(controller->OnConnected());
+
+    call->SetCallDirection(CallDirection::CALL_DIRECTION_OUT);
+    call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
+    EXPECT_NO_THROW(controller->OnConnected());
+}
+
+/**
+
+ * @tc.number   Telephony_InteroperableClientManagerTest_005
+ * @tc.name     test call created
+ * @tc.desc     Function test
+ */
+HWTEST_F(InteroperableClientManagerTest, Telephony_InteroperableClientManagerTest_005, Function | MediumTest | Level1)
+{
+    auto controller = std::make_shared<InteroperableClientManager>();
+    DialParaInfo info;
+    std::string networkId = "1";
+    std::string accountNumber = "123";
+    sptr<CallBase> call = new IMSCall(info);
+    call->SetAccountNumber(accountNumber);
+    call->callState_ = TelCallState::CALL_STATUS_WAITING;
+    EXPECT_NO_THROW(controller->CallCreated(call, networkId));
+}
 } // namespace Telephony
 } // namespace OHOS

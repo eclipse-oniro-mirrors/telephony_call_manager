@@ -145,5 +145,35 @@ void InteroperableCommunicationManager::CallStateUpdated(
         dataController_->OnCallDestroyed();
     }
 }
+
+void InteroperableCommunicationManager::NewCallCreated(sptr<CallBase> &call)
+{
+    TELEPHONY_LOGI("interoperable NewCallCreated");
+    if (dataController_ == nullptr) {
+        TELEPHONY_LOGE("dataController is nullptr");
+        return;
+    }
+    if (peerDevices_.empty() || call == nullptr) {
+        TELEPHONY_LOGE("no peer device or call is nullptr");
+        return;
+    }
+    dataController_->CallCreated(call, peerDevices_.front());
+}
+
+int32_t InteroperableCommunicationManager::GetBtCallSlotId(const std::string &phoneNum)
+{
+    int32_t btCallSlot = BT_CALL_INVALID_SLOT;
+    if (dataController_ == nullptr) {
+        return btCallSlot;
+    }
+
+    btCallSlot = dataController_->GetBtSlotIdByPhoneNumber(phoneNum);
+    if (btCallSlot == BT_CALL_INVALID_SLOT) { // slotId has not been received yet, need wait.
+        dataController_->WaitForBtSlotId(phoneNum);
+        btCallSlot = dataController_->GetBtSlotIdByPhoneNumber(phoneNum);
+    }
+    dataController_->DeleteBtSlotIdByPhoneNumber(phoneNum); // delete after query
+    return btCallSlot;
+}
 }
 }

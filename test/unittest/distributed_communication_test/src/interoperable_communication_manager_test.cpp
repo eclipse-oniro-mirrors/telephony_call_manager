@@ -16,7 +16,9 @@
 #include <gtest/gtest.h>
 #include <cstring>
 #include "cs_call.h"
+#include "ims_call.h"
 #include "interoperable_communication_manager.h"
+#include "interoperable_client_manager.h"
 #include "singleton.h"
 
 namespace OHOS {
@@ -93,6 +95,31 @@ HWTEST_F(InteroperableCommunicationManagerTest,
     deviceInfo.deviceTypeId = 0x83;
     ASSERT_NO_THROW(dcManager->OnDeviceOnline(deviceInfo));
     ASSERT_NO_THROW(dcManager->OnDeviceOffline(deviceInfo));
+}
+
+/**
+ * @tc.number   Telephony_InteroperableCommunicationManagerTest_003
+ * @tc.name     test new call created
+ * @tc.desc     Function test
+ */
+HWTEST_F(InteroperableCommunicationManagerTest,
+         Telephony_InteroperableCommunicationManagerTest_003, Function | MediumTest | Level1)
+{
+    auto dcManager = DelayedSingleton<InteroperableCommunicationManager>::GetInstance();
+    sptr<CallBase> call = nullptr;
+    dcManager->dataController_ = nullptr;
+    EXPECT_EQ(dcManager->dataController_, nullptr);
+    EXPECT_NO_THROW(dcManager->NewCallCreated(call)); // dataControl is nullptr
+
+    dcManager->dataController_ = std::make_shared<InteroperableClientManager>();
+    dcManager->peerDevices_.push_back("test");
+    EXPECT_FALSE(dcManager->peerDevices_.empty());
+    EXPECT_NO_THROW(dcManager->NewCallCreated(call)); // call is nullptr
+
+    DialParaInfo info;
+    call = new IMSCall(info);
+    EXPECT_NO_THROW(dcManager->NewCallCreated(call));
+    dcManager->peerDevices_.clear();
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -1734,8 +1734,8 @@ int32_t CallManagerProxy::SendUssdResponse(int32_t slotId, std::string &content)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::SetCallPolicyInfo(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
-    int32_t incomingPolicy, const std::vector<std::string> &incomingList)
+int32_t CallManagerProxy::SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
+    bool isIncomingTrustlist, const std::vector<std::string> &incomingList)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
@@ -1746,8 +1746,8 @@ int32_t CallManagerProxy::SetCallPolicyInfo(int32_t dialingPolicy, const std::ve
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t errCode = callManagerServicePtr_->SetCallPolicyInfo(dialingPolicy, dialingList,
-        incomingPolicy, incomingList);
+    int32_t errCode = callManagerServicePtr_->SetCallPolicyInfo(isDialingTrustlist, dialingList,
+        isIncomingTrustlist, incomingList);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("failed, errcode:%{public}d", errCode);
         return errCode;

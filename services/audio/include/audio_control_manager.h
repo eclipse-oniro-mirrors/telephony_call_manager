@@ -96,6 +96,8 @@ public:
     void ExcludeBluetoothSco();
     void UnexcludeBluetoothSco();
     bool IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath);
+    bool PlayForNoRing();
+    bool StopForNoRing();
 
 private:
     RingState ringState_ = RingState::STOPPED;
@@ -147,6 +149,8 @@ private:
     int32_t voiceVolume_ = -1;
     AudioDeviceType initCrsDeviceType_ = AudioDeviceType::DEVICE_UNKNOWN;
     ffrt::mutex crsMutex_{};
+    std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_ = nullptr;
+    bool isPlayForNoRing_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

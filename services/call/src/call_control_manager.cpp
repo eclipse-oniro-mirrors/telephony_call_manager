@@ -149,6 +149,7 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
         TELEPHONY_LOGE("Invalid number!");
         return ret;
     }
+    TELEPHONY_LOGI("dialInfo slotId is[%{public}d]", extras.GetIntValue("accountId"));
     bool isEcc = false;
     std::string newPhoneNum =
         DelayedSingleton<CallNumberUtils>::GetInstance()->RemoveSeparatorsPhoneNumber(accountNumber);

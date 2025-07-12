@@ -17,6 +17,8 @@
 #include "interoperable_device_observer.h"
 #include "telephony_log_wrapper.h"
 #include "transmission_manager.h"
+#include "call_object_manager.h"
+#include "call_control_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -46,6 +48,50 @@ void InteroperableServerManager::OnDeviceOffline(const std::string &networkId, c
     session_->Destroy();
     session_.reset();
     session_ = nullptr;
+}
+
+void InteroperableServerManager::HandleSpecificMsg(int32_t msgType, const cJSON *msg)
+{
+    if (msg == nullptr) {
+        return;
+    }
+    switch (msgType) {
+        case static_cast<int32_t>(InteroperableMsgType::DATA_TYPE_QUERY_REQUISITES_DATA):
+            OnQueryRequisitesDataMsgReceived(msg);
+            break;
+        default:
+            break;
+    }
+}
+
+void InteroperableServerManager::OnQueryRequisitesDataMsgReceived(const cJSON *msg)
+{
+    std::string phoneNum = "";
+    sptr<CallBase> callPtr = nullptr;
+    if (!GetStringValue(msg, INTEROPERABLE_ITEM_PHONE_NUMBER, phoneNum)) {
+        TELEPHONY_LOGE("bt call remote query dara, parse data failed");
+        return;
+    }
+
+    callPtr = CallObjectManager::GetOneCallObject(phoneNum);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGE("query call failed!");
+        return;
+    }
+    SendRequisiteDataToPeer(callPtr->GetAccountId(), callPtr->GetAccountNumber());
+}
+
+void InteroperableServerManager::OnCallDestroyed()
+{
+    ClearBtSlotId();
+}
+
+void InteroperableServerManager::CallCreated(const sptr<CallBase> &call, const std::string &networkId)
+{
+    TELEPHONY_LOGI("server manager call create");
+    if (call != nullptr) {
+        SendRequisiteDataToPeer(call->GetAccountId(), call->GetAccountNumber());
+    }
 }
 }
 }

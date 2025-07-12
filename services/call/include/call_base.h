@@ -139,6 +139,7 @@ public:
     void SetCallDirection(CallDirection direction);
     CallDirection GetCallDirection();
     int32_t GetAccountId();
+    void SetAccountId(int32_t accountId);
     bool IsAnsweredCall();
     void SetAnsweredCall(bool isAnswered);
     AAFwk::WantParams GetExtraParams();
@@ -147,6 +148,7 @@ public:
     void SetAiAutoAnswer(bool isAiAutoAnswer);
     bool IsForcedReportVoiceCall();
     void SetForcedReportVoiceCall(bool isForcedReportVoiceCall);
+    int32_t GetPhoneOrWatchDial();
 
 protected:
     int32_t callId_;

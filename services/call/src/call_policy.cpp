@@ -581,31 +581,19 @@ int32_t CallPolicy::CloseUnFinishedUssdPolicy(int32_t slotId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallPolicy::SetEdmPolicy(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
-    int32_t incomingPolicy, const std::vector<std::string> &incomingList)
+int32_t CallPolicy::SetEdmPolicy(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
+    bool isIncomingTrustlist, const std::vector<std::string> &incomingList)
 {
-    if (edmCallPolicy_ == nullptr) {
-        TELEPHONY_LOGE("edmCallPolicy_ is null!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return edmCallPolicy_->SetCallPolicy(dialingPolicy, dialingList, incomingPolicy, incomingList);
+    return edmCallPolicy_->SetCallPolicy(isDialingTrustlist, dialingList, isIncomingTrustlist, incomingList);
 }
 
 bool CallPolicy::IsDialingEnable(const std::string &phoneNum)
 {
-    if (edmCallPolicy_ == nullptr) {
-        TELEPHONY_LOGE("edmCallPolicy_ is null!");
-        return true;
-    }
     return edmCallPolicy_->IsDialingEnable(phoneNum);
 }
 
 bool CallPolicy::IsIncomingEnable(const std::string &phoneNum)
 {
-    if (edmCallPolicy_ == nullptr) {
-        TELEPHONY_LOGE("edmCallPolicy_ is null!");
-        return true;
-    }
     return edmCallPolicy_->IsIncomingEnable(phoneNum);
 }
 } // namespace Telephony
