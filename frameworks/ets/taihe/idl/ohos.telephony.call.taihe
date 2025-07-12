@@ -211,7 +211,7 @@ enum DisconnectedReason: i32 {
 function OnCallDisconnectedCauses(callback: (data: DisconnectedDetails) => void): void;
 
 @on_off("callDisconnectedCause")
-function OffCallDisconnectedCauses(callback: Optional<(data: DisconnectedDetails) => void)>: void;
+function OffCallDisconnectedCauses(callback: Optional<(data: DisconnectedDetails) => void>): void;
 
 struct MmiCodeResults {
     result: MmiCodeResult;
