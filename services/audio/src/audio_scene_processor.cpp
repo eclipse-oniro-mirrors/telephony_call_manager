@@ -215,6 +215,7 @@ bool AudioSceneProcessor::SwitchIncoming()
     }
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    bool
     if (state == (int32_t) CallStateToApp::CALL_STATE_OFFHOOK) {
         DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
     } else {
