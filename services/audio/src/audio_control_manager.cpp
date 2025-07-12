@@ -397,7 +397,6 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
                 }
             }
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
-            DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
             break;
         default:
             break;
