@@ -1712,6 +1712,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_011, TestSize.Level0)
     call->SetNumberMarkInfo(numberMarkInfo);
     callStatusManager->HandleDialWhenHolding(0, call);
     callStatusManager->RefreshCallDisconnectReason(call,
+        static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_CS_CALL_ANSWERED_ELSEWHER));
+    callStatusManager->RefreshCallDisconnectReason(call,
         static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_ANSWERED_ELSEWHER));
     callStatusManager->RefreshCallDisconnectReason(call,
         static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_NORMAL));

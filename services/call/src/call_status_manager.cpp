@@ -2274,6 +2274,11 @@ void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, 
 {
     switch (reason) {
         case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_CS_CALL_ANSWERED_ELSEWHER):
+            if (call->GetCallType() == CallType::TYPE_CS) {
+                call->SetAnswerType(CallAnswerType::CALL_ANSWERED_ELSEWHER);
+                TELEPHONY_LOGI("cs call answered elsewhere");
+            }
+            break;
         case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_ANSWERED_ELSEWHER):
             if ((DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole()) ||
                 (system::GetParameter("const.product.devicetype", "") == "wearable")) {
