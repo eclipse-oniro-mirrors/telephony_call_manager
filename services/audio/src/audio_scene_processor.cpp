@@ -215,8 +215,11 @@ bool AudioSceneProcessor::SwitchIncoming()
     }
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
-    bool
-    if (state == (int32_t) CallStateToApp::CALL_STATE_OFFHOOK) {
+    int endCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_ENDED);
+    if (state == (int32_t) CallStateToApp::CALL_STATE_OFFHOOK ||
+        (CallObjectManager::GetCurrentCallNum() - endCallCount > ONE_CALL_EXIST &&
+            DelayedSingleton::GetInstance()->IsSoundPlaying() &&
+            CallObjectManager::HasIncomingCallCrsType())) {
         DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
     } else {
         bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();

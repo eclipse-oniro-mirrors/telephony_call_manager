@@ -93,6 +93,7 @@ public:
     static bool IsVoipCallExist();
     static bool IsVoipCallExist(TelCallState callState, int32_t &callId);
     static bool HasIncomingCallCrsType();
+    static bool HasIncomingCallVideoRingType();
     static CellularCallInfo GetDialCallInfo();
     static bool HasSatelliteCallExist();
     static int32_t GetSatelliteCallList(std::list<int32_t> &list);
