@@ -47,7 +47,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm* vm, uint32_t* result)
         return ANI_ERROR;
     }
 
-    const char *spaceName = "L@ohos.call.d.ets/CallAbility;";
+    const char *spaceName = "@ohos.call.d.ets.CallAbility";
     ani_namespace spc;
     status = env->FindNamespace(spaceName, &spc);
     if (ANI_OK != status) {
@@ -56,9 +56,9 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm* vm, uint32_t* result)
 
     std::array methods = {
         ani_native_function { "hasVoiceCapability",
-            ":I", reinterpret_cast<void*>(hasVoiceCapability) },
+            ":i", reinterpret_cast<void*>(hasVoiceCapability) },
         ani_native_function { "makeCallExecute",
-            ":I", reinterpret_cast<void*>(makeCallExecute) },
+            ":i", reinterpret_cast<void*>(makeCallExecute) },
     };
     status = env->Namespace_BindNativeFunctions(spc, methods.data(), methods.size());
     if (ANI_OK != status) {
