@@ -391,13 +391,13 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
         case TelCallState::CALL_STATUS_DISCONNECTED:
             if (!CallObjectManager::HasIncomingCallCrsType() && !CallObjectManager::HasIncomingCallVideoRingType()) {
                 if (isCrsVibrating_ || isVideoRingVibrating_) {
-                    DelayedSingleton::GetInstance()->StopVibrator();
+                    DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
                     isCrsVibrating_ = false;
                     isVideoRingVibrating_ = false;
                 }
             }
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
-            DelayedSingleton::GetInstance()->StopWaitingTone();
+            DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
             break;
         default:
             break;
@@ -460,7 +460,7 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
         callRunningState == CallRunningState::CALL_RUNNING_STATE_RINGING) {
         if (!CallObjectManager::HasIncomingCallCrsType() && !CallObjectManager::HasIncomingCallVideoRingType()) {
             if (isCrsVibrating_ || isVideoRingVibrating_) {
-                DelayedSingleton::GetInstance()->StopVibrator();
+                DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
                 isCrsVibrating_ = false;
                 isVideoRingVibrating_ = false;
             }

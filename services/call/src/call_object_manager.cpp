@@ -552,12 +552,12 @@ bool CallObjectManager::HasIncomingCallCrsType()
 
 bool CallObjectManager::HasIncomingCallVideoRingType()
 {
-    std::lock_guardstd::mutex lock(listMutex_);
-    std::list<sptr>::iterator it;
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
             ContactInfo contactInfo = (*it)->GetCallerInfo();
-            if (DelayedSingleton::GetInstance()->IsVideoRing(
+            if (DelayedSingleton<AudioControlManager>::GetInstance()->IsVideoRing(
                 contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
             return true;
             }

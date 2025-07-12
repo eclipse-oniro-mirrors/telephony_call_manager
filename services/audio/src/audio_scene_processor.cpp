@@ -218,7 +218,7 @@ bool AudioSceneProcessor::SwitchIncoming()
     int endCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_ENDED);
     if (state == (int32_t) CallStateToApp::CALL_STATE_OFFHOOK ||
         (CallObjectManager::GetCurrentCallNum() - endCallCount > ONE_CALL_EXIST &&
-            DelayedSingleton::GetInstance()->IsSoundPlaying() &&
+            DelayedSingleton<AudioControlManager>::GetInstance()->IsSoundPlaying() &&
             CallObjectManager::HasIncomingCallCrsType())) {
         DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
     } else {
