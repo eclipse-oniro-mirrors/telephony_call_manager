@@ -15,7 +15,8 @@
 
 @!sts_inject_into_module("import Context from 'application,Context';")
 @!namespace("@ohos.telephony.call", "call")
-@!sts_inject("""static { loadLibrary("telephony_call_taihe_native.z") } 
+@!sts_inject("""
+static { loadLibrary("telephony_call_taihe_native.z") } 
 """)
 
 @gen_async("makeCall")
@@ -93,10 +94,10 @@ struct NumberFormatOptions {
     countryCode: String;
 }
 
-@on_off("CallDetailsChange")
+@on_off("callDetailsChange")
 function OnCallDetailsChange(callback: (data: CallAttributeOptions) => void): void;
 
-@on_off("CallDetailsChange")
+@on_off("callDetailsChange")
 function OffCallDetailsChange(callback: Optional<(data: CallAttributeOptions) => void>): void;
 
 struct CallEventOptions {
