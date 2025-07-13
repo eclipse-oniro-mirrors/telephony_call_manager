@@ -94,12 +94,6 @@ struct NumberFormatOptions {
     countryCode: String;
 }
 
-@on_off("callDetailsChange")
-function OnCallDetailsChange(callback: (data: CallAttributeOptions) => void): void;
-
-@on_off("callDetailsChange")
-function OffCallDetailsChange(callback: Optional<(data: CallAttributeOptions) => void>): void;
-
 struct CallEventOptions {
     eventId: CallAbilityEventId;
 }
@@ -114,12 +108,6 @@ enum CallAbilityEventId: i32 {
     EVENT_SHOW_FULL_SCREEN = 7,
     EVENT_SHOW_FLOAT_WINDOW = 8,
 }
-
-@on_off("callEventChange")
-function OnCallEventChange(callback: (data: CallEventOptions) => void): void;
-
-@on_off("callEventChange")
-function OffCallEventChange(callback: Optional<(data: CallEventOptions) => void>): void;
 
 struct DisconnectedDetails {
     reason: DisconnectedReason;
@@ -208,12 +196,6 @@ enum DisconnectedReason: i32 {
     UNKNOWN = 1279
 }
 
-@on_off("callDisconnectedCause")
-function OnCallDisconnectedCauses(callback: (data: DisconnectedDetails) => void): void;
-
-@on_off("callDisconnectedCause")
-function OffCallDisconnectedCauses(callback: Optional<(data: DisconnectedDetails) => void>): void;
-
 struct MmiCodeResults {
     result: MmiCodeResult;
     message: String;
@@ -223,12 +205,6 @@ enum MmiCodeResult: i32 {
     MMI_CODE_SUCCESS = 0,
     MMI_CODE_FAILED = 1
 }
-
-@on_off("mmiCodeResult")
-function OnMmiCodeResult(callback: (data: MmiCodeResults) => void): void;
-
-@on_off("mmiCodeResult")
-function OffMmiCodeResult(callback: Optional<(data: MmiCodeResults) => void>): void;
 
 struct AudioDeviceCallbackInfo {
     audioDeviceList: Array<AudioDevice>;
@@ -249,39 +225,3 @@ enum AudioDeviceType: i32 {
     DEVICE_BLUETOOTH_SCO,
     DEVICE_DISTRIBUTED_AUTOMOTIVE
 }
-
-@on_off("audioDeviceChange")
-function OnAudioDeviceChange(callback: (data: AudioDeviceCallbackInfo) => void): void;
-
-@on_off("audioDeviceChange")
-function OffAudioDeviceChange(callback: Optional<(data: AudioDeviceCallbackInfo) => void>): void;
-
-@on_off("postDialDelay")
-function OnPostDialDelay(callback: (data: String) => void): void;
-
-@on_off("postDialDelay")
-function OffPostDialDelay(callback: Optional<(data: String) => void>): void;
-
-@on_off("imsCallModeChange")
-function OnImsCallModeChange(callback: (data: ImsCallModeInfo) => void): void;
-
-@on_off("imsCallModeChange")
-function OffImsCallModeChange(callback: Optional<(data: ImsCallModeInfo) => void>): void;
-
-@on_off("callSessionEvent")
-function OnCallSessionEvent(callback: (data: CallSessionEvent) => void): void;
-
-@on_off("callSessionEvent")
-function OffCallSessionEvent(callback: Optional<(data: CallSessionEvent) => void>): void;
-
-@on_off("peerDimensionsChange")
-function OnPeerDimensionsChange(callback: (data: PeerDimensionsDetail) => void): void;
-
-@on_off("peerDimensionsChange")
-function OffPeerDimensionsChange(callback: Optional<(data: PeerDimensionsDetail) => void>): void;
-
-@on_off("cameraCapabilitiesChange")
-function OnCameraCapabilitiesChange(callback: (data: CameraCapabilities) => void): void;
-
-@on_off("cameraCapabilitiesChange")
-function OffCameraCapabilitiesChange(callback: Optional<(data: CameraCapabilities) => void>): void;
