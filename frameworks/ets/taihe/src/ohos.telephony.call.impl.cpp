@@ -170,7 +170,7 @@ void OffPostDialDelay(::taihe::optional_view<::taihe::callback<void(::taihe::str
     return;
 }
 
-void OnImsCallModeChange(::ohos::taihe::callback_view<void(::ohos::telephony::call::ImsCallModeInfo const&)> callback)
+void OnImsCallModeChange(::taihe::callback_view<void(::ohos::telephony::call::ImsCallModeInfo const&)> callback)
 {
     TELEPHONY_LOGI("OnImsCallModeChange");
     return;
@@ -242,7 +242,7 @@ TH_EXPORT_CPP_API_OffCallDisconnectedCauses(OffCallDisconnectedCauses);
 TH_EXPORT_CPP_API_OnMmiCodeResult(OnMmiCodeResult);
 TH_EXPORT_CPP_API_OffMmiCodeResult(OffMmiCodeResult);
 TH_EXPORT_CPP_API_OnAudioDeviceChange(OnAudioDeviceChange);
-TH_EXPORT_CPP_API_OffAudioDevicechange(OffAudioDeviceChange);
+TH_EXPORT_CPP_API_OffAudioDeviceChange(OffAudioDeviceChange);
 TH_EXPORT_CPP_API_OnPostDialDelay(OnPostDialDelay);
 TH_EXPORT_CPP_API_OffPostDialDelay(OffPostDialDelay);
 TH_EXPORT_CPP_API_OnImsCallModeChange(OnImsCallModeChange);
