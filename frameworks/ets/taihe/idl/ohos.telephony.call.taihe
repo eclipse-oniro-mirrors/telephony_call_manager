@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-@!sts_inject_into_module("import Context from 'application,Context';")
+@!sts_inject_into_module("import Context from 'application.Context';")
 @!namespace("@ohos.telephony.call", "call")
 @!sts_inject("""
 static { loadLibrary("telephony_call_taihe_native.z") } 
