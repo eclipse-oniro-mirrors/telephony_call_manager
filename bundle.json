@@ -70,7 +70,8 @@
                 "dsoftbus",
                 "input",
                 "device_manager",
-                "openssl"
+                "openssl",
+                "runtime_core"
             ],
             "third_party": [
                 "libphonenumber",
@@ -83,7 +84,8 @@
                 "base_group": [
                 ],
                 "fwk_group": [
-                    "//base/telephony/call_manager/frameworks/js:call"
+                    "//base/telephony/call_manager/frameworks/js:call",
+                    "//base/telephony/call_manager/frameworks/ets/taihe:telephony_call_taihe"
                 ],
                 "service_group": [
                     "//base/telephony/call_manager:tel_call_manager",
@@ -104,6 +106,9 @@
                         "header_files": []
                     },
                     "name":"//base/telephony/call_manager/frameworks/cj:cj_telephony_call_ffi"
+                },
+                {
+                    "name":"//base/telephony/call_manager/frameworks/ets/taihe:copy_telephonycall"
                 }
             ],
             "test": [
