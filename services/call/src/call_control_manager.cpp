@@ -2158,5 +2158,25 @@ bool CallControlManager::isNotWearOnWrist()
     }
     return false;
 }
+
+void CallControlManager::HandleVideoRingPlayFail()
+{
+    sptr incomingCall =
+        CallObjectManager::GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (incomingCall == nullptr) {
+        TELEPHONY_LOGE("incomingCall is nullptr");
+        return;
+    }
+    ContactInfo contactInfo = incomingCall->GetCallerInfo();
+        if (memset_s(&contactInfo.ringtonePath, FILE_PATH_MAX_LEN, 0, FILE_PATH_MAX_LEN) != EOK) {
+        TELEPHONY_LOGE("memset_s fail.");
+    }
+    incomingCall->SetCallerInfo(contactInfo);
+    if (CallObjectManager::IsNeedSilentInDoNotDisturbMode()) {
+        TELEPHONY_LOGI("no need play system ring.");
+        return;
+    }
+    DelayedSingleton::GetInstance()->PlayRingtone();
+}
 } // namespace Telephony
 } // namespace OHOS
