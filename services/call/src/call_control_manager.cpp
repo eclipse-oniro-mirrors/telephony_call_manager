@@ -76,31 +76,11 @@ CallControlManager::~CallControlManager()
 bool CallControlManager::Init()
 {
     callStateListenerPtr_ = std::make_unique<CallStateListener>();
-    if (callStateListenerPtr_ == nullptr) {
-        TELEPHONY_LOGE("callStateListenerPtr_ is null");
-        return false;
-    }
     CallRequestHandlerPtr_ = std::make_unique<CallRequestHandler>();
-    if (CallRequestHandlerPtr_ == nullptr) {
-        TELEPHONY_LOGE("CallRequestHandlerPtr_ is null");
-        return false;
-    }
     CallRequestHandlerPtr_->Init();
     incomingCallWakeup_ = std::make_shared<IncomingCallWakeup>();
-    if (incomingCallWakeup_ == nullptr) {
-        TELEPHONY_LOGE("incomingCallWakeup_ is null");
-        return false;
-    }
     missedCallNotification_ = std::make_shared<MissedCallNotification>();
-    if (missedCallNotification_ == nullptr) {
-        TELEPHONY_LOGE("missedCallNotification_ is null");
-        return false;
-    }
     callSettingManagerPtr_ = std::make_unique<CallSettingManager>();
-    if (callSettingManagerPtr_ == nullptr) {
-        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
-        return false;
-    }
     if (SubscriberSaStateChange() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SubscriberSaStateChange failed!");
     }
