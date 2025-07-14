@@ -395,6 +395,28 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_005, Function | MediumTes
 }
 
 /**
+ * @tc.number   Telephony_CallRequestProcess_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_006, Function | MediumTest | Level1)
+{
+    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
+    DialParaInfo info;
+    info.dialType = DialType::DIAL_BLUETOOTH_TYPE;
+    info.number = 112;
+    EXPECT_GT(callRequestProcess->BluetoothDialProcess(info), TELEPHONY_SUCCESS);
+    sptr<CallBase> imsCall = nullptr;
+    imsCall = new IMSCall(info);
+    CallObjectManager::callObjectPtrList_.push_back(imsCall);
+    DialParaInfo info2;
+    info2.dialType = DialType::DIAL_BLUETOOTH_TYPE;
+    info2.number = 123;
+    EXPECT_GT(callRequestProcess->BluetoothDialProcess(info2), CALL_ERR_CALL_COUNTS_EXCEED_LIMIT);
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
  * @tc.number   Telephony_CallObjectManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test

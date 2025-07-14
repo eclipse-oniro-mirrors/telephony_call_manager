@@ -1054,7 +1054,9 @@ int32_t CallRequestProcess::EccDialPolicy()
 int32_t CallRequestProcess::BluetoothDialProcess(DialParaInfo &info)
 {
     TELEPHONY_LOGI("CallRequestProcess BluetoothDialProcess start");
-    if (CallObjectManager::HasCallExist()) {
+    bool isEcc = false;
+    DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(info.number, info.accountId, isEcc);
+    if (!isEcc && CallObjectManager::HasCallExist()) {
         TELEPHONY_LOGW("BluetoothCall Dial has Call Exist.");
         return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
     }
