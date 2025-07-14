@@ -1711,6 +1711,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_011, TestSize.Level0)
     numberMarkInfo.markType = MarkType::MARK_TYPE_CRANK;
     call->SetNumberMarkInfo(numberMarkInfo);
     callStatusManager->HandleDialWhenHolding(0, call);
+    call->SetCallType(CallType::TYPE_CS);
     callStatusManager->RefreshCallDisconnectReason(call,
         static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_CS_CALL_ANSWERED_ELSEWHER));
     callStatusManager->RefreshCallDisconnectReason(call,
