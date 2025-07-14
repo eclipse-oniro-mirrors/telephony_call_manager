@@ -23,7 +23,7 @@
 #include "i_call_status_callback.h"
 #include "if_system_ability_manager.h"
 #include "refbase.h"
-#include "rwlock.h"
+#include "ffrt.h"
 #include "singleton.h"
 #include "surface.h"
 #include "system_ability_status_change_stub.h"
@@ -606,7 +606,7 @@ private:
     sptr<CellularCallInterface> cellularCallInterfacePtr_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     bool connectState_;
-    Utils::RWLock rwClientLock_;
+    ffrt::shared_mutex ClientLock_;
 };
 } // namespace Telephony
 } // namespace OHOS

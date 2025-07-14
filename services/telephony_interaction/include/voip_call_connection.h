@@ -63,7 +63,6 @@ private:
     sptr<IVoipCallManagerService> voipCallManagerInterfacePtr_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     bool connectCallManagerState_ = false;
-    Utils::RWLock rwClientLock_;
     std::mutex mutex_;
 };
 } // namespace Telephony

@@ -137,7 +137,7 @@ void CallManagerProxy::UnInit()
  */
 int32_t CallManagerProxy::RegisterCallBack(std::unique_ptr<CallManagerCallback> callback)
 {
-    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock(ClientLock_);
     if (registerStatus_) {
         TELEPHONY_LOGE("you have already register callback yet!");
         return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
@@ -175,7 +175,7 @@ int32_t CallManagerProxy::RegisterCallBack(std::unique_ptr<CallManagerCallback> 
 
 int32_t CallManagerProxy::UnRegisterCallBack()
 {
-    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock(ClientLock_);
     if (!registerStatus_) {
         TELEPHONY_LOGE("you haven't register callback yet, please RegisterCallBack first!");
         return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
@@ -206,7 +206,7 @@ int32_t CallManagerProxy::UnRegisterCallBack()
 
 int32_t CallManagerProxy::ConnectService()
 {
-    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock(ClientLock_);
     if (callManagerServicePtr_ != nullptr) {
         return TELEPHONY_SUCCESS;
     }
@@ -246,7 +246,7 @@ int32_t CallManagerProxy::ConnectService()
 void CallManagerProxy::DisconnectService()
 {
     UnRegisterCallBack();
-    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock(ClientLock_);
     if (callManagerServicePtr_ != nullptr) {
         callManagerServicePtr_.clear();
         callManagerServicePtr_ = nullptr;
@@ -258,7 +258,7 @@ int32_t CallManagerProxy::ReConnectService()
     sptr<ICallManagerService> callManagerServicePtr = nullptr;
     bool registerStatus = false;
     {
-        Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+        std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
         callManagerServicePtr = callManagerServicePtr_;
         registerStatus = registerStatus_;
     }
@@ -278,7 +278,7 @@ int32_t CallManagerProxy::ReConnectService()
 
 int32_t CallManagerProxy::ReRegisterCallBack()
 {
-    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -302,7 +302,7 @@ int32_t CallManagerProxy::ReRegisterCallBack()
 
 int32_t CallManagerProxy::ObserverOnCallDetailsChange()
 {
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -317,7 +317,7 @@ int32_t CallManagerProxy::ObserverOnCallDetailsChange()
 
 int32_t CallManagerProxy::RegisterVoipCallManagerCallback()
 {
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -332,7 +332,7 @@ int32_t CallManagerProxy::RegisterVoipCallManagerCallback()
 
 int32_t CallManagerProxy::UnRegisterVoipCallManagerCallback()
 {
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -351,7 +351,7 @@ int32_t CallManagerProxy::DialCall(std::u16string number, AppExecFwk::PacMap &ex
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -370,7 +370,7 @@ int32_t CallManagerProxy::MakeCall(std::string number)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -389,7 +389,7 @@ int32_t CallManagerProxy::AnswerCall(int32_t callId, int32_t videoState)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -408,7 +408,7 @@ int32_t CallManagerProxy::RejectCall(int32_t callId, bool isSendSms, std::u16str
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -427,7 +427,7 @@ int32_t CallManagerProxy::HangUpCall(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -446,7 +446,7 @@ int32_t CallManagerProxy::GetCallState()
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -465,7 +465,7 @@ int32_t CallManagerProxy::HoldCall(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -484,7 +484,7 @@ int32_t CallManagerProxy::UnHoldCall(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -503,7 +503,7 @@ int32_t CallManagerProxy::SwitchCall(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -522,7 +522,7 @@ int32_t CallManagerProxy::CombineConference(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -541,7 +541,7 @@ int32_t CallManagerProxy::SeparateConference(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -560,7 +560,7 @@ int32_t CallManagerProxy::KickOutFromConference(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -579,7 +579,7 @@ int32_t CallManagerProxy::GetMainCallId(int32_t &callId, int32_t &mainCallId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -598,7 +598,7 @@ int32_t CallManagerProxy::GetSubCallIdList(int32_t callId, std::vector<std::u16s
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -617,7 +617,7 @@ int32_t CallManagerProxy::GetCallIdListForConference(int32_t callId, std::vector
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -636,7 +636,7 @@ int32_t CallManagerProxy::GetCallWaiting(int32_t slotId)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -655,7 +655,7 @@ int32_t CallManagerProxy::SetCallWaiting(int32_t slotId, bool activate)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -674,7 +674,7 @@ int32_t CallManagerProxy::GetCallRestriction(int32_t slotId, CallRestrictionType
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -693,7 +693,7 @@ int32_t CallManagerProxy::SetCallRestriction(int32_t slotId, CallRestrictionInfo
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -713,7 +713,7 @@ int32_t CallManagerProxy::SetCallRestrictionPassword(
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -732,7 +732,7 @@ int32_t CallManagerProxy::GetCallTransferInfo(int32_t slotId, CallTransferType t
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -751,7 +751,7 @@ int32_t CallManagerProxy::SetCallTransferInfo(int32_t slotId, CallTransferInfo &
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -770,7 +770,7 @@ int32_t CallManagerProxy::CanSetCallTransferTime(int32_t slotId, bool &result)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -784,7 +784,7 @@ int32_t CallManagerProxy::SetCallPreferenceMode(int32_t slotId, int32_t mode)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -803,7 +803,7 @@ int32_t CallManagerProxy::StartDtmf(int32_t callId, char str)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -822,7 +822,7 @@ int32_t CallManagerProxy::StopDtmf(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -841,7 +841,7 @@ int32_t CallManagerProxy::PostDialProceed(int32_t callId, bool proceed)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -860,7 +860,7 @@ int32_t CallManagerProxy::IsRinging(bool &enabled)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -874,7 +874,7 @@ bool CallManagerProxy::HasCall(const bool isInCludeVoipCall)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return false;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return false;
@@ -888,7 +888,7 @@ int32_t CallManagerProxy::IsNewCallAllowed(bool &enabled)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -902,7 +902,7 @@ int32_t CallManagerProxy::IsInEmergencyCall(bool &enabled)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -916,7 +916,7 @@ int32_t CallManagerProxy::IsEmergencyPhoneNumber(std::u16string &number, int32_t
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -931,7 +931,7 @@ int32_t CallManagerProxy::FormatPhoneNumber(
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -951,7 +951,7 @@ int32_t CallManagerProxy::FormatPhoneNumberToE164(
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -970,7 +970,7 @@ int32_t CallManagerProxy::SetMuted(bool isMute)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -989,7 +989,7 @@ int32_t CallManagerProxy::MuteRinger()
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1008,7 +1008,7 @@ int32_t CallManagerProxy::SetAudioDevice(const AudioDevice &audioDevice)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1027,7 +1027,7 @@ int32_t CallManagerProxy::ControlCamera(int32_t callId, std::u16string &cameraId
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1046,7 +1046,7 @@ int32_t CallManagerProxy::SetPreviewWindow(int32_t callId, std::string &surfaceI
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     TELEPHONY_LOGI("surfaceId is %{public}s", surfaceId.c_str());
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
@@ -1081,7 +1081,7 @@ int32_t CallManagerProxy::SetDisplayWindow(int32_t callId, std::string &surfaceI
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     TELEPHONY_LOGI("surfaceId is %{public}s", surfaceId.c_str());
     int32_t errCode = TELEPHONY_SUCCESS;
     if (callManagerServicePtr_ == nullptr) {
@@ -1116,7 +1116,7 @@ int32_t CallManagerProxy::SetCameraZoom(float zoomRatio)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1135,7 +1135,7 @@ int32_t CallManagerProxy::SetPausePicture(int32_t callId, std::u16string &path)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1154,7 +1154,7 @@ int32_t CallManagerProxy::SetDeviceDirection(int32_t callId, int32_t rotation)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1173,7 +1173,7 @@ int32_t CallManagerProxy::GetImsConfig(int32_t slotId, ImsConfigItem item)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1192,7 +1192,7 @@ int32_t CallManagerProxy::SetImsConfig(int32_t slotId, ImsConfigItem item, std::
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1211,7 +1211,7 @@ int32_t CallManagerProxy::GetImsFeatureValue(int32_t slotId, FeatureType type)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1230,7 +1230,7 @@ int32_t CallManagerProxy::SetImsFeatureValue(int32_t slotId, FeatureType type, i
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1249,7 +1249,7 @@ int32_t CallManagerProxy::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1268,7 +1268,7 @@ int32_t CallManagerProxy::EnableImsSwitch(int32_t slotId)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1287,7 +1287,7 @@ int32_t CallManagerProxy::DisableImsSwitch(int32_t slotId)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1306,7 +1306,7 @@ int32_t CallManagerProxy::IsImsSwitchEnabled(int32_t slotId, bool &enabled)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1325,7 +1325,7 @@ int32_t CallManagerProxy::SetVoNRState(int32_t slotId, int32_t state)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1344,7 +1344,7 @@ int32_t CallManagerProxy::GetVoNRState(int32_t slotId, int32_t &state)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1363,7 +1363,7 @@ int32_t CallManagerProxy::StartRtt(int32_t callId, std::u16string &msg)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1382,7 +1382,7 @@ int32_t CallManagerProxy::StopRtt(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1401,7 +1401,7 @@ int32_t CallManagerProxy::JoinConference(int32_t callId, std::vector<std::u16str
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1420,7 +1420,7 @@ int32_t CallManagerProxy::ReportOttCallDetailsInfo(std::vector<OttCallDetailsInf
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1439,7 +1439,7 @@ int32_t CallManagerProxy::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1458,7 +1458,7 @@ int32_t CallManagerProxy::CloseUnFinishedUssd(int32_t slotId)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1478,7 +1478,7 @@ int32_t CallManagerProxy::InputDialerSpecialCode(const std::string &specialCode)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
 
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1497,7 +1497,7 @@ int32_t CallManagerProxy::RemoveMissedIncomingCallNotification()
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1516,7 +1516,7 @@ int32_t CallManagerProxy::SetVoIPCallState(int32_t state)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1535,7 +1535,7 @@ int32_t CallManagerProxy::GetVoIPCallState(int32_t &state)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1554,7 +1554,7 @@ int32_t CallManagerProxy::SetVoIPCallInfo(int32_t callId, int32_t state, std::st
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1573,7 +1573,7 @@ int32_t CallManagerProxy::GetVoIPCallInfo(int32_t &callId, int32_t &state, std::
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1592,7 +1592,7 @@ sptr<IRemoteObject> CallManagerProxy::GetProxyObjectPtr(CallManagerProxyType pro
         TELEPHONY_LOGE("ipc reconnect failed!");
         return nullptr;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return nullptr;
@@ -1611,7 +1611,7 @@ void CallManagerProxy::OnRemoteDied(const wptr<IRemoteObject> &remote)
         TELEPHONY_LOGE("OnRemoteDied failed, remote is nullptr");
         return;
     }
-    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("OnRemoteDied failed, callManagerServicePtr_ is nullptr");
         return;
@@ -1631,7 +1631,7 @@ int32_t CallManagerProxy::ReportAudioDeviceInfo()
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1650,7 +1650,7 @@ int32_t CallManagerProxy::CancelCallUpgrade(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1669,7 +1669,7 @@ int32_t CallManagerProxy::RequestCameraCapabilities(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1688,7 +1688,7 @@ int32_t CallManagerProxy::SendCallUiEvent(int32_t callId, std::string &eventName
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1703,7 +1703,7 @@ int32_t CallManagerProxy::SendCallUiEvent(int32_t callId, std::string &eventName
 
 sptr<ICallStatusCallback> CallManagerProxy::RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress)
 {
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return nullptr;
@@ -1721,7 +1721,7 @@ int32_t CallManagerProxy::SendUssdResponse(int32_t slotId, std::string &content)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1741,7 +1741,7 @@ int32_t CallManagerProxy::SetCallPolicyInfo(bool isDialingTrustlist, const std::
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock_shared(ClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

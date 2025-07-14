@@ -33,7 +33,7 @@
 #include "iservice_registry.h"
 #include "pac_map.h"
 #include "refbase.h"
-#include "rwlock.h"
+#include "ffrt.h"
 #include "surface_utils.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
@@ -529,7 +529,7 @@ private:
     int32_t systemAbilityId_;
     sptr<ICallManagerService> callManagerServicePtr_;
     sptr<ICallAbilityCallback> callAbilityCallbackPtr_;
-    Utils::RWLock rwClientLock_;
+    ffrt::shared_mutex ClientLock_;
 };
 } // namespace Telephony
 } // namespace OHOS

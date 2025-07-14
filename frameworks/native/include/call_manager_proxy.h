@@ -23,7 +23,7 @@
 #include "refbase.h"
 #include "singleton.h"
 #include "surface_utils.h"
-#include "rwlock.h"
+#include "ffrt.h"
 #include "pac_map.h"
 
 #include "i_call_manager_service.h"
@@ -165,7 +165,7 @@ private:
 
 private:
     int32_t systemAbilityId_;
-    Utils::RWLock rwClientLock_;
+    ffrt::shared_mutex ClientLock_;
     bool registerStatus_;
     bool initStatus_;
     sptr<ICallManagerService> callManagerServicePtr_ = nullptr;
