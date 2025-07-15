@@ -707,7 +707,16 @@ void VoiceAssistantRingSubscriber::OnReceiveEvent(const EventFwk::CommonEventDat
         if (isplay == voicePtr->SWITCH_TURN_ON && isPlayRing) {
             TELEPHONY_LOGI("broadcast switch is open, start play system ring");
             DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
-            DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+            sptr<CallBase> incomingCall =
+                CallObjectManager::GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+                ContactInfo contactInfo = incomingCall->GetCallerInfo();
+            if (DelayedSingleton<AudioControlManager>::GetInstance()->DealVideoRingPath(contactInfo, incomingCall)) {
+                CallAttributeInfo info;
+                incomingCall->GetCallAttributeBaseInfo(info);
+                DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
+            } else {
+                DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+            }
         }
     });
 };

@@ -414,21 +414,22 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_010, Function | MediumTe
  */
 HWTEST_F(ZeroBranch9Test, Telephony_DealVideoRingPath_001, TestSize.Level0)
 {
-    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    callStatusManager->Init();
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     sptr<CallBase> callObjectPtr = nullptr;
     DialParaInfo dialParaInfo;
+    dialParaInfo.index = 0;
+    dialParaInfo.accountId = 0;
     dialParaInfo.callType = CallType::TYPE_CS;
     dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
     callObjectPtr = new IMSCall(dialParaInfo);
     ContactInfo contactInfo;
-    ASSERT_NO_THROW(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
+    ASSERT_FALSE(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
     AccessToken token;
-    ASSERT_NO_THROW(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
+    ASSERT_TRUE(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
     memcpy_s(contactInfo.ringtonePath, 3, "123", 3);
-    ASSERT_NO_THROW(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
+    ASSERT_FALSE(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
     memcpy_s(contactInfo.personalNotificationRingtone, strlen(STR_MP4) + 1, STR_MP4, strlen(STR_MP4));
-    ASSERT_NO_THROW(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
+    ASSERT_TRUE(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
     memcpy_s(contactInfo.ringtonePath, strlen(SYSTEM_VIDEO_RING) + 1, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING));
     memcpy_s(contactInfo.personalNotificationRingtone, strlen(STR_NOT_MP4) + 1, STR_NOT_MP4, strlen(STR_NOT_MP4));
     ASSERT_NO_THROW(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));

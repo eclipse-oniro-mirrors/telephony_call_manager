@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -224,7 +224,7 @@ bool AudioSceneProcessor::SwitchIncoming()
     } else {
         bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
         bool isNeedSilent = CallObjectManager::IsNeedSilentInDoNotDisturbMode();
-        bool isNotWearWatch = DelayedSingleton<CallControlManager>::GetInstance()->isNotWearOnWrist();
+        bool isNotWearWatch = DelayedSingleton<CallControlManager>::GetInstance()->IsNotWearOnWrist();
         if (!isStartBroadcast && !isNeedSilent && !isNotWearWatch) {
             TELEPHONY_LOGI("broadcast switch and doNotDisturbMode close, start play system ring");
             DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
