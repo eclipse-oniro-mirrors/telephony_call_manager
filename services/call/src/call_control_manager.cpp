@@ -2063,7 +2063,7 @@ void CallControlManager::HangUpFirstCallBySecondCallID(int32_t secondCallId, boo
         } else if (telCallState == TelCallState::CALL_STATUS_INCOMING ||
             telCallState == TelCallState::CALL_STATUS_WAITING) {
             TELEPHONY_LOGI("first call RejectCall callid=%{public}d", call->GetCallID());
-            if (answerCall->GetAccountNumber() == call->GetAccountNumber()) {
+            if (answerCall != nullptr && answerCall->GetAccountNumber() == call->GetAccountNumber()) {
                 break;
             }
             int32_t ret = RejectCall(call->GetCallID(), false, Str8ToStr16(""));
