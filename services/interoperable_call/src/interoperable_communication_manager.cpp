@@ -33,8 +33,7 @@ InteroperableCommunicationManager::~InteroperableCommunicationManager()
  
 void InteroperableCommunicationManager::OnDeviceOnline(const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
-    TELEPHONY_LOGI("Interoperable device online, networkId = %{public}s, devrole = %{public}d",
-        deviceInfo.networkId, deviceInfo.deviceTypeId);
+    TELEPHONY_LOGI("Interoperable device online, devrole = %{public}d", deviceInfo.deviceTypeId);
     std::string networkId = deviceInfo.networkId;
     std::string devName = deviceInfo.deviceName;
     uint16_t devType = deviceInfo.deviceTypeId;
@@ -67,8 +66,7 @@ void InteroperableCommunicationManager::OnDeviceOnline(const DistributedHardware
  
 void InteroperableCommunicationManager::OnDeviceOffline(const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
-    TELEPHONY_LOGI("Interoperable device offline, networkId = %{public}s, devrole = %{public}d",
-        deviceInfo.networkId, deviceInfo.deviceTypeId);
+    TELEPHONY_LOGI("Interoperable device offline, devrole = %{public}d", deviceInfo.deviceTypeId);
     if (devObserver_ == nullptr) {
         return;
     }
