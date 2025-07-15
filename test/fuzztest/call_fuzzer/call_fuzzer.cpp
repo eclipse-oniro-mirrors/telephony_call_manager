@@ -501,7 +501,7 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
     antiFraudService->CheckAntiFraudService(std::string(reinterpret_cast<const char *>(data), size), slotId, count);
     antiFraudService->StartAntiFraudService(std::string(reinterpret_cast<const char *>(data), size), slotId, count);
     char temp[size + 1];
-    for (size_t i = 0; i< size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         temp[i] = static_cast<char>(data[i]);
     }
     temp[size] = '\0';
