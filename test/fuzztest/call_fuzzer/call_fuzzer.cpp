@@ -500,7 +500,12 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
     int32_t count = GetInt<int32_t>(data, size, index++);
     antiFraudService->CheckAntiFraudService(std::string(reinterpret_cast<const char *>(data), size), slotId, count);
     antiFraudService->StartAntiFraudService(std::string(reinterpret_cast<const char *>(data), size), slotId, count);
-    antiFraudService->CreateDataShareHelper(slotId, reinterpret_cast<const char *>(data));
+    char temp[size + 1];
+    for (size_t i = 0; i < size; ++i) {
+        temp[i] = static_cast<char>(data[i]);
+    }
+    temp[size] = '\0';
+    antiFraudService->CreateDataShareHelper(slotId, temp);
     antiFraudService->IsSwitchOn(std::string(reinterpret_cast<const char *>(data), size));
     antiFraudService->IsAntiFraudSwitchOn();
     antiFraudService->IsUserImprovementPlanSwitchOn();
