@@ -26,6 +26,7 @@
 #include "telephony_log_wrapper.h"
 #include "voip_call.h"
 #include "fold_status_manager.h"
+#include "audio_control_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -547,6 +548,22 @@ bool CallObjectManager::HasIncomingCallCrsType()
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING &&
             (*it)->GetCrsType() == CRS_TYPE) {
             return true;
+        }
+    }
+    return false;
+}
+
+bool CallObjectManager::HasIncomingCallVideoRingType()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+            ContactInfo contactInfo = (*it)->GetCallerInfo();
+            if (DelayedSingleton<AudioControlManager>::GetInstance()->IsVideoRing(
+                contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+            return true;
+            }
         }
     }
     return false;

@@ -76,31 +76,11 @@ CallControlManager::~CallControlManager()
 bool CallControlManager::Init()
 {
     callStateListenerPtr_ = std::make_unique<CallStateListener>();
-    if (callStateListenerPtr_ == nullptr) {
-        TELEPHONY_LOGE("callStateListenerPtr_ is null");
-        return false;
-    }
     CallRequestHandlerPtr_ = std::make_unique<CallRequestHandler>();
-    if (CallRequestHandlerPtr_ == nullptr) {
-        TELEPHONY_LOGE("CallRequestHandlerPtr_ is null");
-        return false;
-    }
     CallRequestHandlerPtr_->Init();
     incomingCallWakeup_ = std::make_shared<IncomingCallWakeup>();
-    if (incomingCallWakeup_ == nullptr) {
-        TELEPHONY_LOGE("incomingCallWakeup_ is null");
-        return false;
-    }
     missedCallNotification_ = std::make_shared<MissedCallNotification>();
-    if (missedCallNotification_ == nullptr) {
-        TELEPHONY_LOGE("missedCallNotification_ is null");
-        return false;
-    }
     callSettingManagerPtr_ = std::make_unique<CallSettingManager>();
-    if (callSettingManagerPtr_ == nullptr) {
-        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
-        return false;
-    }
     if (SubscriberSaStateChange() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SubscriberSaStateChange failed!");
     }
@@ -2157,6 +2137,26 @@ bool CallControlManager::isNotWearOnWrist()
         return true;
     }
     return false;
+}
+
+void CallControlManager::HandleVideoRingPlayFail()
+{
+    sptr<CallBase> incomingCall =
+        CallObjectManager::GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (incomingCall == nullptr) {
+        TELEPHONY_LOGE("incomingCall is nullptr");
+        return;
+    }
+    ContactInfo contactInfo = incomingCall->GetCallerInfo();
+    if (memset_s(&contactInfo.ringtonePath, FILE_PATH_MAX_LEN, 0, FILE_PATH_MAX_LEN) != EOK) {
+        TELEPHONY_LOGE("memset_s fail.");
+    }
+    incomingCall->SetCallerInfo(contactInfo);
+    if (CallObjectManager::IsNeedSilentInDoNotDisturbMode()) {
+        TELEPHONY_LOGI("no need play system ring.");
+        return;
+    }
+    DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
 }
 } // namespace Telephony
 } // namespace OHOS

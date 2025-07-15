@@ -325,6 +325,89 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_008, Function | MediumTe
 }
 
 /**
+ * @tc.number Telephony_AudioControlManager_009
+ * @tc.name   test error branch
+ * @tc.desc   Function test
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_009, Function | MediumTest | Level3)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    sptr<OHOS::Telephony::CallBase> crsCallObjectPtr = nullptr;
+    DialParaInfo mDialParaInfo;
+    mDialParaInfo.accountId = 0;
+    mDialParaInfo.callId = 0;
+    mDialParaInfo.index = 0;
+    crsCallObjectPtr = new IMSCall(mDialParaInfo);
+    crsCallObjectPtr->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::AddOneCallObject(crsCallObjectPtr);
+    ASSERT_NO_THROW(audioControl->HandleNextState(crsCallObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED));
+    ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(crsCallObjectPtr));
+    audioControl->isCrsVibrating_ = true;
+    ASSERT_NO_THROW(audioControl->HandleNextState(crsCallObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED));
+    ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(crsCallObjectPtr));
+    audioControl->isVideoRingVibrating_ = true;
+    ASSERT_NO_THROW(audioControl->HandleNextState(crsCallObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED));
+    ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(crsCallObjectPtr));
+    crsCallObjectPtr->SetCrsType(2);
+    ASSERT_NO_THROW(audioControl->HandleNextState(crsCallObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED));
+    crsCallObjectPtr->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    ASSERT_NO_THROW(audioControl->HandleNextState(crsCallObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED));
+    sptr<OHOS::Telephony::CallBase> videoRingCallObjectPtr = nullptr;
+    mDialParaInfo.callId = 1;
+    mDialParaInfo.index = 1;
+    videoRingCallObjectPtr = new IMSCall(mDialParaInfo);
+    CallObjectManager::AddOneCallObject(videoRingCallObjectPtr);
+    ASSERT_NO_THROW(audioControl->HandleNextState(crsCallObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED));
+    crsCallObjectPtr->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    ASSERT_NO_THROW(audioControl->HandleNextState(crsCallObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED));
+    ContactInfo contactInfo = videoRingCallObjectPtr->GetCallerInfo();
+    memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING));
+    videoRingCallObjectPtr->SetCallerInfo(contactInfo);
+    ASSERT_NO_THROW(audioControl->HandleNextState(crsCallObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED));
+    ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(crsCallObjectPtr->GetCallID()));
+    ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(videoRingCallObjectPtr->GetCallID()));
+}
+
+/**
+ * @tc.number Telephony_AudioControlManager_010
+ * @tc.name   test error branch
+ * @tc.desc   Function test
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_010, Function | MediumTest | Level3)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    DialParaInfo mDialParaInfo;
+    mDialParaInfo.accountId = 0;
+    mDialParaInfo.callId = 0;
+    mDialParaInfo.index = 0;
+    sptr<OHOS::Telephony::CallBase> videoRingCallObjectPtr = nullptr;
+    videoRingCallObjectPtr = new IMSCall(mDialParaInfo);
+    videoRingCallObjectPtr->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    CallObjectManager::AddOneCallObject(videoRingCallObjectPtr);
+    ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(videoRingCallObjectPtr));
+    audioControl->isCrsVibrating_ = true;
+    ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(videoRingCallObjectPtr));
+    audioControl->isVideoRingVibrating_ = true;
+    ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(videoRingCallObjectPtr));
+    sptr<OHOS::Telephony::CallBase> videoRingCallObjectPtr1 = nullptr;
+    mDialParaInfo.callId = 1;
+    mDialParaInfo.index = 1;
+    videoRingCallObjectPtr1 = new IMSCall(mDialParaInfo);
+    videoRingCallObjectPtr1->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    CallObjectManager::AddOneCallObject(videoRingCallObjectPtr1);
+    ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(videoRingCallObjectPtr));
+    ContactInfo contactInfo = videoRingCallObjectPtr1->GetCallerInfo();
+    memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING));
+    videoRingCallObjectPtr1->SetCallerInfo(contactInfo);
+    ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(videoRingCallObjectPtr));
+    memcpy_s(contactInfo.personalNotificationRingtone, FILE_PATH_MAX_LEN, "abc.mp4", strlen("abc.mp4"));
+    videoRingCallObjectPtr1->SetCallerInfo(contactInfo);
+    ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(videoRingCallObjectPtr));
+    ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(videoRingCallObjectPtr->GetCallID()));
+    ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(videoRingCallObjectPtr1->GetCallID()));
+}
+
+/**
  * @tc.number   Telephony_DealVideoRingPath_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -376,6 +459,41 @@ HWTEST_F(ZeroBranch9Test, Telephony_PlayRingtone_001, Function | MediumTest | Le
     ASSERT_TRUE(audioControl->PlayRingtone());
     ringingCall->SetCrsType(CRS_TYPE);
     ASSERT_FALSE(audioControl->PlayRingtone());
+    ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(ringingCall->GetCallID()));
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
+}
+
+/**
+ * @tc.number Telephony_SwitchIncoming_001
+ * @tc.name   test error branch
+ * @tc.desc   Function test
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_SwitchIncoming_001, Function | MediumTest | Level3)
+{
+    auto audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    DialParaInfo mDialParaInfo;
+    mDialParaInfo.callType = CallType::TYPE_IMS;
+    mDialParaInfo.accountId = 0;
+    mDialParaInfo.callId = 0;
+    mDialParaInfo.index = 0;
+    sptr<OHOS::Telephony::CallBase> crsCallObjectPtr = nullptr;
+    crsCallObjectPtr = new IMSCall(mDialParaInfo);
+    crsCallObjectPtr->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    CallObjectManager::AddOneCallObject(crsCallObjectPtr);
+    ASSERT_TRUE(audioSceneProcessor->SwitchIncoming());
+    crsCallObjectPtr->SetCrsType(CRS_TYPE);
+    ASSERT_TRUE(audioSceneProcessor->SwitchIncoming());
+    mDialParaInfo.callId = 1;
+    mDialParaInfo.index = 1;
+    sptr<OHOS::Telephony::CallBase> vidioRingCallObjectPtr = nullptr;
+    vidioRingCallObjectPtr = new IMSCall(mDialParaInfo);
+    vidioRingCallObjectPtr->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    CallObjectManager::AddOneCallObject(vidioRingCallObjectPtr);
+    ASSERT_TRUE(audioSceneProcessor->SwitchIncoming());
+    audioControl->SetSoundState(SoundState::SOUNDING);
+    ASSERT_TRUE(audioSceneProcessor->SwitchIncoming());
+    ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(crsCallObjectPtr->GetCallID()));
+    ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(vidioRingCallObjectPtr->GetCallID()));
 }
 }

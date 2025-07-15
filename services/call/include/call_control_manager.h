@@ -162,6 +162,7 @@ public:
     void setWearState(int32_t state);
     void RegisterObserver();
     void UnRegisterObserver();
+    void HandleVideoRingPlayFail();
 private:
     void CallStateObserve();
     int32_t NumberLegalityCheck(std::string &number);
