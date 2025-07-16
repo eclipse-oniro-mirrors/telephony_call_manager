@@ -169,6 +169,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantConnectCallback_
  */
 HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantRingSubscriber_001, TestSize.Level0)
 {
+    std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     std::string event = "test.test.test.test";
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(event);

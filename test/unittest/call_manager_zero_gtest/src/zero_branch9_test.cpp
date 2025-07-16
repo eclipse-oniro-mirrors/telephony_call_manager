@@ -115,6 +115,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_001, TestSize.Level0)
     audioControl->HandleNewActiveCall(call);
     audioControl->GetCallList().empty();
     ASSERT_TRUE(audioControl->GetCurrentActiveCall() == nullptr);
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
 /**
@@ -152,6 +153,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_002, TestSize.Level1)
     audioControl->IsNumberAllowed(NUMBER);
     audioControl->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
     ASSERT_TRUE(audioControl->IsAudioActivated());
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
 /**
@@ -171,6 +173,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_003, TestSize.Level0)
     audioControl->OnPostDialNextChar('a');
     audioControl->IsSoundPlaying();
     ASSERT_TRUE(audioControl->IsVideoCall(VideoStateType::TYPE_VIDEO));
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
 /**
@@ -194,6 +197,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_004, TestSize.Level0)
     audioControl->ringState_ = RingState::RINGING;
     audioControl->MuteRinger();
     ASSERT_TRUE(audioControl->GetCurrentActiveCall() == nullptr);
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
 /**
@@ -239,6 +243,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_005, TestSize.Level0)
     audioControl->StopRingtone();
     audioControl->PlayCallTone(ToneDescriptor::TONE_ENGAGED);
     EXPECT_EQ(audioControl->StopRingback(), 0);
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
 /**
@@ -274,6 +279,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_006, TestSize.Level0)
     ASSERT_FALSE(audioControl->StopForNoRing());
     ASSERT_TRUE(audioControl->PlayForNoRing());
     ASSERT_TRUE(audioControl->StopForNoRing());
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
 /**
@@ -293,6 +299,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_007, Function | MediumTe
     ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
     CallObjectManager::AddOneCallObject(ringingCall);
     ASSERT_NO_THROW(audioControl->PostProcessRingtone());
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
 /**
@@ -322,6 +329,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_008, Function | MediumTe
         TelCallState::CALL_STATUS_DISCONNECTING);
     ASSERT_NO_THROW(DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(call->GetCallID(),
         TelCallState::CALL_STATUS_ACTIVE));
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
 /**
@@ -366,6 +374,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_009, Function | MediumTe
     ASSERT_NO_THROW(audioControl->HandleNextState(crsCallObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED));
     ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(crsCallObjectPtr->GetCallID()));
     ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(videoRingCallObjectPtr->GetCallID()));
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
 /**
@@ -405,6 +414,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_010, Function | MediumTe
     ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(videoRingCallObjectPtr));
     ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(videoRingCallObjectPtr->GetCallID()));
     ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(videoRingCallObjectPtr1->GetCallID()));
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
 /**
@@ -501,6 +511,6 @@ HWTEST_F(ZeroBranch9Test, Telephony_SwitchIncoming_001, Function | MediumTest | 
     audioControl->SetSoundState(SoundState::SOUNDING);
     ASSERT_TRUE(audioSceneProcessor->SwitchIncoming());
     ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(crsCallObjectPtr->GetCallID()));
-    ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(vidioRingCallObjectPtr->GetCallID()));
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 }

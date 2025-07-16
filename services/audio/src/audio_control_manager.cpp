@@ -677,7 +677,7 @@ bool AudioControlManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallB
         TELEPHONY_LOGI("crs type call.");
         return false;
     }
-    bool isNotWearWatch = DelayedSingletone<CallControlManager>::GetInstance()->IsNotWearOnWrist();
+    bool isNotWearWatch = DelayedSingleton<CallControlManager>::GetInstance()->IsNotWearOnWrist();
     if (isNotWearWatch) {
         TELEPHONY_LOGI("isNotWearWatch: %{public}d", isNotWearWatch);
         return false;
@@ -813,17 +813,6 @@ bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &rin
         return false;
     }
     TELEPHONY_LOGI("type_crs but not play ringtone");
-    return false;
-}
-
-bool AudioControlManager::IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath)
-{
-    if ((personalNotificationRingtone.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
-        personalNotificationRingtone.substr(personalNotificationRingtone.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
-        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) || ringtonePath == SYSTEM_VIDEO_RING) {
-        TELEPHONY_LOGI("Is video ring.");
-        return true;
-    }
     return false;
 }
 

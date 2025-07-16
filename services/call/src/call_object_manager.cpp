@@ -26,7 +26,6 @@
 #include "telephony_log_wrapper.h"
 #include "voip_call.h"
 #include "fold_status_manager.h"
-#include "audio_control_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -40,6 +39,9 @@ bool CallObjectManager::needWaitHold_ = false;
 CellularCallInfo CallObjectManager::dialCallInfo_;
 constexpr int32_t CRS_TYPE = 2;
 constexpr uint64_t DISCONNECT_DELAY_TIME = 2000000;
+static constexpr const char *VIDEO_RING_PATH_FIX_TAIL = ".mp4";
+constexpr int32_t VIDEO_RING_PATH_FIX_TAIL_LENGTH = 4;
+static constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
 #ifdef NOT_SUPPORT_MULTICALL
 constexpr int32_t CALL_MAX_COUNT = 2;
 #endif
@@ -558,13 +560,24 @@ bool CallObjectManager::HasIncomingCallVideoRingType()
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
-        if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+        if ((*it)->GetCallType() != CallType::TYPE_VOIP &&
+            (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
             ContactInfo contactInfo = (*it)->GetCallerInfo();
-            if (DelayedSingleton<AudioControlManager>::GetInstance()->IsVideoRing(
-                contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+            if (IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
             return true;
             }
         }
+    }
+    return false;
+}
+
+bool CallObjectManager::IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath)
+{
+    if ((personalNotificationRingtone.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
+        personalNotificationRingtone.substr(personalNotificationRingtone.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
+        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) || ringtonePath == SYSTEM_VIDEO_RING) {
+        TELEPHONY_LOGI("Is video ring.");
+        return true;
     }
     return false;
 }

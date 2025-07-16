@@ -95,7 +95,6 @@ public:
     bool IsScoTemporarilyDisabled();
     void ExcludeBluetoothSco();
     void UnexcludeBluetoothSco();
-    bool IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath);
     bool PlayForNoRing();
     bool StopForNoRing();
     bool DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr);
