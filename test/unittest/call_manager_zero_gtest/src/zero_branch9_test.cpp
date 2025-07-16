@@ -369,9 +369,9 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_009, Function | MediumTe
 }
 
 /**
- * @tc.number Telephony_AudioControlManager_010
- * @tc.name   test error branch
- * @tc.desc   Function test
+ * @tc.number   Telephony_AudioControlManager_010
+ * @tc.name     test error branch
+ * @tc.desc     Function test
  */
 HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_010, Function | MediumTest | Level3)
 {
@@ -423,16 +423,22 @@ HWTEST_F(ZeroBranch9Test, Telephony_DealVideoRingPath_001, TestSize.Level0)
     dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
     callObjectPtr = new IMSCall(dialParaInfo);
     ContactInfo contactInfo;
-    ASSERT_FALSE(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
+    ASSERT_FALSE(audioControl->DealVideoRingPath(contactInfo, callObjectPtr));
     AccessToken token;
-    ASSERT_TRUE(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
+    ASSERT_TRUE(audioControl->DealVideoRingPath(contactInfo, callObjectPtr));
     memcpy_s(contactInfo.ringtonePath, 3, "123", 3);
-    ASSERT_FALSE(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
+    ASSERT_FALSE(audioControl->DealVideoRingPath(contactInfo, callObjectPtr));
     memcpy_s(contactInfo.personalNotificationRingtone, strlen(STR_MP4) + 1, STR_MP4, strlen(STR_MP4));
-    ASSERT_TRUE(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
+    ASSERT_TRUE(audioControl->DealVideoRingPath(contactInfo, callObjectPtr));
     memcpy_s(contactInfo.ringtonePath, strlen(SYSTEM_VIDEO_RING) + 1, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING));
     memcpy_s(contactInfo.personalNotificationRingtone, strlen(STR_NOT_MP4) + 1, STR_NOT_MP4, strlen(STR_NOT_MP4));
-    ASSERT_NO_THROW(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
+    ASSERT_TRUE(audioControl->DealVideoRingPath(contactInfo, callObjectPtr));
+    auto callControl = DelayedSingleton<CallControlManager>::GetInstance();
+    callControl->SetWearState(WEAR_STATUS_OFF);
+    ASSERT_FALSE(audioControl->DealVideoRingPath(contactInfo, callObjectPtr));
+    callObjectPtr->SetCrsType(CRS_TYPE);
+    ASSERT_FALSE(audioControl->DealVideoRingPath(contactInfo, callObjectPtr));
+    ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(callObjectPtr->GetCallID()));
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
@@ -465,9 +471,9 @@ HWTEST_F(ZeroBranch9Test, Telephony_PlayRingtone_001, Function | MediumTest | Le
 }
 
 /**
- * @tc.number Telephony_SwitchIncoming_001
- * @tc.name   test error branch
- * @tc.desc   Function test
+ * @tc.number   Telephony_SwitchIncoming_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
  */
 HWTEST_F(ZeroBranch9Test, Telephony_SwitchIncoming_001, Function | MediumTest | Level3)
 {

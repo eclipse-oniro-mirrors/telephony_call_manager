@@ -98,7 +98,7 @@ public:
     bool IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath);
     bool PlayForNoRing();
     bool StopForNoRing();
-    void DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr);
+    bool DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr);
 private:
     RingState ringState_ = RingState::STOPPED;
     void HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState);

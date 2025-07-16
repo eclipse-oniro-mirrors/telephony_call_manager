@@ -660,7 +660,7 @@ int32_t AudioControlManager::HandleWirelessAudioDevice(const AudioDevice &device
     return TELEPHONY_SUCCESS;
 }
 
-void AudioControlManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr)
+bool AudioControlManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr)
 {
     int32_t userId = 0;
     bool isUserUnlocked = false;
@@ -668,7 +668,7 @@ void AudioControlManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallB
     AccountSA::OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
     TELEPHONY_LOGI("isUserUnlocked: %{public}d", isUserUnlocked);
     if (!isUserUnlocked) {
-        return;
+        return false;
     }
     CallAttributeInfo info;
     callObjectPtr->GetCallAttributeBaseInfo(info);
@@ -677,18 +677,18 @@ void AudioControlManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallB
         TELEPHONY_LOGI("crs type call.");
         return false;
     }
-    bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
-    if (isStartBroadcast) {
-        TELEPHONY_LOGI("Incoming call broadcast is on.");
-        return;
+    bool isNotWearWatch = DelayedSingletone<CallControlManager>::GetInstance()->IsNotWearOnWrist();
+    if (isNotWearWatch) {
+        TELEPHONY_LOGI("isNotWearWatch: %{public}d", isNotWearWatch);
+        return false;
     }
 
     if (!strlen(contactInfo.ringtonePath)) {
         if (IsSetSystemVideoRing(callObjectPtr)) {
-            if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING))
-                != EOK) {
+            if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING)) !=
+                EOK) {
                 TELEPHONY_LOGE("memcpy_s ringtonePath fail");
-                return;
+                return false;
             };
         }
     }
@@ -698,7 +698,9 @@ void AudioControlManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallB
         AAFwk::WantParams params = callObjectPtr->GetExtraParams();
         params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfo.ringtonePath)));
         callObjectPtr->SetExtraParams(params);
+        return true;
     }
+    return false;
 }
 
 bool AudioControlManager::IsSetSystemVideoRing(sptr<CallBase> &callObjectPtr)

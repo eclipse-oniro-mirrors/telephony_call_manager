@@ -709,7 +709,7 @@ void VoiceAssistantRingSubscriber::OnReceiveEvent(const EventFwk::CommonEventDat
             DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
             sptr<CallBase> incomingCall =
                 CallObjectManager::GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-                ContactInfo contactInfo = incomingCall->GetCallerInfo();
+            ContactInfo contactInfo = incomingCall->GetCallerInfo();
             if (DelayedSingleton<AudioControlManager>::GetInstance()->DealVideoRingPath(contactInfo, incomingCall)) {
                 CallAttributeInfo info;
                 incomingCall->GetCallAttributeBaseInfo(info);
