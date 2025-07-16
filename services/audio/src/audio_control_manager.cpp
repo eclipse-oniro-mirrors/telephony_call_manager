@@ -46,6 +46,7 @@ static constexpr const char *VIDEO_RING_PATH_FIX_TAIL = ".mp4";
 constexpr int32_t VIDEO_RING_PATH_FIX_TAIL_LENGTH = 4;
 static constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
 const int16_t MIN_MULITY_ACTIVE_CALL_COUNT = 1;
+const int16_t MIN_DC_MULITY_ACTIVE_CALL_COUNT = 2;
 
 AudioControlManager::AudioControlManager()
     : isLocalRingbackNeeded_(false), ring_(nullptr), tone_(nullptr), sound_(nullptr)
@@ -332,11 +333,14 @@ void AudioControlManager::HandleCallStateUpdated(
         TELEPHONY_LOGI("user answered, mute ringer instead of release renderer");
         if (priorState == TelCallState::CALL_STATUS_INCOMING) {
             callStateProcessor->DeleteCall(callObjectPtr->GetCallID(), priorState);
+            callObjectPtr->SetIsAnsweredByPhone(true);
         }
         MuteRinger();
     }
-    if (nextState == TelCallState::CALL_STATUS_ACTIVE && priorState == TelCallState::CALL_STATUS_INCOMING) {
-        return UnmuteSoundTone();
+    if (nextState == TelCallState::CALL_STATUS_ACTIVE && priorState == TelCallState::CALL_STATUS_INCOMING &&
+        callObjectPtr->GetAnsweredByPhone()) {
+        UnmuteSoundTone();
+        return;
     }
     HandleNextState(callObjectPtr, nextState);
     if (priorState == nextState) {
@@ -472,9 +476,15 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
 void AudioControlManager::ProcessSoundtone(sptr<CallBase> &callObjectPtr)
 {
     int ringCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
-    if ((CallObjectManager::GetCurrentCallNum() - ringCallCount) < MIN_MULITY_ACTIVE_CALL_COUNT) {
+    int minMulityCall = MIN_MULITY_ACTIVE_CALL_COUNT;
+    if (!callObjectPtr->GetAnsweredByPhone()) {
+        minMulityCall = MIN_DC_MULITY_ACTIVE_CALL_COUNT;
+    }
+    if (((CallObjectManager::GetCurrentCallNum() - ringCallCount) < minMulityCall)) {
         if (isCrsStartSoundTone_ == true) {
-            ResumeCrsSoundTone();
+            if (callObjectPtr->GetAnsweredByPhone()) {
+                ResumeCrsSoundTone();
+            }
         } else {
             TELEPHONY_LOGI("local ring  MT call is answer, now playsoundtone");
             StopSoundtone();
@@ -497,8 +507,10 @@ void AudioControlManager::ResumeCrsSoundTone()
     };
     DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device);
     TELEPHONY_LOGI("crs soundtone preferred deivce = %{public}d", device.deviceType);
-    device.deviceType = initCrsDeviceType_;
-    SetAudioDevice(device);
+    if (device.deviceType == AudioDeviceType::DEVICE_SPEAKER) {
+        device.deviceType = initCrsDeviceType_;
+        SetAudioDevice(device);
+    }
 }
 
 void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)

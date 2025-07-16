@@ -149,6 +149,8 @@ public:
     bool IsForcedReportVoiceCall();
     void SetForcedReportVoiceCall(bool isForcedReportVoiceCall);
     int32_t GetPhoneOrWatchDial();
+    bool GetAnsweredByPhone();
+    void SetIsAnsweredByPhone(bool isAnsweredByPhone);
 
 protected:
     int32_t callId_;
@@ -203,6 +205,7 @@ private:
     int32_t phoneOrWatch_ = 0;
     bool isAiAutoAnswer_;
     bool isForcedReportVoiceCall_{false};
+    bool isAnsweredByPhone_{false};
 };
 } // namespace Telephony
 } // namespace OHOS

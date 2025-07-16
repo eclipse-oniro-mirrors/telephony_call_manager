@@ -738,5 +738,15 @@ void CallBase::SetForcedReportVoiceCall(bool isForcedReportVoiceCall)
 {
     isForcedReportVoiceCall_ = isForcedReportVoiceCall;
 }
+
+bool CallBase::GetAnsweredByPhone()
+{
+    return isAnsweredByPhone_;
+}
+
+void CallBase::SetIsAnsweredByPhone(bool isAnsweredByPhone)
+{
+    isAnsweredByPhone_ = isAnsweredByPhone;
+}
 } // namespace Telephony
 } // namespace OHOS
