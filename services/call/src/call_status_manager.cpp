@@ -558,7 +558,12 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         ContactInfo contactInfoTemp = contactInfo;
         QueryCallerInfo(contactInfoTemp, phoneNum);
         if (!CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast()) {
-            DelayedSingleton<AudioControlManager>::GetInstance()->DealVideoRingPath(contactInfoTemp, callObjectPtr);
+            if (DelayedSingleton<AudioControlManager>::GetInstance()->NeedPlayVideoRing(
+                contactInfoTemp, callObjectPtr)) {
+                AAFwk::WantParams params = callObjectPtr->GetExtraParams();
+                params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfo.ringtonePath)));
+                callObjectPtr->SetExtraParams(params);
+            }
         }
         callObjectPtr->SetCallerInfo(contactInfoTemp);
         CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfoTemp, callObjectPtr->GetCallID());
