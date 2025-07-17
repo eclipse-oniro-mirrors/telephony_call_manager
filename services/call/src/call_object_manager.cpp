@@ -564,7 +564,7 @@ bool CallObjectManager::HasIncomingCallVideoRingType()
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
             ContactInfo contactInfo = (*it)->GetCallerInfo();
             if (IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
-            return true;
+                return true;
             }
         }
     }
