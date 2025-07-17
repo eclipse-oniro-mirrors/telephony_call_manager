@@ -561,7 +561,7 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
     });
 }
 
-bool CallStatusManager::HandleBluetoothCall(sptr &call, ContactInfo &contactInfo, std::string phoneNum)
+bool CallStatusManager::HandleBluetoothCall(sptr<CallBase> &call, ContactInfo &contactInfo, std::string phoneNum)
 {
     if (call->GetCallType() == CallType::TYPE_BLUETOOTH) {
         std::string contactName = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetHfpContactName(
