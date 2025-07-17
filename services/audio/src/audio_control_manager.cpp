@@ -672,8 +672,7 @@ bool AudioControlManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallB
     }
     CallAttributeInfo info;
     callObjectPtr->GetCallAttributeBaseInfo(info);
-    if (info.crsType == CRS_TYPE || (DelayedSingleton<AudioControlManager>::GetInstance()->IsSoundPlaying() &&
-        CallObjectManager::HasIncomingCallCrsType())) {
+    if (info.crsType == CRS_TYPE) {
         TELEPHONY_LOGI("crs type call.");
         return false;
     }
@@ -693,7 +692,7 @@ bool AudioControlManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallB
         }
     }
 
-    if (IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+    if (CallObjectManager::IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
         TELEPHONY_LOGI("notify callui to play video ring.");
         AAFwk::WantParams params = callObjectPtr->GetExtraParams();
         params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfo.ringtonePath)));
@@ -749,7 +748,7 @@ bool AudioControlManager::PlayRingtone()
     if (incomingCall->GetCrsType() == CRS_TYPE) {
         return dealCrsScene(ringMode);
     }
-    if (IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+    if (CallObjectManager::IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
             ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE) {
             TELEPHONY_LOGI("need start vibrator.");
