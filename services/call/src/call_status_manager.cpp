@@ -533,19 +533,8 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         .isVoiceMail = false,
         .isQueryComplete = true,
     };
-    if (call->GetCallType() == CallType::TYPE_BLUETOOTH) {
-        std::string contactName = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetHfpContactName(
-            phoneNum);
-        if (!contactName.empty()) {
-            contactInfo.name = contactName;
-            contactInfo.isContacterExists = true;
-            call->SetCallerInfo(contactInfo);
-            AAFwk::WantParams params = call->GetExtraParams();
-            params.SetParam("BtCallContactName", AAFwk::String::Box(contactName));
-            call->SetExtraParams(params);
-            TELEPHONY_LOGI("SetCallerInfo end for type bluetooth.");
-            return;
-        }
+    if (HandleBluetoothCall(call, contactInfo, phoneNum)) {
+        return;
     }
     ffrt::submit([=, &call]() {
         if (call == nullptr) {
@@ -570,6 +559,25 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
             DistributedDataType::NAME);
     });
+}
+
+bool CallStatusManager::HandleBluetoothCall(sptr &call, ContactInfo &contactInfo, std::string phoneNum)
+{
+    if (call->GetCallType() == CallType::TYPE_BLUETOOTH) {
+        std::string contactName = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetHfpContactName(
+            phoneNum);
+        if (!contactName.empty()) {
+            contactInfo.name = contactName;
+            contactInfo.isContacterExists = true;
+            call->SetCallerInfo(contactInfo);
+            AAFwk::WantParams params = call->GetExtraParams();
+            params.SetParam("BtCallContactName", AAFwk::String::Box(contactName));
+            call->SetExtraParams(params);
+            TELEPHONY_LOGI("SetCallerInfo end for type bluetooth.");
+            return true;
+        }
+    }
+    return false;
 }
 
 int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call, bool isBlock)

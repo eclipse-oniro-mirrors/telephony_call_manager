@@ -711,9 +711,9 @@ void VoiceAssistantRingSubscriber::OnReceiveEvent(const EventFwk::CommonEventDat
                 CallObjectManager::GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
             ContactInfo contactInfo = incomingCall->GetCallerInfo();
             if (DelayedSingleton<AudioControlManager>::GetInstance()->NeedPlayVideoRing(contactInfo, incomingCall)) {
-                AAFwk::WantParams params = callObjectPtr->GetExtraParams();
+                AAFwk::WantParams params = incomingCall->GetExtraParams();
                 params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfo.ringtonePath)));
-                callObjectPtr->SetExtraParams(params);
+                incomingCall->SetExtraParams(params);
                 CallAttributeInfo info;
                 incomingCall->GetCallAttributeBaseInfo(info);
                 DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
