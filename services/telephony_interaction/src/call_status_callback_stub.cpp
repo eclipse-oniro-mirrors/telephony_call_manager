@@ -224,6 +224,7 @@ void CallStatusCallbackStub::BuildCallReportInfo(MessageParcel &data, CallReport
     if (data.ReadInt32(reason)) {
         parcelPtr.reason = static_cast<DisconnectedReason>(reason);
     }
+    parcelPtr.message = data.ReadString();
 }
 
 int32_t CallStatusCallbackStub::OnUpdateDisconnectedCause(MessageParcel &data, MessageParcel &reply)

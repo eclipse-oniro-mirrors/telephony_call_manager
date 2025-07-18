@@ -145,6 +145,7 @@ int32_t UpdateCallsReportInfo(const uint8_t *data, size_t size)
     messageParcel.WriteString(info.name);
     messageParcel.WriteInt32(info.namePresentation);
     messageParcel.WriteInt32(static_cast<int32_t>(info.reason));
+    messageParcel.WriteString(info.message);
     messageParcel.WriteInt32(slotId);
     messageParcel.RewindRead(0);
     MessageParcel reply;

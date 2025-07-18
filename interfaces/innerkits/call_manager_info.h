@@ -212,6 +212,10 @@ struct CallReportInfo {
      * Indicates the call disconnect information
     */
     DisconnectedReason reason = DisconnectedReason::FAILED_UNKNOWN;
+    /**
+     * Indicates the detail message for the ending call reason.
+     */
+    std::string message = "";
 };
 
 /**
@@ -594,6 +598,10 @@ struct CallDetailInfo {
      * - 3: AntiFraud is finished.
      */
     int32_t antiFraudState = 0;
+    /**
+     * Indicates the detail message for the ending call reason.
+     */
+    std::string message = "";
 
     CallDetailInfo() {}
 
@@ -633,6 +641,7 @@ struct CallDetailInfo {
         phoneOrWatch = temp.phoneOrWatch;
         reason = temp.reason;
         antiFraudState = temp.antiFraudState;
+        message = temp.message;
         return *this;
     }
 };
