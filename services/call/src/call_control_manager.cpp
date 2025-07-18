@@ -1883,7 +1883,6 @@ int32_t CallControlManager::SystemAbilityListener::HfpBroadcastSubscriber()
     subscriberInfos.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     subscriberInfos.SetPermission("ohos.permission.MANAGR_SETTINGS");
     std::shared_ptr<CallBroadcastSubscriber> subscriber = std::make_shared<CallBroadcastSubscriber>(subscriberInfos);
-    if (subscriber == nullptr) {
     subscriberPtrList_.emplace_back(subscriber);
     bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
     TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
@@ -2136,7 +2135,6 @@ void CallControlManager::StartFlashRemind()
     }
     incomingFlashReminder_->StartFlashRemind();
 }
-
 
 void CallControlManager::StopFlashRemind()
 {
