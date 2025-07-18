@@ -1213,7 +1213,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     bool IsTwoCallESIMCall = CallObjectManager::IsTwoCallESIMCall();
 #endif
     call = RefreshCallIfNecessary(call, info);
-    RefreshCallDisconnectReason(call, static_cast<int32_t>(info.reason));
+    RefreshCallDisconnectReason(call, static_cast<int32_t>(info.reason), info.message);
     ClearPendingState(call);
     SetOriginalCallTypeForDisconnectState(call);
     std::vector<std::u16string> callIdList;
@@ -2227,7 +2227,8 @@ void CallStatusManager::ClearPendingState(sptr<CallBase> &call)
     }
 }
 
-void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason)
+void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason,
+    const std::string &message)
 {
     switch (reason) {
         case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_CS_CALL_ANSWERED_ELSEWHER):
@@ -2237,10 +2238,15 @@ void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, 
             }
             break;
         case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_ANSWERED_ELSEWHER):
-            if ((DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole()) ||
-                (system::GetParameter("const.product.devicetype", "") == "wearable")) {
-                call->SetAnswerType(CallAnswerType::CALL_ANSWERED_ELSEWHER);
-                TELEPHONY_LOGI("call answered elsewhere");
+            {
+                TELEPHONY_LOGI("RefreshCallDisconnectReason message[%{public}s]", message.c_str());
+                std::string lowerStr = message;
+                std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
+                if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole() ||
+                    lowerStr.find("elsewhere") != std::string::npos) {
+                    call->SetAnswerType(CallAnswerType::CALL_ANSWERED_ELSEWHER);
+                    TELEPHONY_LOGI("call answered elsewhere");
+                }
             }
             break;
         case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_NORMAL):

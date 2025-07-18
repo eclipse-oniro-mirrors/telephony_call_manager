@@ -134,7 +134,7 @@ private:
     void BtCallDialingHandleFirst(sptr<CallBase> call, const CallDetailInfo &infol);
     int32_t HandleCallReportInfoEx(const CallDetailInfo &info);
     void ClearPendingState(sptr<CallBase> &call);
-    void RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason);
+    void RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason, const std::string &message);
 #ifdef NOT_SUPPORT_MULTICALL
     void AutoAnswerSecondCall();
 #endif

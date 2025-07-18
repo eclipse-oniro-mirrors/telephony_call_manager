@@ -1723,6 +1723,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_011, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     callStatusManager->StopCallMotionRecognition(TelCallState::CALL_STATUS_ALERTING);
+    std::string message = "call answered elsewhere";
     sptr<CallBase> call = nullptr;
     callStatusManager->SetOriginalCallTypeForActiveState(call);
     callStatusManager->SetOriginalCallTypeForDisconnectState(call);
@@ -1747,11 +1748,11 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_011, TestSize.Level0)
     callStatusManager->HandleDialWhenHolding(0, call);
     call->SetCallType(CallType::TYPE_CS);
     callStatusManager->RefreshCallDisconnectReason(call,
-        static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_CS_CALL_ANSWERED_ELSEWHER));
+        static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_CS_CALL_ANSWERED_ELSEWHER), message);
     callStatusManager->RefreshCallDisconnectReason(call,
-        static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_ANSWERED_ELSEWHER));
+        static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_ANSWERED_ELSEWHER), message);
     callStatusManager->RefreshCallDisconnectReason(call,
-        static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_NORMAL));
+        static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_NORMAL), message);
     EXPECT_NE(callStatusManager->RefreshCallIfNecessary(call, info), nullptr);
 }
 
