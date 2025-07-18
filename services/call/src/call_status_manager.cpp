@@ -1516,8 +1516,8 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
 
 void CallStatusManager::SetVideoCallState(sptr<CallBase> &call, TelCallState nextState)
 {
-    if (call == nullptr) {
-        TELEPHONY_LOGE("Call is NULL");
+    if (call == nullptr || call->GetCallType() == CallType::TYPE_VOIP) {
+        TELEPHONY_LOGE("Call is NULL or calltype is VoIP");
         return;
     }
     int slotId = call->GetSlotId();

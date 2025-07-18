@@ -898,6 +898,7 @@ bool AudioControlManager::StopSoundtone()
     sound_->ReleaseRenderer();
     TELEPHONY_LOGI("stop soundtone success");
     RestoreVoiceValumeIfNecessary();
+    isCrsStartSoundTone_ = false;
     return true;
 }
 
