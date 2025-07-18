@@ -1031,7 +1031,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPolicyInfo_0100, Functio
 {
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallPolicyInfo(0, dialingList, 0, incomingList),
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallPolicyInfo(false, dialingList, false, incomingList),
         TELEPHONY_ERR_PERMISSION_ERR);
 }
 } // namespace Telephony

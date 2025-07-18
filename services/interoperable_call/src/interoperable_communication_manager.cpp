@@ -33,8 +33,7 @@ InteroperableCommunicationManager::~InteroperableCommunicationManager()
  
 void InteroperableCommunicationManager::OnDeviceOnline(const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
-    TELEPHONY_LOGI("Interoperable device online, networkId = %{public}s, devrole = %{public}d",
-        deviceInfo.networkId, deviceInfo.deviceTypeId);
+    TELEPHONY_LOGI("Interoperable device online, devrole = %{public}d", deviceInfo.deviceTypeId);
     std::string networkId = deviceInfo.networkId;
     std::string devName = deviceInfo.deviceName;
     uint16_t devType = deviceInfo.deviceTypeId;
@@ -67,8 +66,7 @@ void InteroperableCommunicationManager::OnDeviceOnline(const DistributedHardware
  
 void InteroperableCommunicationManager::OnDeviceOffline(const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
-    TELEPHONY_LOGI("Interoperable device offline, networkId = %{public}s, devrole = %{public}d",
-        deviceInfo.networkId, deviceInfo.deviceTypeId);
+    TELEPHONY_LOGI("Interoperable device offline, devrole = %{public}d", deviceInfo.deviceTypeId);
     if (devObserver_ == nullptr) {
         return;
     }
@@ -144,6 +142,36 @@ void InteroperableCommunicationManager::CallStateUpdated(
         TELEPHONY_LOGI("interoperable call destroyed");
         dataController_->OnCallDestroyed();
     }
+}
+
+void InteroperableCommunicationManager::NewCallCreated(sptr<CallBase> &call)
+{
+    TELEPHONY_LOGI("interoperable NewCallCreated");
+    if (dataController_ == nullptr) {
+        TELEPHONY_LOGE("dataController is nullptr");
+        return;
+    }
+    if (peerDevices_.empty() || call == nullptr) {
+        TELEPHONY_LOGE("no peer device or call is nullptr");
+        return;
+    }
+    dataController_->CallCreated(call, peerDevices_.front());
+}
+
+int32_t InteroperableCommunicationManager::GetBtCallSlotId(const std::string &phoneNum)
+{
+    int32_t btCallSlot = BT_CALL_INVALID_SLOT;
+    if (dataController_ == nullptr) {
+        return btCallSlot;
+    }
+
+    btCallSlot = dataController_->GetBtSlotIdByPhoneNumber(phoneNum);
+    if (btCallSlot == BT_CALL_INVALID_SLOT) { // slotId has not been received yet, need wait.
+        dataController_->WaitForBtSlotId(phoneNum);
+        btCallSlot = dataController_->GetBtSlotIdByPhoneNumber(phoneNum);
+    }
+    dataController_->DeleteBtSlotIdByPhoneNumber(phoneNum); // delete after query
+    return btCallSlot;
 }
 }
 }

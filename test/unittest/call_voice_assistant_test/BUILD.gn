@@ -54,7 +54,7 @@ ohos_unittest("tel_call_voice_assistant_test") {
     "//third_party/cJSON:cjson",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
-
+  remove_configs = [ "//build/config/compiler:no_exceptions" ]
   defines = [
     "TELEPHONY_LOG_TAG = \"CallManagerGtest\"",
     "LOG_DOMAIN = 0xD000F00",

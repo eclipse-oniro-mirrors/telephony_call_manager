@@ -1280,6 +1280,40 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_012, Function | MediumTes
 }
 
 /**
+ * @tc.number   Telephony_CallStatusManager_016
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_016, TestSize.Level0)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    DialParaInfo info;
+    CallObjectManager::callObjectPtrList_.clear();
+    sptr<CallBase> imsCall = new IMSCall(info);
+    imsCall->SetCallIndex(0);
+    imsCall->SetSlotId(0);
+    imsCall->SetCallType(CallType::TYPE_IMS);
+    imsCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
+    CallObjectManager::AddOneCallObject(imsCall);
+    EXPECT_TRUE(CallObjectManager::HasCellularCallExist());
+
+    CallDetailInfo callDetailInfo;
+    std::string number = "10086";
+    memcpy_s(&callDetailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
+    callDetailInfo.callType = CallType::TYPE_IMS;
+    callDetailInfo.callMode = VideoStateType::TYPE_VOICE;
+    callDetailInfo.index = 2;
+    callStatusManager->IncomingHandle(callDetailInfo);
+    sptr<CallBase> incomingCall = callStatusManager->CreateNewCall(callDetailInfo, CallDirection::CALL_DIRECTION_OUT);
+    CallObjectManager::AddOneCallObject(incomingCall);
+    EXPECT_TRUE(CallObjectManager::HasCellularCallExist());
+
+    CallObjectManager::DeleteOneCallObject(incomingCall);
+    EXPECT_FALSE(CallObjectManager::HasCellularCallExist());
+}
+
+/**
  * @tc.number   Telephony_CallStatusManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1689,6 +1723,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_011, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     callStatusManager->StopCallMotionRecognition(TelCallState::CALL_STATUS_ALERTING);
+    std::string message = "call answered elsewhere";
     sptr<CallBase> call = nullptr;
     callStatusManager->SetOriginalCallTypeForActiveState(call);
     callStatusManager->SetOriginalCallTypeForDisconnectState(call);
@@ -1711,10 +1746,13 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_011, TestSize.Level0)
     numberMarkInfo.markType = MarkType::MARK_TYPE_CRANK;
     call->SetNumberMarkInfo(numberMarkInfo);
     callStatusManager->HandleDialWhenHolding(0, call);
+    call->SetCallType(CallType::TYPE_CS);
     callStatusManager->RefreshCallDisconnectReason(call,
-        static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_ANSWERED_ELSEWHER));
+        static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_CS_CALL_ANSWERED_ELSEWHER), message);
     callStatusManager->RefreshCallDisconnectReason(call,
-        static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_NORMAL));
+        static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_ANSWERED_ELSEWHER), message);
+    callStatusManager->RefreshCallDisconnectReason(call,
+        static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_NORMAL), message);
     EXPECT_NE(callStatusManager->RefreshCallIfNecessary(call, info), nullptr);
 }
 

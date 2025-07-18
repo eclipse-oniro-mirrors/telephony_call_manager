@@ -289,6 +289,8 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_001, TestSize.Level0)
     audioProxy->SetMaxVolume(AudioStandard::AudioStreamType::STREAM_VOICE_CALL);
     audioProxy->SetVolumeAudible();
     audioProxy->SetVolume(AudioStandard::AudioStreamType::STREAM_VOICE_CALL, volume);
+    audioProxy->SetVolumeWithDevice(AudioStandard::AudioStreamType::STREAM_VOICE_CALL, volume,
+        AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER);
     audioProxy->IsStreamActive(AudioStandard::AudioStreamType::STREAM_VOICE_CALL);
     audioProxy->IsStreamMute(AudioStandard::AudioStreamType::STREAM_VOICE_CALL);
     audioProxy->GetMaxVolume(AudioStandard::AudioStreamType::STREAM_VOICE_CALL);
@@ -857,6 +859,14 @@ HWTEST_F(CallStateTest, Telephony_VoipCallConnection_001, TestSize.Level0)
 {
     std::shared_ptr<VoipCallConnection> voipCallConnection = std::make_shared<VoipCallConnection>();
     int32_t systemAbilityId = 1;
+    sptr<ISystemAbilityManager> managerPtr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<IVoipCallManagerService> voipCallManagerInterfacePtr = nullptr;
+    if (managerPtr != nullptr) {
+        sptr<IRemoteObject> iRemoteObjectPtr = managerPtr->GetSystemAbility(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+        if (iRemoteObjectPtr != nullptr) {
+            voipCallManagerInterfacePtr = iface_cast<IVoipCallManagerService>(iRemoteObjectPtr);
+        }
+    }
     voipCallConnection->Init(systemAbilityId);
     voipCallConnection->UnInit();
     voipCallConnection->GetCallManagerProxy();

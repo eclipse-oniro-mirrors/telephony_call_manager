@@ -43,6 +43,7 @@
 #include "bluetooth_call_connection.h"
 #include "interoperable_communication_manager.h"
 #include "voip_call_connection.h"
+#include "audio_control_manager.h"
 
 #ifdef SUPPORT_MUTE_BY_DATABASE
 #include "interoperable_settings_handler.h"
@@ -51,6 +52,7 @@
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_CUST
 #include "telephony_cust_wrapper.h"
 #endif
+#include "core_service_client.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -304,6 +306,9 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
     std::string bundleName = "";
     TelephonyPermission::GetBundleNameByUid(uid, bundleName);
     extras.PutStringValue("bundleName", bundleName);
+    if (extras.GetBooleanValue("btSlotIdUnknown", false)) {
+        BtCallWaitSlotId(extras, number);
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
         TELEPHONY_LOGE("Permission denied!");
         CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue(SLOT_ID), extras.GetIntValue(CALL_TYPE),
@@ -311,6 +316,12 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
         FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_CUST
+    if (TELEPHONY_CUST_WRAPPER.isChangeDialNumberToTwEmc_ != nullptr &&
+        TELEPHONY_CUST_WRAPPER.isChangeDialNumberToTwEmc_(number, extras.GetIntValue(SLOT_ID))) {
+        TELEPHONY_LOGI("changed dial num to tw emc");
+    }
+#endif
     if (callControlManagerPtr_ != nullptr) {
         int32_t ret = callControlManagerPtr_->DialCall(number, extras);
         if (ret == TELEPHONY_SUCCESS) {
@@ -331,6 +342,19 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+void CallManagerService::BtCallWaitSlotId(AppExecFwk::PacMap &dialInfo, const std::u16string &number)
+{
+    TELEPHONY_LOGE("BtCallWaitSlotId enter");
+    std::string phoneNum(Str16ToStr8(number));
+    auto slotId = DelayedSingleton<InteroperableCommunicationManager>::GetInstance()->GetBtCallSlotId(phoneNum);
+    bool hasSimCard = false;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
+    if (hasSimCard) {
+        TELEPHONY_LOGI("bt call, slotId[%{public}d]", slotId);
+        dialInfo.PutIntValue(SLOT_ID, slotId);
     }
 }
 
@@ -1700,6 +1724,13 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         return HandleCeliaAutoAnswerCall(callId, eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_ON");
     } else if (eventName == "EVENT_VOIP_CALL_SUCCESS" || eventName == "EVENT_VOIP_CALL_FAILED") {
         HandleVoIPCallEvent(callId, eventName);
+    } else if (eventName == "EVENT_INVALID_VIDEO_FD") {
+        if (callControlManagerPtr_ != nullptr) {
+            callControlManagerPtr_->HandleVideoRingPlayFail();
+        } else {
+            TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
     }
     return TELEPHONY_SUCCESS;
 }
@@ -1795,12 +1826,12 @@ int32_t CallManagerService::SendUssdResponse(int32_t slotId, const std::string &
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerService::SetCallPolicyInfo(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
-    int32_t incomingPolicy, const std::vector<std::string> &incomingList)
+int32_t CallManagerService::SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
+    bool isIncomingTrustlist, const std::vector<std::string> &incomingList)
 {
-    TELEPHONY_LOGI("SetCallPolicyInfo dialingPolicy:%{public}d, dialingList size:%{public}u, "
-        "incomingPolicy:%{public}d, incomingList size:%{public}u", dialingPolicy, dialingList.size(),
-        incomingPolicy, incomingList.size());
+    TELEPHONY_LOGI("SetCallPolicyInfo isDialingTrustlist:%{public}d, dialingList size:%{public}u, "
+        "isIncomingTrustlist:%{public}d, incomingList size:%{public}u", isDialingTrustlist, dialingList.size(),
+        isIncomingTrustlist, incomingList.size());
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -1811,8 +1842,8 @@ int32_t CallManagerService::SetCallPolicyInfo(int32_t dialingPolicy, const std::
     }
     int32_t uid = IPCSkeleton::GetCallingUid();
     if (uid == EDM_UID) {
-        return callControlManagerPtr_->SetEdmPolicy(dialingPolicy, dialingList,
-            incomingPolicy, incomingList);
+        return callControlManagerPtr_->SetEdmPolicy(isDialingTrustlist, dialingList,
+            isIncomingTrustlist, incomingList);
     } else {
         return TELEPHONY_ERR_PERMISSION_ERR;
     }

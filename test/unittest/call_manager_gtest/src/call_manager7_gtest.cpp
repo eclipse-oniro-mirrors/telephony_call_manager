@@ -287,7 +287,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, TestSize.Level1)
     ASSERT_EQ(callManagerService->SendUssdResponse(slotId, content), TELEPHONY_SUCCESS);
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
-    ASSERT_NE(callManagerService->SetCallPolicyInfo(0, dialingList, 0, incomingList), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -335,7 +335,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, TestSize.Level1)
     ASSERT_NE(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
-    ASSERT_NE(callManagerService->SetCallPolicyInfo(0, dialingList, 0, incomingList), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -768,6 +768,15 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_008, TestSize.Level0
     data11.WriteRawData((const void *)&imsCallMode, length);
     data11.RewindRead(0);
     ASSERT_EQ(callManagerService->OnUpdateCallMediaMode(data11, reply), TELEPHONY_SUCCESS);
+    MessageParcel data12;
+    data12.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    std::vector<std::string> dialingList;
+    std::vector<std::string> incomingList;
+    data12.WriteInt32(0);
+    data12.WriteStringVector(dialingList);
+    data12.WriteInt32(0);
+    data12.WriteStringVector(incomingList);
+    ASSERT_EQ(callManagerService->OnSetCallPolicyInfo(data12, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -790,6 +799,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_009, TestSize.Level0
     data.WriteInt32(defaultNumber);
     data.WriteInt32(defaultNumber);
     data.WriteString(bundleName);
+    callManagerService->OnDialCall(data, reply);
+    data.WriteBool(true);
     callManagerService->OnDialCall(data, reply);
 
     MessageParcel data12;

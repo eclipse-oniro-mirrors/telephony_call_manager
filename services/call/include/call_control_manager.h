@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -158,10 +158,11 @@ public:
     bool HangUpFirstCall(int32_t secondCallId);
     void HangUpFirstCallBySecondCallID(int32_t secondCallId, bool secondAutoAnswer = false);
 #endif
-    bool isNotWearOnWrist();
-    void setWearState(int32_t state);
+    bool IsNotWearOnWrist();
+    void SetWearState(int32_t state);
     void RegisterObserver();
     void UnRegisterObserver();
+    void HandleVideoRingPlayFail();
 private:
     void CallStateObserve();
     int32_t NumberLegalityCheck(std::string &number);
@@ -184,6 +185,7 @@ private:
     void SetVoipCallInfoInner(const int32_t callId, const int32_t state,
         const std::string phoneNumber);
     void sendEventToVoip(CallAbilityEventId eventId);
+    bool IsCallActivated(const TelCallState& priorState, const TelCallState& nextState);
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
     public:

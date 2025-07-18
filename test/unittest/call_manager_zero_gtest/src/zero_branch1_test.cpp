@@ -366,6 +366,57 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_004, Function | MediumTes
 }
 
 /**
+ * @tc.number   Telephony_CallRequestProcess_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_005, Function | MediumTest | Level1)
+{
+    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
+    callRequestProcess->isFirstDialCallAdded_ = false;
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo info;
+    sptr<CallBase> imsCall = new IMSCall(info);
+    imsCall->SetCallType(CallType::TYPE_IMS);
+    imsCall->SetCallIndex(0);
+    imsCall->SetCallId(VALID_CALLID);
+    imsCall->SetSlotId(0);
+    imsCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
+    CallObjectManager::AddOneCallObject(imsCall);
+    callRequestProcess->HandleDialFail();
+    CallDetailInfo callDetailInfo;
+    callDetailInfo.callType = imsCall->GetCallType();
+    callDetailInfo.accountId = imsCall->GetSlotId();
+    callDetailInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
+    callDetailInfo.voiceDomain = static_cast<int32_t>(imsCall->GetCallType());
+    std::shared_ptr<CallStatusManager> callStatusManagerPtr = std::make_shared<CallStatusManager>();
+    callStatusManagerPtr->DisconnectedHandle(callDetailInfo);
+    EXPECT_FALSE(CallObjectManager::HasCellularCallExist());
+}
+
+/**
+ * @tc.number   Telephony_CallRequestProcess_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_006, Function | MediumTest | Level1)
+{
+    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
+    DialParaInfo info;
+    info.dialType = DialType::DIAL_BLUETOOTH_TYPE;
+    info.number = 112;
+    EXPECT_GT(callRequestProcess->BluetoothDialProcess(info), TELEPHONY_SUCCESS);
+    sptr<CallBase> imsCall = nullptr;
+    imsCall = new IMSCall(info);
+    CallObjectManager::callObjectPtrList_.push_back(imsCall);
+    DialParaInfo info2;
+    info2.dialType = DialType::DIAL_BLUETOOTH_TYPE;
+    info2.number = 123;
+    EXPECT_GT(callRequestProcess->BluetoothDialProcess(info2), CALL_ERR_CALL_COUNTS_EXCEED_LIMIT);
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
  * @tc.number   Telephony_CallObjectManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -753,6 +804,9 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_001, Function | MediumTest | Leve
     mPacMap.PutIntValue("videoState", static_cast<int32_t>(VideoStateType::TYPE_VOICE));
     ASSERT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, false), TELEPHONY_ERR_SUCCESS);
+    system::SetParameter("persist.edm.telephony_call_disable", "true");
+    ASSERT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_POLICY_DISABLED);
+    system::SetParameter("persist.edm.telephony_call_disable", "false");
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_VOICE_MAIL_TYPE));
     ASSERT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, false), TELEPHONY_ERR_SUCCESS);
@@ -969,7 +1023,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_006, Function | MediumTest | Leve
     ASSERT_EQ(callPolicy.IsIncomingEnable(number), true);
     dialingList.push_back(number);
     incomingList.push_back(number);
-    ASSERT_EQ(callPolicy.SetEdmPolicy(0, dialingList, 0, incomingList), TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(callPolicy.SetEdmPolicy(false, dialingList, false, incomingList), TELEPHONY_ERR_SUCCESS);
     ASSERT_EQ(callPolicy.IsDialingEnable(number), false);
     ASSERT_EQ(callPolicy.IsIncomingEnable(number), false);
 }
@@ -1200,23 +1254,18 @@ HWTEST_F(ZeroBranch2Test, Telephony_EdmCallPolicy_001, Function | MediumTest | L
     std::string number = "11111111";
     bool isModifyParameter = false;
     std::shared_ptr<EdmCallPolicy> edmCallPolicy = std::make_shared<EdmCallPolicy>();
-    if (system::GetBoolParameter("persist.edm.telephony_call_disable", false)) {
-        system::SetParameter("persist.edm.telephony_call_disable", "false");
-        isModifyParameter = true;
-    }
-    edmCallPolicy->SetCallPolicy(0, dialingList, 0, incomingList);
+    edmCallPolicy->SetCallPolicy(false, dialingList, false, incomingList);
     EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), true);
     dialingList.push_back(number);
-    edmCallPolicy->SetCallPolicy(0, dialingList, 0, incomingList);
+    edmCallPolicy->SetCallPolicy(false, dialingList, false, incomingList);
     EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), false);
-    edmCallPolicy->SetCallPolicy(1, dialingList, 0, incomingList);
+    edmCallPolicy->SetCallPolicy(true, dialingList, false, incomingList);
     EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), true);
+    dialingList.insert(dialingList.end(), 1000, "22222222");
+    EXPECT_EQ(edmCallPolicy->SetCallPolicy(false, dialingList, false, incomingList), TELEPHONY_ERR_ARGUMENT_INVALID);
     dialingList.clear();
-    edmCallPolicy->SetCallPolicy(1, dialingList, 0, incomingList);
+    edmCallPolicy->SetCallPolicy(true, dialingList, false, incomingList);
     EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), true);
-    if (isModifyParameter) {
-        system::SetParameter("persist.edm.telephony_call_disable", "true");
-    }
 }
 
 /**
@@ -1231,24 +1280,18 @@ HWTEST_F(ZeroBranch2Test, Telephony_EdmCallPolicy_002, Function | MediumTest | L
     std::string number = "11111111";
     bool isModifyParameter = false;
     std::shared_ptr<EdmCallPolicy> edmCallPolicy = std::make_shared<EdmCallPolicy>();
-    if (system::GetBoolParameter("persist.edm.telephony_call_disable", false)) {
-        system::SetParameter("persist.edm.telephony_call_disable", "false");
-        isModifyParameter = true;
-    }
-    edmCallPolicy->SetCallPolicy(0, dialingList, 0, incomingList);
+    edmCallPolicy->SetCallPolicy(false, dialingList, false, incomingList);
     EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), true);
     incomingList.push_back(number);
-    edmCallPolicy->SetCallPolicy(0, dialingList, 0, incomingList);
+    edmCallPolicy->SetCallPolicy(false, dialingList, false, incomingList);
     EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), false);
-    edmCallPolicy->SetCallPolicy(0, dialingList, 1, incomingList);
+    edmCallPolicy->SetCallPolicy(false, dialingList, true, incomingList);
     EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), true);
+    incomingList.insert(incomingList.end(), 1000, "22222222");
+    EXPECT_EQ(edmCallPolicy->SetCallPolicy(false, dialingList, false, incomingList), TELEPHONY_ERR_ARGUMENT_INVALID);
     incomingList.clear();
-    edmCallPolicy->SetCallPolicy(0, dialingList, 1, incomingList);
+    edmCallPolicy->SetCallPolicy(false, dialingList, true, incomingList);
     EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), true);
-
-    if (isModifyParameter) {
-        system::SetParameter("persist.edm.telephony_call_disable", "true");
-    }
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -83,6 +83,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001,
     ASSERT_TRUE(voicePtr->settingsCallback_  == nullptr);
     ASSERT_TRUE(voicePtr->connectCallback_  == nullptr);
     ASSERT_TRUE(voicePtr->mRemoteObject == nullptr);
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
 /**
@@ -130,6 +131,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002,
     ASSERT_TRUE(voicePtr->settingsCallback_  == nullptr);
     ASSERT_TRUE(voicePtr->connectCallback_  == nullptr);
     ASSERT_TRUE(voicePtr->mRemoteObject == nullptr);
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
 /**
@@ -167,6 +169,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantConnectCallback_
  */
 HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantRingSubscriber_001, TestSize.Level0)
 {
+    std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     std::string event = "test.test.test.test";
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(event);
@@ -181,7 +184,24 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantRingSubscriber_0
     subscriber->Initial();
     subscriber->Release();
     ASSERT_TRUE(subscriber->subscriber_ == nullptr);
+    event = voicePtr->CONTROL_SWITCH_STATE_CHANGE_EVENT;
+    want.SetAction(event);
+    want.SetParam(event, event);
+    eventData.SetWant(want);
+    ASSERT_NO_THROW(subscriber->OnReceiveEvent(eventData));
+    std::string key1 = "publisher_name";
+    std::string value1 = "remote_object_send_request";
+    want.SetParam(key1, value1);
+    eventData.SetWant(want);
+    ASSERT_NO_THROW(subscriber->OnReceiveEvent(eventData));
+    std::string value2 = "connect_voice_assistant_ability_failed";
+    want.SetParam(key1, value2);
+    eventData.SetWant(want);
+    ASSERT_NO_THROW(subscriber->OnReceiveEvent(eventData));
+    want.SetParam(voicePtr->IS_PLAY_RING, voicePtr->SWITCH_TURN_ON);
+    eventData.SetWant(want);
+    ASSERT_NO_THROW(subscriber->OnReceiveEvent(eventData));
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
-
 }
 }

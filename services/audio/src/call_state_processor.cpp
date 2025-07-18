@@ -57,6 +57,7 @@ void CallStateProcessor::AddCall(int32_t callId, TelCallState state)
             }
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
+        case TelCallState::CALL_STATUS_ANSWERED:
             if (activeCalls_.count(callId) == EMPTY_VALUE) {
                 TELEPHONY_LOGI("add call , state : active");
                 activeCalls_.insert(callId);
@@ -184,6 +185,7 @@ bool CallStateProcessor::UpdateCurrentCallState()
     } else {
         event = AudioEvent::SWITCH_AUDIO_INACTIVE_STATE;
     }
+    TELEPHONY_LOGI("UpdateCurrentCallState ProcessEvent event=%{public}d", event);
     return DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
 }
 

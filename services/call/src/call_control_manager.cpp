@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,31 +76,11 @@ CallControlManager::~CallControlManager()
 bool CallControlManager::Init()
 {
     callStateListenerPtr_ = std::make_unique<CallStateListener>();
-    if (callStateListenerPtr_ == nullptr) {
-        TELEPHONY_LOGE("callStateListenerPtr_ is null");
-        return false;
-    }
     CallRequestHandlerPtr_ = std::make_unique<CallRequestHandler>();
-    if (CallRequestHandlerPtr_ == nullptr) {
-        TELEPHONY_LOGE("CallRequestHandlerPtr_ is null");
-        return false;
-    }
     CallRequestHandlerPtr_->Init();
     incomingCallWakeup_ = std::make_shared<IncomingCallWakeup>();
-    if (incomingCallWakeup_ == nullptr) {
-        TELEPHONY_LOGE("incomingCallWakeup_ is null");
-        return false;
-    }
     missedCallNotification_ = std::make_shared<MissedCallNotification>();
-    if (missedCallNotification_ == nullptr) {
-        TELEPHONY_LOGE("missedCallNotification_ is null");
-        return false;
-    }
     callSettingManagerPtr_ = std::make_unique<CallSettingManager>();
-    if (callSettingManagerPtr_ == nullptr) {
-        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
-        return false;
-    }
     if (SubscriberSaStateChange() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SubscriberSaStateChange failed!");
     }
@@ -149,6 +129,7 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
         TELEPHONY_LOGE("Invalid number!");
         return ret;
     }
+    TELEPHONY_LOGI("dialInfo slotId is[%{public}d]", extras.GetIntValue("accountId"));
     bool isEcc = false;
     std::string newPhoneNum =
         DelayedSingleton<CallNumberUtils>::GetInstance()->RemoveSeparatorsPhoneNumber(accountNumber);
@@ -259,14 +240,15 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
         TELEPHONY_LOGE("call is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    call->SetAnsweredCall(true);
     if (call->GetCrsType() == CRS_TYPE && static_cast<VideoStateType>(videoState) != VideoStateType::TYPE_VIDEO) {
+        TELEPHONY_LOGI("answer call set speaker deactive");
         DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(false);
     }
     ReportPhoneUEInSuperPrivacy(CALL_ANSWER_IN_SUPER_PRIVACY);
     if (CurrentIsSuperPrivacyMode(callId, videoState)) {
         return TELEPHONY_SUCCESS;
     }
-    call->SetAnsweredCall(true);
     AnswerHandlerForSatelliteOrVideoCall(call, videoState);
     TELEPHONY_LOGI("report answered state");
     NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
@@ -620,9 +602,7 @@ bool CallControlManager::NotifyCallStateUpdated(
         if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
             return true;
         }
-        if ((priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ALERTING) ||
-            (priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ACTIVE) ||
-            (priorState == TelCallState::CALL_STATUS_INCOMING && nextState == TelCallState::CALL_STATUS_ACTIVE)) {
+        if (IsCallActivated(priorState, nextState)) {
             TELEPHONY_LOGI("call is actived, now check and switch call to distributed audio device");
             DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
         } else if ((priorState == TelCallState::CALL_STATUS_ACTIVE &&
@@ -644,6 +624,14 @@ bool CallControlManager::NotifyCallStateUpdated(
         return true;
     }
     return false;
+}
+
+bool CallControlManager::IsCallActivated(const TelCallState& priorState, const TelCallState& nextState)
+{
+    return (priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ALERTING) ||
+           (priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ACTIVE) ||
+           (priorState == TelCallState::CALL_STATUS_INCOMING && nextState == TelCallState::CALL_STATUS_ACTIVE) ||
+           (priorState == TelCallState::CALL_STATUS_ALERTING && nextState == TelCallState::CALL_STATUS_ACTIVE);
 }
 
 bool CallControlManager::NotifyVoipCallStateUpdated(
@@ -2075,7 +2063,7 @@ void CallControlManager::HangUpFirstCallBySecondCallID(int32_t secondCallId, boo
         } else if (telCallState == TelCallState::CALL_STATUS_INCOMING ||
             telCallState == TelCallState::CALL_STATUS_WAITING) {
             TELEPHONY_LOGI("first call RejectCall callid=%{public}d", call->GetCallID());
-            if (answerCall->GetAccountNumber() == call->GetAccountNumber()) {
+            if (answerCall != nullptr && answerCall->GetAccountNumber() == call->GetAccountNumber()) {
                 break;
             }
             int32_t ret = RejectCall(call->GetCallID(), false, Str8ToStr16(""));
@@ -2098,11 +2086,11 @@ void WearStatusObserver::OnChange()
     }
     TELEPHONY_LOGI("OnChange wear status: %{public}s", wearStatus.c_str());
     if (wearStatus == "1") {
-        callControlMgr->setWearState(WEAR_STATUS_OFF);
+        callControlMgr->SetWearState(WEAR_STATUS_OFF);
     } else if (wearStatus == "2") {
-        callControlMgr->setWearState(WEAR_STATUS_ON);
+        callControlMgr->SetWearState(WEAR_STATUS_ON);
     } else {
-        callControlMgr->setWearState(WEAR_STATUS_INVALID);
+        callControlMgr->SetWearState(WEAR_STATUS_INVALID);
     }
 }
 void CallControlManager::RegisterObserver()
@@ -2136,19 +2124,39 @@ void CallControlManager::UnRegisterObserver()
     }
 }
 
-void CallControlManager::setWearState(int32_t state)
+void CallControlManager::SetWearState(int32_t state)
 {
     std::lock_guard<std::mutex> lock(wearStatusMutex_);
     wearStatus_ = state;
 }
 
-bool CallControlManager::isNotWearOnWrist()
+bool CallControlManager::IsNotWearOnWrist()
 {
     std::lock_guard<std::mutex> lock(wearStatusMutex_);
     if (wearStatus_ == WEAR_STATUS_OFF) {
         return true;
     }
     return false;
+}
+
+void CallControlManager::HandleVideoRingPlayFail()
+{
+    sptr<CallBase> incomingCall =
+        CallObjectManager::GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (incomingCall == nullptr) {
+        TELEPHONY_LOGE("incomingCall is nullptr");
+        return;
+    }
+    ContactInfo contactInfo = incomingCall->GetCallerInfo();
+    if (memset_s(&contactInfo.ringtonePath, FILE_PATH_MAX_LEN, 0, FILE_PATH_MAX_LEN) != EOK) {
+        TELEPHONY_LOGE("memset_s fail.");
+    }
+    incomingCall->SetCallerInfo(contactInfo);
+    if (CallObjectManager::IsNeedSilentInDoNotDisturbMode()) {
+        TELEPHONY_LOGI("no need play system ring.");
+        return;
+    }
+    DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
 }
 } // namespace Telephony
 } // namespace OHOS

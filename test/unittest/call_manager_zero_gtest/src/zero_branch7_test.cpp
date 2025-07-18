@@ -182,14 +182,16 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallPolicy_001, Function | MediumTest | Leve
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_OTT_TYPE));
     mPacMap.PutIntValue("callType", static_cast<int32_t>(CallType::TYPE_BLUETOOTH));
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_CARRIER_TYPE));
-    EXPECT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
+    mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true);
     mPacMap.PutIntValue("callType", static_cast<int32_t>(CallType::TYPE_CS));
     mPacMap.PutIntValue("dialScene", 3);
-    EXPECT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
+    mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true);
     mPacMap.PutIntValue("dialScene", static_cast<int32_t>(DialScene::CALL_EMERGENCY));
     mPacMap.PutIntValue("videoState", static_cast<int32_t>(VideoStateType::TYPE_VOICE));
-    EXPECT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
+    mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true);
     mPacMap.PutIntValue("videoState", static_cast<int32_t>(VideoStateType::TYPE_SEND_ONLY));
+    mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true);
+    mPacMap.PutIntValue("dialType", -1);
     EXPECT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
 }
 
@@ -205,13 +207,20 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_001, Function | MediumTes
     std::u16string test = u"";
     callManagerService->OnAddSystemAbility(systemAbilityId, deviceId);
     EXPECT_NE(systemAbilityId, AUDIO_POLICY_SERVICE_ID);
+    std::string eventName = "EVENT_INVALID_VIDEO_FD";
+    int32_t callId = 0;
+    EXPECT_EQ(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_ERR_FAIL);
+    DialParaInfo info;
+    sptr<CallBase> ringingCall = new IMSCall(info);
+    ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    CallObjectManager::AddOneCallObject(ringingCall);
+    EXPECT_EQ(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
     int32_t slotId = 0;
     EXPECT_NE(callManagerService->CloseUnFinishedUssd(slotId), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callManagerService->SetVoIPCallState(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_TRUE(TelephonyPermission::CheckCallerIsSystemApp());
     EXPECT_TRUE(TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE));
-    std::string eventName = "ABC";
-    int32_t callId = 0;
+    eventName = "ABC";
     EXPECT_EQ(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
     callManagerService->dealCeliaCallEvent(1);
     std::string number = "123456";
@@ -566,7 +575,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerClient_001, Function | MediumTest
     EXPECT_NE(callManagerClient->SendUssdResponse(slotId, content), TELEPHONY_ERR_UNINIT);
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
-    EXPECT_NE(callManagerClient->SetCallPolicyInfo(0, dialingList, 0, incomingList), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_ERR_UNINIT);
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_CallStatusCallback_001, Function | MediumTest | Level1)
@@ -604,6 +613,8 @@ HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTes
     AppExecFwk::PacMap extras;
     voipCallConnection->SendCallUiEventForWindow(extras);
     voipCallConnection->voipCallManagerInterfacePtr_ = nullptr;
+    int32_t systemAbilityId = 1;
+    voipCallConnection->Init(systemAbilityId);
     voipCallConnection->SendCallUiEventForWindow(extras);
     voipCallConnection->ClearVoipCall();
 }

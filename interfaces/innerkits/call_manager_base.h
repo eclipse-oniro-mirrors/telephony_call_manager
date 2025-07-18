@@ -109,6 +109,11 @@ constexpr int16_t MAX_MINUTE = 60;
 constexpr int16_t INVALID_TIME = -1;
 
 /**
+ * @brief Indicates invalid slot id.
+*/
+constexpr int32_t BT_CALL_INVALID_SLOT = -1;
+
+/**
  * @brief Indicates the type of call, includs CS, IMS, OTT, OTHER.
  */
 enum class CallType {

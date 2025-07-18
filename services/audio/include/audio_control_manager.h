@@ -24,6 +24,7 @@
 #include "audio_scene_processor.h"
 #include "call_manager_inner_type.h"
 #include "call_state_listener_base.h"
+#include "ffrt.h"
 #include "ring.h"
 #include "singleton.h"
 #include "sound.h"
@@ -82,7 +83,7 @@ public:
     void UpdateDeviceTypeForVideoOrSatelliteCall();
     void UpdateDeviceTypeForCrs(AudioDeviceType deviceType);
     void UpdateDeviceTypeForVideoDialing();
-    void MuteNetWorkRingTone();
+    void MuteNetWorkRingTone(bool isMute = true);
     bool IsVideoCall(VideoStateType videoState);
     bool IsSoundPlaying();
     bool StopSoundtone();
@@ -94,8 +95,9 @@ public:
     bool IsScoTemporarilyDisabled();
     void ExcludeBluetoothSco();
     void UnexcludeBluetoothSco();
-    bool IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath);
-
+    bool PlayForNoRing();
+    bool StopForNoRing();
+    bool NeedPlayVideoRing(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr);
 private:
     RingState ringState_ = RingState::STOPPED;
     void HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState);
@@ -112,6 +114,7 @@ private:
     void UpdateForegroundLiveCall();
     bool IsBtOrWireHeadPlugin();
     void ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr);
+    void ResumeCrsSoundTone();
     int32_t HandleDistributeAudioDevice(const AudioDevice &device);
     int32_t HandleWirelessAudioDevice(const AudioDevice &device);
     void SendMuteRingEvent();
@@ -125,10 +128,14 @@ private:
     void RestoreVoiceValumeIfNecessary();
     void PostProcessRingtone();
     bool IsExternalAudioDevice(AudioDeviceType initDeviceType);
+    void UnmuteSoundTone();
+    void ProcessSoundtone(sptr<CallBase> &callObjectPtr);
+    bool IsSystemVideoRing(sptr<CallBase> &callObjectPtr);
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;
     bool isCrsVibrating_ = false;
+    bool isCrsStartSoundTone_ = false;
     bool isVideoRingVibrating_ = false;
     std::set<sptr<CallBase>> totalCalls_;
     std::unique_ptr<Ring> ring_;
@@ -140,6 +147,10 @@ private:
     bool isSetAudioDeviceByUser_ = false;
     bool isScoTemporarilyDisabled_ = false;
     int32_t voiceVolume_ = -1;
+    AudioDeviceType initCrsDeviceType_ = AudioDeviceType::DEVICE_UNKNOWN;
+    ffrt::mutex crsMutex_{};
+    std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_ = nullptr;
+    bool isPlayForNoRing_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

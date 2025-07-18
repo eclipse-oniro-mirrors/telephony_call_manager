@@ -39,6 +39,9 @@ bool CallObjectManager::needWaitHold_ = false;
 CellularCallInfo CallObjectManager::dialCallInfo_;
 constexpr int32_t CRS_TYPE = 2;
 constexpr uint64_t DISCONNECT_DELAY_TIME = 2000000;
+static constexpr const char *VIDEO_RING_PATH_FIX_TAIL = ".mp4";
+constexpr int32_t VIDEO_RING_PATH_FIX_TAIL_LENGTH = 4;
+static constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
 #ifdef NOT_SUPPORT_MULTICALL
 constexpr int32_t CALL_MAX_COUNT = 2;
 #endif
@@ -294,8 +297,7 @@ int32_t CallObjectManager::HasNewCall()
             ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CREATE ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CONNECTING ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING ||
-            (*it)->GetCallType() == CallType::TYPE_SATELLITE ||
-            (*it)->GetCallType() == CallType::TYPE_BLUETOOTH)) {
+            (*it)->GetCallType() == CallType::TYPE_SATELLITE)) {
             TELEPHONY_LOGE("there is already a new call[callId:%{public}d,state:%{public}d], please redial later",
                 (*it)->GetCallID(), (*it)->GetCallRunningState());
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
@@ -321,6 +323,9 @@ int32_t CallObjectManager::IsNewCallAllowedCreate(bool &enabled)
     }
     int32_t count = 0;
     int32_t callNum = 2;
+#ifdef NOT_SUPPORT_MULTICALL
+    callNum = 1;
+#endif
     std::list<int32_t> callIdList;
     GetCarrierCallList(callIdList);
     for (int32_t otherCallId : callIdList) {
@@ -550,6 +555,33 @@ bool CallObjectManager::HasIncomingCallCrsType()
     return false;
 }
 
+bool CallObjectManager::HasIncomingCallVideoRingType()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallType() != CallType::TYPE_VOIP &&
+            (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+            ContactInfo contactInfo = (*it)->GetCallerInfo();
+            if (IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool CallObjectManager::IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath)
+{
+    if ((personalNotificationRingtone.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
+        personalNotificationRingtone.substr(personalNotificationRingtone.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
+        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) || ringtonePath == SYSTEM_VIDEO_RING) {
+        TELEPHONY_LOGI("Is video ring.");
+        return true;
+    }
+    return false;
+}
+
 bool CallObjectManager::HasVideoCall()
 {
     std::lock_guard<std::mutex> lock(listMutex_);
@@ -689,8 +721,9 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(int32
         std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
         for (; it != callObjectPtrList_.end(); ++it) {
             if ((*it)->GetCallType() == CallType::TYPE_BLUETOOTH && (*it)->GetCallIndex() == index &&
-                (*it)->GetSlotId() == slotId) {
-                    return (*it);
+                ((*it)->GetSlotId() == slotId || (*it)->GetPhoneOrWatchDial() ==
+                    static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL))) {
+                return (*it);
             }
         }
     } else {
@@ -971,6 +1004,7 @@ CellularCallInfo CallObjectManager::GetDialCallInfo()
 
 int32_t CallObjectManager::DealFailDial(sptr<CallBase> call)
 {
+    TELEPHONY_LOGI("DealFailDial");
     CallDetailInfo callDetatilInfo;
     if (memset_s(&callDetatilInfo, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo)) != EOK) {
         TELEPHONY_LOGE("memset_s callDetatilInfo fail");

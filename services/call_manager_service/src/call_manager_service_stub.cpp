@@ -19,7 +19,6 @@
 
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
-#include "telephony_cust_wrapper.h"
 
 #include "message_option.h"
 #include "message_parcel.h"
@@ -355,13 +354,10 @@ int32_t CallManagerServiceStub::OnDialCall(MessageParcel &data, MessageParcel &r
     dialInfo.PutIntValue("callType", data.ReadInt32());
     dialInfo.PutStringValue("extraParams", data.ReadString());
     dialInfo.PutStringValue("bundleName", data.ReadString());
+    dialInfo.PutBooleanValue("btSlotIdUnknown", data.ReadBool());
     if (callNumber.length() > ACCOUNT_NUMBER_MAX_LENGTH) {
         TELEPHONY_LOGE("the account number length exceeds the limit");
         return CALL_ERR_NUMBER_OUT_OF_RANGE;
-    }
-    if (TELEPHONY_CUST_WRAPPER.isChangeDialNumberToTwEmc_ != nullptr
-        && TELEPHONY_CUST_WRAPPER.isChangeDialNumberToTwEmc_(callNumber, dialInfo.GetIntValue("accountId"))) {
-        TELEPHONY_LOGI("changed dial num to tw emc");
     }
     result = DialCall(callNumber, dialInfo);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -1494,14 +1490,14 @@ int32_t CallManagerServiceStub::OnSendUssdResponse(MessageParcel &data, MessageP
 int32_t CallManagerServiceStub::OnSetCallPolicyInfo(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    int32_t dialingPolicy = data.ReadInt32();
+    bool isDialingTrustlist = data.ReadBool();
     std::vector<std::string> dialingList;
     data.ReadStringVector(&dialingList);
-    int32_t incomingPolicy = data.ReadInt32();
+    bool isIncomingTrustlist = data.ReadBool();
     std::vector<std::string> incomingList;
     data.ReadStringVector(&incomingList);
 
-    result = SetCallPolicyInfo(dialingPolicy, dialingList, incomingPolicy, incomingList);
+    result = SetCallPolicyInfo(isDialingTrustlist, dialingList, isIncomingTrustlist, incomingList);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("SetCallPolicyInfo fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

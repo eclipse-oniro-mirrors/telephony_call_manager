@@ -26,6 +26,14 @@
 #include "satellite_call.h"
 #include "surface_utils.h"
 #include "voip_call.h"
+#include "antifraud_service.h"
+#include "interoperable_device_observer.h"
+#include "interoperable_communication_manager.h"
+#include "bluetooth_call_connection.h"
+#include "bluetooth_call_state.h"
+#include "antifraud_adapter.h"
+#include "call_manager_service.h"
+#include "call_manager_utils.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -43,6 +51,7 @@ constexpr int32_t INVALID_CALL_ID = -1;
 constexpr int32_t IMS_CALL_MODE_NUM = 5;
 constexpr int32_t CALL_INDEX_MAX_NUM = 8;
 constexpr int32_t VIDEO_REQUEST_RESULT_TYPE_NUM = 102;
+constexpr int32_t DATA_COUNT = 2;
 
 void CSCallFunc(const uint8_t *data, size_t size)
 {
@@ -471,6 +480,174 @@ void SatelliteCallFunc(const uint8_t *data, size_t size)
     callObjectPtr->GetCallAttributeInfo(info);
 }
 
+template <typename Type>
+static Type GetInt(const uint8_t *data, size_t size, int index = 0)
+{
+    size_t typeSize = sizeof(Type);
+    uintptr_t align = reinterpret_cast<uintptr_t>(data) % typeSize;
+    const uint8_t *base = data + (align > 0 ? typeSize - align : 0);
+    if (size - align < typeSize * index + (typeSize - align)) {
+        return 0;
+    }
+    return *reinterpret_cast<const Type*>(base + index * typeSize);
+}
+
+void AntiFraudServiceFunc(const uint8_t *data, size_t size)
+{
+    int index = 0;
+    auto antiFraudService = DelayedSingleton<Telephony::AntiFraudService>::GetInstance();
+    int32_t slotId = GetInt<int32_t>(data, size, index++);
+    int32_t count = GetInt<int32_t>(data, size, index++);
+    antiFraudService->CheckAntiFraudService(std::string(reinterpret_cast<const char *>(data), size), slotId, count);
+    antiFraudService->StartAntiFraudService(std::string(reinterpret_cast<const char *>(data), size), slotId, count);
+    char temp[size + 1];
+    for (size_t i = 0; i < size; ++i) {
+        temp[i] = static_cast<char>(data[i]);
+    }
+    temp[size] = '\0';
+    antiFraudService->CreateDataShareHelper(slotId, temp);
+    antiFraudService->IsSwitchOn(std::string(reinterpret_cast<const char *>(data), size));
+    antiFraudService->IsAntiFraudSwitchOn();
+    antiFraudService->IsUserImprovementPlanSwitchOn();
+    antiFraudService->InitParams();
+    antiFraudService->GetStoppedSlotId();
+    antiFraudService->GetStoppedIndex();
+    antiFraudService->AnonymizeText();
+    OHOS::AntiFraudService::AntiFraudResult antiFraudResult;
+    antiFraudResult.modelVersion = GetInt<int32_t>(data, size, index++);
+    antiFraudResult.fraudType = GetInt<int32_t>(data, size, index++);
+    antiFraudService->RecordDetectResult(antiFraudResult, std::string(reinterpret_cast<const char*>(data), size),
+        slotId, count);
+    antiFraudService->StopAntiFraudService(slotId, count);
+    antiFraudService->SetStoppedSlotId(slotId);
+    antiFraudService->SetStoppedIndex(count);
+    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
+    antiFraudAdapter->ReleaseAntiFraud();
+    std::string phoneNum = std::string(reinterpret_cast<const char*>(data), size);
+    auto listener = std::make_shared<Telephony::AntiFraudService::AntiFraudDetectResListenerImpl>(
+        phoneNum, slotId, index);
+    listener->HandleAntiFraudDetectRes(antiFraudResult);
+}
+
+void InterOperableCommunicationManagerFunc(const uint8_t *data, size_t size)
+{
+    int index = 0;
+    auto communicationManager = DelayedSingleton<InteroperableCommunicationManager>::GetInstance();
+    DistributedHardware::DmDeviceInfo deviceInfo;
+    deviceInfo.range = GetInt<int32_t>(data, size, index++);
+    deviceInfo.networkType = GetInt<int32_t>(data, size, index++);
+    communicationManager->SetMuted(GetInt<bool>(data, size, index++));
+    communicationManager->OnDeviceOnline(deviceInfo);
+    communicationManager->OnDeviceOffline(deviceInfo);
+    communicationManager->MuteRinger();
+}
+
+void InterOperableDeviceObserverFunc(const uint8_t *data, size_t size)
+{
+    auto observer = DelayedSingleton<InteroperableDeviceObserver>::GetInstance();
+    auto stateCallback = std::make_shared<DmStateCallback>();
+    observer->Init();
+    size_t length = size / DATA_COUNT;
+    std::string networkId = std::string(reinterpret_cast<const char*>(data), length);
+    std::string devName = std::string(reinterpret_cast<const char*>(data + length), length);
+    observer->OnDeviceOnline(networkId, devName, GetInt<uint16_t>(data, size, 0));
+    observer->OnDeviceOffline(networkId, devName, GetInt<uint16_t>(data, size, 0));
+    DistributedHardware::DmDeviceInfo deviceInfo;
+    deviceInfo.range = GetInt<int32_t>(data, size, 0);
+    deviceInfo.networkType = GetInt<int32_t>(data, size, 1);
+    stateCallback->OnDeviceOnline(deviceInfo);
+    stateCallback->OnDeviceOffline(deviceInfo);
+}
+
+void BluetoothCallConnectionFunc(const uint8_t *data, size_t size)
+{
+    int index = 0;
+    auto bluetoothConnection = DelayedSingleton<BluetoothCallConnection>::GetInstance();
+    DialParaInfo info;
+    info.accountId = GetInt<int32_t>(data, size, index++);
+    info.callId = GetInt<int32_t>(data, size, index++);
+    bluetoothConnection->Dial(info);
+    bluetoothConnection->GetMacAddress();
+    bluetoothConnection->ConnectBtSco();
+    bluetoothConnection->DisConnectBtSco();
+    bluetoothConnection->GetBtScoIsConnected();
+    bluetoothConnection->SetHfpConnected(GetInt<bool>(data, size, index++));
+    bluetoothConnection->GetSupportBtCall();
+    bluetoothConnection->SetBtCallScoConnected(GetInt<bool>(data, size, index++));
+    bluetoothConnection->HfpDisConnectedEndBtCall();
+    size_t length = size / DATA_COUNT;
+    std::string hfpPhoneNumber = std::string(reinterpret_cast<const char*>(data), length);
+    std::string hfpContactName = std::string(reinterpret_cast<const char*>(data + length), length);
+    bluetoothConnection->SetHfpContactName(hfpPhoneNumber, hfpContactName);
+    bluetoothConnection->GetHfpContactName(hfpPhoneNumber);
+}
+
+void BluetoothCallStateFunc(const uint8_t *data, size_t size)
+{
+    auto bluetoothCallState = std::make_shared<BluetoothCallState>();
+    Bluetooth::BluetoothRemoteDevice device;
+    int32_t state = GetInt<int32_t>(data, size, 0);
+    int32_t cause = GetInt<int32_t>(data, size, 1);
+    bluetoothCallState->OnConnectionStateChanged(device, state, cause);
+    bluetoothCallState->OnScoStateChanged(device, state);
+}
+
+void CallMangerServiceFunc(const uint8_t *data, size_t size)
+{
+    auto callManagerService = DelayedSingleton<CallManagerService>::GetInstance();
+    int index = 0;
+    int32_t systemAbilityId = GetInt<int32_t>(data, size, index++);
+    callManagerService->OnAddSystemAbility(systemAbilityId, std::string(reinterpret_cast<const char*>(data), size));
+    std::vector<std::u16string> args;
+    std::u16string arg = Str8ToStr16(std::string(reinterpret_cast<const char*>(data), size));
+    args.push_back(arg);
+    std::int32_t fd = GetInt<int32_t>(data, size, index++);
+    callManagerService->Dump(fd, args);
+    callManagerService->GetBindTime();
+    callManagerService->GetStartServiceSpent();
+    bool enabled = GetInt<bool>(data, size, index++);
+    callManagerService->IsNewCallAllowed(enabled);
+    int32_t callId = GetInt<int32_t>(data, size, index++);
+    callManagerService->SwitchCall(callId);
+    callManagerService->UnHoldCall(callId);
+    callManagerService->StopDtmf(callId);
+    callManagerService->EnableImsSwitch(callId);
+    callManagerService->GetBundleInfo();
+    callManagerService->dealCeliaCallEvent(callId);
+    std::string eventName = std::string(reinterpret_cast<const char*>(data), size);
+    callManagerService->HandleVoIPCallEvent(callId, eventName);
+    callManagerService->HandleDisplaySpecifiedCallPage(callId);
+    callManagerService->HandleCeliaAutoAnswerCall(callId, GetInt<bool>(data, size, index++));
+    callManagerService->SendUssdResponse(callId, std::string(reinterpret_cast<const char*>(data), size));
+    callManagerService->OnStop();
+    callManagerService->UnRegisterCallBack();
+    callManagerService->UnInit();
+    MessageParcel messageParcel;
+    CallAttributeInfo info;
+    info.accountId = GetInt<int32_t>(data, size, index);
+    info.callType = CallType::TYPE_VOIP;
+    CallManagerUtils::WriteCallAttributeInfo(info, messageParcel);
+    CallManagerUtils::IsBundleInstalled(std::string(reinterpret_cast<const char*>(data), size), callId);
+}
+
+void CallMangerServiceStubFunc(const uint8_t *data, size_t size)
+{
+    auto callManagerService = DelayedSingleton<CallManagerService>::GetInstance();
+    MessageParcel dataParcel;
+    MessageParcel reply;
+    int index = 0;
+    int32_t callId = GetInt<int32_t>(data, size, index++);
+    dataParcel.WriteInt32(callId);
+    callManagerService->OnUnHoldCall(dataParcel, reply);
+    callManagerService->OnSwitchCall(dataParcel, reply);
+    callManagerService->OnStopDtmf(dataParcel, reply);
+    callManagerService->OnCombineConference(dataParcel, reply);
+    callManagerService->OnEnableVoLte(dataParcel, reply);
+    callManagerService->OnSendUssdResponse(dataParcel, reply);
+    dataParcel.WriteBool(GetInt<bool>(data, size, index++));
+    callManagerService->OnIsNewCallAllowed(dataParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -488,6 +665,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     OttVideoCallFunc(data, size);
     OttVideoCallWindowFunc(data, size);
     SatelliteCallFunc(data, size);
+    AntiFraudServiceFunc(data, size);
+    InterOperableCommunicationManagerFunc(data, size);
+    InterOperableDeviceObserverFunc(data, size);
+    BluetoothCallConnectionFunc(data, size);
+    BluetoothCallStateFunc(data, size);
+    CallMangerServiceFunc(data, size);
+    CallMangerServiceStubFunc(data, size);
 }
 } // namespace OHOS
 

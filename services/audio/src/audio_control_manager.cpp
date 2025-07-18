@@ -41,9 +41,12 @@ constexpr int32_t DTMF_PLAY_TIME = 30;
 constexpr int32_t VOICE_TYPE = 0;
 constexpr int32_t CRS_TYPE = 2;
 constexpr int32_t CALL_ENDED_PLAY_TIME = 300;
+constexpr uint64_t UNMUTE_SOUNDTONE_DELAY_TIME = 500000;
 static constexpr const char *VIDEO_RING_PATH_FIX_TAIL = ".mp4";
 constexpr int32_t VIDEO_RING_PATH_FIX_TAIL_LENGTH = 4;
 static constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
+const int16_t MIN_MULITY_ACTIVE_CALL_COUNT = 1;
+const int16_t MIN_DC_MULITY_ACTIVE_CALL_COUNT = 2;
 
 AudioControlManager::AudioControlManager()
     : isLocalRingbackNeeded_(false), ring_(nullptr), tone_(nullptr), sound_(nullptr)
@@ -164,6 +167,8 @@ void AudioControlManager::VideoStateUpdated(
         .address = { 0 },
     };
     AudioDeviceType initDeviceType = GetInitAudioDeviceType();
+    initCrsDeviceType_ = initDeviceType;
+    TELEPHONY_LOGI("before CRS, initDeviceType = %{public}d", initCrsDeviceType_);
     if (callObjectPtr->GetCrsType() == CRS_TYPE && !IsVoIPCallActived()) {
         AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
         if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
@@ -267,6 +272,9 @@ void AudioControlManager::UpdateDeviceTypeForCrs(AudioDeviceType deviceType)
                 device.deviceType = initDeviceType;
             }
         }
+        TELEPHONY_LOGI("update deviceType = %{public}d,initCrsDeviceType_ %{public}d",
+            deviceType, initCrsDeviceType_);
+        initCrsDeviceType_ = deviceType;
         if (device.deviceType == deviceType) {
             return;
         }
@@ -315,13 +323,23 @@ void AudioControlManager::HandleCallStateUpdated(
         TELEPHONY_LOGE("call object is nullptr");
         return;
     }
+    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
     TELEPHONY_LOGI("HandleCallStateUpdated priorState:%{public}d, nextState:%{public}d", priorState, nextState);
+    if ((nextState == TelCallState::CALL_STATUS_DISCONNECTING ||
+         nextState == TelCallState::CALL_STATUS_DISCONNECTED) && priorState == TelCallState::CALL_STATUS_INCOMING) {
+        callStateProcessor->DeleteCall(callObjectPtr->GetCallID(), TelCallState::CALL_STATUS_ACTIVE);
+    }
     if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
         TELEPHONY_LOGI("user answered, mute ringer instead of release renderer");
         if (priorState == TelCallState::CALL_STATUS_INCOMING) {
-            DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(callObjectPtr->GetCallID(), priorState);
+            callStateProcessor->DeleteCall(callObjectPtr->GetCallID(), priorState);
+            callObjectPtr->SetIsAnsweredByPhone(true);
         }
         MuteRinger();
+    }
+    if (nextState == TelCallState::CALL_STATUS_ACTIVE && priorState == TelCallState::CALL_STATUS_INCOMING &&
+        callObjectPtr->GetAnsweredByPhone()) {
+        UnmuteSoundTone();
         return;
     }
     HandleNextState(callObjectPtr, nextState);
@@ -330,6 +348,23 @@ void AudioControlManager::HandleCallStateUpdated(
         return;
     }
     HandlePriorState(callObjectPtr, priorState);
+}
+
+void AudioControlManager::UnmuteSoundTone()
+{
+    auto weak = weak_from_this();
+    ffrt::submit_h([weak]() {
+        auto strong = weak.lock();
+        if (strong != nullptr) {
+            std::unique_lock<ffrt::mutex> lock(strong->crsMutex_);
+            if (strong->isCrsStartSoundTone_) {
+                TELEPHONY_LOGI("crs unmuteSound");
+                strong->isCrsStartSoundTone_ = false;
+            }
+            lock.unlock();
+            DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(false);
+        }
+        }, {}, {}, ffrt::task_attr().delay(UNMUTE_SOUNDTONE_DELAY_TIME));
 }
 
 void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState)
@@ -347,6 +382,7 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_RINGING;
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
+        case TelCallState::CALL_STATUS_ANSWERED:
             HandleNewActiveCall(callObjectPtr);
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
             break;
@@ -357,13 +393,12 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
             break;
         case TelCallState::CALL_STATUS_DISCONNECTING:
         case TelCallState::CALL_STATUS_DISCONNECTED:
-            if (isCrsVibrating_) {
-                DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
-                isCrsVibrating_ = false;
-            }
-            if (isVideoRingVibrating_) {
-                DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
-                isVideoRingVibrating_ = false;
+            if (!CallObjectManager::HasIncomingCallCrsType() && !CallObjectManager::HasIncomingCallVideoRingType()) {
+                if (isCrsVibrating_ || isVideoRingVibrating_) {
+                    DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
+                    isCrsVibrating_ = false;
+                    isVideoRingVibrating_ = false;
+                }
             }
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
             break;
@@ -423,21 +458,58 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
 
 void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr)
 {
-    if (callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
-        if (isCrsVibrating_) {
-            DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
-            isCrsVibrating_ = false;
+    auto callRunningState = callObjectPtr->GetCallRunningState();
+    if (callRunningState == CallRunningState::CALL_RUNNING_STATE_ACTIVE ||
+        callRunningState == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+        if (!CallObjectManager::HasIncomingCallCrsType() && !CallObjectManager::HasIncomingCallVideoRingType()) {
+            if (isCrsVibrating_ || isVideoRingVibrating_) {
+                DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
+                isCrsVibrating_ = false;
+                isVideoRingVibrating_ = false;
+            }
         }
-        if (isVideoRingVibrating_) {
-            DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
-            isVideoRingVibrating_ = false;
-        }
-        int ringCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
-        if ((CallObjectManager::GetCurrentCallNum() - ringCallCount) < MIN_MULITY_CALL_COUNT) {
+        ProcessSoundtone(callObjectPtr);
+        UpdateDeviceTypeForVideoOrSatelliteCall();
+    }
+}
+
+void AudioControlManager::ProcessSoundtone(sptr<CallBase> &callObjectPtr)
+{
+    int ringCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    int minMulityCall = MIN_MULITY_ACTIVE_CALL_COUNT;
+    if (!callObjectPtr->GetAnsweredByPhone()) {
+        minMulityCall = MIN_DC_MULITY_ACTIVE_CALL_COUNT;
+    }
+    if (((CallObjectManager::GetCurrentCallNum() - ringCallCount) < minMulityCall)) {
+        if (isCrsStartSoundTone_ == true) {
+            if (callObjectPtr->GetAnsweredByPhone()) {
+                ResumeCrsSoundTone();
+            }
+        } else {
+            TELEPHONY_LOGI("local ring  MT call is answer, now playsoundtone");
             StopSoundtone();
             PlaySoundtone();
+            if (callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+                TELEPHONY_LOGI("mute when mt call is answer");
+                DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(true);
+            }
         }
-        UpdateDeviceTypeForVideoOrSatelliteCall();
+    }
+}
+
+void AudioControlManager::ResumeCrsSoundTone()
+{
+    TELEPHONY_LOGI("ResumeCrsSoundTone start");
+    RestoreVoiceValumeIfNecessary();
+    AudioDevice device = {
+        .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+        .address = { 0 },
+    };
+    DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device);
+    TELEPHONY_LOGI("crs soundtone preferred deivce = %{public}d", device.deviceType);
+    if (device.deviceType == AudioDeviceType::DEVICE_SPEAKER) {
+        device.deviceType = initCrsDeviceType_;
+        SetAudioDevice(device);
     }
 }
 
@@ -598,6 +670,67 @@ int32_t AudioControlManager::HandleWirelessAudioDevice(const AudioDevice &device
     return TELEPHONY_SUCCESS;
 }
 
+bool AudioControlManager::NeedPlayVideoRing(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr)
+{
+    int32_t userId = 0;
+    bool isUserUnlocked = false;
+    AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
+    AccountSA::OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
+    TELEPHONY_LOGI("isUserUnlocked: %{public}d", isUserUnlocked);
+    if (!isUserUnlocked) {
+        return false;
+    }
+    CallAttributeInfo info;
+    callObjectPtr->GetCallAttributeBaseInfo(info);
+    if (info.crsType == CRS_TYPE) {
+        TELEPHONY_LOGI("crs type call.");
+        return false;
+    }
+    bool isNotWearWatch = DelayedSingleton<CallControlManager>::GetInstance()->IsNotWearOnWrist();
+    if (isNotWearWatch) {
+        TELEPHONY_LOGI("isNotWearWatch: %{public}d", isNotWearWatch);
+        return false;
+    }
+
+    if (!strlen(contactInfo.ringtonePath)) {
+        if (IsSystemVideoRing(callObjectPtr)) {
+            if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING)) !=
+                EOK) {
+                TELEPHONY_LOGE("memcpy_s ringtonePath fail");
+                return false;
+            };
+        }
+    }
+
+    if (CallObjectManager::IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+        TELEPHONY_LOGI("need play video ring.");
+        return true;
+    }
+    return false;
+}
+
+bool AudioControlManager::IsSystemVideoRing(sptr<CallBase> &callObjectPtr)
+{
+    CallAttributeInfo info;
+    callObjectPtr->GetCallAttributeBaseInfo(info);
+    const std::shared_ptr<AbilityRuntime::Context> context;
+    Media::RingtoneType type = info.accountId == DEFAULT_SIM_SLOT_ID ? Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0 :
+        Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
+    std::shared_ptr<Media::SystemSoundManager> systemSoundManager =
+        Media::SystemSoundManagerFactory::CreateSystemSoundManager();
+    if (systemSoundManager == nullptr) {
+        TELEPHONY_LOGE("get systemSoundManager failed");
+        return false;
+    }
+    Media::ToneAttrs toneAttrs = systemSoundManager->GetCurrentRingtoneAttribute(type);
+    TELEPHONY_LOGI("type: %{public}d, mediatype: %{public}d", type, toneAttrs.GetMediaType());
+    if (toneAttrs.GetMediaType() == Media::ToneMediaType::MEDIA_TYPE_VID) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool AudioControlManager::PlayRingtone()
 {
     int32_t ret;
@@ -622,7 +755,7 @@ bool AudioControlManager::PlayRingtone()
     if (incomingCall->GetCrsType() == CRS_TYPE) {
         return dealCrsScene(ringMode);
     }
-    if (IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+    if (CallObjectManager::IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
             ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE) {
             TELEPHONY_LOGI("need start vibrator.");
@@ -644,6 +777,29 @@ bool AudioControlManager::PlayRingtone()
     return true;
 }
 
+bool AudioControlManager::PlayForNoRing()
+{
+    if (isPlayForNoRing_) {
+        TELEPHONY_LOGI("isPlayForNoRing_ is true,return");
+        return true;
+    }
+    AudioStandard::AudioRendererParams rendererParams;
+    rendererParams.sampleFormat = AudioStandard::SAMPLE_S24LE;
+    rendererParams.channelCount = AudioStandard::STEREO;
+    if (audioRenderer_ == nullptr) {
+        audioRenderer_ = AudioStandard::AudioRenderer::Create(AudioStandard::AudioStreamType::STREAM_VOICE_RING);
+    }
+    if (audioRenderer_ == nullptr) {
+        TELEPHONY_LOGE("audioRenderer_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t audioRet = audioRenderer_->SetParams(rendererParams);
+    bool isStarted = audioRenderer_->Start();
+    TELEPHONY_LOGI("PlayForNoRing isStarted : %{public}d, audioRet: %{public}d", isStarted, audioRet);
+    isPlayForNoRing_ = true;
+    return isStarted;
+}
+
 bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &ringMode)
 {
     if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
@@ -652,25 +808,17 @@ bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &rin
         }
     }
     if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
-        AdjustVolumesForCrs();
+        isCrsStartSoundTone_ = true;
         if (PlaySoundtone()) {
             TELEPHONY_LOGI("play soundtone success");
+            AdjustVolumesForCrs();
             return true;
         }
+        AdjustVolumesForCrs();
+        TELEPHONY_LOGE("play soundtone fail.");
         return false;
     }
     TELEPHONY_LOGI("type_crs but not play ringtone");
-    return false;
-}
-
-bool AudioControlManager::IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath)
-{
-    if ((personalNotificationRingtone.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
-        personalNotificationRingtone.substr(personalNotificationRingtone.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
-        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) || ringtonePath == SYSTEM_VIDEO_RING) {
-        TELEPHONY_LOGI("Is video ring.");
-        return true;
-    }
     return false;
 }
 
@@ -755,6 +903,9 @@ bool AudioControlManager::StopSoundtone()
 
 bool AudioControlManager::StopRingtone()
 {
+    if (isPlayForNoRing_) {
+        return StopForNoRing();
+    }
     if (ringState_ == RingState::STOPPED) {
         TELEPHONY_LOGI("ringtone already stopped");
         return true;
@@ -769,6 +920,20 @@ bool AudioControlManager::StopRingtone()
     }
     ring_->ReleaseRenderer();
     TELEPHONY_LOGI("stop ringtone success");
+    return true;
+}
+
+bool AudioControlManager::StopForNoRing()
+{
+    isPlayForNoRing_ = false;
+    if (audioRenderer_ == nullptr) {
+        TELEPHONY_LOGE("audioRenderer_ is nullptr");
+        return false;
+    }
+    audioRenderer_->Stop();
+    audioRenderer_->Release();
+    audioRenderer_ = nullptr;
+    TELEPHONY_LOGI("StopForNoRing success");
     return true;
 }
 
@@ -876,7 +1041,7 @@ int32_t AudioControlManager::MuteRinger()
         if (incomingCall->GetCrsType() == CRS_TYPE && !IsVoIPCallActived() &&
             soundState_ == SoundState::SOUNDING) {
             TELEPHONY_LOGI("Mute network ring tone.");
-            MuteNetWorkRingTone();
+            MuteNetWorkRingTone(true);
         }
     }
     SendMuteRingEvent();
@@ -1203,12 +1368,12 @@ bool AudioControlManager::IsSoundPlaying()
     return soundState_ == SoundState::SOUNDING;
 }
 
-void AudioControlManager::MuteNetWorkRingTone()
+void AudioControlManager::MuteNetWorkRingTone(bool isMute)
 {
     bool result =
-        DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(true);
-    TELEPHONY_LOGI("Set Voice Ringtone mute, result: %{public}d", result);
-    if (isCrsVibrating_) {
+        DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(isMute);
+    TELEPHONY_LOGI("Set Voice Ringtone mute,isMute: %{public}d, result: %{public}d", isMute, result);
+    if (isCrsVibrating_ && isMute) {
         DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
         isCrsVibrating_ = false;
     }
@@ -1365,8 +1530,9 @@ void AudioControlManager::RestoreVoiceValumeIfNecessary()
     auto voiceVolume = GetBackupVoiceVolume();
     TELEPHONY_LOGI("now voiceVolume is %{public}d", voiceVolume);
     if (voiceVolume >= 0) {
-        DelayedSingleton<AudioProxy>::GetInstance()->SetVolume(
-            AudioStandard::AudioVolumeType::STREAM_VOICE_CALL, voiceVolume);
+        DelayedSingleton<AudioProxy>::GetInstance()->SetVolumeWithDevice(
+            AudioStandard::AudioVolumeType::STREAM_VOICE_CALL, voiceVolume,
+            AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER);
         SaveVoiceVolume(-1);
     }
 }

@@ -93,12 +93,14 @@ public:
     static bool IsVoipCallExist();
     static bool IsVoipCallExist(TelCallState callState, int32_t &callId);
     static bool HasIncomingCallCrsType();
+    static bool HasIncomingCallVideoRingType();
     static CellularCallInfo GetDialCallInfo();
     static bool HasSatelliteCallExist();
     static int32_t GetSatelliteCallList(std::list<int32_t> &list);
     static int32_t GetCallNumByRunningState(CallRunningState callState);
     static sptr<CallBase> GetForegroundLiveCallByCallId(int32_t callId);
     static bool IsNeedSilentInDoNotDisturbMode();
+    static bool IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath);
 #ifdef NOT_SUPPORT_MULTICALL
     static bool IsTwoCallBtCallAndESIM();
     static bool IsTwoCallBtCall();

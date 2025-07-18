@@ -139,6 +139,7 @@ public:
     void SetCallDirection(CallDirection direction);
     CallDirection GetCallDirection();
     int32_t GetAccountId();
+    void SetAccountId(int32_t accountId);
     bool IsAnsweredCall();
     void SetAnsweredCall(bool isAnswered);
     AAFwk::WantParams GetExtraParams();
@@ -147,6 +148,9 @@ public:
     void SetAiAutoAnswer(bool isAiAutoAnswer);
     bool IsForcedReportVoiceCall();
     void SetForcedReportVoiceCall(bool isForcedReportVoiceCall);
+    int32_t GetPhoneOrWatchDial();
+    bool GetAnsweredByPhone();
+    void SetIsAnsweredByPhone(bool isAnsweredByPhone);
 
 protected:
     int32_t callId_;
@@ -201,6 +205,7 @@ private:
     int32_t phoneOrWatch_ = 0;
     bool isAiAutoAnswer_;
     bool isForcedReportVoiceCall_{false};
+    bool isAnsweredByPhone_{false};
 };
 } // namespace Telephony
 } // namespace OHOS

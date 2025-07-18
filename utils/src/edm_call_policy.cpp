@@ -30,8 +30,8 @@ constexpr int32_t MAX_COUNT = 1000;
 EdmCallPolicy::EdmCallPolicy() {}
 EdmCallPolicy::~EdmCallPolicy() {}
 
-int32_t EdmCallPolicy::SetCallPolicy(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
-    int32_t incomingPolicy, const std::vector<std::string> &incomingList)
+int32_t EdmCallPolicy::SetCallPolicy(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
+    bool isIncomingTrustlist, const std::vector<std::string> &incomingList)
 {
     TELEPHONY_LOGI("enter EdmCallPolicy::SetCallPolicy");
     if (dialingList.size() > MAX_COUNT || incomingList.size() > MAX_COUNT) {
@@ -40,11 +40,13 @@ int32_t EdmCallPolicy::SetCallPolicy(int32_t dialingPolicy, const std::vector<st
     std::unique_lock<ffrt::shared_mutex> lock(rwMutex_);
     dialingList_.numberList.clear();
     incomingList_.numberList.clear();
-    dialingList_.policyFlag = (EDMPolicyFlag)dialingPolicy;
+    dialingList_.policyFlag = isDialingTrustlist ?
+        EdmPolicyFlag::POLICY_FLAG_TRUST : EdmPolicyFlag::POLICY_FLAG_BLOCK;
     for (auto item : dialingList) {
         dialingList_.numberList.insert(item);
     }
-    incomingList_.policyFlag = (EDMPolicyFlag)incomingPolicy;
+    incomingList_.policyFlag = isIncomingTrustlist ?
+        EdmPolicyFlag::POLICY_FLAG_TRUST : EdmPolicyFlag::POLICY_FLAG_BLOCK;
     for (auto item : incomingList) {
         incomingList_.numberList.insert(item);
     }
@@ -59,17 +61,17 @@ bool EdmCallPolicy::IsCallEnable(const std::string &phoneNum, const EdmCallPolic
     }
     std::shared_lock<ffrt::shared_mutex> lock(rwMutex_);
     switch (list.policyFlag) {
-        case EDMPolicyFlag::POLICY_FLAG_NONE:
+        case EdmPolicyFlag::POLICY_FLAG_NONE:
             return true;
-        case EDMPolicyFlag::POLICY_FLAG_BLOCK: {
-               // 黑名单
+        case EdmPolicyFlag::POLICY_FLAG_BLOCK: {
+            // 黑名单
             if (list.numberList.empty()) {
                 return true;
             }
             auto iter = list.numberList.find(phoneNum);
             return iter == list.numberList.end();
         }
-        case EDMPolicyFlag::POLICY_FLAG_TRUST: {
+        case EdmPolicyFlag::POLICY_FLAG_TRUST: {
             // 白名单
             if (list.numberList.empty()) {
                 return true;

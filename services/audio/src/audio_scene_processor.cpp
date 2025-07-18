@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -215,12 +215,16 @@ bool AudioSceneProcessor::SwitchIncoming()
     }
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
-    if (state == (int32_t) CallStateToApp::CALL_STATE_OFFHOOK) {
+    int endCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_ENDED);
+    if (state == (int32_t) CallStateToApp::CALL_STATE_OFFHOOK ||
+        (CallObjectManager::GetCurrentCallNum() - endCallCount > ONE_CALL_EXIST &&
+            DelayedSingleton<AudioControlManager>::GetInstance()->IsSoundPlaying() &&
+            CallObjectManager::HasIncomingCallCrsType())) {
         DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
     } else {
         bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
         bool isNeedSilent = CallObjectManager::IsNeedSilentInDoNotDisturbMode();
-        bool isNotWearWatch = DelayedSingleton<CallControlManager>::GetInstance()->isNotWearOnWrist();
+        bool isNotWearWatch = DelayedSingleton<CallControlManager>::GetInstance()->IsNotWearOnWrist();
         if (!isStartBroadcast && !isNeedSilent && !isNotWearWatch) {
             TELEPHONY_LOGI("broadcast switch and doNotDisturbMode close, start play system ring");
             DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
@@ -229,6 +233,10 @@ bool AudioSceneProcessor::SwitchIncoming()
         } else {
             TELEPHONY_LOGI("isStartBroadcast: %{public}d, isNeedSilent: %{public}d, isNotWearWatch: %{public}d",
                 isStartBroadcast, isNeedSilent, isNotWearWatch);
+            if (system::GetParameter("const.product.devicetype", "") == "wearable") {
+                DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
+                DelayedSingleton<AudioControlManager>::GetInstance()->PlayForNoRing();
+            }
         }
         DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_RINGING);
     }

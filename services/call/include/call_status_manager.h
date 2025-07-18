@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -109,8 +109,7 @@ private:
     bool IsTrustedNumber(MarkType markType, std::string phoneNumber);
     int32_t UpdateDialingCallInfo(const CallDetailInfo &info);
     void SetContactInfo(sptr<CallBase> &call, std::string phoneNum);
-    void DealVideoRingPath(ContactInfo &ringtonePath, sptr<CallBase> &callObjectPtr);
-    bool IsSetSystemVideoRing(sptr<CallBase> &callObjectPtr);
+    bool HandleBluetoothCall(sptr<CallBase> &call, ContactInfo &contactInfo, std::string phoneNum);
     int32_t HandleRejectCall(sptr<CallBase> &call, bool isBlock);
     bool ShouldRejectIncomingCall();
     bool ShouldBlockIncomingCall(const sptr<CallBase> &call, const CallDetailInfo &info);
@@ -135,7 +134,7 @@ private:
     void BtCallDialingHandleFirst(sptr<CallBase> call, const CallDetailInfo &infol);
     int32_t HandleCallReportInfoEx(const CallDetailInfo &info);
     void ClearPendingState(sptr<CallBase> &call);
-    void RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason);
+    void RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason, const std::string &message);
 #ifdef NOT_SUPPORT_MULTICALL
     void AutoAnswerSecondCall();
 #endif

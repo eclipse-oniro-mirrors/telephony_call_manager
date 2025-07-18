@@ -371,6 +371,10 @@ enum class RilDisconnectedReason : int32_t {
      */
     DISCONNECTED_REASON_NORMAL = 0,
     /**
+    * Indicates the cs call is answered elsewhere.
+    */
+    DISCONNECTED_REASON_CS_CALL_ANSWERED_ELSEWHER = 13,
+    /**
      * Indicates the call disconnect due to user reject.
      */
     DISCONNECTED_REASON_USER_DECLINE = 143,

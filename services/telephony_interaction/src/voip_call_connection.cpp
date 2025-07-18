@@ -43,7 +43,9 @@ void VoipCallConnection::Init(int32_t systemAbilityId)
     }
     systemAbilityId_ = systemAbilityId;
     TELEPHONY_LOGI("systemAbilityId_ = %{public}d", systemAbilityId);
-    GetCallManagerProxy();
+    if (GetCallManagerProxy() == TELEPHONY_SUCCESS) {
+        connectCallManagerState_ = true;
+    }
     statusChangeListener_ = new (std::nothrow) SystemAbilityListener();
     if (statusChangeListener_ == nullptr) {
         TELEPHONY_LOGE("Init, failed to create statusChangeListener.");
@@ -67,13 +69,6 @@ void VoipCallConnection::UnInit()
     std::lock_guard<std::mutex> lock(mutex_);
     voipCallManagerInterfacePtr_ = nullptr;
     connectCallManagerState_ = false;
-    if (statusChangeListener_ != nullptr) {
-        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (samgrProxy != nullptr) {
-            samgrProxy->UnSubscribeSystemAbility(systemAbilityId_, statusChangeListener_);
-            statusChangeListener_ = nullptr;
-        }
-    }
     TELEPHONY_LOGI("voip call connection uninit");
 }
 
@@ -101,7 +96,6 @@ int32_t VoipCallConnection::GetCallManagerProxy()
     }
 
     voipCallManagerInterfacePtr_ = voipCallManagerInterfacePtr;
-    connectCallManagerState_ = true;
     return TELEPHONY_SUCCESS;
 }
 

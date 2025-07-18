@@ -31,7 +31,12 @@ public:
     void OnDeviceOffline(const std::string &networkId, const std::string &devName, uint16_t devType) override;
     void OnConnected() override {}
     void OnCallCreated(const sptr<CallBase> &call, const std::string &networkId) override {}
-    void OnCallDestroyed() override {}
+    void OnCallDestroyed() override;
+    void HandleSpecificMsg(int32_t msgType, const cJSON *msg) override;
+    void CallCreated(const sptr<CallBase> &call, const std::string &networkId) override;
+
+private:
+    void OnQueryRequisitesDataMsgReceived(const cJSON *msg);
 };
 }
 }
