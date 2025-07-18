@@ -51,7 +51,7 @@ IncomingFlashReminder::~IncomingFlashReminder()
 
 void IncomingFlashReminder::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    switch(event->GetInnerEventId()) {
+    switch (event->GetInnerEventId()) {
         case DELAY_SET_TORCH_EVENT:
             HandleSetTorchMode();
             break;
@@ -125,7 +125,7 @@ bool IncomingFlashReminder::IsFlashReminderSwitchOn()
         + std::to_string(userId) + "?Proxy=true");
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
     std::string value;
-    int32_t result = datashareHelper->Query(uri, "accessibility_reminder_function_enabled", value);
+    int32_t result = datashareHelper->Query(uri, "", value);
     TELEPHONY_LOGI("query reminder switch, result: %{public}d", result);
     return (result == TELEPHONY_SUCCESS && value.find(FLASH_REMINDER_SWITCH_SUBSTRING) != std::string::npos);
 }
@@ -138,7 +138,7 @@ void IncomingFlashReminder::StartFlashRemind()
 void IncomingFlashReminder::HandleStartFlashRemind()
 {
     if (isFlashRemindUsed_) {
-       return;
+        return;
     }
     isFlashRemindUsed_ = true;
     SendEvent(AppExecFwk::InnerEvent::Get(DELAY_SET_TORCH_EVENT, 0));
@@ -159,14 +159,14 @@ void IncomingFlashReminder::HandleSetTorchMode()
 
 void IncomingFlashReminder::StopFlashRemind()
 {
-    SendEvent(AppExecFwk::InnerEvent::Get(STOP_FLASH_REMIND_EVENT, 0));   
+    SendEvent(AppExecFwk::InnerEvent::Get(STOP_FLASH_REMIND_EVENT, 0));
 }
 
 void IncomingFlashReminder::HandleStopFlashRemind()
 {
     if (!isFlashRemindUsed_) {
         TELEPHONY_LOGI("no need to stop");
-        DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminderer();
+        DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
         return;
     }
     isFlashRemindUsed_ = false;
@@ -176,7 +176,7 @@ void IncomingFlashReminder::HandleStopFlashRemind()
     int32_t result = camMgr->SetTorchMode(CameraStandard::TORCH_MODE_OFF);
     TELEPHONY_LOGI("set torch mode result: %{public}d", result);
 #endif
-    DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminderer();
+    DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
 }
 }
 }

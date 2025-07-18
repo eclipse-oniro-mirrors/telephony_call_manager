@@ -412,7 +412,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_001, TestSize.Level1)
     DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
     DelayedSingleton<CallControlManager>::GetInstance()->StartFlashRemind();
     DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
-    DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminderer();
+    DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
     EXPECT_EQ(DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_, nullptr);
 }
 
