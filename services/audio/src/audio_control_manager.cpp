@@ -670,6 +670,67 @@ int32_t AudioControlManager::HandleWirelessAudioDevice(const AudioDevice &device
     return TELEPHONY_SUCCESS;
 }
 
+bool AudioControlManager::NeedPlayVideoRing(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr)
+{
+    int32_t userId = 0;
+    bool isUserUnlocked = false;
+    AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
+    AccountSA::OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
+    TELEPHONY_LOGI("isUserUnlocked: %{public}d", isUserUnlocked);
+    if (!isUserUnlocked) {
+        return false;
+    }
+    CallAttributeInfo info;
+    callObjectPtr->GetCallAttributeBaseInfo(info);
+    if (info.crsType == CRS_TYPE) {
+        TELEPHONY_LOGI("crs type call.");
+        return false;
+    }
+    bool isNotWearWatch = DelayedSingleton<CallControlManager>::GetInstance()->IsNotWearOnWrist();
+    if (isNotWearWatch) {
+        TELEPHONY_LOGI("isNotWearWatch: %{public}d", isNotWearWatch);
+        return false;
+    }
+
+    if (!strlen(contactInfo.ringtonePath)) {
+        if (IsSystemVideoRing(callObjectPtr)) {
+            if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING)) !=
+                EOK) {
+                TELEPHONY_LOGE("memcpy_s ringtonePath fail");
+                return false;
+            };
+        }
+    }
+
+    if (CallObjectManager::IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+        TELEPHONY_LOGI("need play video ring.");
+        return true;
+    }
+    return false;
+}
+
+bool AudioControlManager::IsSystemVideoRing(sptr<CallBase> &callObjectPtr)
+{
+    CallAttributeInfo info;
+    callObjectPtr->GetCallAttributeBaseInfo(info);
+    const std::shared_ptr<AbilityRuntime::Context> context;
+    Media::RingtoneType type = info.accountId == DEFAULT_SIM_SLOT_ID ? Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0 :
+        Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
+    std::shared_ptr<Media::SystemSoundManager> systemSoundManager =
+        Media::SystemSoundManagerFactory::CreateSystemSoundManager();
+    if (systemSoundManager == nullptr) {
+        TELEPHONY_LOGE("get systemSoundManager failed");
+        return false;
+    }
+    Media::ToneAttrs toneAttrs = systemSoundManager->GetCurrentRingtoneAttribute(type);
+    TELEPHONY_LOGI("type: %{public}d, mediatype: %{public}d", type, toneAttrs.GetMediaType());
+    if (toneAttrs.GetMediaType() == Media::ToneMediaType::MEDIA_TYPE_VID) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool AudioControlManager::PlayRingtone()
 {
     int32_t ret;
@@ -694,7 +755,7 @@ bool AudioControlManager::PlayRingtone()
     if (incomingCall->GetCrsType() == CRS_TYPE) {
         return dealCrsScene(ringMode);
     }
-    if (IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+    if (CallObjectManager::IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
             ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE) {
             TELEPHONY_LOGI("need start vibrator.");
@@ -758,17 +819,6 @@ bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &rin
         return false;
     }
     TELEPHONY_LOGI("type_crs but not play ringtone");
-    return false;
-}
-
-bool AudioControlManager::IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath)
-{
-    if ((personalNotificationRingtone.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
-        personalNotificationRingtone.substr(personalNotificationRingtone.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
-        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) || ringtonePath == SYSTEM_VIDEO_RING) {
-        TELEPHONY_LOGI("Is video ring.");
-        return true;
-    }
     return false;
 }
 

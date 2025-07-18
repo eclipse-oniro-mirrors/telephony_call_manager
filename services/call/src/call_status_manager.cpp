@@ -61,7 +61,6 @@ namespace Telephony {
 constexpr int32_t INIT_INDEX = 0;
 constexpr int32_t PRESENTATION_RESTRICTED = 3;
 constexpr int32_t MAIN_USER_SPACE = 100;
-static constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
 const std::string ADVSECMODE_STATE = "ohos.boot.advsecmode.state";
 
 CallStatusManager::CallStatusManager()
@@ -534,19 +533,8 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         .isVoiceMail = false,
         .isQueryComplete = true,
     };
-    if (call->GetCallType() == CallType::TYPE_BLUETOOTH) {
-        std::string contactName = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetHfpContactName(
-            phoneNum);
-        if (!contactName.empty()) {
-            contactInfo.name = contactName;
-            contactInfo.isContacterExists = true;
-            call->SetCallerInfo(contactInfo);
-            AAFwk::WantParams params = call->GetExtraParams();
-            params.SetParam("BtCallContactName", AAFwk::String::Box(contactName));
-            call->SetExtraParams(params);
-            TELEPHONY_LOGI("SetCallerInfo end for type bluetooth.");
-            return;
-        }
+    if (HandleBluetoothCall(call, contactInfo, phoneNum)) {
+        return;
     }
     ffrt::submit([=, &call]() {
         if (call == nullptr) {
@@ -558,7 +546,14 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         // Get the contact data from the database
         ContactInfo contactInfoTemp = contactInfo;
         QueryCallerInfo(contactInfoTemp, phoneNum);
-        DealVideoRingPath(contactInfoTemp, callObjectPtr);
+        if (!CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast()) {
+            if (DelayedSingleton<AudioControlManager>::GetInstance()->NeedPlayVideoRing(
+                contactInfoTemp, callObjectPtr)) {
+                AAFwk::WantParams params = callObjectPtr->GetExtraParams();
+                params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfo.ringtonePath)));
+                callObjectPtr->SetExtraParams(params);
+            }
+        }
         callObjectPtr->SetCallerInfo(contactInfoTemp);
         CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfoTemp, callObjectPtr->GetCallID());
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
@@ -566,61 +561,23 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
     });
 }
 
-void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr)
+bool CallStatusManager::HandleBluetoothCall(sptr<CallBase> &call, ContactInfo &contactInfo, std::string phoneNum)
 {
-    int32_t userId = 0;
-    bool isUserUnlocked = false;
-    AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
-    AccountSA::OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
-    TELEPHONY_LOGI("isUserUnlocked: %{public}d", isUserUnlocked);
-    if (!isUserUnlocked) {
-        return;
-    }
-    bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
-    if (isStartBroadcast) {
-        TELEPHONY_LOGI("Incoming call broadcast is on.");
-        return;
-    }
-
-    if (!strlen(contactInfo.ringtonePath)) {
-        if (IsSetSystemVideoRing(callObjectPtr)) {
-            if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING))
-                != EOK) {
-                TELEPHONY_LOGE("memcpy_s ringtonePath fail");
-                return;
-            };
+    if (call->GetCallType() == CallType::TYPE_BLUETOOTH) {
+        std::string contactName = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetHfpContactName(
+            phoneNum);
+        if (!contactName.empty()) {
+            contactInfo.name = contactName;
+            contactInfo.isContacterExists = true;
+            call->SetCallerInfo(contactInfo);
+            AAFwk::WantParams params = call->GetExtraParams();
+            params.SetParam("BtCallContactName", AAFwk::String::Box(contactName));
+            call->SetExtraParams(params);
+            TELEPHONY_LOGI("SetCallerInfo end for type bluetooth.");
+            return true;
         }
     }
-
-    if (DelayedSingleton<AudioControlManager>::GetInstance()->IsVideoRing(contactInfo.personalNotificationRingtone,
-        contactInfo.ringtonePath)) {
-        TELEPHONY_LOGI("notify callui to play video ring.");
-        AAFwk::WantParams params = callObjectPtr->GetExtraParams();
-        params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfo.ringtonePath)));
-        callObjectPtr->SetExtraParams(params);
-    }
-}
-
-bool CallStatusManager::IsSetSystemVideoRing(sptr<CallBase> &callObjectPtr)
-{
-    CallAttributeInfo info;
-    callObjectPtr->GetCallAttributeBaseInfo(info);
-    const std::shared_ptr<AbilityRuntime::Context> context;
-    Media::RingtoneType type = info.accountId == DEFAULT_SIM_SLOT_ID ? Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0 :
-        Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
-    std::shared_ptr<Media::SystemSoundManager> systemSoundManager =
-        Media::SystemSoundManagerFactory::CreateSystemSoundManager();
-    if (systemSoundManager == nullptr) {
-        TELEPHONY_LOGE("get systemSoundManager failed");
-        return false;
-    }
-    Media::ToneAttrs toneAttrs = systemSoundManager->GetCurrentRingtoneAttribute(type);
-    TELEPHONY_LOGI("type: %{public}d, mediatype: %{public}d", type, toneAttrs.GetMediaType());
-    if (toneAttrs.GetMediaType() == Media::ToneMediaType::MEDIA_TYPE_VID) {
-        return true;
-    } else {
-        return false;
-    }
+    return false;
 }
 
 int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call, bool isBlock)

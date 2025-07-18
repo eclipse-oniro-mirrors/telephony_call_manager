@@ -95,10 +95,9 @@ public:
     bool IsScoTemporarilyDisabled();
     void ExcludeBluetoothSco();
     void UnexcludeBluetoothSco();
-    bool IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath);
     bool PlayForNoRing();
     bool StopForNoRing();
-
+    bool NeedPlayVideoRing(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr);
 private:
     RingState ringState_ = RingState::STOPPED;
     void HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState);
@@ -131,6 +130,7 @@ private:
     bool IsExternalAudioDevice(AudioDeviceType initDeviceType);
     void UnmuteSoundTone();
     void ProcessSoundtone(sptr<CallBase> &callObjectPtr);
+    bool IsSystemVideoRing(sptr<CallBase> &callObjectPtr);
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;

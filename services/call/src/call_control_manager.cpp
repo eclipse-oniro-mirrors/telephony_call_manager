@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -2086,11 +2086,11 @@ void WearStatusObserver::OnChange()
     }
     TELEPHONY_LOGI("OnChange wear status: %{public}s", wearStatus.c_str());
     if (wearStatus == "1") {
-        callControlMgr->setWearState(WEAR_STATUS_OFF);
+        callControlMgr->SetWearState(WEAR_STATUS_OFF);
     } else if (wearStatus == "2") {
-        callControlMgr->setWearState(WEAR_STATUS_ON);
+        callControlMgr->SetWearState(WEAR_STATUS_ON);
     } else {
-        callControlMgr->setWearState(WEAR_STATUS_INVALID);
+        callControlMgr->SetWearState(WEAR_STATUS_INVALID);
     }
 }
 void CallControlManager::RegisterObserver()
@@ -2124,13 +2124,13 @@ void CallControlManager::UnRegisterObserver()
     }
 }
 
-void CallControlManager::setWearState(int32_t state)
+void CallControlManager::SetWearState(int32_t state)
 {
     std::lock_guard<std::mutex> lock(wearStatusMutex_);
     wearStatus_ = state;
 }
 
-bool CallControlManager::isNotWearOnWrist()
+bool CallControlManager::IsNotWearOnWrist()
 {
     std::lock_guard<std::mutex> lock(wearStatusMutex_);
     if (wearStatus_ == WEAR_STATUS_OFF) {
