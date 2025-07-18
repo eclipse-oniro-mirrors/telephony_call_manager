@@ -199,12 +199,12 @@ private:
         void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
 
     private:
-        int32_t CommonBroadcastSubscriber();
-        int32_t ContactsBroadcastSubscriber();
-        int32_t SatcommBroadcastSubscriber();
-        int32_t SuperPrivacyModeBroadcastSubscriber();
-        int32_t HSDRBroadcastSubscriber();
-        int32_t HfpBroadcastSubscriber();
+        void CommonBroadcastSubscriber();
+        void ContactsBroadcastSubscriber();
+        void SatcommBroadcastSubscriber();
+        void SuperPrivacyModeBroadcastSubscriber();
+        void HSDRBroadcastSubscriber();
+        void HfpBroadcastSubscriber();
         void MuteKeyBroadcastSubscriber();
 
     private:
