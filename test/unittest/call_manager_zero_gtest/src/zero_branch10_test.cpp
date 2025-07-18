@@ -24,11 +24,19 @@
 #include "bluetooth_call_service.h"
 #include "call_ability_callback.h"
 #include "call_ability_report_proxy.h"
+#include "call_control_manager.h"
 #include "ims_call.h"
+#include "incoming_flash_reminder.h"
 #include "nativetoken_kit.h"
 #include "nearlink_call_client.h"
 #include "telephony_errors.h"
 #include "token_setproc.h"
+#ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
+#include "input/camera_manager.h"
+#endif
+#ifdef ABILITY_SCREENLOCKMGR_SUPPORT
+#include "screenlock_mgr.h"
+#endif
 
 namespace OHOS::Telephony {
 using namespace testing::ext;
@@ -386,5 +394,59 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioProxy_001, TestSize.Level0)
     std::make_shared<AudioPreferDeviceChangeCallback>()->OnPreferredOutputDeviceUpdated(descs);
     EXPECT_EQ(DelayedSingleton<AudioDeviceManager>::GetInstance()->audioDeviceType_,
         AudioDeviceType::DEVICE_WIRED_HEADSET);
+}
+
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_001
+ * @tc.name     test IncomingFlashReminder
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_001, TestSize.Level1)
+{
+    DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ = nullptr;
+    DelayedSingleton<CallControlManager>::GetInstance()->StartFlashRemind();
+    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
+    auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
+    DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ =
+        std::make_shared<IncomingFlashReminder>(runner);
+    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
+    DelayedSingleton<CallControlManager>::GetInstance()->StartFlashRemind();
+    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
+    DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
+    EXPECT_EQ(DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_002
+ * @tc.name     test IncomingFlashReminder
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_002, TestSize.Level1)
+{
+    auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
+    std::shared_ptr<IncomingFlashReminder> reminder = std::make_shared<IncomingFlashReminder>(runner);
+    reminder->isFlashRemindUsed_ = false;
+    reminder->HandleStopFlashRemind();
+    reminder->isFlashRemindUsed_ = true;
+    reminder->HandleStopFlashRemind();
+    EXPECT_FALSE(reminder->isFlashRemindUsed_);
+    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(0);
+    reminder->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(1000001);
+    reminder->ProcessEvent(event);
+    event = AppExecFwk::InnerEvent::Get(1000002);
+    reminder->ProcessEvent(event);
+    EXPECT_TRUE(reminder->isFlashRemindUsed_);
+    reminder->HandleStartFlashRemind();
+    event = AppExecFwk::InnerEvent::Get(1000000);
+    reminder->ProcessEvent(event);
+    reminder->RemoveEvent(1000000);
+    reminder->IsScreenStatusSatisfied();
+    bool isTorchOk = false;
+#ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
+    isTorchOk = (CameraStandard::CameraManager::GetInstance()->IsTorchSupported() &&
+        CameraStandard::CameraManager::GetInstance()->GetTorchMode() != CameraStandard::TORCH_MODE_ON);
+#endif
+    EXPECT_EQ(reminder->IsTorchReady(), isTorchOk);
 }
 }

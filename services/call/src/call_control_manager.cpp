@@ -35,6 +35,7 @@
 #include "cellular_call_connection.h"
 #include "common_type.h"
 #include "ims_call.h"
+#include "incoming_flash_reminder.h"
 #include "iservice_registry.h"
 #include "reject_call_sms.h"
 #include "report_call_info_handler.h"
@@ -220,6 +221,7 @@ void CallControlManager::PackageDialInformation(AppExecFwk::PacMap &extras, std:
 
 int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
 {
+    StopFlashRemind();
 #ifdef NOT_SUPPORT_MULTICALL
     if (HangUpFirstCall(callId)) {
         return TELEPHONY_SUCCESS;
@@ -391,6 +393,7 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
         return ret;
     }
     std::string messageStr(Str16ToStr8(textMessage));
+    StopFlashRemind();
     ret = CallRequestHandlerPtr_->RejectCall(callId, rejectWithMessage, messageStr);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RejectCall failed!");
@@ -1801,6 +1804,7 @@ void CallControlManager::SystemAbilityListener::OnAddSystemAbility(int32_t syste
     if (ret) {
         TELEPHONY_LOGW("HfpBroadcastSubscriber fail.");
     }
+    MuteKeyBroadcastSubscriber();
     IPCSkeleton::SetCallingIdentity(identity);
     TELEPHONY_LOGI("CallControlManager add BroadcastSubscriber");
 }
@@ -1937,6 +1941,20 @@ int32_t CallControlManager::SystemAbilityListener::HfpBroadcastSubscriber()
     TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
 #endif
     return TELEPHONY_SUCCESS;
+}
+
+void CallControlManager::SystemAbilityListener::MuteKeyBroadcastSubscriber()
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent("multimodal.event.MUTE_KEY_PRESS");
+    EventFwk::CommonEventSubscribeInfo subscriberInfos(matchingSkills);
+    subscriberInfos.SetPermission("ohos.permission.SET_TELEPHONY_STATE");
+    subscriberInfos.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    std::shared_ptr<CallBroadcastSubscriber> subscriber =
+        std::make_shared<CallBroadcastSubscriber>(subscriberInfos);
+    subscriberPtrList_.emplace_back(subscriber);
+    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
+    TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
 }
 
 int32_t CallControlManager::SubscriberSaStateChange()
@@ -2157,6 +2175,36 @@ void CallControlManager::HandleVideoRingPlayFail()
         return;
     }
     DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+}
+
+void CallControlManager::StartFlashRemind()
+{
+    std::lock_guard<ffrt::mutex> lock(reminderMutex_);
+    if (incomingFlashReminder_ == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
+        incomingFlashReminder_ = std::make_shared<IncomingFlashReminder>(runner);
+    }
+    if (!incomingFlashReminder_->IsFlashRemindNecessary()) {
+        incomingFlashReminder_ = nullptr;
+        return;
+    }
+    incomingFlashReminder_->StartFlashRemind();
+}
+
+
+void CallControlManager::StopFlashRemind()
+{
+    std::lock_guard<ffrt::mutex> lock(reminderMutex_);
+    if (incomingFlashReminder_ == nullptr) {
+        return;
+    }
+    incomingFlashReminder_->StopFlashRemind();
+}
+
+void CallControlManager::ClearFlashReminder()
+{
+    std::lock_guard<ffrt::mutex> lock(reminderMutex_);
+    incomingFlashReminder_ = nullptr;
 }
 } // namespace Telephony
 } // namespace OHOS

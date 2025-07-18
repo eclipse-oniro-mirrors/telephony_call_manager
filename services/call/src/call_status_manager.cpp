@@ -485,6 +485,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("FilterResultsDispose failed!");
     }
+    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
     return ret;
 }
 
@@ -1167,6 +1168,7 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
     }
+    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
     return ret;
 }
 
@@ -1244,6 +1246,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     }
 #endif
     StopCallMotionRecognition(TelCallState::CALL_STATUS_DISCONNECTED);
+    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
     return TELEPHONY_SUCCESS;
 }
 
