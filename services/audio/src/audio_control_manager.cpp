@@ -511,6 +511,7 @@ void AudioControlManager::ResumeCrsSoundTone()
         device.deviceType = initCrsDeviceType_;
         SetAudioDevice(device);
     }
+    isCrsStartSoundTone_ = false;
 }
 
 void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)
