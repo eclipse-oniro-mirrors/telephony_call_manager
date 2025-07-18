@@ -154,7 +154,7 @@ public:
     void DisconnectAllCalls();
     void StartFlashRemind();
     void StopFlashRemind();
-    void ClearFlashRemind();
+    void ClearFlashReminder();
 #ifdef NOT_SUPPORT_MULTICALL
     bool HangUpFirstCallBtAndESIM(int32_t secondCallId);
     bool HangUpFirstCallBtCall(int32_t secondCallId);

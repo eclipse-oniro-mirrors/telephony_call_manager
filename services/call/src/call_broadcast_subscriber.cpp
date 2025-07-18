@@ -61,7 +61,7 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { HfpConnectBroadcast(data); };
     memberFuncMap_[SCREEN_UNLOCKED] =
         [this](const EventFwk::CommonEventData &data) { ScreenUnlockedBroadcast(data); };
-    memberFuncMap_[MUTE_KEY_PRESS] = 
+    memberFuncMap_[MUTE_KEY_PRESS] =
         [this](const EventFwk::CommonEventData &data) { MuteKeyBroadcast(data); };
 }
 

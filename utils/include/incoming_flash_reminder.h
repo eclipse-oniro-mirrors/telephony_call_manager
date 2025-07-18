@@ -23,14 +23,14 @@ namespace OHOS {
 namespace Telephony {
 class IncomingFlashReminder : public AppExecFwk::EventHandler {
 public:
-    IncomingFlashReminder(const std::shared<AppExecFwk::EventRunner> &runner);
+    IncomingFlashReminder(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
     ~IncomingFlashReminder();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     bool IsFlashRemindNecessary();
     void StartFlashRemind();
     void StopFlashRemind();
 private:
-    bool IsFlashReminderSwicthOn();
+    bool IsFlashReminderSwitchOn();
     bool IsScreenStatusSatisfied();
     bool IsTorchReady();
     void HandleSetTorchMode();

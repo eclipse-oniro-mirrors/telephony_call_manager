@@ -2201,7 +2201,7 @@ void CallControlManager::StopFlashRemind()
     incomingFlashReminder_->StopFlashRemind();
 }
 
-void CallControlManager::ClearFlashReminder()
+void CallControlManager::ClearFlashReminderer()
 {
     std::lock_guard<ffrt::mutex> lock(reminderMutex_);
     incomingFlashReminder_ = nullptr;

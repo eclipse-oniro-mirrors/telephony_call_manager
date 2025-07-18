@@ -23,15 +23,15 @@
 #include "input/camera_manager.h"
 #endif
 #ifdef ABILITY_SCREENLOCKMGR_SUPPORT
-#include "screenlock_mgr.h"
+#include "screenlock_manager.h"
 #endif
 
 namespace OHOS {
 namespace Telephony {
 constexpr int64_t DELAY_SET_TORCH_MODE_TIME = 300;
-constexpr uint32_t DELAY_SET_TORCH_EVENT = 100000;
-constexpr uint32_t STOP_FLASH_REMIND_EVENT = 100001;
-constexpr uint32_t START_FLASH_REMIND_EVENT = 100002;
+constexpr uint32_t DELAY_SET_TORCH_EVENT = 1000000;
+constexpr uint32_t STOP_FLASH_REMIND_EVENT = 1000001;
+constexpr uint32_t START_FLASH_REMIND_EVENT = 1000002;
 const std::string FLASH_REMINDER_SWITCH_SUBSTRING = "INCOMING_CALL";
 IncomingFlashReminder::IncomingFlashReminder(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
     : AppExecFwk::EventHandler(runner) {}
@@ -82,7 +82,7 @@ bool IncomingFlashReminder::IsScreenStatusSatisfied()
 #ifdef ABILITY_SCREENLOCKMGR_SUPPORT
     if (!OHOS::ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked()) {
         TELEPHONY_LOGI("screen is unlocked");
-        return;
+        return false;
     }
     return true;
 #else
@@ -95,7 +95,7 @@ bool IncomingFlashReminder::IsTorchReady()
 {
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
     sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
-    if (!cmaMgr->IsTorchSupported()) {
+    if (!camMgr->IsTorchSupported()) {
         TELEPHONY_LOGI("torch not support");
         return false;
     }
@@ -125,7 +125,7 @@ bool IncomingFlashReminder::IsFlashReminderSwitchOn()
         + std::to_string(userId) + "?Proxy=true");
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
     std::string value;
-    int resp = datashareHelper->Query(uri, "accessibility_reminder_function_enabled", value);
+    int32_t result = datashareHelper->Query(uri, "accessibility_reminder_function_enabled", value);
     TELEPHONY_LOGI("query reminder switch, result: %{public}d", result);
     return (result == TELEPHONY_SUCCESS && value.find(FLASH_REMINDER_SWITCH_SUBSTRING) != std::string::npos);
 }
@@ -151,7 +151,7 @@ void IncomingFlashReminder::HandleSetTorchMode()
     CameraStandard::TorchMode currentMode = camMgr->GetTorchMode();
     CameraStandard::TorchMode nextMode = (currentMode == CameraStandard::TORCH_MODE_ON?
         CameraStandard::TORCH_MODE_OFF : CameraStandard::TORCH_MODE_ON);
-    int result = camMgr->SetTorchMode(nextMode);
+    int32_t result = camMgr->SetTorchMode(nextMode);
     TELEPHONY_LOGI("set torch mode result: %{public}d", result);
     SendEvent(AppExecFwk::InnerEvent::Get(DELAY_SET_TORCH_EVENT, 0), DELAY_SET_TORCH_MODE_TIME);
 #endif
@@ -166,17 +166,17 @@ void IncomingFlashReminder::HandleStopFlashRemind()
 {
     if (!isFlashRemindUsed_) {
         TELEPHONY_LOGI("no need to stop");
-        DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
+        DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminderer();
         return;
     }
     isFlashRemindUsed_ = false;
     RemoveEvent(DELAY_SET_TORCH_EVENT);
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
     sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
-    int result = camMgr->SetTorchMode(CameraStandard::TORCH_MODE_OFF);
+    int32_t result = camMgr->SetTorchMode(CameraStandard::TORCH_MODE_OFF);
     TELEPHONY_LOGI("set torch mode result: %{public}d", result);
 #endif
-    DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
+    DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminderer();
 }
 }
 }

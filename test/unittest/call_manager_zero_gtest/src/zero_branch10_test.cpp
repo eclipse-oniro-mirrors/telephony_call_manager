@@ -35,7 +35,7 @@
 #include "input/camera_manager.h"
 #endif
 #ifdef ABILITY_SCREENLOCKMGR_SUPPORT
-#include "screenlock_mgr.h"
+#include "screenlock_manager.h"
 #endif
 
 namespace OHOS::Telephony {
@@ -412,7 +412,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_001, TestSize.Level1)
     DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
     DelayedSingleton<CallControlManager>::GetInstance()->StartFlashRemind();
     DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
-    DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
+    DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminderer();
     EXPECT_EQ(DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_, nullptr);
 }
 

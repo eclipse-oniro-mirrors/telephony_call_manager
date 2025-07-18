@@ -485,7 +485,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("FilterResultsDispose failed!");
     }
-    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
+    DelayedSingleton<CallControlManager>::GetInstance()->StartFlashRemind();
     return ret;
 }
 
