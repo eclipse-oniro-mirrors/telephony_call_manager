@@ -1804,7 +1804,7 @@ void CallControlManager::SystemAbilityListener::OnRemoveSystemAbility(
     TELEPHONY_LOGI("CallControlManager remove BroadcastSubscriber");
 }
 
-int32_t CallControlManager::SystemAbilityListener::CommonBroadcastSubscriber()
+void CallControlManager::SystemAbilityListener::CommonBroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
@@ -1820,7 +1820,7 @@ int32_t CallControlManager::SystemAbilityListener::CommonBroadcastSubscriber()
     TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
 }
 
-int32_t CallControlManager::SystemAbilityListener::ContactsBroadcastSubscriber()
+void CallControlManager::SystemAbilityListener::ContactsBroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent("event.custom.contacts.PAGE_STATE_CHANGE");
@@ -1833,7 +1833,7 @@ int32_t CallControlManager::SystemAbilityListener::ContactsBroadcastSubscriber()
     TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
 }
 
-int32_t CallControlManager::SystemAbilityListener::SatcommBroadcastSubscriber()
+void CallControlManager::SystemAbilityListener::SatcommBroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
@@ -1846,7 +1846,7 @@ int32_t CallControlManager::SystemAbilityListener::SatcommBroadcastSubscriber()
     TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
 }
 
-int32_t CallControlManager::SystemAbilityListener::SuperPrivacyModeBroadcastSubscriber()
+void CallControlManager::SystemAbilityListener::SuperPrivacyModeBroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent("usual.event.SUPER_PRIVACY_MODE");
@@ -1860,7 +1860,7 @@ int32_t CallControlManager::SystemAbilityListener::SuperPrivacyModeBroadcastSubs
     TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
 }
 
-int32_t CallControlManager::SystemAbilityListener::HSDRBroadcastSubscriber()
+void CallControlManager::SystemAbilityListener::HSDRBroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkillsHsdr;
     matchingSkillsHsdr.AddEvent("usual.event.HSDR_EVENT");
@@ -1874,7 +1874,7 @@ int32_t CallControlManager::SystemAbilityListener::HSDRBroadcastSubscriber()
     TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
 }
 
-int32_t CallControlManager::SystemAbilityListener::HfpBroadcastSubscriber()
+void CallControlManager::SystemAbilityListener::HfpBroadcastSubscriber()
 {
 #ifdef HFP_ASYNC_ENABLE
     EventFwk::MatchingSkills matchingSkillsHfp;
