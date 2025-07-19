@@ -1881,7 +1881,7 @@ void CallControlManager::SystemAbilityListener::HfpBroadcastSubscriber()
     matchingSkillsHfp.AddEvent("usual.event.bluetooth.CONNECT_HFP_HF");
     EventFwk::CommonEventSubscribeInfo subscriberInfos(matchingSkillsHfp);
     subscriberInfos.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    subscriberInfos.SetPermission("ohos.permission.MANAGR_SETTINGS");
+    subscriberInfos.SetPermission("ohos.permission.MANAGE_SETTINGS");
     std::shared_ptr<CallBroadcastSubscriber> subscriber = std::make_shared<CallBroadcastSubscriber>(subscriberInfos);
     subscriberPtrList_.emplace_back(subscriber);
     bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
