@@ -62,6 +62,8 @@ BluetoothCallStub::BluetoothCallStub()
         [this](MessageParcel &data, MessageParcel &reply) { return OnRemoveAudioDeviceList(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_RESET_NEARLINK_AUDIO_DEVICE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnResetNearlinkDeviceList(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_RESET_BT_HEARINGAID_AUDIO_DEVICE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnResetBtHearingAidDeviceList(data, reply); };
 }
 
 BluetoothCallStub::~BluetoothCallStub()
@@ -266,6 +268,17 @@ int32_t BluetoothCallStub::OnRemoveAudioDeviceList(MessageParcel &data, MessageP
 int32_t BluetoothCallStub::OnResetNearlinkDeviceList(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = ResetNearlinkDeviceList();
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t BluetoothCallStub::OnResetBtHearingAidDeviceList(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = ResetBtHearingAidDeviceList();
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");

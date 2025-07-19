@@ -175,6 +175,14 @@ public:
      */
     int32_t ResetNearlinkDeviceList() override;
 
+    /**
+     * ResetBtHearingAidDeviceList
+     *
+     * @brief Reset all bluetooth hearing aid devices
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t ResetBtHearingAidDeviceList() override;
+
 private:
     int32_t SendRequest(BluetoothCallInterfaceCode code);
     int32_t SendRequest(BluetoothCallInterfaceCode code, MessageParcel &dataParcel, MessageParcel &replyParcel);

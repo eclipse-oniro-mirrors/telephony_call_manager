@@ -276,8 +276,13 @@ void AudioProxy::SetWiredHeadsetState(bool isConnected)
 static int32_t SetWirelessAudioDevice(AudioDevice &device, AudioStandard::DeviceType deviceType,
     const std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> &desc)
 {
-    device.deviceType = (deviceType == AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO) ?
-        AudioDeviceType::DEVICE_BLUETOOTH_SCO : AudioDeviceType::DEVICE_NEARLINK;
+    if (deviceType == AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO) {
+        device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
+    } else if (deviceType == AudioStandard::DEVICE_TYPE_NEARLINK) {
+        device.deviceType = AudioDeviceType::DEVICE_NEARLINK;
+    } else {
+        device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID;
+    }
     if (memset_s(&device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK ||
         memset_s(&device.deviceName, kMaxDeviceNameLen + 1, 0, kMaxDeviceNameLen + 1) != EOK) {
         TELEPHONY_LOGE("memset_s address fail");
@@ -314,7 +319,8 @@ int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device, bool isNe
     }
     switch (desc[0]->deviceType_) {
         case AudioStandard::DEVICE_TYPE_NEARLINK:
-        case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO: {
+        case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO:
+        case AudioStandard::DEVICE_TYPE_HEARING_AID: {
             int32_t result = SetWirelessAudioDevice(device, desc[0]->deviceType_, desc);
             if (result != TELEPHONY_SUCCESS) {
                 return result;
@@ -419,6 +425,7 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
     switch (desc[0]->deviceType_) {
         case AudioStandard::DEVICE_TYPE_NEARLINK:
         case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO:
+        case AudioStandard::DEVICE_TYPE_HEARING_AID:
             if (SetWirelessAudioDevice(device, desc[0]->deviceType_, desc) != TELEPHONY_SUCCESS) {
                 return;
             }

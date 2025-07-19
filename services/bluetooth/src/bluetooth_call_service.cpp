@@ -414,12 +414,13 @@ int32_t BluetoothCallService::AddAudioDeviceList(const std::string &address, int
         TELEPHONY_LOGE("AddAudioDeviceList, Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    if (deviceType != static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK)) {
+    if (deviceType != static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK) &&
+        deviceType != static_cast<int32_t>(AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID)) {
         TELEPHONY_LOGE("AddAudioDeviceList, invalid device type!");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(address, AudioDeviceType::DEVICE_NEARLINK,
-        name);
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(address,
+        static_cast<int32_t>(deviceType), name);
     return TELEPHONY_SUCCESS;
 }
 
@@ -429,12 +430,13 @@ int32_t BluetoothCallService::RemoveAudioDeviceList(const std::string &address, 
         TELEPHONY_LOGE("RemoveAudioDeviceList, Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    if (deviceType != static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK)) {
+    if (deviceType != static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK) &&
+        deviceType != static_cast<int32_t>(AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID)) {
         TELEPHONY_LOGE("RemoveAudioDeviceList, invalid device type!");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->RemoveAudioDeviceList(address,
-        AudioDeviceType::DEVICE_NEARLINK);
+        static_cast<int32_t>(deviceType));
     return TELEPHONY_SUCCESS;
 }
 
@@ -445,6 +447,16 @@ int32_t BluetoothCallService::ResetNearlinkDeviceList()
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ResetNearlinkAudioDevicesList();
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t BluetoothCallService::ResetBtHearingAidDeviceList()
+{
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("ResetBtHearingAidDeviceList, Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->ResetBtHearingAidDeviceList();
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

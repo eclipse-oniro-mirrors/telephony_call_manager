@@ -46,6 +46,7 @@ public:
     virtual int32_t AddAudioDeviceList(const std::string &address, int32_t deviceType, const std::string &name) = 0;
     virtual int32_t RemoveAudioDeviceList(const std::string &address, int32_t deviceType) = 0;
     virtual int32_t ResetNearlinkDeviceList() = 0;
+    virtual int32_t ResetBtHearingAidDeviceList() = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.IBluetoothCall");

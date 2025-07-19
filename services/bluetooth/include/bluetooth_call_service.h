@@ -139,7 +139,7 @@ public:
      *
      * @brief Add an audio device
      * @param address[in], The device address
-     * @param deviceType[in], The device type
+     * @param deviceType[in], The device type, only support nearing and bt hearing aid
      * @param name[in], The device name
      * @return Returns 0 on success, others on failure.
      */
@@ -150,7 +150,7 @@ public:
      *
      * @brief Remove an audio device
      * @param address[in], The device address
-     * @param deviceType[in], The device type
+     * @param deviceType[in], The device type, only support nearing and bt hearing aid
      * @return Returns 0 on success, others on failure.
      */
     int32_t RemoveAudioDeviceList(const std::string &address, int32_t deviceType) override;
@@ -162,6 +162,14 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t ResetNearlinkDeviceList() override;
+
+    /**
+     * ResetBtHearingAidDeviceList
+     *
+     * @brief Reset all bt hearing aid devices
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t ResetBtHearingAidDeviceList() override;
 
 private:
     std::vector<int32_t> getCarrierCallInfoNum(int32_t &callState, std::string &number);

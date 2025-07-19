@@ -639,6 +639,10 @@ enum class AudioDeviceType {
      * Indicates the device type is a nearlink device.
      */
     DEVICE_NEARLINK,
+    /**
+     * Indicates the device type is a bluetooth hearing aid device.
+     */
+    DEVICE_BLUETOOTH_HEARING_AID,
 };
 
 /**
