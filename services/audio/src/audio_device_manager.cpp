@@ -297,7 +297,6 @@ void AudioDeviceManager::ResetDistributedCallDevicesList()
 void AudioDeviceManager::ResetNearlinkAudioDevicesList()
 {
     std::unique_lock<std::mutex> lock(infoMutex_);
-    lock.lock();
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     bool hadNearlinkActived = false;
     while (it != info_.audioDeviceList.end()) {
@@ -322,7 +321,6 @@ void AudioDeviceManager::ResetNearlinkAudioDevicesList()
 void AudioDeviceManager::ResetBtHearingAidDeviceList()
 {
     std::unique_lock<std::mutex> lock(infoMutex_);
-    lock.lock();
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     bool hadBtHearingAidActived = false;
     while (it != info_.audioDeviceList.end()) {
