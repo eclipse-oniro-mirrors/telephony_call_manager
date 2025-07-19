@@ -300,7 +300,6 @@ if (defined(global_parts_info) &&
     defined(global_parts_info.multimedia_camera_framework) &&
     global_parts_info.multimedia_camera_framework) {
   call_manager_external_deps += [ "camera_framework:camera_framework" ]
-  call_manager_defines += [ "ABILITY_CAMERA_FRAMEWORK_SUPPORT" ]
 }
 
 if (target_platform == "watch") {
