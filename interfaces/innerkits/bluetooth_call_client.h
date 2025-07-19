@@ -206,6 +206,7 @@ public:
      *
      * @param address[in], audio device address
      * @param name[in], audio device name
+     * @param deviceType[in], audio device type
      * @return Returns 0 on success, others on failure.
      */
     int32_t AddAudioDevice(const std::string &address, const std::string &name, AudioDeviceType deviceType);
@@ -214,6 +215,7 @@ public:
      * @brief Remove bluetooth audio device
      *
      * @param address[in], audio device address
+     * @param deviceType[in], audio device type
      * @return Returns 0 on success, others on failure.
      */
     int32_t RemoveAudioDevice(const std::string &address, AudioDeviceType deviceType);
@@ -223,7 +225,7 @@ public:
      *
      * @return Returns 0 on success, others on failure.
      */
-    int32_t ResetBtHearingAidDeviceList();
+    int32_t ResetHearingAidDeviceList();
 };
 } // namespace Telephony
 } // namespace OHOS

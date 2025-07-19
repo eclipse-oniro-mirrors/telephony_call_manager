@@ -335,7 +335,7 @@ int32_t BluetoothCallClient::RemoveAudioDevice(const std::string &address, Audio
     return g_bluetoothCallProxyPtr->RemoveAudioDeviceList(address, static_cast<int32_t>(deviceType));
 }
 
-int32_t BluetoothCallClient::ResetNearlinkDeviceList()
+int32_t BluetoothCallClient::ResetHearingAidDeviceList()
 {
     if (g_bluetoothCallProxyPtr == nullptr) {
         TELEPHONY_LOGE("init first please!");

@@ -420,7 +420,7 @@ int32_t BluetoothCallService::AddAudioDeviceList(const std::string &address, int
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(address,
-        static_cast<int32_t>(deviceType), name);
+        static_cast<AudioDeviceType>(deviceType), name);
     return TELEPHONY_SUCCESS;
 }
 
@@ -436,7 +436,7 @@ int32_t BluetoothCallService::RemoveAudioDeviceList(const std::string &address, 
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->RemoveAudioDeviceList(address,
-        static_cast<int32_t>(deviceType));
+        static_cast<AudioDeviceType>(deviceType));
     return TELEPHONY_SUCCESS;
 }
 

@@ -117,7 +117,7 @@ private:
     void ResumeCrsSoundTone();
     int32_t HandleDistributeAudioDevice(const AudioDevice &device);
     int32_t HandleWirelessAudioDevice(const AudioDevice &device);
-    void GetWirelessAudioDeviceAddress(AudioDeviceType deviceType, std::string &name);
+    void GetWirelessAudioDeviceAddress(AudioDeviceType deviceType, std::string &address);
     void SendMuteRingEvent();
     bool IsRingingVibrateModeOn();
     bool IsVoIPCallActived();

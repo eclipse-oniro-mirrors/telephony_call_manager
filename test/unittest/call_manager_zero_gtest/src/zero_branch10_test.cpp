@@ -170,7 +170,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_BluetoothCallClient_001, TestSize.Level1)
     BluetoothCallClient &client = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
     EXPECT_EQ(client.AddAudioDevice("", "", AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID), TELEPHONY_ERR_UNINIT);
     EXPECT_EQ(client.RemoveAudioDevice("", AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID), TELEPHONY_ERR_UNINIT);
-    EXPECT_EQ(client.ResetBtHearingAidDeviceList(), TELEPHONY_ERR_UNINIT);
+    EXPECT_EQ(client.ResetHearingAidDeviceList(), TELEPHONY_ERR_UNINIT);
 }
 
 /**
@@ -416,7 +416,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioDeviceManager_001, TestSize.Level0)
     audioDeviceManager->info_.audioDeviceList.push_back(device);
     audioDeviceManager->audioDeviceType_ = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
     audioDeviceManager->ResetNearlinkAudioDevicesList();
-    audioDeviceManager->ResetBtAudioDeviceDeviceList();
+    audioDeviceManager->ResetBtHearingAidDeviceList();
     device.deviceType = AudioDeviceType::DEVICE_NEARLINK;
     audioDeviceManager->info_.audioDeviceList.push_back(device);
     audioDeviceManager->audioDeviceType_ = AudioDeviceType::DEVICE_NEARLINK;
@@ -512,11 +512,11 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioProxy_001, TestSize.Level0)
 }
 
 /**
- * @tc.number   Telephony_AudioProxy_001
+ * @tc.number   Telephony_AudioProxy_002
  * @tc.name     test AudioProxy
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch10Test, Telephony_AudioProxy_001, TestSize.Level0)
+HWTEST_F(ZeroBranch10Test, Telephony_AudioProxy_002, TestSize.Level0)
 {
     DelayedSingleton<AudioDeviceManager>::GetInstance()->audioDeviceType_ = AudioDeviceType::DEVICE_SPEAKER;
     std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> descs;

@@ -186,7 +186,7 @@ void AudioControlManager::VideoStateUpdated(
     CheckTypeAndSetAudioDevice(callObjectPtr, priorVideoState, nextVideoState, initDeviceType, device);
 }
 
-bool AudioControlManager::IsExternalAudioDevice(AudioDeviceType initDeviceType)
+bool AudioControlManager::IsInEarAudioDevice(AudioDeviceType initDeviceType)
 {
     return (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
         initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
