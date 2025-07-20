@@ -342,6 +342,9 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBroadCastSubscriber_002, Function | Medi
     want.SetAction("usual.event.bluetooth.CONNECT_HFP_HF");
     data.SetWant(want);
     subscriberPtr->OnReceiveEvent(data);
+    want.SetAction("multimodal.event.MUTE_KEY_PRESS");
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
     want.SetAction("unknown.event");
     data.SetWant(want);
     subscriberPtr->OnReceiveEvent(data);
