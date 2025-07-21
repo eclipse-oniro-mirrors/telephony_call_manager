@@ -394,6 +394,7 @@ HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_002, TestSize.Level0)
     audioDeviceManager->IsDCallDevEnable();
     audioDeviceManager->IsSpeakerDevEnable();
     ASSERT_FALSE(audioDeviceManager->IsSpeakerAvailable());
+    ASSERT_FALSE(audioDeviceManager->IsBtActived());
 }
 
 /**
