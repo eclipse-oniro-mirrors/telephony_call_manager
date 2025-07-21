@@ -718,14 +718,12 @@ bool AudioControlManager::NeedPlayVideoRing(ContactInfo &contactInfo, sptr<CallB
         return false;
     }
 
-    if (!strlen(contactInfo.ringtonePath)) {
-        if (IsSystemVideoRing(callObjectPtr)) {
-            if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING)) !=
-                EOK) {
-                TELEPHONY_LOGE("memcpy_s ringtonePath fail");
-                return false;
-            };
-        }
+    if (std::string(contactInfo.ringtonePath).empty() && IsSystemVideoRing(callObjectPtr)) {
+        if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING)) !=
+            EOK) {
+            TELEPHONY_LOGE("memcpy_s ringtonePath fail");
+            return false;
+        };
     }
 
     if (CallObjectManager::IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
