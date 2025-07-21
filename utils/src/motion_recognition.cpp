@@ -134,6 +134,7 @@ void FlipMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
                     controlManager->MuteRinger();
                     TELEPHONY_LOGI("flip motion muteRinger");
                 }
+                controlManager->StopFlashRemind();
             }
             break;
         case MOTION_TYPE_PICKUP:
@@ -141,6 +142,7 @@ void FlipMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
                 break;
             }
             MotionRecogntion::UnsubscribePickupSensor();
+            controlManager->StopFlashRemind();
             ffrt::submit([=]() {
                 MotionRecogntion::ReduceRingToneVolume();
             });
@@ -214,6 +216,7 @@ void CloseToEarMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
                         controlManager->SetAudioDevice(device);
                 }
             }
+            controlManager->StopFlashRemind();
             break;
         default:
             break;

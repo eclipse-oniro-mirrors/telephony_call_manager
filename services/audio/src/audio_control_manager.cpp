@@ -514,6 +514,7 @@ void AudioControlManager::ResumeCrsSoundTone()
         device.deviceType = initCrsDeviceType_;
         SetAudioDevice(device);
     }
+    isCrsStartSoundTone_ = false;
 }
 
 void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)
@@ -923,6 +924,7 @@ bool AudioControlManager::StopSoundtone()
     sound_->ReleaseRenderer();
     TELEPHONY_LOGI("stop soundtone success");
     RestoreVoiceValumeIfNecessary();
+    isCrsStartSoundTone_ = false;
     return true;
 }
 

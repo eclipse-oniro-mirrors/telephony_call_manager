@@ -485,6 +485,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("FilterResultsDispose failed!");
     }
+    DelayedSingleton<CallControlManager>::GetInstance()->StartFlashRemind();
     return ret;
 }
 
@@ -1167,6 +1168,7 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
     }
+    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
     return ret;
 }
 
@@ -1244,6 +1246,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     }
 #endif
     StopCallMotionRecognition(TelCallState::CALL_STATUS_DISCONNECTED);
+    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
     return TELEPHONY_SUCCESS;
 }
 
@@ -1516,8 +1519,8 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
 
 void CallStatusManager::SetVideoCallState(sptr<CallBase> &call, TelCallState nextState)
 {
-    if (call == nullptr) {
-        TELEPHONY_LOGE("Call is NULL");
+    if (call == nullptr || call->GetCallType() == CallType::TYPE_VOIP) {
+        TELEPHONY_LOGE("Call is NULL or calltype is VoIP");
         return;
     }
     int slotId = call->GetSlotId();
