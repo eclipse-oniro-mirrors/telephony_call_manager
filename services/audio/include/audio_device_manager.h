@@ -40,6 +40,7 @@ public:
     static bool IsBtScoConnected();
     static bool IsBtActived();
     static bool IsNearlinkActived(AudioDevice &device);
+    static bool IsBtHearingAidActived(AudioDevice &device);
     static bool IsDistributedCallConnected();
     static bool IsWiredHeadsetConnected();
     static void SetDeviceAvailable(AudioDeviceType deviceType, bool available);
@@ -50,6 +51,7 @@ public:
     void ResetBtAudioDevicesList();
     void ResetDistributedCallDevicesList();
     void ResetNearlinkAudioDevicesList();
+    void ResetBtHearingAidDeviceList();
     int32_t ReportAudioDeviceChange(const AudioDevice &device);
     bool CheckAndSwitchDistributedAudioDevice();
     int32_t ReportAudioDeviceInfo();
@@ -79,6 +81,25 @@ public:
     AudioDeviceType GetCurrentAudioDevice();
 
 private:
+    bool SwitchDevice(AudioEvent event);
+    bool EnableBtSco();
+    bool EnableNearlink();
+    bool EnableBtHearingAid();
+    bool EnableWiredHeadset();
+    bool EnableSpeaker();
+    bool EnableEarpiece();
+    bool DisableAll();
+    bool IsBtScoDevEnable();
+    bool IsDCallDevEnable();
+    bool IsSpeakerDevEnable();
+    bool IsEarpieceDevEnable();
+    bool IsWiredHeadsetDevEnable();
+    bool IsDistributedAudioDeviceType(AudioDeviceType deviceType);
+    bool IsSupportEarpiece();
+    void AddEarpiece();
+    void UpdateBtDevice(std::string &address, std::string &deviceName);
+    void UpdateNearlinkDevice(std::string &address, std::string &deviceName);
+    void UpdateBtHearingAidDevice(std::string &address, std::string &deviceName);
     std::mutex mutex_;
     std::mutex infoMutex_;
     AudioDeviceType audioDeviceType_;
@@ -98,23 +119,6 @@ private:
     using AudioDeviceManagerFunc = std::function<bool()>;
     std::map<uint32_t, AudioDeviceManagerFunc> memberFuncMap_;
     AudioDeviceInfo info_;
-    bool SwitchDevice(AudioEvent event);
-    bool EnableBtSco();
-    bool EnableNearlink();
-    bool EnableWiredHeadset();
-    bool EnableSpeaker();
-    bool EnableEarpiece();
-    bool DisableAll();
-    bool IsBtScoDevEnable();
-    bool IsDCallDevEnable();
-    bool IsSpeakerDevEnable();
-    bool IsEarpieceDevEnable();
-    bool IsWiredHeadsetDevEnable();
-    bool IsDistributedAudioDeviceType(AudioDeviceType deviceType);
-    bool IsSupportEarpiece();
-    void AddEarpiece();
-    void UpdateBtDevice(std::string &address, std::string &deviceName);
-    void UpdateNearlinkDevice(std::string &address, std::string &deviceName);
 };
 } // namespace Telephony
 } // namespace OHOS

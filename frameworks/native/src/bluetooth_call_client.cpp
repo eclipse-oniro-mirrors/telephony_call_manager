@@ -313,5 +313,36 @@ std::vector<CallAttributeInfo> BluetoothCallClient::GetCurrentCallList(int32_t s
         return callVec;
     }
 }
+
+int32_t BluetoothCallClient::AddAudioDevice(const std::string &address, const std::string &name,
+    AudioDeviceType deviceType)
+{
+    if (g_bluetoothCallProxyPtr == nullptr) {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+
+    return g_bluetoothCallProxyPtr->AddAudioDeviceList(address, static_cast<int32_t>(deviceType), name);
+}
+
+int32_t BluetoothCallClient::RemoveAudioDevice(const std::string &address, AudioDeviceType deviceType)
+{
+    if (g_bluetoothCallProxyPtr == nullptr) {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+
+    return g_bluetoothCallProxyPtr->RemoveAudioDeviceList(address, static_cast<int32_t>(deviceType));
+}
+
+int32_t BluetoothCallClient::ResetHearingAidDeviceList()
+{
+    if (g_bluetoothCallProxyPtr == nullptr) {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+
+    return g_bluetoothCallProxyPtr->ResetBtHearingAidDeviceList();
+}
 } // namespace Telephony
 } // namespace OHOS

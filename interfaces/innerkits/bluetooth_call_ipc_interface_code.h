@@ -37,6 +37,7 @@ enum class BluetoothCallInterfaceCode {
     INTERFACE_BT_ADD_AUDIO_DEVICE,
     INTERFACE_BT_REMOVE_AUDIO_DEVICE,
     INTERFACE_BT_RESET_NEARLINK_AUDIO_DEVICE,
+    INTERFACE_BT_RESET_BT_HEARINGAID_AUDIO_DEVICE,
 };
 } // end extern
 } // namespace Telephony

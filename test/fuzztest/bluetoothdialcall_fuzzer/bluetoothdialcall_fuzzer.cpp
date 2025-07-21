@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -198,6 +198,61 @@ void GetCurrentCallList(const uint8_t *data, size_t size)
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnGetCurrentCallList(messageParcel, reply);
 }
 
+void AddAudioDeviceList(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel messageParcel;
+    std::string str(reinterpret_cast<const char *>(data), size);
+    messageParcel.WriteString(str);
+    messageParcel.WriteInt32(static_cast<int32_t>(data[0]));
+    messageParcel.WriteString(str);
+    MessageParcel reply;
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnAddAudioDeviceList(messageParcel, reply);
+}
+
+void RemoveAudioDeviceList(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel messageParcel;
+    std::string str(reinterpret_cast<const char *>(data), size);
+    messageParcel.WriteString(str);
+    messageParcel.WriteInt32(static_cast<int32_t>(data[0]));
+    MessageParcel reply;
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnRemoveAudioDeviceList(messageParcel, reply);
+}
+
+void ResetNearlinkDeviceList(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnResetNearlinkDeviceList(messageParcel, reply);
+}
+
+void ResetBtHearingAidDeviceList(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnResetBtHearingAidDeviceList(messageParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -217,6 +272,10 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     StartDtmf(data, size);
     StopDtmf(data, size);
     GetCurrentCallList(data, size);
+    AddAudioDeviceList(data, size);
+    RemoveAudioDeviceList(data, size);
+    ResetNearlinkDeviceList(data, size);
+    ResetBtHearingAidDeviceList(data, size);
 }
 } // namespace OHOS
 

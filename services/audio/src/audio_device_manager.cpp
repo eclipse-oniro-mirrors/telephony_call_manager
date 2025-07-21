@@ -296,7 +296,7 @@ void AudioDeviceManager::ResetDistributedCallDevicesList()
 
 void AudioDeviceManager::ResetNearlinkAudioDevicesList()
 {
-    std::lock_guard<std::mutex> lock(infoMutex_);
+    std::unique_lock<std::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     bool hadNearlinkActived = false;
     while (it != info_.audioDeviceList.end()) {
@@ -310,11 +310,36 @@ void AudioDeviceManager::ResetNearlinkAudioDevicesList()
     if (hadNearlinkActived) {
         ReportAudioDeviceInfo();
     }
+    lock.unlock();
     if (audioDeviceType_ == AudioDeviceType::DEVICE_NEARLINK) {
         TELEPHONY_LOGI("Nearlink SA removed, init audio device");
         ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
     }
     TELEPHONY_LOGI("ResetNearlinkAudioDevicesList success");
+}
+
+void AudioDeviceManager::ResetBtHearingAidDeviceList()
+{
+    std::unique_lock<std::mutex> lock(infoMutex_);
+    std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
+    bool hadBtHearingAidActived = false;
+    while (it != info_.audioDeviceList.end()) {
+        if (it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID) {
+            hadBtHearingAidActived = true;
+            it = info_.audioDeviceList.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    if (hadBtHearingAidActived) {
+        ReportAudioDeviceInfo();
+    }
+    lock.unlock();
+    if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID) {
+        TELEPHONY_LOGI("Bluetooth SA removed, init audio device");
+        ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
+    }
+    TELEPHONY_LOGI("ResetBtHearingAidDeviceList success");
 }
 
 bool AudioDeviceManager::InitAudioDevice()
@@ -401,6 +426,9 @@ bool AudioDeviceManager::SwitchDevice(AudioDeviceType device)
         case AudioDeviceType::DEVICE_NEARLINK:
             result = EnableNearlink();
             break;
+        case AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID:
+            result = EnableBtHearingAid();
+            break;
         default:
             break;
     }
@@ -461,6 +489,18 @@ bool AudioDeviceManager::EnableNearlink()
         return true;
     }
     TELEPHONY_LOGI("enable nearlink device failed");
+    return false;
+}
+
+bool AudioDeviceManager::EnableBtHearingAid()
+{
+    AudioDevice device;
+    if (IsBtHearingAidActived(device)) {
+        TELEPHONY_LOGI("bt hearing aid enabled , current audio device : bt hearing aid");
+        SetCurrentAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID);
+        return true;
+    }
+    TELEPHONY_LOGI("enable bt hearing aid device failed");
     return false;
 }
 
@@ -559,6 +599,8 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
         address = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallDeviceAddr();
     } else if (audioDeviceType_ == AudioDeviceType::DEVICE_NEARLINK) {
         UpdateNearlinkDevice(address, deviceName);
+    } else if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID) {
+        UpdateBtHearingAidDevice(address, deviceName);
     }
     if (address.length() > kMaxAddressLen) {
         TELEPHONY_LOGE("address is not too long");
@@ -617,6 +659,21 @@ void AudioDeviceManager::UpdateNearlinkDevice(std::string &address, std::string 
     deviceName = device.deviceName;
 }
 
+void AudioDeviceManager::UpdateBtHearingAidDevice(std::string &address, std::string &deviceName)
+{
+    if (!address.empty() && !deviceName.empty()) {
+        return;
+    }
+
+    AudioDevice device;
+    if (!IsBtHearingAidActived(device)) {
+        TELEPHONY_LOGE("Get active bt hearing aid device failed.");
+        return;
+    }
+    address = device.address;
+    deviceName = device.deviceName;
+}
+
 int32_t AudioDeviceManager::ReportAudioDeviceInfo()
 {
     sptr<CallBase> liveCall = CallObjectManager::GetAudioLiveCall();
@@ -627,7 +684,8 @@ std::string AudioDeviceManager::ConvertAddress()
 {
     std::string addr = info_.currentAudioDevice.address;
     if (info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
-        info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_NEARLINK) {
+        info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_NEARLINK ||
+        info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID) {
         if (!addr.empty() && addr.length() > DEVICE_ADDR_LEN) {
             return (addr.substr(0, ADDR_HEAD_VALID_LEN) + ":*:*:*:" +
                 addr.substr(addr.length() - ADDR_TAIL_VALID_LEN));
@@ -721,6 +779,17 @@ bool AudioDeviceManager::IsNearlinkActived(AudioDevice &device)
         return false;
     }
     if (device.deviceType != AudioDeviceType::DEVICE_NEARLINK || strlen(device.address) == 0) {
+        return false;
+    }
+    return true;
+}
+
+bool AudioDeviceManager::IsBtHearingAidActived(AudioDevice &device)
+{
+    if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device) != TELEPHONY_SUCCESS) {
+        return false;
+    }
+    if (device.deviceType != AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID || strlen(device.address) == 0) {
         return false;
     }
     return true;

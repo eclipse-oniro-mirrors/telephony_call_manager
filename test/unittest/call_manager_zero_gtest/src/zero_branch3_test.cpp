@@ -434,6 +434,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallStub_001, TestSize.Level0)
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
     result = bluetoothCallService->OnResetNearlinkDeviceList(messageParcel, reply);
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnResetBtHearingAidDeviceList(messageParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 /**
@@ -1716,6 +1718,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_010, TestSize.Level0)
     EXPECT_EQ(callStatusManager->UpdateDialingCallInfo(info), TELEPHONY_SUCCESS);
     EXPECT_NE(callStatusManager->HoldingHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callStatusManager->DisconnectingHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    info.callType = CallType::TYPE_VOIP;
     EXPECT_NE(callStatusManager->DialingHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 

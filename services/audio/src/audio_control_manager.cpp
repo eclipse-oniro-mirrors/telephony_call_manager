@@ -172,12 +172,10 @@ void AudioControlManager::VideoStateUpdated(
     if (callObjectPtr->GetCrsType() == CRS_TYPE && !IsVoIPCallActived()) {
         AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
         if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
-            if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-                initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
-                initDeviceType == AudioDeviceType::DEVICE_NEARLINK) {
+            if (IsInEarAudioDevice(initDeviceType)) {
                 device.deviceType = initDeviceType;
                 SetAudioDevice(device);
-                TELEPHONY_LOGI("VideoStateUpdated DEVICE_BLUETOOTH_SCO or DEVICE_WIRED_HEADSET or DEVICE_NEARLINK");
+                TELEPHONY_LOGI("crs reset to initDeviceType");
             }
         } else {
             TELEPHONY_LOGI("crs ring tone should be speaker");
@@ -188,12 +186,21 @@ void AudioControlManager::VideoStateUpdated(
     CheckTypeAndSetAudioDevice(callObjectPtr, priorVideoState, nextVideoState, initDeviceType, device);
 }
 
+bool AudioControlManager::IsInEarAudioDevice(AudioDeviceType initDeviceType)
+{
+    return (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
+        initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+        initDeviceType == AudioDeviceType::DEVICE_NEARLINK ||
+        initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID);
+}
+
 bool AudioControlManager::IsExternalAudioDevice(AudioDeviceType initDeviceType)
 {
     return (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
         initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
         initDeviceType == AudioDeviceType::DEVICE_NEARLINK ||
-        initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE);
+        initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE ||
+        initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID);
 }
 
 void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState,
@@ -266,9 +273,7 @@ void AudioControlManager::UpdateDeviceTypeForCrs(AudioDeviceType deviceType)
         AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
         if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
             AudioDeviceType initDeviceType = GetInitAudioDeviceType();
-            if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-                initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
-                initDeviceType == AudioDeviceType::DEVICE_NEARLINK) {
+            if (IsInEarAudioDevice(initDeviceType)) {
                 device.deviceType = initDeviceType;
             }
         }
@@ -295,9 +300,7 @@ void AudioControlManager::UpdateDeviceTypeForVideoDialing()
             .address = { 0 },
         };
         AudioDeviceType initDeviceType = GetInitAudioDeviceType();
-        if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
-            initDeviceType == AudioDeviceType::DEVICE_NEARLINK) {
+        if (IsInEarAudioDevice(initDeviceType)) {
             device.deviceType = initDeviceType;
         }
         TELEPHONY_LOGI("dialing video call should be speaker");
@@ -580,7 +583,8 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
         case AudioDeviceType::DEVICE_DISTRIBUTED_PC:
             return HandleDistributeAudioDevice(device);
         case AudioDeviceType::DEVICE_BLUETOOTH_SCO:
-        case AudioDeviceType::DEVICE_NEARLINK: {
+        case AudioDeviceType::DEVICE_NEARLINK:
+        case AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID: {
             if (HandleWirelessAudioDevice(device) != TELEPHONY_SUCCESS) {
                 return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
             }
@@ -629,29 +633,20 @@ int32_t AudioControlManager::HandleDistributeAudioDevice(const AudioDevice &devi
 int32_t AudioControlManager::HandleWirelessAudioDevice(const AudioDevice &device)
 {
     std::string address = device.address;
+    GetWirelessAudioDeviceAddress(device.deviceType, address);
     if (address.empty()) {
-        if (device.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
-            std::shared_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
-                AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
-            if (activeBluetoothDevice == nullptr || activeBluetoothDevice->macAddress_.empty()) {
-                TELEPHONY_LOGE("Get active bluetooth device failed.");
-                return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
-            }
-            address = activeBluetoothDevice->macAddress_;
-        } else {
-            AudioDevice preferredAudioDevice;
-            if (!AudioDeviceManager::IsNearlinkActived(preferredAudioDevice)) {
-                TELEPHONY_LOGE("Get active nearlink device failed.");
-                return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
-            }
-            address = preferredAudioDevice.address;
-        }
+        return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
     }
     std::shared_ptr<AudioStandard::AudioDeviceDescriptor> audioDev =
         std::make_shared<AudioStandard::AudioDeviceDescriptor>();
     audioDev->macAddress_ = address;
-    audioDev->deviceType_ = (device.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) ?
-        AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO : AudioStandard::DEVICE_TYPE_NEARLINK;
+    if (device.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+        audioDev->deviceType_ = AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO;
+    } else if (device.deviceType == AudioDeviceType::DEVICE_NEARLINK) {
+        audioDev->deviceType_ = AudioStandard::DEVICE_TYPE_NEARLINK;
+    } else {
+        audioDev->deviceType_ = AudioStandard::DEVICE_TYPE_HEARING_AID;
+    }
     audioDev->deviceRole_ = AudioStandard::OUTPUT_DEVICE;
     audioDev->networkId_ = AudioStandard::LOCAL_NETWORK_ID;
     std::vector<std::shared_ptr<AudioDeviceDescriptor>> remoteDevice;
@@ -669,6 +664,36 @@ int32_t AudioControlManager::HandleWirelessAudioDevice(const AudioDevice &device
         return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
     }
     return TELEPHONY_SUCCESS;
+}
+
+void AudioControlManager::GetWirelessAudioDeviceAddress(AudioDeviceType deviceType, std::string &address)
+{
+    if (!address.empty()) {
+        return;
+    }
+    if (deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+        std::shared_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
+            AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
+        if (activeBluetoothDevice == nullptr || activeBluetoothDevice->macAddress_.empty()) {
+            TELEPHONY_LOGE("Get active bluetooth device failed.");
+            return;
+        }
+        address = activeBluetoothDevice->macAddress_;
+    } else if (deviceType == AudioDeviceType::DEVICE_NEARLINK) {
+        AudioDevice preferredAudioDevice;
+        if (!AudioDeviceManager::IsNearlinkActived(preferredAudioDevice)) {
+            TELEPHONY_LOGE("Get active nearlink device failed.");
+            return;
+        }
+        address = preferredAudioDevice.address;
+    } else {
+        AudioDevice preferredAudioDevice;
+        if (!AudioDeviceManager::IsBtHearingAidActived(preferredAudioDevice)) {
+            TELEPHONY_LOGE("Get active bt hearing aid device failed.");
+            return;
+        }
+        address = preferredAudioDevice.address;
+    }
 }
 
 bool AudioControlManager::NeedPlayVideoRing(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr)
@@ -973,6 +998,9 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
         }
         if (AudioDeviceManager::IsWiredHeadsetConnected()) {
             return AudioDeviceType::DEVICE_WIRED_HEADSET;
+        }
+        if (AudioDeviceManager::IsBtHearingAidActived(device)) {
+            return AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID;
         }
         sptr<CallBase> liveCall = CallObjectManager::GetForegroundCall();
         if (liveCall != nullptr && (liveCall->GetVideoStateType() == VideoStateType::TYPE_VIDEO ||
