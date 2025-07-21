@@ -61,6 +61,8 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { HfpConnectBroadcast(data); };
     memberFuncMap_[SCREEN_UNLOCKED] =
         [this](const EventFwk::CommonEventData &data) { ScreenUnlockedBroadcast(data); };
+    memberFuncMap_[MUTE_KEY_PRESS] =
+        [this](const EventFwk::CommonEventData &data) { MuteKeyBroadcast(data); };
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -89,6 +91,8 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
         code = SCREEN_UNLOCKED;
     } else if (action == "usual.event.bluetooth.CONNECT_HFP_HF") {
         code = HFP_EVENT;
+    } else if (action == "multimodal.event.MUTE_KEY_PRESS") {
+        code = MUTE_KEY_PRESS;
     } else {
         code = UNKNOWN_BROADCAST_EVENT;
     }
@@ -177,12 +181,14 @@ void CallBroadcastSubscriber::ConnectCallUiUserSwitchedBroadcast(const EventFwk:
     DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
     sptr<CallAbilityConnectCallback> connectCallback_ = new CallAbilityConnectCallback();
     connectCallback_->ReConnectAbility();
+    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
 }
 
 void CallBroadcastSubscriber::ShutdownBroadcast(const EventFwk::CommonEventData &data)
 {
     TELEPHONY_LOGI("system is shutdown.");
     DelayedSingleton<CallControlManager>::GetInstance()->DisconnectAllCalls();
+    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
 }
 
 void CallBroadcastSubscriber::HsdrEventBroadcast(const EventFwk::CommonEventData &data)
@@ -238,7 +244,14 @@ void CallBroadcastSubscriber::ScreenUnlockedBroadcast(const EventFwk::CommonEven
         EventFwk::CommonEventPublishInfo publishInfo;
         publishInfo.SetOrdered(true);
         EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr);
+    } else {
+        DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
     }
+}
+
+void CallBroadcastSubscriber::MuteKeyBroadcast(const EventFwk::CommonEventData &data)
+{
+    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
 }
 } // namespace Telephony
 } // namespace OHOS

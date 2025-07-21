@@ -57,6 +57,7 @@ public:
     ~WearStatusObserver() = default;
     void OnChange() override;
 };
+class IncomingFlashReminder;
 class CallControlManager : public CallPolicy {
     DECLARE_DELAYED_SINGLETON(CallControlManager)
 
@@ -151,6 +152,9 @@ public:
     void AcquireDisconnectedLock();
     void ReleaseDisconnectedLock();
     void DisconnectAllCalls();
+    void StartFlashRemind();
+    void StopFlashRemind();
+    void ClearFlashReminder();
 #ifdef NOT_SUPPORT_MULTICALL
     bool HangUpFirstCallBtAndESIM(int32_t secondCallId);
     bool HangUpFirstCallBtCall(int32_t secondCallId);
@@ -195,12 +199,13 @@ private:
         void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
 
     private:
-        int32_t CommonBroadcastSubscriber();
-        int32_t ContactsBroadcastSubscriber();
-        int32_t SatcommBroadcastSubscriber();
-        int32_t SuperPrivacyModeBroadcastSubscriber();
-        int32_t HSDRBroadcastSubscriber();
-        int32_t HfpBroadcastSubscriber();
+        void CommonBroadcastSubscriber();
+        void ContactsBroadcastSubscriber();
+        void SatcommBroadcastSubscriber();
+        void SuperPrivacyModeBroadcastSubscriber();
+        void HSDRBroadcastSubscriber();
+        void HfpBroadcastSubscriber();
+        void MuteKeyBroadcastSubscriber();
 
     private:
         std::vector<std::shared_ptr<CallBroadcastSubscriber>> subscriberPtrList_;
@@ -244,6 +249,8 @@ private:
     sptr<WearStatusObserver> wearStatusObserver_ = nullptr;
     int32_t wearStatus_ = WEAR_STATUS_INVALID;
     std::mutex wearStatusMutex_;
+    ffrt::mutex reminderMutex_;
+    std::shared_ptr<IncomingFlashReminder> incomingFlashReminder_ {nullptr};
 };
 } // namespace Telephony
 } // namespace OHOS

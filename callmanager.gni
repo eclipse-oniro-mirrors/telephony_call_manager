@@ -142,6 +142,7 @@ call_manager_sources = [
   "${call_manager_path}/utils/src/call_manager_utils.cpp",
   "${call_manager_path}/utils/src/call_number_utils.cpp",
   "${call_manager_path}/utils/src/call_setting_ability_connection.cpp",
+  "${call_manager_path}/utils/src/incoming_flash_reminder.cpp",
   "${call_manager_path}/utils/src/motion_recognition.cpp",
   "${call_manager_path}/utils/src/number_identity_data_base_helper.cpp",
   "${call_manager_path}/utils/src/screen_sensor_plugin.cpp",
@@ -286,6 +287,19 @@ if (defined(global_parts_info) &&
 if (defined(global_parts_info) && defined(global_parts_info.msdp_motion) &&
     global_parts_info.msdp_motion) {
   call_manager_defines += [ "OHOS_SUBSCRIBE_MOTION_ENABLE" ]
+}
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.theme_screenlock_mgr) &&
+    global_parts_info.theme_screenlock_mgr) {
+  call_manager_external_deps += [ "screenlock_mgr:screenlock_client" ]
+  call_manager_defines += [ "ABILITY_SCREENLOCKMGR_SUPPORT" ]
+}
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.multimedia_camera_framework) &&
+    global_parts_info.multimedia_camera_framework) {
+  call_manager_external_deps += [ "camera_framework:camera_framework" ]
 }
 
 if (target_platform == "watch") {
