@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -534,7 +534,7 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         .isVoiceMail = false,
         .isQueryComplete = true,
     };
-    if (HandleBluetoothCall(call, contactInfo, phoneNum)) {
+    if (call->GetCallType() == CallType::TYPE_BLUETOOTH && SetBluetoothCallContactInfo(call, contactInfo, phoneNum)) {
         return;
     }
     ffrt::submit([=, &call]() {
@@ -551,7 +551,7 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
             if (DelayedSingleton<AudioControlManager>::GetInstance()->NeedPlayVideoRing(
                 contactInfoTemp, callObjectPtr)) {
                 AAFwk::WantParams params = callObjectPtr->GetExtraParams();
-                params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfo.ringtonePath)));
+                params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfoTemp.ringtonePath)));
                 callObjectPtr->SetExtraParams(params);
             }
         }
@@ -562,21 +562,20 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
     });
 }
 
-bool CallStatusManager::HandleBluetoothCall(sptr<CallBase> &call, ContactInfo &contactInfo, std::string phoneNum)
+bool CallStatusManager::SetBluetoothCallContactInfo(sptr<CallBase> &call, ContactInfo &contactInfo,
+    std::string phoneNum)
 {
-    if (call->GetCallType() == CallType::TYPE_BLUETOOTH) {
-        std::string contactName = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetHfpContactName(
-            phoneNum);
-        if (!contactName.empty()) {
-            contactInfo.name = contactName;
-            contactInfo.isContacterExists = true;
-            call->SetCallerInfo(contactInfo);
-            AAFwk::WantParams params = call->GetExtraParams();
-            params.SetParam("BtCallContactName", AAFwk::String::Box(contactName));
-            call->SetExtraParams(params);
-            TELEPHONY_LOGI("SetCallerInfo end for type bluetooth.");
-            return true;
-        }
+    std::string contactName = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetHfpContactName(
+        phoneNum);
+    if (!contactName.empty()) {
+        contactInfo.name = contactName;
+        contactInfo.isContacterExists = true;
+        call->SetCallerInfo(contactInfo);
+        AAFwk::WantParams params = call->GetExtraParams();
+        params.SetParam("BtCallContactName", AAFwk::String::Box(contactName));
+        call->SetExtraParams(params);
+        TELEPHONY_LOGI("SetCallerInfo end for type bluetooth.");
+        return true;
     }
     return false;
 }
