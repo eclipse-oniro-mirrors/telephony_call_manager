@@ -413,8 +413,8 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         return;
     }
     if (ProcessVoipCallOutputDeviceUpdated()) {
-    return;
-}
+        return;
+    }
 
     switch (desc[0]->deviceType_) {
         case AudioStandard::DEVICE_TYPE_NEARLINK:
@@ -459,6 +459,11 @@ bool AudioPreferDeviceChangeCallback::IsDistributedDeviceSelected(
         std::string networkId = (*iter)->networkId_;
         if (LOCAL_DEVICE != networkId && (*iter)->deviceType_ == AudioStandard::DEVICE_TYPE_SPEAKER) {
             TELEPHONY_LOGI("distributed device networkId.");
+            return true;
+        }
+        if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDistributedCarDeviceOnline() &&
+            LOCAL_DEVICE == networkId && (*iter)->deviceType_ == AudioStandard::DEVICE_TYPE_EARPIECE) {
+            TELEPHONY_LOGI("filter local earpiece.");
             return true;
         }
     }

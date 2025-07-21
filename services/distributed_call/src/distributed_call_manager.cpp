@@ -22,6 +22,9 @@
 #include "telephony_log_wrapper.h"
 #include "nlohmann/json.hpp"
 #include "i_distributed_device_callback.h"
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+#include "bluetooth_device.h"
+#endif
 
 using json = nlohmann::json;
 
@@ -36,6 +39,8 @@ const int32_t DCALL_SWITCH_DEVICE_TYPE_SOURCE = 0;
 const int32_t DCALL_SWITCH_DEVICE_TYPE_SINK = 1;
 const int32_t DISTRIBUTED_CALL_SOURCE_SA_ID = 9855;
 const int32_t IS_CELIA_CALL = 1;
+const int32_t DEFAULT_DCALL_HFP_FLAG_VALUE = -1;
+const int32_t DCALL_BT_HEADSET_UNWEAR_ACTION = 1;
 const std::string CALLBACK_NAME = "telephony";
 const std::string DISTRIBUTED_AUDIO_DEV_CAR = "dCar";
 const std::string DISTRIBUTED_AUDIO_DEV_PHONE = "dPhone";
@@ -180,6 +185,15 @@ std::string DistributedCallManager::GetDevIdFromAudioDevice(const AudioDevice& d
 int32_t DistributedCallManager::AddDCallDevice(const std::string& devId)
 {
     TELEPHONY_LOGI("add dcall device, devId: %{public}s.", GetAnonyString(devId).c_str());
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (dcallHfpListener_ == nullptr) {
+            dcallHfpListener_ = std::make_shared<DCallHfpListener>();
+            Bluetooth::HandsFreeAudioGateway::GetProfile()->RegisterObserver(dcallHfpListener_);
+        }
+    }
+#endif
     std::lock_guard<std::mutex> lock(onlineDeviceMtx_);
 
     auto iter = onlineDCallDevices_.find(devId);
@@ -528,7 +542,23 @@ int32_t DistributedCallManager::OnDCallDeviceOnline(const std::string &devId)
 int32_t DistributedCallManager::OnDCallDeviceOffline(const std::string &devId)
 {
     TELEPHONY_LOGI("dcall device is offline, devId: %{public}s", GetAnonyString(devId).c_str());
-    return RemoveDCallDevice(devId);
+    auto ret = RemoveDCallDevice(devId);
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    bool isAllDeviceOffline = true;
+    {
+        std::lock_guard<std::mutex> lock(onlineDeviceMtx_);
+        isAllDeviceOffline = onlineDCallDevices_.empty();
+    }
+    if (isAllDeviceOffline) {
+        TELEPHONY_LOGI("all dcall device offline");
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (dcallHfpListener_ != nullptr) {
+            Bluetooth::HandsFreeAudioGateway::GetProfile()->DeregisterObserver(dcallHfpListener_);
+            dcallHfpListener_ = nullptr;
+        }
+    }
+#endif
+    return ret;
 }
 
 int32_t DistributedCallManager::DistributedCallDeviceListener::OnDCallDeviceOnline(const std::string &devId)
@@ -624,5 +654,25 @@ void DCallSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, 
     DelayedSingleton<DistributedCallManager>::GetInstance()->OnDCallSystemAbilityRemoved(deviceId);
 }
 
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+void DCallHfpListener::OnHfpStackChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t action)
+{
+    TELEPHONY_LOGI("dcall hfp stack changed, action[%{public}d]", action);
+    int32_t cod = DEFAULT_DCALL_HFP_FLAG_VALUE;
+    int32_t majorClass = DEFAULT_DCALL_HFP_FLAG_VALUE;
+    int32_t majorMinorClass = DEFAULT_DCALL_HFP_FLAG_VALUE;
+    device.GetDeviceProductType(cod, majorClass, majorMinorClass);
+    bool isBtHeadset = (majorClass == Bluetooth::BluetoothDevice::MAJOR_AUDIO_VIDEO &&
+                        (majorMinorClass == Bluetooth::BluetoothDevice::AUDIO_VIDEO_HEADPHONES ||
+                         majorMinorClass == Bluetooth::BluetoothDevice::AUDIO_VIDEO_WEARABLE_HEADSET));
+    if (!isBtHeadset) {
+        return;
+    }
+    if (action == DCALL_BT_HEADSET_UNWEAR_ACTION) {
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
+    }
+}
+#endif
+ 
 } // namespace Telephony
 } // namespace OHOS

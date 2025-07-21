@@ -359,6 +359,7 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
                 TELEPHONY_LOGE("call is not active, no need to connect sco");
                 return false;
             }
+            CheckAndSwitchDistributedAudioDevice();
             break;
         }
         default:
