@@ -41,15 +41,15 @@ ohos_unittest("tel_call_manager_zero1_gtest") {
   include_dirs += call_manager_include_dirs
 
   external_deps = [
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
 
   deps = [
     "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
-    "//third_party/cJSON:cjson",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
   defines = [
@@ -83,15 +83,15 @@ ohos_unittest("tel_call_manager_zero2_gtest") {
   include_dirs += call_manager_include_dirs
 
   external_deps = [
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
 
   deps = [
     "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
-    "//third_party/cJSON:cjson",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
   defines = [
@@ -125,8 +125,10 @@ ohos_unittest("tel_call_manager_zero3_gtest") {
   include_dirs += call_manager_include_dirs
 
   external_deps = [
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
 
@@ -134,8 +136,6 @@ ohos_unittest("tel_call_manager_zero3_gtest") {
 
   deps = [
     "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
-    "//third_party/cJSON:cjson",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
   defines = [
@@ -170,15 +170,15 @@ ohos_unittest("tel_call_manager_zero4_gtest") {
   include_dirs += call_manager_include_dirs
 
   external_deps = [
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
 
   deps = [
     "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
-    "//third_party/cJSON:cjson",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
   defines = [
@@ -212,15 +212,15 @@ ohos_unittest("tel_call_manager_zero5_gtest") {
   include_dirs += call_manager_include_dirs
 
   external_deps = [
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
 
   deps = [
     "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
-    "//third_party/cJSON:cjson",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
   defines = [
@@ -254,15 +254,15 @@ ohos_unittest("tel_call_manager_zero6_gtest") {
   include_dirs += call_manager_include_dirs
 
   external_deps = [
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
 
   deps = [
     "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
-    "//third_party/cJSON:cjson",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
   defines = [
@@ -302,15 +302,15 @@ ohos_unittest("tel_call_manager_zero7_gtest") {
   include_dirs += call_manager_include_dirs
 
   external_deps = [
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
 
   deps = [
     "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
-    "//third_party/cJSON:cjson",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
   defines = [
@@ -344,15 +344,15 @@ ohos_unittest("tel_call_manager_zero8_gtest") {
   include_dirs += call_manager_include_dirs
 
   external_deps = [
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
 
   deps = [
     "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
-    "//third_party/cJSON:cjson",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
   defines = [
@@ -389,7 +389,7 @@ ohos_unittest("tel_call_manager_zero9_gtest") {
   include_dirs += call_manager_include_dirs
 
   external_deps = [
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "libphonenumber:phonenumber_standard",
@@ -431,7 +431,7 @@ ohos_unittest("tel_call_manager_zero10_gtest") {
   include_dirs += call_manager_include_dirs
 
   external_deps = [
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "libphonenumber:phonenumber_standard",

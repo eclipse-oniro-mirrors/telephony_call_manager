@@ -11,8 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//arkcompiler/ets_frontend/es2panda/es2abc_config.gni")
+import("//build/config/components/ets_frontend/es2abc_config.gni")
 import("//build/ohos.gni")
+import("//build/ohos/ace/ace.gni")
+import("//build/templates/abc/ohos_abc.gni")
+
 SUBSYSTEM_DIR = "../../.."
 config("call_manager_js_config") {
   include_dirs = [ "napi/include" ]
@@ -21,22 +24,12 @@ config("call_manager_js_config") {
 jspath = "napi/src/call.js"
 
 # compile .js to .abc.
-action("gen_call_abc") {
-  visibility = [ ":*" ]
-  script = "../../../../../arkcompiler/ets_frontend/es2panda/scripts/generate_js_bytecode.py"
-
-  args = [
-    "--src-js",
-    rebase_path(jspath),
-    "--dst-file",
-    rebase_path(target_out_dir + "/call.abc"),
-    "--frontend-tool-path",
-    rebase_path("${es2abc_build_path}"),
-    "--module",
-  ]
-  deps = [ "../../../../../arkcompiler/ets_frontend/es2panda:es2panda_build" ]
-  inputs = [ jspath ]
-  outputs = [ target_out_dir + "/call.abc" ]
+es2abc_gen_abc("gen_call_abc") {
+  src_js = rebase_path(jspath)
+  dst_file = rebase_path(target_out_dir + "/call.abc")
+  in_puts = [ jspath ]
+  out_puts = [ target_out_dir + "/call.abc" ]
+  extra_args = [ "--module" ]
 }
 
 base_output_path = get_label_info(":call_js", "target_out_dir")

@@ -36,23 +36,22 @@ ohos_unittest("tel_call_voice_assistant_test") {
   sources += call_manager_sources
 
   include_dirs = [
-    "//third_party/libphonenumber/cpp/src",
-    "//third_party/libphonenumber/cpp/src/phonenumbers",
-    "//third_party/protobuf/src",
     "${CALL_MANAGER_PATH}/interfaces/innerkits",
   ]
   include_dirs += call_manager_include_dirs
 
   external_deps = [
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "libphonenumber:phonenumber_standard",
+    "libphonenumber:geocoding",
+    "protobuf:protobuf",
   ]
   external_deps += call_manager_external_deps
 
   deps = [
     "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
-    "//third_party/cJSON:cjson",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
   defines = [

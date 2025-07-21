@@ -32,13 +32,13 @@ ohos_fuzztest("ControlCameraFuzzTest") {
 
   deps = [
     "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
-    "//third_party/cJSON:cjson",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
   external_deps = [
-    "access_token:libnativetoken",
+    "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
 
