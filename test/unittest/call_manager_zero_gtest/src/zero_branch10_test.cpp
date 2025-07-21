@@ -543,6 +543,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioProxy_002, TestSize.Level0)
         AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID);
 }
 
+/**
  * @tc.number   Telephony_IncomingFlashReminder_001
  * @tc.name     test IncomingFlashReminder
  * @tc.desc     Function test
