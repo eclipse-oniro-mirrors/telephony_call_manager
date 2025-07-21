@@ -722,6 +722,14 @@ enum class CallTransferType {
      * Indicates transfer the call when unreachable.
      */
     TRANSFER_TYPE_NOT_REACHABLE = 3,
+    /**
+     * Indicates transfer the call when all.
+     */
+    TRANSFER_TYPE_ALL = 4,
+    /**
+     * Indicates transfer the call conditionally.
+     */
+    TRANSFER_TYPE_CONDITIONAL = 5,
 };
 
 /**
