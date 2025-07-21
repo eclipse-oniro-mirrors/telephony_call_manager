@@ -328,8 +328,8 @@ void AudioControlManager::HandleCallStateUpdated(
     }
     auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
     TELEPHONY_LOGI("HandleCallStateUpdated priorState:%{public}d, nextState:%{public}d", priorState, nextState);
-    if ((nextState == TelCallState::CALL_STATUS_DISCONNECTING ||
-         nextState == TelCallState::CALL_STATUS_DISCONNECTED) && priorState == TelCallState::CALL_STATUS_INCOMING) {
+    if ((nextState == TelCallState::CALL_STATUS_DISCONNECTING || nextState == TelCallState::CALL_STATUS_DISCONNECTED) &&
+        callObjectPtr->GetAnsweredByPhone()) {
         callStateProcessor->DeleteCall(callObjectPtr->GetCallID(), TelCallState::CALL_STATUS_ACTIVE);
     }
     if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
