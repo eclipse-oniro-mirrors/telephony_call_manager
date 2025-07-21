@@ -33,11 +33,14 @@ ohos_shared_library("tel_call_manager") {
 
   deps = [
     "frameworks/native:tel_call_manager_api",
-    "//third_party/cJSON:cjson",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
-  external_deps = call_manager_external_deps
+  external_deps = [
+    "cJSON:cjson",
+    "libphonenumber:phonenumber_standard",
+  ]
+
+  external_deps += call_manager_external_deps
 
   cflags_cc = [
     "-Wunused",
