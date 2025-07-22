@@ -340,8 +340,8 @@ void AudioControlManager::HandleCallStateUpdated(
         }
         MuteRinger();
     }
-    if (nextState == TelCallState::CALL_STATUS_ACTIVE && priorState == TelCallState::CALL_STATUS_INCOMING &&
-        callObjectPtr->GetAnsweredByPhone()) {
+    if (nextState == TelCallState::CALL_STATUS_ACTIVE && callObjectPtr->GetAnsweredByPhone() &&
+        (priorState == TelCallState::CALL_STATUS_INCOMING || priorState == TelCallState::CALL_STATUS_WAITING)) {
         UnmuteSoundTone();
         return;
     }
