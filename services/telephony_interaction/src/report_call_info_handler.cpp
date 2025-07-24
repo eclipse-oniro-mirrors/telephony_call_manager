@@ -49,6 +49,11 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
         TELEPHONY_LOGE("callStatusManagerPtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (!CallStatusManager::GetDevProvisioned() && info.callType == CallType::TYPE_BLUETOOTH) {
+        TELEPHONY_LOGE("wangfan other state not report");
+        return TELEPHONY_SUCCESS;
+    }
+
     CallDetailInfo callDetailInfo = info;
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
     TELEPHONY_LOGW("UpdateCallReportInfo submit task enter");

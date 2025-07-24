@@ -38,6 +38,12 @@ namespace OHOS {
 namespace Telephony {
 const int32_t SLOT_NUM = 2;
 const std::string ANTIFRAUD_FEATURE = "const.telephony.antifraud.supported";
+class OOBEStatusObserver : public AAFwk::DataAbilityObserverStub {
+public:
+    OOBEStatusObserver() = default;
+    ~OOBEStatusObserver() = default;
+    void OnChange() override;
+};
 
 class CallStatusManager : public CallStatusPolicy {
 public:
@@ -58,6 +64,9 @@ public:
     void TriggerAntiFraud(int32_t antiFraudState);
     int32_t GetAntiFraudSlotId();
     int32_t GetAntiFraudIndex();
+    static bool GetDevProvisioned();
+    static void SetDevProvisioned(bool value);
+    static void RegisterObserver();
 
 private:
     void InitCallBaseEvent();
@@ -147,6 +156,7 @@ private:
     void StopCallMotionRecognition(TelCallState nextState);
     bool UpdateDialingHandle(const CallDetailInfo &info, bool &isDistributedDeviceDialing);
     bool RefreshDialingStateByOtherState(sptr<CallBase> &call, const CallDetailInfo &info);
+    void UnRegisterObserver();
 
 private:
     CallDetailInfo callReportInfo_;
@@ -169,6 +179,8 @@ private:
     int32_t antiFraudSlotId_ = -1;
     int32_t antiFraudIndex_ = -1;
     ffrt::mutex mutex_;
+    static sptr<OOBEStatusObserver> OOBEStatusObserver_;
+    static bool isDeviceProvisioned_;
 };
 } // namespace Telephony
 } // namespace OHOS

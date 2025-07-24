@@ -125,9 +125,10 @@ void ZeroBranch5Test::TearDown() {}
 
 void ZeroBranch5Test::SetUpTestCase()
 {
-    constexpr int permissionNum = 1;
+    constexpr int permissionNum = 2;
     const char *perms[permissionNum] = {
-        "ohos.permission.GET_TELEPHONY_STATE"
+        "ohos.permission.GET_TELEPHONY_STATE",
+        "ohos.permission.MANAGE_SETTINGS"
     };
     NativeTokenInfoParams infoInstance = {
         .dcapsNum = 0,  // Indicates the capsbility list of the sa.
@@ -324,6 +325,43 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     info.index = 1;
     info.state = TelCallState::CALL_STATUS_DISCONNECTED;
     callStatusManager->HandleCallReportInfo(info);
+}
+/**
+ * @tc.number   Telephony_CallStatusManager_008
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_008, TestSize.Level0)
+{
+    Uri uri(DEVICE_PROVISIONED_URI);
+    auto OOBEStatusObserver_ = new (std::nothrow) OOBEStatusObserver();
+    ASSERT_TRUE(OOBEStatusObserver_ != nullptr);
+    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    callStatusManager->RegisterObserver();
+    EXPECT_EQ(helper->RegisterToDataShare(uri, OOBEStatusObserver_), true);
+    OOBEStatusObserver_->OnChange();
+    EXPECT_EQ(helper->Update(uri, "device_provisioned", "0"), 0);
+    OOBEStatusObserver_->OnChange();
+    EXPECT_EQ(helper->UnRegisterToDataShare(uri, OOBEStatusObserver_), true);
+
+    CallDetailInfo info;
+    std::string number = "123456789";
+    memcpy_s(&info.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    info.index = 1;
+    info.state = TelCallState::CALL_STATUS_INCOMING;
+    callStatusManager->isDeviceProvisioned_ = false;
+    EXPECT_TRUE(callStatusManager->ShouldRejectIncomingCall());
+    
+    info.callType = CallType::TYPE_BLUETOOTH;
+    auto reportCallInfo = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    reportCallInfo->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
+    reportCallInfo->UpdateCallReportInfo(info);
+
+    callStatusManager->UnRegisterObserver();
+    callStatusManager->RegisterObserver();
+    callStatusManager->OOBEStatusObserver_ = nullptr;
+    callStatusManager->UnRegisterObserver();
 }
 /**
  * @tc.number   Telephony_IncomingCallWakeup_001
