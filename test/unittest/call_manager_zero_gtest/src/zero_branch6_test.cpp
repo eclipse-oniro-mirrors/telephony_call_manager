@@ -335,27 +335,29 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
 {
     Uri uri(DEVICE_PROVISIONED_URI);
     auto OOBEStatusObserver_ = new (std::nothrow) OOBEStatusObserver();
+    auto reportCallInfo = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    reportCallInfo->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    std::string number = "123456789";
+    memcpy_s(&info.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    info.index = 1;
+    info.state = TelCallState::CALL_STATUS_INCOMING;
+    info.callType = CallType::TYPE_BLUETOOTH;
     ASSERT_TRUE(OOBEStatusObserver_ != nullptr);
     auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     callStatusManager->RegisterObserver();
     EXPECT_EQ(helper->RegisterToDataShare(uri, OOBEStatusObserver_), true);
     OOBEStatusObserver_->OnChange();
+    callStatusManager->deviceProvisioned_ = -1;
+    reportCallInfo->UpdateDevProvisioned();
     EXPECT_EQ(helper->Update(uri, "device_provisioned", "0"), 0);
     OOBEStatusObserver_->OnChange();
     EXPECT_EQ(helper->UnRegisterToDataShare(uri, OOBEStatusObserver_), true);
 
-    CallDetailInfo info;
-    std::string number = "123456789";
-    memcpy_s(&info.phoneNum, kMaxNumberLen, number.c_str(), number.length());
-    info.index = 1;
-    info.state = TelCallState::CALL_STATUS_INCOMING;
-    callStatusManager->isDeviceProvisioned_ = false;
+    callStatusManager->deviceProvisioned_ = 0;
     EXPECT_TRUE(callStatusManager->ShouldRejectIncomingCall());
-    
-    info.callType = CallType::TYPE_BLUETOOTH;
-    auto reportCallInfo = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
-    reportCallInfo->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
+    callStatusManager->deviceProvisioned_ = -1;
     reportCallInfo->UpdateCallReportInfo(info);
 
     callStatusManager->UnRegisterObserver();

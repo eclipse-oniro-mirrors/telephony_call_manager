@@ -63,7 +63,7 @@ constexpr int32_t INIT_INDEX = 0;
 constexpr int32_t PRESENTATION_RESTRICTED = 3;
 constexpr int32_t MAIN_USER_SPACE = 100;
 const std::string ADVSECMODE_STATE = "ohos.boot.advsecmode.state";
-bool CallStatusManager::isDeviceProvisioned_ = true;
+int32_t CallStatusManager::deviceProvisioned_ = DEVICE_PROVISION_UNDEF;
 sptr<OOBEStatusObserver> CallStatusManager::OOBEStatusObserver_ = nullptr;
 
 CallStatusManager::CallStatusManager()
@@ -116,6 +116,7 @@ int32_t CallStatusManager::UnInit()
     }
     mEventIdTransferMap_.clear();
     mOttEventIdTransferMap_.clear();
+    UnRegisterObserver();
     return TELEPHONY_SUCCESS;
 }
 
@@ -1806,7 +1807,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         TELEPHONY_LOGI("HasEmergencyCall reject incoming call.");
         return true;
     }
-    if (!GetDevProvisioned()) {
+    if (CallStatusManager::GetDevProvisioned() == DEVICE_PROVISION_INVALID) {
         TELEPHONY_LOGW("ShouldRejectIncomingCall: device_provisioned = 0");
         return true;
     }
@@ -2480,9 +2481,9 @@ void OOBEStatusObserver::OnChange()
     }
     TELEPHONY_LOGI("OnChange device_provisioned: %{public}s", OOBEStatus.c_str());
     if (OOBEStatus == "1") {
-        CallStatusManager::SetDevProvisioned(true);
+        CallStatusManager::SetDevProvisioned(DEVICE_PROVISION_VALID);
     } else {
-        CallStatusManager::SetDevProvisioned(false);
+        CallStatusManager::SetDevProvisioned(DEVICE_PROVISION_INVALID);
     }
 }
 
@@ -2517,14 +2518,14 @@ void CallStatusManager::UnRegisterObserver()
     }
 }
 
-bool CallStatusManager::GetDevProvisioned()
+int32_t CallStatusManager::GetDevProvisioned()
 {
-    return isDeviceProvisioned_;
+    return deviceProvisioned_;
 }
 
-void CallStatusManager::SetDevProvisioned(bool value)
+void CallStatusManager::SetDevProvisioned(int32_t value)
 {
-    isDeviceProvisioned_ = value;
+    deviceProvisioned_ = value;
 }
 } // namespace Telephony
 } // namespace OHOS

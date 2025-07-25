@@ -38,6 +38,10 @@ namespace OHOS {
 namespace Telephony {
 const int32_t SLOT_NUM = 2;
 const std::string ANTIFRAUD_FEATURE = "const.telephony.antifraud.supported";
+constexpr int32_t DEVICE_PROVISION_UNDEF = -1;
+constexpr int32_t DEVICE_PROVISION_INVALID = 0;
+constexpr int32_t DEVICE_PROVISION_VALID = 1;
+
 class OOBEStatusObserver : public AAFwk::DataAbilityObserverStub {
 public:
     OOBEStatusObserver() = default;
@@ -64,8 +68,8 @@ public:
     void TriggerAntiFraud(int32_t antiFraudState);
     int32_t GetAntiFraudSlotId();
     int32_t GetAntiFraudIndex();
-    static bool GetDevProvisioned();
-    static void SetDevProvisioned(bool value);
+    static int32_t GetDevProvisioned();
+    static void SetDevProvisioned(int32_t value);
     static void RegisterObserver();
 
 private:
@@ -180,7 +184,7 @@ private:
     int32_t antiFraudIndex_ = -1;
     ffrt::mutex mutex_;
     static sptr<OOBEStatusObserver> OOBEStatusObserver_;
-    static bool isDeviceProvisioned_;
+    static int32_t deviceProvisioned_;
 };
 } // namespace Telephony
 } // namespace OHOS
