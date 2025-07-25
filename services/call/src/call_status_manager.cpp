@@ -55,7 +55,6 @@
 #include "uri.h"
 #include "voip_call.h"
 #include "want_params_wrapper.h"
-#include "settings_datashare_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -64,7 +63,7 @@ constexpr int32_t PRESENTATION_RESTRICTED = 3;
 constexpr int32_t MAIN_USER_SPACE = 100;
 const std::string ADVSECMODE_STATE = "ohos.boot.advsecmode.state";
 int32_t CallStatusManager::deviceProvisioned_ = DEVICE_PROVISION_UNDEF;
-sptr<OOBEStatusObserver> CallStatusManager::OOBEStatusObserver_ = nullptr;
+sptr<OOBEStatusObserver> CallStatusManager::oOBEStatusObserver_ = nullptr;
 
 CallStatusManager::CallStatusManager()
 {
@@ -1807,7 +1806,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         TELEPHONY_LOGI("HasEmergencyCall reject incoming call.");
         return true;
     }
-    if (CallStatusManager::GetDevProvisioned() == DEVICE_PROVISION_INVALID) {
+    if (CallStatusManager::GetDevProvisioned() != DEVICE_PROVISION_VALID) {
         TELEPHONY_LOGW("ShouldRejectIncomingCall: device_provisioned = 0");
         return true;
     }
@@ -2472,15 +2471,15 @@ bool CallStatusManager::RefreshDialingStateByOtherState(sptr<CallBase> &call, co
 
 void OOBEStatusObserver::OnChange()
 {
-    std::string OOBEStatus = "";
+    std::string oOBEStatus = "";
     auto settingHelper = SettingsDataShareHelper::GetInstance();
     auto callControlMgr = DelayedSingleton<CallControlManager>().GetInstance();
     if (settingHelper != nullptr) {
         OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
-        settingHelper->Query(settingUri, "device_provisioned", OOBEStatus);
+        settingHelper->Query(settingUri, "device_provisioned", oOBEStatus);
     }
-    TELEPHONY_LOGI("OnChange device_provisioned: %{public}s", OOBEStatus.c_str());
-    if (OOBEStatus == "1") {
+    TELEPHONY_LOGI("OnChange device_provisioned: %{public}s", oOBEStatus.c_str());
+    if (oOBEStatus == "1") {
         CallStatusManager::SetDevProvisioned(DEVICE_PROVISION_VALID);
     } else {
         CallStatusManager::SetDevProvisioned(DEVICE_PROVISION_INVALID);
@@ -2489,43 +2488,64 @@ void OOBEStatusObserver::OnChange()
 
 void CallStatusManager::RegisterObserver()
 {
-    if (OOBEStatusObserver_ != nullptr) {
+    if (oOBEStatusObserver_ != nullptr) {
         return;
     }
-    OOBEStatusObserver_ = new (std::nothrow) OOBEStatusObserver();
-    if (OOBEStatusObserver_ == nullptr) {
-        TELEPHONY_LOGE("OOBEStatusObserver_ is null");
+    oOBEStatusObserver_ = new (std::nothrow) OOBEStatusObserver();
+    if (oOBEStatusObserver_ == nullptr) {
+        TELEPHONY_LOGE("oOBEStatusObserver_ is null");
         return;
     }
 
     OHOS::Uri OOBEStatusUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI + "&key=device_provisioned");
     auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
-    if (!helper->RegisterToDataShare(OOBEStatusUri, OOBEStatusObserver_)) {
+    if (!helper->RegisterToDataShare(OOBEStatusUri, oOBEStatusObserver_)) {
         TELEPHONY_LOGE("RegisterObserver failed");
     }
 }
 
 void CallStatusManager::UnRegisterObserver()
 {
-    if (OOBEStatusObserver_ == nullptr) {
+    if (oOBEStatusObserver_ == nullptr) {
         return;
     }
 
     OHOS::Uri OOBEStatusUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI + "&key=device_provisioned");
     auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
-    if (!helper->UnRegisterToDataShare(OOBEStatusUri, OOBEStatusObserver_)) {
+    if (!helper->UnRegisterToDataShare(OOBEStatusUri, oOBEStatusObserver_)) {
         TELEPHONY_LOGE("UnRegisterObserver failed");
     }
 }
 
 int32_t CallStatusManager::GetDevProvisioned()
 {
+    if (deviceProvisioned_ == DEVICE_PROVISION_UNDEF) {
+        UpdateDevProvisioned();
+    }
     return deviceProvisioned_;
 }
 
 void CallStatusManager::SetDevProvisioned(int32_t value)
 {
     deviceProvisioned_ = value;
+}
+
+void CallStatusManager::UpdateDevProvisioned()
+{
+    auto datashareHelper = SettingsDataShareHelper::GetInstance();
+    std::string device_provisioned {"0"};
+    OHOS::Uri uri(
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned");
+    int resp = datashareHelper->Query(uri, "device_provisioned", device_provisioned);
+    if (resp == TELEPHONY_SUCCESS) {
+        if (device_provisioned == "0" || device_provisioned.empty()) {
+            TELEPHONY_LOGI("SetDevProvisioned device_provisioned = 0");
+            CallStatusManager::SetDevProvisioned(DEVICE_PROVISION_INVALID);
+        } else if (device_provisioned == "1") {
+            TELEPHONY_LOGI("SetDevProvisioned device_provisioned = 1");
+            CallStatusManager::SetDevProvisioned(DEVICE_PROVISION_VALID);
+        }
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

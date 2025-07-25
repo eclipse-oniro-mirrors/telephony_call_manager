@@ -52,7 +52,6 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    UpdateDevProvisioned();
     if (CallStatusManager::GetDevProvisioned() == DEVICE_PROVISION_INVALID &&
         info.callType == CallType::TYPE_BLUETOOTH) {
         TELEPHONY_LOGE("wangfan other state not report");
@@ -74,25 +73,6 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
         }
     });
     return TELEPHONY_SUCCESS;
-}
-
-void ReportCallInfoHandler::UpdateDevProvisioned()
-{
-    if (CallStatusManager::GetDevProvisioned() == DEVICE_PROVISION_UNDEF) {
-        auto datashareHelper = SettingsDataShareHelper::GetInstance();
-        std::string device_provisioned {"0"};
-        OHOS::Uri uri(
-            "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned");
-        int resp = datashareHelper->Query(uri, "device_provisioned", device_provisioned);
-        if ((resp == TELEPHONY_SUCCESS || resp == TELEPHONY_ERR_UNINIT) &&
-            (device_provisioned == "0" || device_provisioned.empty())) {
-            TELEPHONY_LOGI("SetDevProvisioned device_provisioned = 0");
-            CallStatusManager::SetDevProvisioned(DEVICE_PROVISION_INVALID);
-        } else {
-            TELEPHONY_LOGI("SetDevProvisioned device_provisioned = 1");
-            CallStatusManager::SetDevProvisioned(DEVICE_PROVISION_VALID);
-        }
-    }
 }
 
 void ReportCallInfoHandler::BuildCallDetailsInfo(CallDetailsInfo &info, CallDetailsInfo &callDetailsInfo)
@@ -126,7 +106,6 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    UpdateDevProvisioned();
     CallDetailsInfo callDetailsInfo;
     callDetailsInfo.slotId = info.slotId;
     (void)memcpy_s(callDetailsInfo.bundleName, kMaxBundleNameLen, info.bundleName, kMaxBundleNameLen);

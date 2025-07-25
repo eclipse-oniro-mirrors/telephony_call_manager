@@ -334,7 +334,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
  HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_008, TestSize.Level0)
 {
     Uri uri(DEVICE_PROVISIONED_URI);
-    auto OOBEStatusObserver_ = new (std::nothrow) OOBEStatusObserver();
+    auto oOBEStatusObserver_ = new (std::nothrow) OOBEStatusObserver();
     auto reportCallInfo = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
     reportCallInfo->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
     CallDetailInfo info;
@@ -343,26 +343,27 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     info.index = 1;
     info.state = TelCallState::CALL_STATUS_INCOMING;
     info.callType = CallType::TYPE_BLUETOOTH;
-    ASSERT_TRUE(OOBEStatusObserver_ != nullptr);
+    ASSERT_TRUE(oOBEStatusObserver_ != nullptr);
     auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     callStatusManager->RegisterObserver();
-    EXPECT_EQ(helper->RegisterToDataShare(uri, OOBEStatusObserver_), true);
-    OOBEStatusObserver_->OnChange();
+    EXPECT_EQ(helper->RegisterToDataShare(uri, oOBEStatusObserver_), true);
+    oOBEStatusObserver_->OnChange();
     callStatusManager->deviceProvisioned_ = -1;
-    reportCallInfo->UpdateDevProvisioned();
+    callStatusManager->UpdateDevProvisioned();
     EXPECT_EQ(helper->Update(uri, "device_provisioned", "0"), 0);
-    OOBEStatusObserver_->OnChange();
-    EXPECT_EQ(helper->UnRegisterToDataShare(uri, OOBEStatusObserver_), true);
+    oOBEStatusObserver_->OnChange();
+    callStatusManager->deviceProvisioned_ = -1;
+    callStatusManager->UpdateDevProvisioned();
+    EXPECT_EQ(helper->UnRegisterToDataShare(uri, oOBEStatusObserver_), true);
 
     callStatusManager->deviceProvisioned_ = 0;
     EXPECT_TRUE(callStatusManager->ShouldRejectIncomingCall());
-    callStatusManager->deviceProvisioned_ = -1;
     reportCallInfo->UpdateCallReportInfo(info);
 
     callStatusManager->UnRegisterObserver();
     callStatusManager->RegisterObserver();
-    callStatusManager->OOBEStatusObserver_ = nullptr;
+    callStatusManager->oOBEStatusObserver_ = nullptr;
     callStatusManager->UnRegisterObserver();
 }
 /**
