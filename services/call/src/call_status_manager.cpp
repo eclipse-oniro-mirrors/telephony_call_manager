@@ -2518,11 +2518,10 @@ void CallStatusManager::UpdateDevProvisioned()
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned");
     int resp = datashareHelper->Query(uri, "device_provisioned", deviceProvisioned);
     if (resp == TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGI("UpdateDevProvisioned device_provisioned = %{public}s", deviceProvisioned.c_str());
         if (deviceProvisioned == "0" || deviceProvisioned.empty()) {
-            TELEPHONY_LOGI("UpdateDevProvisioned device_provisioned = 0");
             deviceProvisioned_ = DEVICE_PROVISION_INVALID;
         } else if (deviceProvisioned == "1") {
-            TELEPHONY_LOGI("UpdateDevProvisioned device_provisioned = 1");
             deviceProvisioned_ = DEVICE_PROVISION_VALID;
         }
     }
