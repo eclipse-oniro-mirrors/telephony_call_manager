@@ -807,15 +807,6 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_001, TestSize.Level0)
     callManagerHisysevent->WriteAnswerCallFaultEvent(0, 0, 0, errCode, desc);
     callManagerHisysevent->WriteHangUpFaultEvent(0, 0, static_cast<int32_t>(CALL_ERR_INVALID_SLOT_ID), desc);
     callManagerHisysevent->WriteHangUpFaultEvent(0, 0, errCode, desc);
-    callManagerHisysevent->WriteVoipCallStatisticalEvent(0, "statisticalField");
-    DialParaInfo info;
-    sptr<CallBase> call1 = new VoIPCall(info);
-    CallObjectlManager::AddOneCallObject(call1);
-    callManagerHisysevent->WriteVoipCallStatisticalEvent("123", "abc", ,100, "statisticalField");
-    callManagerHisysevent->WriteVoipCallStatisticalEvent(call1->GetCallID(), "statisticalField");
-    int32_t appIndex = -1;
-    callManagerHisysevent->GetAppIndexByBundleName("dingding", 100, appIndex);
-
     CallErrorCode eventValue;
     callManagerHisysevent->CallDataErrorCodeConversion(-1, eventValue);
     callManagerHisysevent->CallDataErrorCodeConversion(static_cast<int32_t>(CALL_ERR_INVALID_SLOT_ID), eventValue);
@@ -903,6 +894,14 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_002, TestSize.Level0)
     std::shared_ptr<NativeCallManagerHisysevent> nativeCallManagerHisysevent =
         std::make_shared<NativeCallManagerHisysevent>();
     nativeCallManagerHisysevent->WriteVoipCallEvent("001", "test", 0, 111, "testMsg", 1, 1, 1);
+    callManagerHisysevent->WriteVoipCallStatisticalEvent(0, "statisticalField");
+    DialParaInfo info;
+    sptr<CallBase> call1 = new VoIPCall(info);
+    CallObjectlManager::AddOneCallObject(call1);
+    callManagerHisysevent->WriteVoipCallStatisticalEvent("123", "abc", 100, "statisticalField");
+    callManagerHisysevent->WriteVoipCallStatisticalEvent(call1->GetCallID(), "statisticalField");
+    int32_t appIndex = -1;
+    callManagerHisysevent->GetAppIndexByBundleName("dingding", 100, appIndex);
 }
 
 /**
