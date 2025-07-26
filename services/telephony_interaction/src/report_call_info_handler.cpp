@@ -49,6 +49,13 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
         TELEPHONY_LOGE("callStatusManagerPtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+
+    if (CallStatusManager::GetDevProvisioned() != DEVICE_PROVISION_INVALID &&
+        info.callType == CallType::TYPE_BLUETOOTH) {
+        TELEPHONY_LOGE("BT call not report in OOBE");
+        return TELEPHONY_SUCCESS;
+    }
+
     CallDetailInfo callDetailInfo = info;
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
     TELEPHONY_LOGW("UpdateCallReportInfo submit task enter");
@@ -96,6 +103,7 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
         TELEPHONY_LOGE("callStatusManagerPtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+
     CallDetailsInfo callDetailsInfo;
     callDetailsInfo.slotId = info.slotId;
     (void)memcpy_s(callDetailsInfo.bundleName, kMaxBundleNameLen, info.bundleName, kMaxBundleNameLen);
