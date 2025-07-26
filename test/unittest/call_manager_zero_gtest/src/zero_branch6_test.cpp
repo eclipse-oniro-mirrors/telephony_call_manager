@@ -101,6 +101,8 @@ constexpr const char *TEST_STR = "123";
 constexpr const char *LONG_STR =
     "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
     "111111111";
+constexpr const char *DEVICE_PROVISIONED_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 } // namespace
 
 class DemoHandler : public AppExecFwk::EventHandler {
