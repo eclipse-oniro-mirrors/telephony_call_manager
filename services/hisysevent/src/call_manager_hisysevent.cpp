@@ -342,7 +342,7 @@ void CallManagerHisysevent::JudgingAnswerTimeOut(const int32_t slotId, const int
 }
 
 void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const std::string &voipCallId, const std::string &bundleName,
-    const int32_t &uid, const std::string &statisticalField)
+    const int32_t &uid, const std::string statisticalField)
 {
     ffrt::submit([voipCallId, bundleName, uid, statisticalField]() {
         int32_t appIndex = -1;
@@ -351,7 +351,7 @@ void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const std::string &voi
             BUNDLE_NAME_KEY, bundleName, STATISTICAL_FIELD_KEY, statisticalField, APP_INDEX_KEY, appIndex);
     });
 }
-void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const int32_t &callId, const std::string &statisticalField)
+void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const int32_t &callId, const std::string statisticalField)
 {
     auto call = CallControlManager::GetOneCallObject(callId);
     if (call == nullptr || call->GetCallType() != CallType::TYPE_VOIP) {
@@ -369,21 +369,21 @@ void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const int32_t &callId,
             BUNDLE_NAME_KEY, bundleName, STATISTICAL_FIELD_KEY, statisticalField, APP_INDEX_KEY, appIndex);
     });
 }
-void GetAppIndexByBundleName(std::string bundleName, int32_t uid, int32_t &appIndex)
+void CallManagerHisysevent::GetAppIndexByBundleName(std::string bundleName, int32_t uid, int32_t &appIndex)
 {
     sptr<ISystemAbilityManager> systemAbilityManager =
-        SystemAbilityManagerClient::GetInstance()::GetSystemAbilityManager();
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityManager == nullptr) {
         TELEPHONY_LOGE("system ability manager is nullptr");
         return;
     }
-    sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MAG_SERVICE_SYS_ABILITY_ID);
+    sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
     if (remoteObject == nullptr) {
-        TELEPHONY_LOGE("get system ability failed");
+        TELEPHONY_LOGE("Get system ability failed");
         return;
     }
     sptr<IBundleMgr> bundleMgr = iface_cast<IBundleMgr>(remoteObject);
-    bundlemgr->GetNameAndIndexForUid(uid, bundleName, appIndex);
+    bundleMgr->GetNameAndIndexForUid(uid, bundleName, appIndex);
 }
 
 } // namespace Telephony
