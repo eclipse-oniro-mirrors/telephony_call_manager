@@ -809,10 +809,10 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_001, TestSize.Level0)
     callManagerHisysevent->WriteHangUpFaultEvent(0, 0, errCode, desc);
     callManagerHisysevent->WriteVoipCallStatisticalEvent(0, "statisticalField");
     DialParaInfo info;
-    sptr<CallBase> call1 = new VoIPCall(inof);
-    CallControlManager::AddOneCallObject(call1);
+    sptr<CallBase> call1 = new VoIPCall(info);
+    CallObjectlManager::AddOneCallObject(call1);
     callManagerHisysevent->WriteVoipCallStatisticalEvent("123", "abc", ,100, "statisticalField");
-    callManagerHisysevent->WriteVoipCallStatisticalEvent(call1->GetCallId(), "statisticalField");
+    callManagerHisysevent->WriteVoipCallStatisticalEvent(call1->GetCallID(), "statisticalField");
     int32_t appIndex = -1;
     callManagerHisysevent->GetAppIndexByBundleName("dingding", 100, appIndex);
 
