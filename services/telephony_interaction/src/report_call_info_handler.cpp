@@ -50,7 +50,7 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    if (CallStatusManager::GetDevProvisioned() != DEVICE_PROVISION_INVALID &&
+    if (CallStatusManager::GetDevProvisioned() != DEVICE_PROVISION_VALID &&
         info.callType == CallType::TYPE_BLUETOOTH) {
         TELEPHONY_LOGE("BT call not report in OOBE");
         return TELEPHONY_SUCCESS;
