@@ -131,7 +131,7 @@ int32_t VoipCallConnection::HangUpCall(const VoipCallEventInfo &events)
         return TELEPHONY_ERROR;
     }
     CallManagerHisysevent::WriteVoipCallStatisticalEvent(events.voipCallId, events.bundleName,
-        events.uid, "HungupByCallManager");
+        events.uid, "HungupByCallmanager");
     return voipCallManagerInterfacePtr_->HangUp(events);
 }
 
