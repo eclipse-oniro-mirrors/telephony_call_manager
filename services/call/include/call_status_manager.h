@@ -69,7 +69,6 @@ public:
     int32_t GetAntiFraudSlotId();
     int32_t GetAntiFraudIndex();
     static int32_t GetDevProvisioned();
-    static void SetDevProvisioned(int32_t value);
     static void RegisterObserver();
     static void UpdateDevProvisioned();
 
@@ -184,7 +183,7 @@ private:
     int32_t antiFraudSlotId_ = -1;
     int32_t antiFraudIndex_ = -1;
     ffrt::mutex mutex_;
-    static sptr<OOBEStatusObserver> oOBEStatusObserver_;
+    static sptr<OOBEStatusObserver> oobeStatusObserver_;
     static int32_t deviceProvisioned_;
 };
 } // namespace Telephony

@@ -334,7 +334,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
  HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_008, TestSize.Level0)
 {
     Uri uri(DEVICE_PROVISIONED_URI);
-    auto oOBEStatusObserver_ = new (std::nothrow) OOBEStatusObserver();
+    auto oobeStatusObserver_ = new (std::nothrow) OOBEStatusObserver();
     auto reportCallInfo = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
     reportCallInfo->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
     CallDetailInfo info;
@@ -343,19 +343,19 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     info.index = 1;
     info.state = TelCallState::CALL_STATUS_INCOMING;
     info.callType = CallType::TYPE_BLUETOOTH;
-    ASSERT_TRUE(oOBEStatusObserver_ != nullptr);
+    ASSERT_TRUE(oobeStatusObserver_ != nullptr);
     auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     callStatusManager->RegisterObserver();
-    EXPECT_EQ(helper->RegisterToDataShare(uri, oOBEStatusObserver_), true);
-    oOBEStatusObserver_->OnChange();
+    EXPECT_EQ(helper->RegisterToDataShare(uri, oobeStatusObserver_), true);
+    oobeStatusObserver_->OnChange();
     callStatusManager->deviceProvisioned_ = -1;
     callStatusManager->UpdateDevProvisioned();
     EXPECT_EQ(helper->Update(uri, "device_provisioned", "0"), 0);
-    oOBEStatusObserver_->OnChange();
+    oobeStatusObserver_->OnChange();
     callStatusManager->deviceProvisioned_ = -1;
-    callStatusManager->UpdateDevProvisioned();
-    EXPECT_EQ(helper->UnRegisterToDataShare(uri, oOBEStatusObserver_), true);
+    callStatusManager->GetDevProvisioned();
+    EXPECT_EQ(helper->UnRegisterToDataShare(uri, oobeStatusObserver_), true);
 
     callStatusManager->deviceProvisioned_ = 0;
     EXPECT_TRUE(callStatusManager->ShouldRejectIncomingCall());
@@ -363,7 +363,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
 
     callStatusManager->UnRegisterObserver();
     callStatusManager->RegisterObserver();
-    callStatusManager->oOBEStatusObserver_ = nullptr;
+    callStatusManager->oobeStatusObserver_ = nullptr;
     callStatusManager->UnRegisterObserver();
 }
 /**

@@ -24,8 +24,6 @@
 #include "telephony_log_wrapper.h"
 #include "antifraud_service.h"
 #include "thread"
-#include "settings_datashare_helper.h"
-#include "uri.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -54,7 +52,7 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
 
     if (CallStatusManager::GetDevProvisioned() == DEVICE_PROVISION_INVALID &&
         info.callType == CallType::TYPE_BLUETOOTH) {
-        TELEPHONY_LOGE("wangfan other state not report");
+        TELEPHONY_LOGE("BT call not report in OOBE");
         return TELEPHONY_SUCCESS;
     }
 
