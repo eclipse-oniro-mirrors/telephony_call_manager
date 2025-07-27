@@ -894,16 +894,28 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_002, TestSize.Level0)
     std::shared_ptr<NativeCallManagerHisysevent> nativeCallManagerHisysevent =
         std::make_shared<NativeCallManagerHisysevent>();
     nativeCallManagerHisysevent->WriteVoipCallEvent("001", "test", 0, 111, "testMsg", 1, 1, 1);
-    callManagerHisysevent->WriteVoipCallStatisticalEvent(0, "statisticalField");
-    DialParaInfo info;
-    sptr<CallBase> call1 = new VoIPCall(info);
-    CallObjectlManager::AddOneCallObject(call1);
-    callManagerHisysevent->WriteVoipCallStatisticalEvent("123", "abc", 100, "statisticalField");
-    callManagerHisysevent->WriteVoipCallStatisticalEvent(call1->GetCallID(), "statisticalField");
-    int32_t appIndex = -1;
-    callManagerHisysevent->GetAppIndexByBundleName("dingding", 100, appIndex);
 }
 
+
+/**
+ * @tc.number   Telephony_CallManagerHisysevent_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_003, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerHisysevent> callManagerHisysevent = std::make_shared<CallManagerHisysevent>();
+    callManagerHisysevent->WriteVoipCallStatisticalEvent(0, "statisticalField");
+    DialParaInfo dialInfo;
+    int32_t appIndex = -1;
+    sptr<CallBase> call1 = new VoIPCall(dialInfo);
+    CallObjectManager::AddOneCallObject(call1);
+    sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call1.GetRefPtr());
+    callManagerHisysevent->WriteVoipCallStatisticalEvent("123", "abc", 100, "statisticalField");
+    callManagerHisysevent->WriteVoipCallStatisticalEvent(call1->GetCallID(), "statisticalField");
+    callManagerHisysevent->GetAppIndexByBundleName(voipCall->GetVoipBundleName(), voipCall->GetVoipUid(), appIndex);
+    EXPECT_EQ(appIndex, -1);
+}
 /**
  * @tc.number   Telephony_OTTCall_001
  * @tc.name     test error branch
