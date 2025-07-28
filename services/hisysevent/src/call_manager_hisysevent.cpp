@@ -16,11 +16,12 @@
 #include "call_manager_hisysevent.h"
 
 #include "app_mgr_interface.h"
-#include "call_control_manager.h"
-#include "call_manager_errors.h"
 #include "bundle_mgr_interface.h"
 #include "bundle_mgr_proxy.h"
 #include "iservice_registry.h"
+
+#include "call_control_manager.h"
+#include "call_manager_errors.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "voip_call.h"
@@ -359,15 +360,8 @@ void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const int32_t &callId,
     }
 
     sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
-    std::string bundleName = voipCall->GetVoipBundleName();
-    std::string voipCallId = voipCall->GetVoipCallId();
-    int32_t uid = voipCall->GetVoipUid();
-    ffrt::submit([voipCallId, bundleName, uid, statisticalField]() {
-        int32_t appIndex = -1;
-        GetAppIndexByBundleName(bundleName, uid, appIndex);
-        HiSysEventWrite(DOMAIN_NAME, VOIP_CALL_STATISTICAL, EventType::FAULT, CALL_ID_KEY, voipCallId,
-            BUNDLE_NAME_KEY, bundleName, STATISTICAL_FIELD_KEY, statisticalField, APP_INDEX_KEY, appIndex);
-    });
+    WriteVoipCallStatisticalEvent(voipCall->GetVoipCallId(), voipCall->GetVoipBundleName(), voipCall->GetVoipUid(),
+        statisticalField);
 }
 void CallManagerHisysevent::GetAppIndexByBundleName(std::string bundleName, int32_t uid, int32_t &appIndex)
 {
