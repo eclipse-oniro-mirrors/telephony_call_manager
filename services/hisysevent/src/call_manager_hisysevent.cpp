@@ -36,7 +36,6 @@ static constexpr const char *CALL_HANGUP_FAILED_EVENT = "CALL_HANGUP_FAILED";
 static constexpr const char *INCOMING_CALL_EVENT = "INCOMING_CALL";
 static constexpr const char *CALL_STATE_CHANGED_EVENT = "CALL_STATE";
 static constexpr const char *CALL_INCOMING_NUM_IDENTITY_EVENT = "CALL_INCOMING_NUM_IDENTITY";
-static  const std::string VOIP_CALL_STATISTICAL = "VOIP_CALL_STATISTICS";
 
 // KEY
 static constexpr const char *MODULE_NAME_KEY = "MODULE";
@@ -51,9 +50,6 @@ static constexpr const char *ERROR_MSG_KEY = "ERROR_MSG";
 static constexpr const char *MARK_TYPE_KEY = "MARK_TYPE";
 static constexpr const char *IS_BLOCK = "IS_BLOCK";
 static constexpr const char *BLOCK_REASON = "BLOCK_REASON";
-static  const std::string BUNDLE_NAME_KEY = "BUNDLE_NAME";
-static  const std::string STATISTICAL_FIELD_KEY = "STATISTICAL_FIELD";
-static  const std::string APP_INDEX_KEY = "APP_INDEX";
 
 // VALUE
 static constexpr const char *CALL_MANAGER_MODULE = "CALL_MANAGER";
@@ -348,8 +344,8 @@ void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const std::string &voi
     ffrt::submit([voipCallId, bundleName, uid, statisticalField]() {
         int32_t appIndex = -1;
         GetAppIndexByBundleName(bundleName, uid, appIndex);
-        HiSysEventWrite(DOMAIN_NAME, VOIP_CALL_STATISTICAL, EventType::FAULT, CALL_ID_KEY, voipCallId,
-            BUNDLE_NAME_KEY, bundleName, STATISTICAL_FIELD_KEY, statisticalField, APP_INDEX_KEY, appIndex);
+        HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_STATISTICS", EventType::FAULT, CALL_ID_KEY, voipCallId,
+            "BUNDLE_NAME", bundleName, "STATISTICAL_FIELD", statisticalField, "APP_INDEX", appIndex);
     });
 }
 void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const int32_t &callId, const std::string statisticalField)
