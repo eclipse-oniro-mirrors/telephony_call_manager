@@ -15,9 +15,16 @@
 
 #include "call_manager_hisysevent.h"
 
+#include "app_mgr_interface.h"
+#include "bundle_mgr_interface.h"
+#include "bundle_mgr_proxy.h"
+#include "iservice_registry.h"
+
+#include "call_control_manager.h"
 #include "call_manager_errors.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include "voip_call.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -51,7 +58,7 @@ static const int32_t IMS_CALL_TYPE = 1;
 static const int32_t SATELLITE_CALL_TYPE = 5;
 static const int32_t VOICE_TYPE = 0;
 static const int32_t VIDEO_TYPE = 1;
-
+using namespace OHOS::AppExecFwk;
 void CallManagerHisysevent::WriteCallStateBehaviorEvent(const int32_t slotId, const int32_t state, const int32_t index)
 {
     HiWriteBehaviorEvent(CALL_STATE_CHANGED_EVENT, SLOT_ID_KEY, slotId, STATE_KEY, state, INDEX_ID_KEY, index);
@@ -330,5 +337,44 @@ void CallManagerHisysevent::JudgingAnswerTimeOut(const int32_t slotId, const int
             "answer time out " + std::to_string(answerEndTime - answerStartTime_));
     }
 }
+
+void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const std::string &voipCallId, const std::string &bundleName,
+    const int32_t &uid, const std::string statisticalField)
+{
+    ffrt::submit([voipCallId, bundleName, uid, statisticalField]() {
+        int32_t appIndex = -1;
+        GetAppIndexByBundleName(bundleName, uid, appIndex);
+        HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_STATISTICS", EventType::FAULT, CALL_ID_KEY, voipCallId,
+            "BUNDLE_NAME", bundleName, "STATISTICAL_FIELD", statisticalField, "APP_INDEX", appIndex);
+    });
+}
+void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const int32_t &callId, const std::string statisticalField)
+{
+    auto call = CallControlManager::GetOneCallObject(callId);
+    if (call == nullptr || call->GetCallType() != CallType::TYPE_VOIP) {
+        return;
+    }
+
+    sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
+    WriteVoipCallStatisticalEvent(voipCall->GetVoipCallId(), voipCall->GetVoipBundleName(), voipCall->GetVoipUid(),
+        statisticalField);
+}
+void CallManagerHisysevent::GetAppIndexByBundleName(std::string bundleName, int32_t uid, int32_t &appIndex)
+{
+    sptr<ISystemAbilityManager> systemAbilityManager =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        TELEPHONY_LOGE("system ability manager is nullptr");
+        return;
+    }
+    sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (remoteObject == nullptr) {
+        TELEPHONY_LOGE("Get system ability failed");
+        return;
+    }
+    sptr<IBundleMgr> bundleMgr = iface_cast<IBundleMgr>(remoteObject);
+    bundleMgr->GetNameAndIndexForUid(uid, bundleName, appIndex);
+}
+
 } // namespace Telephony
 } // namespace OHOS

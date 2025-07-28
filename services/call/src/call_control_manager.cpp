@@ -273,6 +273,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
             INVALID_PARAMETER, callId, videoState, ret, "AnswerCallPolicy failed");
         return ret;
     }
+    CallManagerHisysevent::WriteVoipCallStatisticalEvent(callId, "MtBannerAnswer");
     return HandlerAnswerCall(callId, videoState);
 }
 
@@ -399,6 +400,7 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
         TELEPHONY_LOGE("RejectCall failed!");
         return ret;
     }
+    CallManagerHisysevent::WriteVoipCallStatisticalEvent(callId, "MtBannerReject");
     ReportPhoneUEInSuperPrivacy(CALL_REJECT_IN_SUPER_PRIVACY);
     return TELEPHONY_SUCCESS;
 }
@@ -454,6 +456,7 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
         TELEPHONY_LOGE("HangUpCall failed!");
         return ret;
     }
+    CallManagerHisysevent::WriteVoipCallStatisticalEvent(callId, "HungupByBanner");
     return TELEPHONY_SUCCESS;
 }
 

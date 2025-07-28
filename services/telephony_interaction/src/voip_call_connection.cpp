@@ -15,6 +15,7 @@
 
 #include "voip_call_connection.h"
 
+#include "call_manager_hisysevent.h"
 #include "i_voip_call_manager_callback.h"
 #include "i_voip_call_manager_service.h"
 #include "iservice_registry.h"
@@ -129,6 +130,8 @@ int32_t VoipCallConnection::HangUpCall(const VoipCallEventInfo &events)
         TELEPHONY_LOGI("Voipconnect HangUpCall voipCallManagerInterfacePtr_ is null");
         return TELEPHONY_ERROR;
     }
+    CallManagerHisysevent::WriteVoipCallStatisticalEvent(events.voipCallId, events.bundleName,
+        events.uid, "HungupByCallmanager");
     return voipCallManagerInterfacePtr_->HangUp(events);
 }
 

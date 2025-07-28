@@ -69,7 +69,9 @@ public:
     void JudgingDialTimeOut(const int32_t slotId, const int32_t callType, const int32_t videoState);
     void JudgingIncomingTimeOut(const int32_t slotId, const int32_t callType, const int32_t videoState);
     void JudgingAnswerTimeOut(const int32_t slotId, const int32_t callId, const int32_t videoState);
-
+    static void WriteVoipCallStatisticalEvent(const std::string &callId, const std::string &bundleName,
+        const int32_t &uid, const std::string statisticalField);
+    static void WriteVoipCallStatisticalEvent(const int32_t &callId, const std::string statisticalField);
 public:
     template<typename... Types>
     static void HiWriteBehaviorEventPhoneUE(const std::string &eventName, Types... args)
@@ -82,6 +84,7 @@ private:
     static int32_t CallDataErrorCodeConversion(const int32_t errCode, CallErrorCode &eventValue);
     static int32_t CallInterfaceErrorCodeConversion(const int32_t errCode, CallErrorCode &eventValue);
     static int32_t TelephonyErrorCodeConversion(const int32_t errCode, CallErrorCode &eventValue);
+    static void GetAppIndexByBundleName(std::string bundleName, int32_t uid, int32_t &appIndex);
 
 private:
     int64_t dialStartTime_ = 0;
