@@ -1544,9 +1544,7 @@ void CallStatusManager::SetVideoCallState(sptr<CallBase> &call, TelCallState nex
 
 sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &call, const CallDetailInfo &info)
 {
-    TELEPHONY_LOGI("RefreshCallIfNecessary");
     call->SetNewCallUseBox(info.newCallUseBox);
-    TELEPHONY_LOGI("Refresh NewCallUseBox = %{public}d", call->GetNewCallUseBox());
     if (call->GetCallType() == CallType::TYPE_IMS && call->GetVideoStateType() != info.callMode) {
         call->SetVideoStateType(info.callMode);
         sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
