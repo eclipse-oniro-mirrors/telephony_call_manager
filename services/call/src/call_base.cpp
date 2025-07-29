@@ -43,8 +43,8 @@ CallBase::CallBase(DialParaInfo &info)
       ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
       blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams), isAnswered_(false),
-      detectDetails_(""), phoneOrWatch_(info.phoneOrWatch), newCallUseBox_(info.newCallUseBox),
-      isAiAutoAnswer_(false), isForcedReportVoiceCall_(false)
+      detectDetails_(""), phoneOrWatch_(info.phoneOrWatch), isAiAutoAnswer_(false),
+      newCallUseBox_(info.newCallUseBox), isForcedReportVoiceCall_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -62,7 +62,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
       numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1),
       extraParams_(info.extraParams), isAnswered_(false), detectDetails_(""), phoneOrWatch_(info.phoneOrWatch),
-      newCallUseBox_(info.newCallUseBox), isAiAutoAnswer_(false), isForcedReportVoiceCall_(false)
+      isAiAutoAnswer_(false), newCallUseBox_(info.newCallUseBox), isForcedReportVoiceCall_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -755,7 +755,7 @@ void CallBase::SetNewCallUseBox(int32_t newCallUseBox)
     newCallUseBox_ = newCallUseBox;
 }
 
-void CallBase::GetNewCallUseBox()
+int32_t CallBase::GetNewCallUseBox()
 {
     return newCallUseBox_;
 }
