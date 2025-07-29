@@ -44,7 +44,7 @@ CallBase::CallBase(DialParaInfo &info)
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
       blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams), isAnswered_(false),
       detectDetails_(""), phoneOrWatch_(info.phoneOrWatch), isAiAutoAnswer_(false),
-      newCallUseBox_(info.newCallUseBox), isForcedReportVoiceCall_(false)
+      isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -62,7 +62,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
       numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1),
       extraParams_(info.extraParams), isAnswered_(false), detectDetails_(""), phoneOrWatch_(info.phoneOrWatch),
-      isAiAutoAnswer_(false), newCallUseBox_(info.newCallUseBox), isForcedReportVoiceCall_(false)
+      isAiAutoAnswer_(false), isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
