@@ -850,6 +850,7 @@ private:
         "*#*#2589#*#*", "*#*#2845#*#*", "*#*#2846#*#*", "*#*#2847#*#*", "*#*#28465#*#*",
         "*#*#2627#*#*", "*#*#258#*#*", "*#28460" };
     std::mutex lock_;
+    std::mutex bluetoothCallCallbackLock_;
     const int32_t startTime_ = 1900;
     const int32_t extraMonth_ = 1;
     int64_t bindTime_ = 0L;
