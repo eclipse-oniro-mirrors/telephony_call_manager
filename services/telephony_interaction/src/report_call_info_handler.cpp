@@ -93,6 +93,7 @@ void ReportCallInfoHandler::BuildCallDetailsInfo(CallDetailsInfo &info, CallDeta
         callDetailInfo.namePresentation = (*iter).namePresentation;
         callDetailInfo.reason = (*iter).reason;
         callDetailInfo.message = (*iter).message;
+        callDetailInfo.newCallUseBox = (*iter).newCallUseBox;
         callDetailsInfo.callVec.push_back(callDetailInfo);
     }
 }

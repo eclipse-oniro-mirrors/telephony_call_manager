@@ -216,6 +216,12 @@ struct CallReportInfo {
      * Indicates the detail message for the ending call reason.
      */
     std::string message = "";
+    /**
+     * Whether to use the message box.
+     * - 0: No
+     * - 1: Yes
+     */
+    int32_t newCallUseBox = 0;
 };
 
 /**
@@ -365,6 +371,12 @@ struct CallAttributeInfo {
      * - 3: AntiFraud is finished.
      */
     int32_t antiFraudState = 0;
+    /**
+     * Whether to use the message box.
+     * - 0: No
+     * - 1: Yes
+     */
+    int32_t newCallUseBox = 0;
 };
 
 /**
@@ -469,6 +481,12 @@ struct CallRecordInfo {
      * - 3：Payphone
      */
     int32_t namePresentation = 0;
+    /**
+     * Whether to use the message box.
+     * - 0: No
+     * - 1: Yes
+     */
+    int32_t newCallUseBox = 0;
 
     CallRecordInfo() {}
 
@@ -514,6 +532,7 @@ struct CallRecordInfo {
             std::begin(detectDetails));
         namePresentation = temp.namePresentation;
         name = temp.name;
+        newCallUseBox = temp.newCallUseBox;
         return *this;
     }
 };
@@ -602,6 +621,12 @@ struct CallDetailInfo {
      * Indicates the detail message for the ending call reason.
      */
     std::string message = "";
+    /**
+     * Whether to use the message box.
+     * - 0: No
+     * - 1: Yes
+     */
+    int32_t newCallUseBox = 0;
 
     CallDetailInfo() {}
 
@@ -642,6 +667,7 @@ struct CallDetailInfo {
         reason = temp.reason;
         antiFraudState = temp.antiFraudState;
         message = temp.message;
+        newCallUseBox = temp.newCallUseBox;
         return *this;
     }
 };

@@ -68,6 +68,7 @@ constexpr const char *CALL_DETECT_DETAILS = "detect_details";
 constexpr const char *CALL_IS_CNAP = "is_cnap";
 constexpr const char *PERSONAL_RINGTONE = "personal_ringtone";
 constexpr const char *PERSONAL_NOTIFICATION_RINGTONE = "personal_notification_ringtone";
+constexpr const char *CALL_USE_NEWCALLBOX = "new_calling";
 
 enum class CallLogReadState {
     CALL_IS_UNREAD,

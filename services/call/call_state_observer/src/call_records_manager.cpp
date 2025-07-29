@@ -138,6 +138,11 @@ void CallRecordsManager::CallStateUpdated(
         callObjectPtr->IsAiAutoAnswer()) {
         info.answerType = CallAnswerType::CALL_ANSWER_MISSED;
     }
+    if (callObjectPtr->GetNewCallUseBox()) {
+        info.newCallUseBox = 1;
+    } else {
+        info.newCallUseBox = 0;
+    }
     AddOneCallRecord(info);
 }
 
@@ -292,6 +297,7 @@ void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecor
     data.celiaCallType = info.celiaCallType;
     data.name = info.name;
     data.namePresentation = info.namePresentation;
+    data.newCallUseBox = info.newCallUseBox;
 }
 
 void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsigned int size)
