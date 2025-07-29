@@ -1544,7 +1544,7 @@ void CallStatusManager::SetVideoCallState(sptr<CallBase> &call, TelCallState nex
 
 sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &call, const CallDetailInfo &info)
 {
-    TELEPHONY_LOGI("RefreshCallIfNecessary");
+    call->SetNewCallUseBox(info.newCallUseBox);
     if (call->GetCallType() == CallType::TYPE_IMS && call->GetVideoStateType() != info.callMode) {
         call->SetVideoStateType(info.callMode);
         sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
@@ -1971,6 +1971,7 @@ void CallStatusManager::PackParaInfo(
     paraInfo.extraParams.SetParam("namePresentation", AAFwk::Integer::Box(namePresentation));
     paraInfo.extraParams.SetParam("name", AAFwk::String::Box(namePresentation == 0 ? info.name : ""));
     paraInfo.phoneOrWatch = info.phoneOrWatch;
+    paraInfo.newCallUseBox = info.newCallUseBox;
 }
 
 bool CallStatusManager::IsFocusModeOpen()

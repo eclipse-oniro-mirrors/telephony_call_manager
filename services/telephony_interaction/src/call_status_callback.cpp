@@ -104,6 +104,7 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
         detailInfo.namePresentation = (*it).namePresentation;
         detailInfo.reason = (*it).reason;
         detailInfo.message = (*it).message;
+        detailInfo.newCallUseBox = (*it).newCallUseBox;
         detailsInfo.callVec.push_back(detailInfo);
     }
     detailsInfo.slotId = callsInfo.slotId;

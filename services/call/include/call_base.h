@@ -151,6 +151,8 @@ public:
     int32_t GetPhoneOrWatchDial();
     bool GetAnsweredByPhone();
     void SetIsAnsweredByPhone(bool isAnsweredByPhone);
+    void SetNewCallUseBox(int32_t newCallUseBox);
+    int32_t GetNewCallUseBox();
 
 protected:
     int32_t callId_;
@@ -206,6 +208,7 @@ private:
     bool isAiAutoAnswer_;
     bool isForcedReportVoiceCall_{false};
     bool isAnsweredByPhone_{false};
+    int32_t newCallUseBox_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
