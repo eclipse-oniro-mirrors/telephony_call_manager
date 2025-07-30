@@ -165,7 +165,7 @@ private:
 
 private:
     int32_t systemAbilityId_;
-    ffrt::shared_mutex ClientLock_;
+    ffrt::shared_mutex clientLock_;
     bool registerStatus_;
     bool initStatus_;
     sptr<ICallManagerService> callManagerServicePtr_ = nullptr;

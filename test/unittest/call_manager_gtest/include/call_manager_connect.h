@@ -529,7 +529,7 @@ private:
     int32_t systemAbilityId_;
     sptr<ICallManagerService> callManagerServicePtr_;
     sptr<ICallAbilityCallback> callAbilityCallbackPtr_;
-    ffrt::shared_mutex ClientLock_;
+    ffrt::shared_mutex clientLock_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -606,7 +606,7 @@ private:
     sptr<CellularCallInterface> cellularCallInterfacePtr_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     bool connectState_;
-    ffrt::shared_mutex ClientLock_;
+    ffrt::shared_mutex clientLock_;
 };
 } // namespace Telephony
 } // namespace OHOS
