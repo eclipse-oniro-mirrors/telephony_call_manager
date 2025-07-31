@@ -464,7 +464,8 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
     auto callRunningState = callObjectPtr->GetCallRunningState();
     if (callRunningState == CallRunningState::CALL_RUNNING_STATE_ACTIVE ||
         callRunningState == CallRunningState::CALL_RUNNING_STATE_RINGING) {
-        if (!CallObjectManager::HasIncomingCallCrsType() && !CallObjectManager::HasIncomingCallVideoRingType()) {
+        if ((callObjectPtr->GetCrsType() == CRS_TYPE || !CallObjectManager::HasIncomingCallCrsType()) &&
+            !CallObjectManager::HasIncomingCallVideoRingType()) {
             if (isCrsVibrating_ || isVideoRingVibrating_) {
                 DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
                 isCrsVibrating_ = false;
