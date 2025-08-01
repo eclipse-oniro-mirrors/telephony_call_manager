@@ -45,6 +45,9 @@ const char *FORMAT_PATTERN = ",|;";
 const char *MARK_SOURCE_OF_ANTIFRAUT_CENTER = "5";
 const char *MARK_SOURCE_OF_OTHERS = "3";
 const std::string SETTINGS_ANTIFRAUD_CENTER_SWITCH = "";
+const std::string SETTINGS_ANTIFRAUD_BESTMIND_SWITCH = "";
+const std::string ANTIFRAUD_CENTER_BUNDLE_NAME = "";
+const std::string BEST_MIND_BUNDLE_NAME = "";
 const std::string TELEPHONY_IDENTITY_SWITCH = "";
 CallRecordsManager::CallRecordsManager() : callRecordsHandlerServerPtr_(nullptr) {}
 
@@ -304,6 +307,7 @@ void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsig
 {
     std::string isAntifraudSwitchOn = "0";
     std::string isTelephonyIdentityOn = "0";
+    std::string isAntiFraudBestMindSwitchOn = "0";
     auto settingHelper = SettingsDataShareHelper::GetInstance();
     if (settingHelper == nullptr) {
         return;
@@ -313,7 +317,8 @@ void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsig
     }
     OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
     settingHelper->Query(settingUri, SETTINGS_ANTIFRAUD_CENTER_SWITCH, isAntifraudSwitchOn);
-    if (isAntifraudSwitchOn == "0") {
+    settingHelper->Query(settingUri, SETTINGS_ANTIFRAUD_BESTMIND_SWITCH, isAntiFraudBestMindSwitchOn);
+    if (isAntifraudSwitchOn == "0" && isAntiFraudBestMindSwitchOn == "0") {
         strcpy_s(source, size, MARK_SOURCE_OF_OTHERS);
         return;
     }
@@ -322,7 +327,8 @@ void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsig
         strcpy_s(source, size, MARK_SOURCE_OF_OTHERS);
         return;
     }
-    if (!CallManagerUtils::IsBundleInstalled("", userId)) {
+    if (!CallManagerUtils::IsBundleInstalled(ANTIFRAUD_CENTER_BUNDLE_NAME, userId) &&
+        !CallManagerUtils::IsBundleInstalled(BEST_MIND_BUNDLE_NAME, userId)) {
         strcpy_s(source, size, MARK_SOURCE_OF_OTHERS);
         return;
     }
