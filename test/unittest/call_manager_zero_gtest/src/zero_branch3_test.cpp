@@ -1829,7 +1829,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_015, TestSize.Level0)
     callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
     callDetailInfo.callType = CallType::TYPE_IMS;
     callDetailInfo.callMode = VideoStateType::TYPE_VOICE;
-    std::string number = "12345678";
+    std::string number = "";
     memcpy_s(&callDetailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
     sptr<CallBase> call = callStatusManager->CreateNewCall(callDetailInfo, CallDirection::CALL_DIRECTION_IN);
     callStatusManager->HandleVideoCallInAdvsecMode(call, callDetailInfo);
@@ -1837,7 +1837,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_015, TestSize.Level0)
 
     call->SetVideoStateType(VideoStateType::TYPE_VIDEO);
     callStatusManager->HandleVideoCallInAdvsecMode(call, callDetailInfo);
-    EXPECT_EQ(call->IsForcedReportVoiceCall(), true);
+    EXPECT_EQ(call->IsForcedReportVoiceCall(), false);
 
     call->SetForcedReportVoiceCall(false);
     call->SetVideoStateType(VideoStateType::TYPE_VIDEO);
