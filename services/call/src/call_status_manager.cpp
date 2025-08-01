@@ -115,7 +115,6 @@ int32_t CallStatusManager::UnInit()
     }
     mEventIdTransferMap_.clear();
     mOttEventIdTransferMap_.clear();
-    UnRegisterObserver();
     return TELEPHONY_SUCCESS;
 }
 
@@ -2487,20 +2486,6 @@ void CallStatusManager::RegisterObserver()
     if (!helper->RegisterToDataShare(OOBEStatusUri, oobeStatusObserver_)) {
         TELEPHONY_LOGE("RegisterObserver failed");
     }
-}
-
-void CallStatusManager::UnRegisterObserver()
-{
-    if (oobeStatusObserver_ == nullptr) {
-        return;
-    }
-
-    OHOS::Uri oobeStatusUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI + "&key=device_provisioned");
-    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
-    if (!helper->UnRegisterToDataShare(oobeStatusUri, oobeStatusObserver_)) {
-        TELEPHONY_LOGE("UnRegisterObserver failed");
-    }
-    oobeStatusObserver_ = nullptr;
 }
 
 int32_t CallStatusManager::GetDevProvisioned()

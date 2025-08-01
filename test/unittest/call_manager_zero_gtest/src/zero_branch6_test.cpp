@@ -362,11 +362,8 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     callStatusManager->deviceProvisioned_ = 0;
     EXPECT_TRUE(callStatusManager->ShouldRejectIncomingCall());
     reportCallInfo->UpdateCallReportInfo(info);
-
-    callStatusManager->UnRegisterObserver();
     callStatusManager->RegisterObserver();
     callStatusManager->oobeStatusObserver_ = nullptr;
-    callStatusManager->UnRegisterObserver();
 }
 /**
  * @tc.number   Telephony_IncomingCallWakeup_001
