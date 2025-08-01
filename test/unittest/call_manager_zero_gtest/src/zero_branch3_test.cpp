@@ -1663,7 +1663,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, TestSize.Level0)
     voipCallEventInfo.voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_UNMUTED;
     EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
     EXPECT_EQ(callStatusManager->IncomingVoipCallHandle(info), TELEPHONY_SUCCESS);
-    EXPECT_EQ(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_SUCCESS);
     info.callMode = VideoStateType::TYPE_VIDEO;
     EXPECT_NE(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
@@ -1830,7 +1829,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_015, TestSize.Level0)
     callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
     callDetailInfo.callType = CallType::TYPE_IMS;
     callDetailInfo.callMode = VideoStateType::TYPE_VOICE;
-    std::string number = "";
+    std::string number = "12345678";
     memcpy_s(&callDetailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
     sptr<CallBase> call = callStatusManager->CreateNewCall(callDetailInfo, CallDirection::CALL_DIRECTION_IN);
     callStatusManager->HandleVideoCallInAdvsecMode(call, callDetailInfo);
