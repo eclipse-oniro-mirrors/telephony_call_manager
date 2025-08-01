@@ -1067,8 +1067,7 @@ int32_t AudioControlManager::MuteRinger()
     }
     sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (incomingCall != nullptr) {
-        if (incomingCall->GetCrsType() == CRS_TYPE && !IsVoIPCallActived() &&
-            soundState_ == SoundState::SOUNDING) {
+        if (incomingCall->GetCrsType() == CRS_TYPE && !IsVoIPCallActived()) {
             TELEPHONY_LOGI("Mute network ring tone.");
             MuteNetWorkRingTone(true);
         }
