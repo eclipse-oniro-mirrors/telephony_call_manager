@@ -839,6 +839,13 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_003, TestSize.Level0)
 
     manager.IsDCallDeviceSwitchedOn();
     manager.OnDCallSystemAbilityRemoved(deviceId);
+    auto tempStatus = manager.dCallDeviceSwitchedOn_.load();
+    manager.dCallDeviceSwitchedOn_.store(false);
+    manager.OnDCallSystemAbilityRemoved(deviceId);
+    manager.dCallDeviceSwitchedOn_.store(true);
+    manager.OnDCallSystemAbilityRemoved(deviceId);
+    EXPECT_FALSE(manager.dCallDeviceSwitchedOn_);
+    manager.dCallDeviceSwitchedOn_.store(tempStatus);
     listener->OnAddSystemAbility(-1, deviceId); // invalid sa id
     listener->OnAddSystemAbility(TELEPHONY_EXT_SA_ID, deviceId);
     listener->OnAddSystemAbility(DISTRIBUTED_CALL_SOURCE_SA_ID, deviceId);
