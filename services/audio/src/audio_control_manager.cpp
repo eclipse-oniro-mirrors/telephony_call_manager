@@ -1067,8 +1067,7 @@ int32_t AudioControlManager::MuteRinger()
     }
     sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (incomingCall != nullptr) {
-        if (incomingCall->GetCrsType() == CRS_TYPE && !IsVoIPCallActived() &&
-            soundState_ == SoundState::SOUNDING) {
+        if (incomingCall->GetCrsType() == CRS_TYPE && !IsVoIPCallActived()) {
             TELEPHONY_LOGI("Mute network ring tone.");
             MuteNetWorkRingTone(true);
         }
@@ -1399,9 +1398,10 @@ bool AudioControlManager::IsSoundPlaying()
 
 void AudioControlManager::MuteNetWorkRingTone(bool isMute)
 {
-    bool result =
+    if (soundState_ == SoundState::SOUNDING) {
         DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(isMute);
-    TELEPHONY_LOGI("Set Voice Ringtone mute,isMute: %{public}d, result: %{public}d", isMute, result);
+    }
+    TELEPHONY_LOGI("Set Voice Ringtone mute,isMute: %{public}d", isMute);
     if (isCrsVibrating_ && isMute) {
         DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
         isCrsVibrating_ = false;
