@@ -49,7 +49,7 @@ enum CallState: i32 {
 
 
 enum DetailedCallState: i32 {
-     CALL_STATUS_ACTIVE = 0,
+    CALL_STATUS_ACTIVE = 0,
     CALL_STATUS_HOLDING = 1,
     CALL_STATUS_DIALING = 2,
     CALL_STATUS_ALERTING = 3,
