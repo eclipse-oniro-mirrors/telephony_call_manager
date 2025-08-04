@@ -344,7 +344,7 @@ void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const std::string &voi
     ffrt::submit([voipCallId, bundleName, uid, statisticalField]() {
         int32_t appIndex = -1;
         GetAppIndexByBundleName(bundleName, uid, appIndex);
-        HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_STATISTICS", EventType::FAULT, CALL_ID_KEY, voipCallId,
+        HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_STATISTICS", EventType::STATISTIC, CALL_ID_KEY, voipCallId,
             "BUNDLE_NAME", bundleName, "STATISTICAL_FIELD", statisticalField, "APP_INDEX", appIndex);
     });
 }
