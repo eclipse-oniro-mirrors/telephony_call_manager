@@ -60,6 +60,7 @@ ohos_shared_library("tel_call_manager_api") {
     "core_service:tel_core_service_api",
     "graphic_surface:surface",
     "hilog:libhilog",
+    "ffrt:libffrt",
     "hisysevent:libhisysevent",
     "hitrace:libhitracechain",
     "init:libbegetutil",

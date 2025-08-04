@@ -90,7 +90,7 @@ bool CellularCallConnection::IsConnect() const
 
 int32_t CellularCallConnection::ConnectService()
 {
-    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock(clientLock_);
     if (cellularCallInterfacePtr_ != nullptr) {
         return TELEPHONY_SUCCESS;
     }
@@ -159,7 +159,7 @@ int32_t CellularCallConnection::ReConnectService()
 
 void CellularCallConnection::Clean()
 {
-    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock(clientLock_);
     UnRegisterCallBack();
     if (cellularCallInterfacePtr_ != nullptr) {
         cellularCallInterfacePtr_.clear();

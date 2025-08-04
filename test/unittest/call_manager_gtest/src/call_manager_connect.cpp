@@ -592,7 +592,7 @@ int32_t CallManagerConnect::RegisterCallBack()
 
 int32_t CallManagerConnect::ConnectService()
 {
-    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock(clientLock_);
     if (callManagerServicePtr_ != nullptr) {
         return TELEPHONY_SUCCESS;
     }
@@ -619,7 +619,7 @@ int32_t CallManagerConnect::ConnectService()
 
 void CallManagerConnect::DisconnectService()
 {
-    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    std::lock_guard<ffrt::shared_mutex> lock(clientLock_);
     if (callManagerServicePtr_) {
         callManagerServicePtr_.clear();
         callManagerServicePtr_ = nullptr;
