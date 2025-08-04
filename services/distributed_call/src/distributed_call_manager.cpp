@@ -616,11 +616,13 @@ void DistributedCallManager::OnDCallSystemAbilityRemoved(const std::string &devi
         dcallDeviceListener_ = nullptr;
         dcallProxy_ = nullptr;
     }
-    dCallDeviceSwitchedOn_.store(false);
     ClearDCallDevices();
     ClearConnectedDCallDevice();
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ResetDistributedCallDevicesList();
-    DelayedSingleton<AudioDeviceManager>::GetInstance()->InitAudioDevice();
+    if (dCallDeviceSwitchedOn_.load()) {
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->InitAudioDevice();
+    }
+    dCallDeviceSwitchedOn_.store(false);
     TELEPHONY_LOGI("OnDCallSystemAbilityRemoved end.");
 }
 
