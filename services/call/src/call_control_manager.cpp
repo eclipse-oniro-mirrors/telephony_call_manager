@@ -2133,7 +2133,15 @@ void CallControlManager::StartFlashRemind()
     std::lock_guard<ffrt::mutex> lock(reminderMutex_);
     if (incomingFlashReminder_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
-        std::shared_ptr<IncomingFlashReminderCallback> callback = std::make_shared<IncomingFlashReminderCallback>();
+        std::shared_ptr<IncomingFlashReminderCallback> callback = std::make_shared<IncomingFlashReminderCallback>(
+            []() {
+                TELEPHONY_LOGI("start flash remind done");
+            },
+            [this]() {
+                TELEPHONY_LOGI("clear flash reminder");
+                this->ClearFlashReminder();
+            }
+        );
         incomingFlashReminder_ = std::make_shared<IncomingFlashReminder>(runner, callback);
     }
     if (!incomingFlashReminder_->IsFlashRemindNecessary()) {

@@ -15,20 +15,23 @@
 
 #include "incoming_flash_reminder_callback.h"
 
-#include "call_control_manager.h"
-#include "telephony_log_wrapper.h"
-
 namespace OHOS {
 namespace Telephony {
+IncomingFlashReminderCallback::IncomingFlashReminderCallback(std::function<void()> startFlashRemindDone,
+    std::function<void()> stopFlashRemindDone)
+    :startFlashRemindDone_(std::move(startFlashRemindDone)), stopFlashRemindDone_(std::move(stopFlashRemindDone)) {}
 void IncomingFlashReminderCallback::OnStartFlashRemindDone()
 {
-    TELEPHONY_LOGI("start flash remind done");
+    if (startFlashRemindDone_ != nullptr) {
+        startFlashRemindDone_();
+    }
 }
 
 void IncomingFlashReminderCallback::OnStopFlashRemindDone()
 {
-    TELEPHONY_LOGI("clear flash reminder");
-    DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
+    if (stopFlashRemindDone_ != nullptr) {
+        stopFlashRemindDone_();
+    }
 }
 }
 }

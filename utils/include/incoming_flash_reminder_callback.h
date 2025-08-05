@@ -16,12 +16,18 @@
 #ifndef INCOMING_FLASH_REMINDER_CALLBACK_H
 #define INCOMING_FLASH_REMINDER_CALLBACK_H
 
+#include <functional>
+
 namespace OHOS {
 namespace Telephony {
 class IncomingFlashReminderCallback {
 public:
+    IncomingFlashReminderCallback(std::function<void()> startFlashRemindDone, std::function<void()> stopFlashRemindDone);
     void OnStartFlashRemindDone();
     void OnStopFlashRemindDone();
+private:
+    std::function<void()> startFlashRemindDone_;
+    std::function<void()> stopFlashRemindDone_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -606,15 +606,27 @@ HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_002, TestSize.Level1)
 HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_003, TestSize.Level1)
 {
     auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
-    std::shared_ptr<IncomingFlashReminderCallback> callback = std::make_shared<IncomingFlashReminderCallback>();
+    std::shared_ptr<IncomingFlashReminderCallback> callback1 = std::make_shared<IncomingFlashReminderCallback>(nullptr,
+        nullptr);
+    callback1->OnStartFlashRemindDone();
+    callback1->OnStopFlashRemindDone();
+    std::shared_ptr<IncomingFlashReminderCallback> callback2 = std::make_shared<IncomingFlashReminderCallback>(
+            []() {
+                TELEPHONY_LOGI("start flash remind done");
+            },
+            []() {
+                TELEPHONY_LOGI("clear flash reminder");
+                DelayedSingleton<CallControlManager>::GetInstance()->->ClearFlashReminder();
+            }
+        );
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ =
-        std::make_shared<IncomingFlashReminder>(runner, callback);
+        std::make_shared<IncomingFlashReminder>(runner, callback2);
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_->HandleStartFlashRemind();
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_->isFlashRemindUsed_ = false;
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_->HandleStopFlashRemind();
     EXPECT_EQ(DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_, nullptr);
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ =
-        std::make_shared<IncomingFlashReminder>(runner, callback);
+        std::make_shared<IncomingFlashReminder>(runner, callback2);
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_->isFlashRemindUsed_ = true;
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_->HandleStopFlashRemind();
     EXPECT_EQ(DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_, nullptr);
