@@ -128,7 +128,7 @@ bool IncomingFlashReminder::IsFlashReminderSwitchOn()
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
     std::string value;
     int32_t result = datashareHelper->Query(uri, "", value);
-    if (result != TELEPHONY_SUCCESS && value != "1") {
+    if (result != TELEPHONY_SUCCESS || value != "1") {
         TELEPHONY_LOGI("off");
         return false;
     }

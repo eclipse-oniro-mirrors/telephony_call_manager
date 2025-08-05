@@ -20,12 +20,12 @@
 
 namespace OHOS {
 namespace Telephony {
-IncomingFlashReminderCallback::OnStartFlashRemindDone()
+void IncomingFlashReminderCallback::OnStartFlashRemindDone()
 {
     TELEPHONY_LOGI("start flash remind done");
 }
 
-IncomingFlashReminderCallback::OnStopFlashRemindDone()
+void IncomingFlashReminderCallback::OnStopFlashRemindDone()
 {
     TELEPHONY_LOGI("clear flash reminder");
     DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
