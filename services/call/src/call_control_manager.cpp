@@ -35,6 +35,7 @@
 #include "cellular_call_connection.h"
 #include "common_type.h"
 #include "ims_call.h"
+#include "incoming_flash_reminder_callback.h"
 #include "incoming_flash_reminder.h"
 #include "iservice_registry.h"
 #include "reject_call_sms.h"
@@ -2132,7 +2133,8 @@ void CallControlManager::StartFlashRemind()
     std::lock_guard<ffrt::mutex> lock(reminderMutex_);
     if (incomingFlashReminder_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
-        incomingFlashReminder_ = std::make_shared<IncomingFlashReminder>(runner);
+        std::shared_ptr<IncomingFlashReminderCallback> callback = std::make_shared<IncomingFlashReminderCallback>();
+        incomingFlashReminder_ = std::make_shared<IncomingFlashReminder>(runner, callback);
     }
     if (!incomingFlashReminder_->IsFlashRemindNecessary()) {
         incomingFlashReminder_ = nullptr;

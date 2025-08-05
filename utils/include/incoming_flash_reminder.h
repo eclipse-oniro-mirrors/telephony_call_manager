@@ -21,9 +21,11 @@
 
 namespace OHOS {
 namespace Telephony {
+class IncomingFlashReminderCallback;
 class IncomingFlashReminder : public AppExecFwk::EventHandler {
 public:
-    IncomingFlashReminder(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    IncomingFlashReminder(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+        const std::shared_ptr<IncomingFlashReminderCallback> &callback);
     ~IncomingFlashReminder();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     bool IsFlashRemindNecessary();
@@ -37,6 +39,7 @@ private:
     void HandleStopFlashRemind();
     void HandleStartFlashRemind();
     bool isFlashRemindUsed_ = false;
+    std::shared_ptr<IncomingFlashReminderCallback> callback_;
 };
 } // namespace Telephony
 } // namespace OHOS
