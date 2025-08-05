@@ -22,7 +22,8 @@ namespace OHOS {
 namespace Telephony {
 class IncomingFlashReminderCallback {
 public:
-    IncomingFlashReminderCallback(std::function<void()> startFlashRemindDone, std::function<void()> stopFlashRemindDone);
+    IncomingFlashReminderCallback(std::function<void()> startFlashRemindDone,
+        std::function<void()> stopFlashRemindDone);
     void OnStartFlashRemindDone();
     void OnStopFlashRemindDone();
 private:
