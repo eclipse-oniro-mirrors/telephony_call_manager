@@ -35,7 +35,6 @@
 #include "cellular_call_connection.h"
 #include "common_type.h"
 #include "ims_call.h"
-#include "incoming_flash_reminder_callback.h"
 #include "incoming_flash_reminder.h"
 #include "iservice_registry.h"
 #include "reject_call_sms.h"

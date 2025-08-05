@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Telephony {
-class IncomingFlashReminderCallback;
 class IncomingFlashReminder : public AppExecFwk::EventHandler {
 public:
     IncomingFlashReminder(const std::shared_ptr<AppExecFwk::EventRunner> &runner,

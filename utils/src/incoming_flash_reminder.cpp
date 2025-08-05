@@ -15,7 +15,6 @@
 
 #include "incoming_flash_reminder.h"
 
-#include "incoming_flash_reminder_callback.h"
 #include "os_account_manager.h"
 #include "settings_datashare_helper.h"
 #include "telephony_errors.h"
