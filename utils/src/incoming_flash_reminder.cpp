@@ -35,8 +35,9 @@ constexpr uint32_t STOP_FLASH_REMIND_EVENT = 1000001;
 constexpr uint32_t START_FLASH_REMIND_EVENT = 1000002;
 const std::string FLASH_REMINDER_SWITCH_SUBSTRING = "INCOMING_CALL";
 IncomingFlashReminder::IncomingFlashReminder(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
-    const std::shared_ptr<IncomingFlashReminderCallback> &callback)
-    : AppExecFwk::EventHandler(runner), callback_(callback) {}
+    std::function<void()> startFlashRemindDone, std::function<void()> stopFlashRemindDone)
+    : AppExecFwk::EventHandler(runner), startFlashRemindDone_(std::move(startFlashRemindDone)),
+    stopFlashRemindDone_(std::move(stopFlashRemindDone)) {}
 
 IncomingFlashReminder::~IncomingFlashReminder()
 {
@@ -149,8 +150,8 @@ void IncomingFlashReminder::HandleStartFlashRemind()
     }
     isFlashRemindUsed_ = true;
     SendEvent(AppExecFwk::InnerEvent::Get(DELAY_SET_TORCH_EVENT, 0));
-    if (callback_ != nullptr) {
-        callback_->OnStartFlashRemindDone();
+    if (startFlashRemindDone_ != nullptr) {
+        startFlashRemindDone_();
     }
 }
 
@@ -176,8 +177,8 @@ void IncomingFlashReminder::HandleStopFlashRemind()
 {
     if (!isFlashRemindUsed_) {
         TELEPHONY_LOGI("no need to stop");
-        if (callback_ != nullptr) {
-            callback_->OnStopFlashRemindDone();
+        if (stopFlashRemindDone_ != nullptr) {
+            stopFlashRemindDone_();
         }
         return;
     }
@@ -188,8 +189,8 @@ void IncomingFlashReminder::HandleStopFlashRemind()
     int32_t result = camMgr->SetTorchMode(CameraStandard::TORCH_MODE_OFF);
     TELEPHONY_LOGI("set torch mode result: %{public}d", result);
 #endif
-    if (callback_ != nullptr) {
-        callback_->OnStopFlashRemindDone();
+    if (stopFlashRemindDone_ != nullptr) {
+        stopFlashRemindDone_();
     }
 }
 }
