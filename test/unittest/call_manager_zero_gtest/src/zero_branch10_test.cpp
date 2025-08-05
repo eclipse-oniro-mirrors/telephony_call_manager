@@ -611,14 +611,14 @@ HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_003, TestSize.Level1)
     callback1->OnStartFlashRemindDone();
     callback1->OnStopFlashRemindDone();
     std::shared_ptr<IncomingFlashReminderCallback> callback2 = std::make_shared<IncomingFlashReminderCallback>(
-            []() {
-                TELEPHONY_LOGI("start flash remind done");
-            },
-            []() {
-                TELEPHONY_LOGI("clear flash reminder");
-                DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
-            }
-        );
+        []() {
+            TELEPHONY_LOGI("start flash remind done");
+        },
+        []() {
+            TELEPHONY_LOGI("clear flash reminder");
+            DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
+        }
+    );
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ =
         std::make_shared<IncomingFlashReminder>(runner, callback2);
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_->HandleStartFlashRemind();

@@ -19,7 +19,7 @@ namespace OHOS {
 namespace Telephony {
 IncomingFlashReminderCallback::IncomingFlashReminderCallback(std::function<void()> startFlashRemindDone,
     std::function<void()> stopFlashRemindDone)
-    :startFlashRemindDone_(std::move(startFlashRemindDone)), stopFlashRemindDone_(std::move(stopFlashRemindDone)) {}
+    : startFlashRemindDone_(std::move(startFlashRemindDone)), stopFlashRemindDone_(std::move(stopFlashRemindDone)) {}
 void IncomingFlashReminderCallback::OnStartFlashRemindDone()
 {
     if (startFlashRemindDone_ != nullptr) {
