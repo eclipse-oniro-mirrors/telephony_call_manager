@@ -616,7 +616,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_003, TestSize.Level1)
             },
             []() {
                 TELEPHONY_LOGI("clear flash reminder");
-                DelayedSingleton<CallControlManager>::GetInstance()->->ClearFlashReminder();
+                DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
             }
         );
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ =
