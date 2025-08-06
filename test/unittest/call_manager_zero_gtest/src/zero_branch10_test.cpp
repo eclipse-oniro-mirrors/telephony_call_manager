@@ -555,7 +555,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_001, TestSize.Level1)
     DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
     auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ =
-        std::make_shared<IncomingFlashReminder>(runner, nullptr, nullptr);
+        std::make_shared<IncomingFlashReminder>(runner, nullptr);
     DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
     DelayedSingleton<CallControlManager>::GetInstance()->StartFlashRemind();
     DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
@@ -571,8 +571,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_001, TestSize.Level1)
 HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_002, TestSize.Level1)
 {
     auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
-    std::shared_ptr<IncomingFlashReminder> reminder = std::make_shared<IncomingFlashReminder>(runner, nullptr,
-        nullptr);
+    std::shared_ptr<IncomingFlashReminder> reminder = std::make_shared<IncomingFlashReminder>(runner, nullptr);
     reminder->isFlashRemindUsed_ = false;
     reminder->HandleStopFlashRemind();
     reminder->isFlashRemindUsed_ = true;
@@ -622,9 +621,6 @@ HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_003, TestSize.Level1)
     EXPECT_EQ(DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_, nullptr);
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ =
         std::make_shared<IncomingFlashReminder>(runner,
-            []() {
-                TELEPHONY_LOGI("start flash remind done");
-            },
             []() {
                 TELEPHONY_LOGI("clear flash reminder");
                 DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
