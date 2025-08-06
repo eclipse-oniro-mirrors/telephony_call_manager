@@ -608,9 +608,6 @@ HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_003, TestSize.Level1)
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ =
         std::make_shared<IncomingFlashReminder>(runner,
             []() {
-                TELEPHONY_LOGI("start flash remind done");
-            },
-            []() {
                 TELEPHONY_LOGI("clear flash reminder");
                 DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
             }

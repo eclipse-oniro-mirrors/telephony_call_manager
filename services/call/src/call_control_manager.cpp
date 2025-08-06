@@ -2133,9 +2133,9 @@ void CallControlManager::StartFlashRemind()
     if (incomingFlashReminder_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
         incomingFlashReminder_ = std::make_shared<IncomingFlashReminder>(runner,
-            [this]() {
+            []() {
                 TELEPHONY_LOGI("clear flash reminder");
-                this->ClearFlashReminder();
+                DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
             }
         );
     }

@@ -129,7 +129,7 @@ bool IncomingFlashReminder::IsFlashReminderSwitchOn()
     int32_t result = datashareHelper->Query(uri, "", value);
     bool isSwitchOn = (result == TELEPHONY_SUCCESS && value == "1");
     if (!isSwitchOn) {
-        TELEPHONY_LOGI("off");
+        TELEPHONY_LOGI("switch off");
         return false;
     }
     result = datashareHelper->Query(uri, "", value);
