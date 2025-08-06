@@ -153,6 +153,8 @@ void CallObjectManager::ClearVoipList()
     if (voipCallObjectList_.size() != 0) {
         voipCallObjectList_.clear();
     }
+    bool res = DelayedSingleton<CallControlManager>::GetInstance()->SetVirtualCall(true);
+    TELEPHONY_LOGI("SetVirtualCall res: %{public}d.", res);
 }
 
 int32_t CallObjectManager::UpdateOneVoipCallObjectByCallId(int32_t callId, TelCallState nextCallState)
