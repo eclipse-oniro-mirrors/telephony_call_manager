@@ -15,9 +15,9 @@
 
 #include "incoming_flash_reminder.h"
 
-#include "call_control_manager.h"
 #include "os_account_manager.h"
 #include "settings_datashare_helper.h"
+#include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
 #include "input/camera_manager.h"
@@ -33,8 +33,9 @@ constexpr uint32_t DELAY_SET_TORCH_EVENT = 1000000;
 constexpr uint32_t STOP_FLASH_REMIND_EVENT = 1000001;
 constexpr uint32_t START_FLASH_REMIND_EVENT = 1000002;
 const std::string FLASH_REMINDER_SWITCH_SUBSTRING = "INCOMING_CALL";
-IncomingFlashReminder::IncomingFlashReminder(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-    : AppExecFwk::EventHandler(runner) {}
+IncomingFlashReminder::IncomingFlashReminder(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+    std::function<void()> stopFlashRemindDone)
+    : AppExecFwk::EventHandler(runner), stopFlashRemindDone_(std::move(stopFlashRemindDone)) {}
 
 IncomingFlashReminder::~IncomingFlashReminder()
 {
@@ -126,6 +127,12 @@ bool IncomingFlashReminder::IsFlashReminderSwitchOn()
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
     std::string value;
     int32_t result = datashareHelper->Query(uri, "", value);
+    bool isSwitchOn = (result == TELEPHONY_SUCCESS && value == "1");
+    if (!isSwitchOn) {
+        TELEPHONY_LOGI("switch off");
+        return false;
+    }
+    result = datashareHelper->Query(uri, "", value);
     TELEPHONY_LOGI("query reminder switch, result: %{public}d", result);
     return (result == TELEPHONY_SUCCESS && value.find(FLASH_REMINDER_SWITCH_SUBSTRING) != std::string::npos);
 }
@@ -166,7 +173,9 @@ void IncomingFlashReminder::HandleStopFlashRemind()
 {
     if (!isFlashRemindUsed_) {
         TELEPHONY_LOGI("no need to stop");
-        DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
+        if (stopFlashRemindDone_ != nullptr) {
+            stopFlashRemindDone_();
+        }
         return;
     }
     isFlashRemindUsed_ = false;
@@ -176,7 +185,9 @@ void IncomingFlashReminder::HandleStopFlashRemind()
     int32_t result = camMgr->SetTorchMode(CameraStandard::TORCH_MODE_OFF);
     TELEPHONY_LOGI("set torch mode result: %{public}d", result);
 #endif
-    DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
+    if (stopFlashRemindDone_ != nullptr) {
+        stopFlashRemindDone_();
+    }
 }
 }
 }

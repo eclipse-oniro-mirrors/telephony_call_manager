@@ -18,12 +18,14 @@
 
 #include "event_handler.h"
 #include "event_runner.h"
+#include <functional>
 
 namespace OHOS {
 namespace Telephony {
 class IncomingFlashReminder : public AppExecFwk::EventHandler {
 public:
-    IncomingFlashReminder(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    IncomingFlashReminder(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+        std::function<void()> stopFlashRemindDone);
     ~IncomingFlashReminder();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     bool IsFlashRemindNecessary();
@@ -37,6 +39,7 @@ private:
     void HandleStopFlashRemind();
     void HandleStartFlashRemind();
     bool isFlashRemindUsed_ = false;
+    std::function<void()> stopFlashRemindDone_;
 };
 } // namespace Telephony
 } // namespace OHOS
