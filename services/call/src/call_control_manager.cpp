@@ -143,7 +143,8 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
     if (ret == TELEPHONY_SUCCESS) {
         ret = DelayedSingleton<SatelliteCallControl>::GetInstance()->IsAllowedSatelliteDialCall();
         if (ret != TELEPHONY_SUCCESS) {
-            CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue("accountId"), static_cast<int32_t>(extras.GetIntValue("callType")),
+            CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue("accountId"),
+                static_cast<int32_t>(extras.GetIntValue("callType")),
                 static_cast<int32_t>(extras.GetIntValue("videoState")), ret, "Dial policy failed");
             return ret;
         } else {
