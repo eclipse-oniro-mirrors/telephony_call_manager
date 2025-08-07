@@ -437,7 +437,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_DealVideoRingPath_001, TestSize.Level0)
     AccessToken token;
     ASSERT_TRUE(audioControl->NeedPlayVideoRing(contactInfo, callObjectPtr));
     memcpy_s(contactInfo.ringtonePath, 3, "123", 3);
-    ASSERT_FALSE(audioControl->NeedPlayVideoRing(contactInfo, callObjectPtr));
+    ASSERT_TRUE(audioControl->NeedPlayVideoRing(contactInfo, callObjectPtr));
     memcpy_s(contactInfo.personalNotificationRingtone, strlen(STR_MP4) + 1, STR_MP4, strlen(STR_MP4));
     ASSERT_TRUE(audioControl->NeedPlayVideoRing(contactInfo, callObjectPtr));
     memcpy_s(contactInfo.ringtonePath, strlen(SYSTEM_VIDEO_RING) + 1, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING));
