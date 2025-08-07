@@ -1022,11 +1022,11 @@ int32_t CallManagerService::SetPreviewWindow(int32_t callId, std::string &surfac
         sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(callId);
         if (call == nullptr || call->GetVideoStateType() != VideoStateType::TYPE_RECEIVE_ONLY) {
             ret = PrivacyKit::AddPermissionUsedRecord(callerToken, "ohos.permission.CAMERA", 1, 0);
-            if (ret != 0 && ret != ERR_PERMISSION_ALREADY_START_USING) {
+            if (ret != 0) {
                 TELEPHONY_LOGE("AddPermissionUsedRecord faild!");
             }
             ret = PrivacyKit::StartUsingPermission(callerToken, "ohos.permission.CAMERA");
-            if (ret != 0 && ret != ERR_PERMISSION_ALREADY_START_USING) {
+            if (ret != 0) {
                 TELEPHONY_LOGE("StartUsingPermission faild!");
             }
         }
