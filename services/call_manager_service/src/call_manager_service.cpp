@@ -1021,11 +1021,11 @@ int32_t CallManagerService::SetPreviewWindow(int32_t callId, std::string &surfac
     } else {
         sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(callId);
         if (call == nullptr || call->GetVideoStateType() != VideoStateType::TYPE_RECEIVE_ONLY) {
-            PrivacyKit::AddPermissionUsedRecord(callerToken, "ohos.permission.CAMERA", 1, 0);
+            ret = PrivacyKit::AddPermissionUsedRecord(callerToken, "ohos.permission.CAMERA", 1, 0);
             if (ret != 0) {
                 TELEPHONY_LOGE("AddPermissionUsedRecord faild!");
             }
-            PrivacyKit::StartUsingPermission(callerToken, "ohos.permission.CAMERA");
+            ret = PrivacyKit::StartUsingPermission(callerToken, "ohos.permission.CAMERA");
             if (ret != 0) {
                 TELEPHONY_LOGE("StartUsingPermission faild!");
             }
