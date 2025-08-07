@@ -143,9 +143,6 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
     if (ret == TELEPHONY_SUCCESS) {
         ret = DelayedSingleton<SatelliteCallControl>::GetInstance()->IsAllowedSatelliteDialCall();
         if (ret != TELEPHONY_SUCCESS) {
-            CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue("accountId"),
-                static_cast<int32_t>(extras.GetIntValue("callType")),
-                static_cast<int32_t>(extras.GetIntValue("videoState")), ret, "Dial policy failed");
             return ret;
         } else {
             extras.PutIntValue("callType", (int32_t)CallType::TYPE_SATELLITE);
@@ -158,7 +155,8 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
     }
     ret = CanDial(number, extras, isEcc);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("can dial policy result:%{public}d", ret);
+        CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue("accountId"), extras.GetIntValue("callType"),
+            extras.GetIntValue("videoState"), ret, "Dial policy failed");
         return ret;
     }
     SetCallTypeExtras(extras);

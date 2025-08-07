@@ -878,7 +878,7 @@ int32_t CallRequestProcess::HandleDialingInfo(std::string newPhoneNum, DialParaI
         if (!canDial) {
             CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
                 static_cast<int32_t>(info.videoState),
-                static_cast<int32_t>(CallErrorCode::CALL_ERR_CALL_COUNTS_EXCEED_LIMIT), "Already a new call");
+                static_cast<int32_t>(CallErrorCode::CALL_ERROR_CALL_COUNTS_EXCEED_LIMIT), "Already a new call");
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
         }
         if (IsDsdsMode5()) {
