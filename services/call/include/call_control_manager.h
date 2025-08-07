@@ -155,6 +155,7 @@ public:
     void StartFlashRemind();
     void StopFlashRemind();
     void ClearFlashReminder();
+    bool SetVirtualCall(bool isVirtual);
 #ifdef NOT_SUPPORT_MULTICALL
     bool HangUpFirstCallBtAndESIM(int32_t secondCallId);
     bool HangUpFirstCallBtCall(int32_t secondCallId);

@@ -2160,5 +2160,11 @@ void CallControlManager::ClearFlashReminder()
     std::lock_guard<ffrt::mutex> lock(reminderMutex_);
     incomingFlashReminder_ = nullptr;
 }
+
+bool CallControlManager::SetVirtualCall(bool isVirtual)
+{
+    TELEPHONY_LOGI("Virtualcall SetVirtualCall: %{public}d.", isVirtual);
+    return DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(isVirtual);
+}
 } // namespace Telephony
 } // namespace OHOS
