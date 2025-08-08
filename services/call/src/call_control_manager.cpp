@@ -1265,8 +1265,10 @@ int32_t CallControlManager::IsEmergencyPhoneNumber(std::u16string &number, int32
     if (IsValidSlotId(slotId)) {
         return CALL_ERR_INVALID_SLOT_ID;
     }
+    std::string newPhoneNum =
+        DelayedSingleton<CallNumberUtils>::GetInstance()->RemoveSeparatorsPhoneNumber(Str16ToStr8(number));
     return DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(
-        Str16ToStr8(number), slotId, enabled);
+        newPhoneNum, slotId, enabled);
 }
 
 int32_t CallControlManager::FormatPhoneNumber(
