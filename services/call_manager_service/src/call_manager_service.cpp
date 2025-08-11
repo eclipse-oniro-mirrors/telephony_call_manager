@@ -1829,8 +1829,8 @@ int32_t CallManagerService::SendUssdResponse(int32_t slotId, const std::string &
 int32_t CallManagerService::SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
     bool isIncomingTrustlist, const std::vector<std::string> &incomingList)
 {
-    TELEPHONY_LOGI("SetCallPolicyInfo isDialingTrustlist:%{public}d, dialingList size:%{public}u, "
-        "isIncomingTrustlist:%{public}d, incomingList size:%{public}u", isDialingTrustlist, dialingList.size(),
+    TELEPHONY_LOGI("SetCallPolicyInfo isDialingTrustlist:%{public}d, dialingList size:%{public}zu, "
+        "isIncomingTrustlist:%{public}d, incomingList size:%{public}zu", isDialingTrustlist, dialingList.size(),
         isIncomingTrustlist, incomingList.size());
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
