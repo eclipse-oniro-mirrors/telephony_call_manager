@@ -182,9 +182,99 @@ enum CallSessionEventId: i32 {
     EVENT_DISPLAY_SURFACE_RELEASED = 100,
     EVENT_PREVIEW_SURFACE_RELEASED,
 }
-
+enum VoNRState: i32 {
+    VONR_STATE_OFF = 0,
+    VONR_STATE_ON = 1,
+}
+enum CallRestrictionType: i32 {
+    RESTRICTION_TYPE_ALL_INCOMING = 0,
+    RESTRICTION_TYPE_ALL_OUTGOING = 1,
+    RESTRICTION_TYPE_INTERNATIONAL = 2,
+    RESTRICTION_TYPE_INTERNATIONAL_EXCLUDING_HOME = 3,
+    RESTRICTION_TYPE_ROAMING_INCOMING = 4,
+    RESTRICTION_TYPE_ALL_CALLS = 5,
+    RESTRICTION_TYPE_OUTGOING_SERVICES = 6,
+    RESTRICTION_TYPE_INCOMING_SERVICES = 7,
+}
+enum CallTransferType: i32 {
+    TRANSFER_TYPE_UNCONDITIONAL = 0,
+    TRANSFER_TYPE_BUSY = 1,
+    TRANSFER_TYPE_NO_REPLY = 2,
+    TRANSFER_TYPE_NOT_REACHABLE = 3,
+}
+enum CallTransferSettingType: i32 {
+    CALL_TRANSFER_DISABLE = 0,
+    CALL_TRANSFER_ENABLE = 1,
+    CALL_TRANSFER_REGISTRATION = 3,
+    CALL_TRANSFER_ERASURE = 4,
+}
+enum DeviceDirection: i32 {
+    DEVICE_DIRECTION_0 = 0,
+    DEVICE_DIRECTION_90 = 90,
+    DEVICE_DIRECTION_180 = 180,
+    DEVICE_DIRECTION_270 = 270,
+}
+enum CallRestrictionMode: i32 {
+    RESTRICTION_MODE_DEACTIVATION = 0,
+    RESTRICTION_MODE_ACTIVATION = 1,
+}
+enum DialScene: i32 {
+    CALL_NORMAL = 0,
+    CALL_PRIVILEGED = 1,
+    CALL_EMERGENCY = 2,
+}
+enum DialType: i32 {
+    DIAL_CARRIER_TYPE = 0,
+    DIAL_VOICE_MAIL_TYPE = 1,
+    DIAL_OTT_TYPE = 2,
+}
+enum CallWaitingStatus: i32 {
+    CALL_WAITING_DISABLE = 0,
+    CALL_WAITING_ENABLE = 1,
+}
+enum RestrictionStatus: i32 {
+    RESTRICTION_DISABLE = 0,
+    RESTRICTION_ENABLE = 1,
+}
+enum TransferStatus: i32 {
+    TRANSFER_DISABLE = 0,
+    TRANSFER_ENABLE = 1,
+}
+enum MarkType: i32 {
+    MARK_TYPE_NONE = 0,
+    MARK_TYPE_CRANK = 1,
+    MARK_TYPE_FRAUD = 2,
+    MARK_TYPE_EXPRESS = 3,
+    MARK_TYPE_PROMOTE_SALES = 4,
+    MARK_TYPE_HOUSE_AGENT = 5,
+    MARK_TYPE_INSURANCE = 6,
+    MARK_TYPE_TAXI = 7,
+    MARK_TYPE_CUSTOM = 8,
+    MARK_TYPE_OTHERS = 9,
+    MARK_TYPE_YELLOW_PAGE = 10,
+    MARK_TYPE_ENTERPRISE = 11,
+}
 struct NumberFormatOptions {
-    countryCode: String;
+    countryCode: Optional<String>;
+}
+struct VoipCallAttribute {
+    voipCallId: String;
+    userName: String;
+    userProfile: @sts_type("image.PixelMap") Opaque;
+    extensionId: String;
+    abilityName: String;
+    voipBundleName: String;
+    showBannerForIncomingCall: Optional<bool>;
+    isConferenceCall: Optional<bool>;
+    isVoiceAnswerSupported: Optional<bool>;
+}
+struct NumberMarkInfo {
+    markType: MarkType;
+    markContent: Optional<String>;
+    markCount: Optional<i32>;
+    markSource: Optional<String>;
+    isCloud: Optional<bool>;
+    markDetails: Optional<String>;
 }
 struct CallAttributeOptions {
     accountNumber: String;
@@ -242,7 +332,40 @@ struct CameraCapabilities {
     width: i32;
     height: i32;
 }
-
+struct CallTransferInfo {
+    transferNum: String;
+    type: CallTransferType;
+    settingType: CallTransferSettingType;
+    startHour: Optional<i32>;
+    startMinute: Optional<i32>;
+    endHour: Optional<i32>;
+    endMinute: Optional<i32>;
+}
+struct CallRestrictionInfo {
+    type: CallRestrictionType;
+    password: String;
+    mode: CallRestrictionMode;
+}
+struct DialOptions {
+    extras: Optional<bool>;
+    accountId: Optional<i32>;
+    videoState: Optional<VideoStateType>;
+    dialScene: Optional<DialScene>;
+    dialType: Optional<DialType>;
+}
+struct DialCallOptions {
+    accountId: Optional<i32>;
+    videoState: Optional<VideoStateType>;
+    dialScene: Optional<DialScene>;
+    dialType: Optional<DialType>;
+    extraParams: Optional<@record Map<String, @sts_type("Object") Opaque>>;
+}
+struct RejectMessageOptions {
+    messageContent: String;
+}
+struct EmergencyNumberOptions {
+    slotId: Optional<i32>;
+}
 @gen_async("makeCall")
 @gen_promise("makeCall")
 function makeCallSync(phoneNumber: String): void;
