@@ -32,6 +32,7 @@ Ring::Ring() : audioPlayer_(new (std::nothrow) AudioPlayer())
 
 Ring::~Ring()
 {
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (audioPlayer_ != nullptr) {
         delete audioPlayer_;
         audioPlayer_ = nullptr;
@@ -49,6 +50,7 @@ void Ring::Init()
 
 int32_t Ring::Play(int32_t slotId, std::string ringtonePath, Media::HapticStartupMode mode)
 {
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (SystemSoundManager_ == nullptr || audioPlayer_ == nullptr) {
         TELEPHONY_LOGE("SystemSoundManager_ or audioPlayer_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -73,7 +75,7 @@ int32_t Ring::Play(int32_t slotId, std::string ringtonePath, Media::HapticStartu
 
 int32_t Ring::Stop()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (audioPlayer_ == nullptr) {
         TELEPHONY_LOGE("audioPlayer_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
