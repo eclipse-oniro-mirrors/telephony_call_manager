@@ -18,6 +18,9 @@
 @!sts_inject("""
 static { loadLibrary("telephony_call_taihe_native.z") }
 """)
+@!sts_inject_into_module("import Context from 'application.Context';")
+@!sts_inject_into_module("import {AsyncCallback , Callback} from '@ohos.base';")
+@!sts_inject_into_module("import image from '@ohos.multimedia.image';")
 
 enum CallState: i32 {
     CALL_STATE_UNKNOWN = -1,
