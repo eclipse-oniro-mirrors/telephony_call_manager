@@ -15,6 +15,7 @@
 import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 import("//build/ohos/taihe_idl/taihe.gni")
+import("//base/telephony/call_manager/callmanager.gni")
 
 copy_taihe_idl("copy_telephonycall") {
   sources = [ "idl/ohos.telephony.call.taihe" ]
@@ -38,10 +39,16 @@ taihe_shared_library("telephony_call_taihe_native") {
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
   sources = get_target_outputs(":run_taihe")
-  include_dirs = [ "../../js/napi/include" ]
+  include_dirs = [
+    "${call_manager_path}/frameworks/ets/taihe/include",
+  ]
   sources += [
     "src/ani_constructor.cpp",
     "src/ohos.telephony.call.impl.cpp",
+    "src/taihe_call_ability_callback.cpp",
+    "src/taihe_call_manager_callback.cpp",
+    "src/taihe_call_manager.cpp",
+    "src/util.cpp",
   ]
   deps = [
     ":run_taihe",

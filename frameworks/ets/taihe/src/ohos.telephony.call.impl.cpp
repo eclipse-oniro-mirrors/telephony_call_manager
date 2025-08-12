@@ -23,12 +23,14 @@
 #include "telephony_log_wrapper.h"
 #include <string_ex.h>
 
+#include "taihe_call_manager.h"
+#include "taihe_call_ability_callback.h"
+
 using namespace taihe;
 using namespace OHOS::Telephony;
 namespace {
-// To be implemented.
 
-void MakeCallSync(::taihe::string_view phoneNumber)
+void makeCallSync(::taihe::string_view phoneNumber)
 {
     auto errCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->MakeCall(std::string(phoneNumber));
     if (errCode != TELEPHONY_ERR_SUCCESS) {
@@ -37,7 +39,7 @@ void MakeCallSync(::taihe::string_view phoneNumber)
     return;
 }
 
-void MakeCallSync2(uintptr_t context, ::taihe::string_view phoneNumber)
+void makeCallSync2(uintptr_t context, ::taihe::string_view phoneNumber)
 {
     auto errCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->MakeCall(std::string(phoneNumber));
     if (errCode != TELEPHONY_ERR_SUCCESS) {
@@ -52,8 +54,8 @@ bool HasVoiceCapability()
     return static_cast<ani_boolean>(ret);
 }
 
-void FormatPhoneNumberSync(::taihe::string_view phoneNumber,
-    ::ohos::telephony::call::NumberFormatOptions const& options)
+void formatPhoneNumberSync(
+    ::taihe::string_view phoneNumber, ::ohos::telephony::call::NumberFormatOptions const& options)
 {
     std::u16string phoneNum = OHOS::Str8ToStr16(std::string(phoneNumber));
     std::u16string countryCode = OHOS::Str8ToStr16(std::string(options.countryCode));
@@ -66,7 +68,7 @@ void FormatPhoneNumberSync(::taihe::string_view phoneNumber,
     return;
 }
 
-void FormatPhoneNumberSync2(::taihe::string_view phoneNumber)
+void formatPhoneNumberSync2(::taihe::string_view phoneNumber)
 {
     std::u16string phoneNum = OHOS::Str8ToStr16(std::string(phoneNumber));
     std::u16string countryCode = OHOS::Str8ToStr16("");
@@ -79,7 +81,7 @@ void FormatPhoneNumberSync2(::taihe::string_view phoneNumber)
     return;
 }
 
-::ohos::telephony::call::CallState GetCallStateSync()
+::ohos::telephony::call::CallState getCallStateSync()
 {
     int32_t callState = static_cast<int32_t>(CallStateToApp::CALL_STATE_UNKNOWN);
     callState = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->GetCallState();
@@ -91,15 +93,210 @@ bool HasCallSync()
     auto ret = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->HasCall();
     return static_cast<ani_boolean>(ret);
 }
-} //namespace
+
+void onCallDetailsChange(
+    ::taihe::callback_view<void(::ohos::telephony::call::CallAttributeOptions const& data)> callback)
+{
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    TaiheCallAbilityCallback::GetInstance().callStateCallback_ =
+        ::taihe::optional<taihe::callback<void(::ohos::telephony::call::CallAttributeOptions const&)>>{
+            std::in_place_t{},
+            callback};
+    return;
+}
+
+void offCallDetailsChange(
+    ::taihe::optional_view<::taihe::callback<void(::ohos::telephony::call::CallAttributeOptions const& data)>> callback)
+{
+    TaiheCallAbilityCallback::GetInstance().callStateCallback_.reset();
+    return;
+}
+
+void onCallEventChange(::taihe::callback_view<void(::ohos::telephony::call::CallEventOptions const& data)> callback)
+{
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    TaiheCallAbilityCallback::GetInstance().callEventCallback_ =
+        ::taihe::optional<taihe::callback<void(::ohos::telephony::call::CallEventOptions const&)>>{
+            std::in_place_t{},
+            callback};
+    return;
+}
+
+void offCallEventChange(
+    ::taihe::optional_view<::taihe::callback<void(::ohos::telephony::call::CallEventOptions const& data)>> callback)
+{
+    TaiheCallAbilityCallback::GetInstance().callEventCallback_.reset();
+    return;
+}
+
+void onCallDisconnectedCauses(
+    ::taihe::callback_view<void(::ohos::telephony::call::DisconnectedDetails const& data)> callback)
+{
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    TaiheCallAbilityCallback::GetInstance().disconnectedCauseCallback_ =
+        ::taihe::optional<taihe::callback<void(::ohos::telephony::call::DisconnectedDetails const&)>>{
+            std::in_place_t{},
+            callback};
+    return;
+}
+
+void offCallDisconnectedCauses(
+    ::taihe::optional_view<::taihe::callback<void(::ohos::telephony::call::DisconnectedDetails const& data)>> callback)
+{
+    TaiheCallAbilityCallback::GetInstance().disconnectedCauseCallback_.reset();
+    return;
+}
+
+void onMmiCodeResult(::taihe::callback_view<void(::ohos::telephony::call::MmiCodeResults const& data)> callback)
+{
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    TaiheCallAbilityCallback::GetInstance().mmiCodeResultCallback_ =
+        ::taihe::optional<taihe::callback<void(::ohos::telephony::call::MmiCodeResults const&)>>{
+            std::in_place_t{},
+            callback};
+    return;
+}
+
+void offMmiCodeResult(
+    ::taihe::optional_view<::taihe::callback<void(::ohos::telephony::call::MmiCodeResults const& data)>> callback)
+{
+    TaiheCallAbilityCallback::GetInstance().mmiCodeResultCallback_.reset();
+    return;
+}
+
+void onAudioDeviceChange(
+    ::taihe::callback_view<void(::ohos::telephony::call::AudioDeviceCallbackInfo const& data)> callback)
+{
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    TaiheCallAbilityCallback::GetInstance().audioDeviceCallback_ =
+        ::taihe::optional<taihe::callback<void(::ohos::telephony::call::AudioDeviceCallbackInfo const&)>>{
+            std::in_place_t{},
+            callback};
+    return;
+}
+
+void offAudioDeviceChange(::taihe::optional_view<
+    ::taihe::callback<void(::ohos::telephony::call::AudioDeviceCallbackInfo const& data)>> callback)
+{
+    TaiheCallAbilityCallback::GetInstance().audioDeviceCallback_.reset();
+    return;
+}
+
+void onPostDialDelay(::taihe::callback_view<void(::taihe::string_view data)> callback)
+{
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    TaiheCallAbilityCallback::GetInstance().postDialDelayCallback_ =
+        ::taihe::optional<taihe::callback<void(::taihe::string_view)>>{
+            std::in_place_t{},
+            callback};
+    return;
+}
+
+void offPostDialDelay(::taihe::optional_view<::taihe::callback<void(::taihe::string_view data)>> callback)
+{
+    TaiheCallAbilityCallback::GetInstance().postDialDelayCallback_.reset();
+    return;
+}
+
+void onImsCallModeChange(
+    ::taihe::callback_view<void(::ohos::telephony::call::ImsCallModeInfo const& data)> callback)
+{
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    TaiheCallAbilityCallback::GetInstance().imsCallModeCallback_ =
+        ::taihe::optional<taihe::callback<void(::ohos::telephony::call::ImsCallModeInfo const&)>>{
+            std::in_place_t{},
+            callback};
+    return;
+}
+
+void offImsCallModeChange(
+    ::taihe::optional_view<::taihe::callback<void(::ohos::telephony::call::ImsCallModeInfo const& data)>> callback)
+{
+    TaiheCallAbilityCallback::GetInstance().imsCallModeCallback_.reset();
+    return;
+}
+
+void onCallSessionEvent(::taihe::callback_view<void(::ohos::telephony::call::CallSessionEvent const& data)> callback)
+{
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    TaiheCallAbilityCallback::GetInstance().callSessionEventCallback_ =
+        ::taihe::optional<taihe::callback<void(::ohos::telephony::call::CallSessionEvent const&)>>{
+            std::in_place_t{},
+            callback};
+    return;
+}
+
+void offCallSessionEvent(
+    ::taihe::optional_view<::taihe::callback<void(::ohos::telephony::call::CallSessionEvent const& data)>> callback)
+{
+    TaiheCallAbilityCallback::GetInstance().callSessionEventCallback_.reset();
+    return;
+}
+
+void onPeerDimensionsChange(
+    ::taihe::callback_view<void(::ohos::telephony::call::PeerDimensionsDetail const& data)> callback)
+{
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    TaiheCallAbilityCallback::GetInstance().peerDimensionsCallback_ =
+        ::taihe::optional<taihe::callback<void(::ohos::telephony::call::PeerDimensionsDetail const&)>>{
+            std::in_place_t{},
+            callback};
+    return;
+}
+
+void offPeerDimensionsChange(
+    ::taihe::optional_view<::taihe::callback<void(::ohos::telephony::call::PeerDimensionsDetail const& data)>> callback)
+{
+    TaiheCallAbilityCallback::GetInstance().peerDimensionsCallback_.reset();
+    return;
+}
+
+void onCameraCapabilitiesChange(
+    ::taihe::callback_view<void(::ohos::telephony::call::CameraCapabilities const& data)> callback)
+{
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    TaiheCallAbilityCallback::GetInstance().cameraCapabilitiesCallback_ =
+        ::taihe::optional<taihe::callback<void(::ohos::telephony::call::CameraCapabilities const&)>>{
+            std::in_place_t{},
+            callback};
+    return;
+}
+
+void offCameraCapabilitiesChange(
+    ::taihe::optional_view<::taihe::callback<void(::ohos::telephony::call::CameraCapabilities const& data)>> callback)
+{
+    TaiheCallAbilityCallback::GetInstance().cameraCapabilitiesCallback_.reset();
+    return;
+}
+}  // namespace
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_MakeCallSync(MakeCallSync);
-TH_EXPORT_CPP_API_MakeCallSync2(MakeCallSync2);
+TH_EXPORT_CPP_API_makeCallSync(makeCallSync);
+TH_EXPORT_CPP_API_makeCallSync2(makeCallSync2);
 TH_EXPORT_CPP_API_HasVoiceCapability(HasVoiceCapability);
-TH_EXPORT_CPP_API_FormatPhoneNumberSync(FormatPhoneNumberSync);
-TH_EXPORT_CPP_API_FormatPhoneNumberSync2(FormatPhoneNumberSync2);
-TH_EXPORT_CPP_API_GetCallStateSync(GetCallStateSync);
+TH_EXPORT_CPP_API_formatPhoneNumberSync(formatPhoneNumberSync);
+TH_EXPORT_CPP_API_formatPhoneNumberSync2(formatPhoneNumberSync2);
+TH_EXPORT_CPP_API_getCallStateSync(getCallStateSync);
 TH_EXPORT_CPP_API_HasCallSync(HasCallSync);
+TH_EXPORT_CPP_API_onCallDetailsChange(onCallDetailsChange);
+TH_EXPORT_CPP_API_offCallDetailsChange(offCallDetailsChange);
+TH_EXPORT_CPP_API_onCallEventChange(onCallEventChange);
+TH_EXPORT_CPP_API_offCallEventChange(offCallEventChange);
+TH_EXPORT_CPP_API_onCallDisconnectedCauses(onCallDisconnectedCauses);
+TH_EXPORT_CPP_API_offCallDisconnectedCauses(offCallDisconnectedCauses);
+TH_EXPORT_CPP_API_onMmiCodeResult(onMmiCodeResult);
+TH_EXPORT_CPP_API_offMmiCodeResult(offMmiCodeResult);
+TH_EXPORT_CPP_API_onAudioDeviceChange(onAudioDeviceChange);
+TH_EXPORT_CPP_API_offAudioDeviceChange(offAudioDeviceChange);
+TH_EXPORT_CPP_API_onPostDialDelay(onPostDialDelay);
+TH_EXPORT_CPP_API_offPostDialDelay(offPostDialDelay);
+TH_EXPORT_CPP_API_onImsCallModeChange(onImsCallModeChange);
+TH_EXPORT_CPP_API_offImsCallModeChange(offImsCallModeChange);
+TH_EXPORT_CPP_API_onCallSessionEvent(onCallSessionEvent);
+TH_EXPORT_CPP_API_offCallSessionEvent(offCallSessionEvent);
+TH_EXPORT_CPP_API_onPeerDimensionsChange(onPeerDimensionsChange);
+TH_EXPORT_CPP_API_offPeerDimensionsChange(offPeerDimensionsChange);
+TH_EXPORT_CPP_API_onCameraCapabilitiesChange(onCameraCapabilitiesChange);
+TH_EXPORT_CPP_API_offCameraCapabilitiesChange(offCameraCapabilitiesChange);
 // NOLINTEND
