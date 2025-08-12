@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "audio_renderer.h"
+#include "ffrt.h"
 
 #include "audio_player.h"
 #include "audio_proxy.h"
@@ -51,7 +52,7 @@ public:
     bool isMutedRing_ = false;
 
 private:
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     AudioPlayer *audioPlayer_ = nullptr;
     std::shared_ptr<Media::SystemSoundManager> SystemSoundManager_ = nullptr;
     std::shared_ptr<Media::RingtonePlayer> RingtonePlayer_ = nullptr;
