@@ -155,7 +155,8 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
     }
     ret = CanDial(number, extras, isEcc);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("can dial policy result:%{public}d", ret);
+        CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue("accountId"), extras.GetIntValue("callType"),
+            extras.GetIntValue("videoState"), ret, "Dial policy failed");
         return ret;
     }
     SetCallTypeExtras(extras);
