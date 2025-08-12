@@ -153,7 +153,8 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
     if (dialType == (int32_t)DialType::DIAL_BLUETOOTH_TYPE) {
         extras.PutIntValue("callType", (int32_t)CallType::TYPE_BLUETOOTH);
     }
-    ret = CanDial(number, extras, isEcc);
+    std::u16string newPhoneNumU16 = Str8ToStr16(newPhoneNum);
+    ret = CanDial(newPhoneNumU16, extras, isEcc);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("can dial policy result:%{public}d", ret);
         return ret;
