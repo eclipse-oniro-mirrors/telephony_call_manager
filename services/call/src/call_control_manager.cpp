@@ -153,7 +153,8 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
     if (dialType == (int32_t)DialType::DIAL_BLUETOOTH_TYPE) {
         extras.PutIntValue("callType", (int32_t)CallType::TYPE_BLUETOOTH);
     }
-    ret = CanDial(number, extras, isEcc);
+    std::u16string newPhoneNumU16 = Str8ToStr16(newPhoneNum);
+    ret = CanDial(newPhoneNumU16, extras, isEcc);
     if (ret != TELEPHONY_SUCCESS) {
         CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue("accountId"), extras.GetIntValue("callType"),
             extras.GetIntValue("videoState"), ret, "Dial policy failed");
@@ -1266,8 +1267,10 @@ int32_t CallControlManager::IsEmergencyPhoneNumber(std::u16string &number, int32
     if (IsValidSlotId(slotId)) {
         return CALL_ERR_INVALID_SLOT_ID;
     }
+    std::string newPhoneNum =
+        DelayedSingleton<CallNumberUtils>::GetInstance()->RemoveSeparatorsPhoneNumber(Str16ToStr8(number));
     return DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(
-        Str16ToStr8(number), slotId, enabled);
+        newPhoneNum, slotId, enabled);
 }
 
 int32_t CallControlManager::FormatPhoneNumber(
