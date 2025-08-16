@@ -129,7 +129,7 @@ bool AudioProxy::SetEarpieceDevActive()
 int32_t AudioProxy::StartVibrator()
 {
     VibrationType type = VibrationType::VIBRATION_RINGTONE;
-    TELEPHONY_LOGE("StartVibrator: for vibration type %{public}d", type);
+    TELEPHONY_LOGI("StartVibrator: for vibration type %{public}d", type);
     int32_t result = TELEPHONY_SUCCESS;
 #ifdef SUPPORT_VIBRATOR
     bool setUsageRet = Sensors::SetUsage(VIBRATOR_USAGE_MAP.at(type));
@@ -137,7 +137,7 @@ int32_t AudioProxy::StartVibrator()
     TELEPHONY_LOGI("setUsageRet %{public}d, result %{public}d", setUsageRet, result);
     if (result == TELEPHONY_SUCCESS) {
         loopFlag_ = true;
-        ffrt::submit(type, this {
+        ffrt::submit([type, this]() {
             while (loopFlag_) {
                 usleep(LOOP_DURATION_2S);
                 TELEPHONY_LOGI("result %{public}d", Sensors::StartVibrator(EFFECT_ID_MAP.at(type).c_str()));
@@ -151,6 +151,7 @@ int32_t AudioProxy::StartVibrator()
 
 int32_t AudioProxy::StopVibrator()
 {
+    TELEPHONY_LOGI("stop virator.");
     loopFlag_ = false;
     return TELEPHONY_SUCCESS;
 }
