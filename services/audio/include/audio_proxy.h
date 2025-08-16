@@ -105,6 +105,7 @@ private:
     std::shared_ptr<AudioStandard::AudioPreferredOutputDeviceChangeCallback> preferredDeviceCallback_;
     std::shared_ptr<AudioStandard::AudioManagerMicStateChangeCallback> audioMicStateChangeCallback_;
     bool isWiredHeadsetConnected_ = false;
+    bool loopFlag_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

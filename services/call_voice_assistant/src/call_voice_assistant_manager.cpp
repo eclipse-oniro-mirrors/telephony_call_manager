@@ -717,9 +717,8 @@ void VoiceAssistantRingSubscriber::OnReceiveEvent(const EventFwk::CommonEventDat
                 CallAttributeInfo info;
                 incomingCall->GetCallAttributeBaseInfo(info);
                 DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
-            } else {
-                DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
             }
+            DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
         }
     });
 };

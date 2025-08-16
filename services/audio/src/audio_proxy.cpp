@@ -48,6 +48,7 @@ const std::unordered_map<VibrationType, std::string> EFFECT_ID_MAP = {
 
 const int32_t NO_DEVICE_VALID = 0;
 const int32_t RENDERER_FLAG = 0;
+constexpr uint64_t LOOP_DURATION_2S = 2000 * 1000;
 const std::string LOCAL_DEVICE = "LocalDevice";
 
 AudioProxy::AudioProxy()
@@ -128,26 +129,31 @@ bool AudioProxy::SetEarpieceDevActive()
 int32_t AudioProxy::StartVibrator()
 {
     VibrationType type = VibrationType::VIBRATION_RINGTONE;
-    TELEPHONY_LOGE("StartVibrator: for vibration type %{public}d", type);
+    TELEPHONY_LOGI("StartVibrator: for vibration type %{public}d", type);
     int32_t result = TELEPHONY_SUCCESS;
 #ifdef SUPPORT_VIBRATOR
     bool setUsageRet = Sensors::SetUsage(VIBRATOR_USAGE_MAP.at(type));
-    bool setLoopRet = Sensors::SetLoopCount(LOOP_COUNT_MAP.at(type));
     result = Sensors::StartVibrator(EFFECT_ID_MAP.at(type).c_str());
-    TELEPHONY_LOGE("StartVibrator: setUsageRet %{public}d, setLoopRet %{public}d, startRet %{public}d",
-        setUsageRet, setLoopRet, result);
+    TELEPHONY_LOGI("setUsageRet %{public}d, result %{public}d", setUsageRet, result);
+    if (result == TELEPHONY_SUCCESS) {
+        loopFlag_ = true;
+        ffrt::submit([type, this]() {
+            while (loopFlag_) {
+                usleep(LOOP_DURATION_2S);
+                TELEPHONY_LOGI("result %{public}d", Sensors::StartVibrator(EFFECT_ID_MAP.at(type).c_str()));
+            }
+            TELEPHONY_LOGI("cancel result: %{public}d", Sensors::Cancel());
+        });
+    }
 #endif
     return result;
 }
 
 int32_t AudioProxy::StopVibrator()
 {
-    int32_t result = TELEPHONY_SUCCESS;
-#ifdef SUPPORT_VIBRATOR
-    result = Sensors::Cancel();
-    TELEPHONY_LOGE("StopVibrator: %{public}d", result);
-#endif
-    return result;
+    TELEPHONY_LOGI("stop virator.");
+    loopFlag_ = false;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t AudioProxy::GetVolume(AudioStandard::AudioVolumeType audioVolumeType)
