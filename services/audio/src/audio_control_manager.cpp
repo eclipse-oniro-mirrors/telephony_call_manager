@@ -811,7 +811,7 @@ bool AudioControlManager::PlayForNoRing()
     AudioStandard::AudioRendererParams rendererParams;
     rendererParams.sampleFormat = AudioStandard::SAMPLE_S24LE;
     rendererParams.channelCount = AudioStandard::STEREO;
-    std::lock_guard<std::mutex> lock(audioRendererMutex_);
+    std::lock_guard<ffrt::mutex> lock(audioRendererMutex_);
     if (audioRenderer_ == nullptr) {
         audioRenderer_ = AudioStandard::AudioRenderer::Create(AudioStandard::AudioStreamType::STREAM_VOICE_RING);
     }
@@ -953,7 +953,7 @@ bool AudioControlManager::StopRingtone()
 bool AudioControlManager::StopForNoRing()
 {
     isPlayForNoRing_ = false;
-    std::lock_guard<std::mutex> lock(audioRendererMutex_);
+    std::lock_guard<ffrt::mutex> lock(audioRendererMutex_);
     if (audioRenderer_ == nullptr) {
         TELEPHONY_LOGE("audioRenderer_ is nullptr");
         return false;
