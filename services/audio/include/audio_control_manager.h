@@ -152,6 +152,7 @@ private:
     AudioDeviceType initCrsDeviceType_ = AudioDeviceType::DEVICE_UNKNOWN;
     ffrt::mutex crsMutex_{};
     std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_ = nullptr;
+    ffrt::mutex audioRendererMutex_{};
     bool isPlayForNoRing_ = false;
 };
 } // namespace Telephony
