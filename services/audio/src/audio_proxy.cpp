@@ -48,7 +48,7 @@ const std::unordered_map<VibrationType, std::string> EFFECT_ID_MAP = {
 
 const int32_t NO_DEVICE_VALID = 0;
 const int32_t RENDERER_FLAG = 0;
-constexpr uint64_t LOOP_DURATION_2S = 2000 * 1000;
+constexpr uint64_t LOOP_DURATION_2S = 2000;
 const std::string LOCAL_DEVICE = "LocalDevice";
 
 AudioProxy::AudioProxy()
@@ -130,7 +130,7 @@ bool AudioProxy::SetEarpieceDevActive()
 void AudioProxy::PreventInterruption(VibrationType type)
 {
     needVibrate_ = true;
-    std::weak_ptr weakPtr = shared_from_this();
+    std::weak_ptr<AudioProxy> weakPtr = shared_from_this();
     ffrt::submit([type, weakPtr]() {
         while (true) {
             std::shared_ptr<AudioProxy> audioProxyPtr = weakPtr.lock();
