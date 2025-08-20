@@ -99,6 +99,7 @@ public:
     bool SetDeviceActive(AudioStandard::DeviceType deviceType, bool flag);
 
 private:
+    void PreventInterruption(VibrationType type);
     const std::string defaultTonePath_ = "/system/etc/telephony/tones/tone.wav";
     const std::string defaultDtmfPath_ = "/system/etc/telephony/dtmfs/dtmf.wav";
     std::shared_ptr<AudioStandard::AudioManagerDeviceChangeCallback> deviceCallback_;

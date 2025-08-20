@@ -126,24 +126,39 @@ bool AudioProxy::SetEarpieceDevActive()
     return SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_EARPIECE, true);
 }
 
+#ifdef SUPPORT_VIBRATOR
+void AudioProxy::PreventInterruption(VibrationType type)
+{
+    needVibrate_ = true;
+    std::weak_ptr weakPtr = shared_from_this();
+    ffrt::submit([type, weakPtr]() {
+        while (true) {
+            std::shared_ptr<AudioProxy> audioProxyPtr = weakPtr.lock();
+            if (audioProxyPtr == nullptr) {
+                TELEPHONY_LOGE("audioProxyPtr is null");
+                break;
+            }
+            if (!audioProxyPtr->needVibrate_) {
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(LOOP_DURATION_2S));
+            Sensors::StartVibrator(EFFECT_ID_MAP.at(type).c_str());
+        }
+        Sensors::Cancel();
+    });
+}
+#endif
+
 int32_t AudioProxy::StartVibrator()
 {
     VibrationType type = VibrationType::VIBRATION_RINGTONE;
-    TELEPHONY_LOGI("StartVibrator: for vibration type %{public}d", type);
     int32_t result = TELEPHONY_SUCCESS;
 #ifdef SUPPORT_VIBRATOR
     bool setUsageRet = Sensors::SetUsage(VIBRATOR_USAGE_MAP.at(type));
     result = Sensors::StartVibrator(EFFECT_ID_MAP.at(type).c_str());
     TELEPHONY_LOGI("setUsageRet %{public}d, result %{public}d", setUsageRet, result);
     if (result == TELEPHONY_SUCCESS) {
-        loopFlag_ = true;
-        ffrt::submit([type, this]() {
-            while (loopFlag_) {
-                usleep(LOOP_DURATION_2S);
-                TELEPHONY_LOGI("result %{public}d", Sensors::StartVibrator(EFFECT_ID_MAP.at(type).c_str()));
-            }
-            TELEPHONY_LOGI("cancel result: %{public}d", Sensors::Cancel());
-        });
+        PreventInterruption(type);
     }
 #endif
     return result;
@@ -151,9 +166,13 @@ int32_t AudioProxy::StartVibrator()
 
 int32_t AudioProxy::StopVibrator()
 {
-    TELEPHONY_LOGI("stop virator.");
-    loopFlag_ = false;
-    return TELEPHONY_SUCCESS;
+    int32_t result = TELEPHONY_SUCCESS;
+#ifdef SUPPORT_VIBRATOR
+    needVibrate_ = false;
+    result = Sensors::Cancel();
+    TELEPHONY_LOGI("StopVibrator: %{public}d", result);
+#endif
+    return result;
 }
 
 int32_t AudioProxy::GetVolume(AudioStandard::AudioVolumeType audioVolumeType)
