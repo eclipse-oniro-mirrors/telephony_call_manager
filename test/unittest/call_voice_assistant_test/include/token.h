@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Telephony {
-const int32_t MAX_LEN = 100000;
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 
@@ -68,25 +67,6 @@ public:
         SetSelfTokenID(tokenIdEx.tokenIDEx);
     }
     ~AccessToken()
-    {
-        AccessTokenKit::DeleteToken(accessID_);
-        SetSelfTokenID(currentID_);
-    }
-private:
-    AccessTokenID currentID_ = 0;
-    AccessTokenID accessID_ = 0;
-};
-
-class AccessFalseToken {
-public:
-    AccessFalseToken()
-    {
-        currentID_ = GetSelfTokenID();
-        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testInfoParamsfalse, testPolicyParams);
-        accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
-        SetSelfTokenID(tokenIdEx.tokenIDEx);
-    }
-    ~AccessFalseToken()
     {
         AccessTokenKit::DeleteToken(accessID_);
         SetSelfTokenID(currentID_);
