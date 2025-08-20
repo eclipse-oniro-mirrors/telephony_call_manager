@@ -550,6 +550,14 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         // Get the contact data from the database
         ContactInfo contactInfoTemp = contactInfo;
         QueryCallerInfo(contactInfoTemp, phoneNum);
+        if (std::string(contactInfoTemp.ringtonePath).empty() &&
+            DelayedSingleton<AudioControlManager>::GetInstance()->IsSystemVideoRing(callObjectPtr)) {
+            if (memcpy_s(contactInfoTemp.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING)) !=
+                EOK) {
+                TELEPHONY_LOGE("memcpy_s ringtonePath fail");
+                return false;
+            };
+        }
         if (DelayedSingleton<AudioControlManager>::GetInstance()->NeedPlayVideoRing(
             contactInfoTemp, callObjectPtr) &&
             !CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -98,6 +98,7 @@ public:
     bool PlayForNoRing();
     bool StopForNoRing();
     bool NeedPlayVideoRing(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr);
+    bool IsSystemVideoRing(sptr<CallBase> &callObjectPtr);
 private:
     RingState ringState_ = RingState::STOPPED;
     void HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState);
@@ -132,7 +133,6 @@ private:
     bool IsInEarAudioDevice(AudioDeviceType initDeviceType);
     void UnmuteSoundTone();
     void ProcessSoundtone(sptr<CallBase> &callObjectPtr);
-    bool IsSystemVideoRing(sptr<CallBase> &callObjectPtr);
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;
