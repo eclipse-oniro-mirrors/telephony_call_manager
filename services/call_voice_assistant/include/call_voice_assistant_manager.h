@@ -152,6 +152,7 @@ public:
     static void Release();
 
 private:
+    void PlayRing();
     static std::shared_ptr<VoiceAssistantRingSubscriber> subscriber_;
 };
 

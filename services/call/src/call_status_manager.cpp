@@ -62,6 +62,7 @@ constexpr int32_t INIT_INDEX = 0;
 constexpr int32_t PRESENTATION_RESTRICTED = 3;
 constexpr int32_t MAIN_USER_SPACE = 100;
 const std::string ADVSECMODE_STATE = "ohos.boot.advsecmode.state";
+constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
 int32_t CallStatusManager::deviceProvisioned_ = DEVICE_PROVISION_UNDEF;
 sptr<OOBEStatusObserver> CallStatusManager::oobeStatusObserver_ = nullptr;
 
@@ -549,13 +550,12 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         // Get the contact data from the database
         ContactInfo contactInfoTemp = contactInfo;
         QueryCallerInfo(contactInfoTemp, phoneNum);
-        if (!CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast()) {
-            if (DelayedSingleton<AudioControlManager>::GetInstance()->NeedPlayVideoRing(
-                contactInfoTemp, callObjectPtr)) {
-                AAFwk::WantParams params = callObjectPtr->GetExtraParams();
-                params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfoTemp.ringtonePath)));
-                callObjectPtr->SetExtraParams(params);
-            }
+        if (DelayedSingleton<AudioControlManager>::GetInstance()->NeedPlayVideoRing(
+            contactInfoTemp, callObjectPtr) &&
+            !CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast()) {
+            AAFwk::WantParams params = callObjectPtr->GetExtraParams();
+            params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfoTemp.ringtonePath)));
+            callObjectPtr->SetExtraParams(params);
         }
         callObjectPtr->SetCallerInfo(contactInfoTemp);
         CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfoTemp, callObjectPtr->GetCallID());
