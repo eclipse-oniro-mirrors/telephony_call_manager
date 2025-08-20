@@ -30,6 +30,7 @@
 #include "cs_call.h"
 #include "call_voice_assistant_manager.h"
 #include "gtest/gtest.h"
+#include "token.h"
 
 namespace OHOS {
 namespace Telephony {
