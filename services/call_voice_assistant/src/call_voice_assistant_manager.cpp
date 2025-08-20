@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -691,11 +691,10 @@ void VoiceAssistantRingSubscriber::PlayRing()
         CallObjectManager::GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     ContactInfo contactInfo = incomingCall->GetCallerInfo();
     if (std::string(contactInfo.ringtonePath).empty() &&
-        DelayedSingleton<AudioControlManager>::GetInstance()->IsSystemVideoRing(callObjectPtr)) {
+        DelayedSingleton<AudioControlManager>::GetInstance()->IsSystemVideoRing(incomingCall)) {
         if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING)) !=
             EOK) {
             TELEPHONY_LOGE("memcpy_s ringtonePath fail");
-            return false;
         };
     }
     if (DelayedSingleton<AudioControlManager>::GetInstance()->NeedPlayVideoRing(contactInfo, incomingCall)) {

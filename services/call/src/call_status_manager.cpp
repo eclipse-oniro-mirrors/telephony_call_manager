@@ -552,10 +552,10 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         QueryCallerInfo(contactInfoTemp, phoneNum);
         if (std::string(contactInfoTemp.ringtonePath).empty() &&
             DelayedSingleton<AudioControlManager>::GetInstance()->IsSystemVideoRing(callObjectPtr)) {
-            if (memcpy_s(contactInfoTemp.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING)) !=
+            if (memcpy_s(
+                contactInfoTemp.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING)) !=
                 EOK) {
                 TELEPHONY_LOGE("memcpy_s ringtonePath fail");
-                return false;
             };
         }
         if (DelayedSingleton<AudioControlManager>::GetInstance()->NeedPlayVideoRing(
