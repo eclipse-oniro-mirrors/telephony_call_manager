@@ -30,6 +30,7 @@
 #include "cs_call.h"
 #include "call_voice_assistant_manager.h"
 #include "gtest/gtest.h"
+#include "token.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -202,6 +203,33 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantRingSubscriber_0
     eventData.SetWant(want);
     ASSERT_NO_THROW(subscriber->OnReceiveEvent(eventData));
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
+}
+
+/**
+ * @tc.number   Telephony_VoiceAssistantRingSubscriber_002
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantRingSubscriber_002, Function | MediumTest | Level3)
+{
+    std::string event = "test.test.test.test";
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(event);
+    EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
+    auto subscriber = std::make_shared<VoiceAssistantRingSubscriber>(subscribeInfo);
+    DialParaInfo info;
+    sptr<CallBase> ringingCall = new CSCall(info);
+    ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    CallObjectManager::AddOneCallObject(ringingCall);
+    ASSERT_NO_THROW(subscriber->PlayRing());
+    std::string url = "abc.mp4";
+    ContactInfo contactInfo = ringingCall->GetCallerInfo();
+    memcpy_s(contactInfo.personalNotificationRingtone, FILE_PATH_MAX_LEN, url.c_str(), url.length());
+    ringingCall->SetCallerInfo(contactInfo);
+    ASSERT_NO_THROW(subscriber->PlayRing());
+    AccessToken token;
+    ASSERT_NO_THROW(subscriber->PlayRing());
+    CallObjectManager::DeleteOneCallObject(ringingCall->GetCallID());
 }
 }
 }

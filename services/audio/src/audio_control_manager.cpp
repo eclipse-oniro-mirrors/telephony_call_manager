@@ -42,9 +42,6 @@ constexpr int32_t VOICE_TYPE = 0;
 constexpr int32_t CRS_TYPE = 2;
 constexpr int32_t CALL_ENDED_PLAY_TIME = 300;
 constexpr uint64_t UNMUTE_SOUNDTONE_DELAY_TIME = 500000;
-static constexpr const char *VIDEO_RING_PATH_FIX_TAIL = ".mp4";
-constexpr int32_t VIDEO_RING_PATH_FIX_TAIL_LENGTH = 4;
-static constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
 const int16_t MIN_MULITY_ACTIVE_CALL_COUNT = 1;
 const int16_t MIN_DC_MULITY_ACTIVE_CALL_COUNT = 2;
 
@@ -714,14 +711,6 @@ bool AudioControlManager::NeedPlayVideoRing(ContactInfo &contactInfo, sptr<CallB
     if (isNotWearWatch) {
         TELEPHONY_LOGI("isNotWearWatch: %{public}d", isNotWearWatch);
         return false;
-    }
-
-    if (std::string(contactInfo.ringtonePath).empty() && IsSystemVideoRing(callObjectPtr)) {
-        if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING)) !=
-            EOK) {
-            TELEPHONY_LOGE("memcpy_s ringtonePath fail");
-            return false;
-        };
     }
 
     if (CallObjectManager::IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {

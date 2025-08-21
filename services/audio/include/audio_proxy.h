@@ -99,6 +99,7 @@ public:
     bool SetDeviceActive(AudioStandard::DeviceType deviceType, bool flag);
 
 private:
+    void PreventInterruption(VibrationType type);
     const std::string defaultTonePath_ = "/system/etc/telephony/tones/tone.wav";
     const std::string defaultDtmfPath_ = "/system/etc/telephony/dtmfs/dtmf.wav";
     std::shared_ptr<AudioStandard::AudioManagerDeviceChangeCallback> deviceCallback_;
@@ -106,6 +107,7 @@ private:
     std::shared_ptr<AudioStandard::AudioManagerMicStateChangeCallback> audioMicStateChangeCallback_;
     bool isWiredHeadsetConnected_ = false;
     bool loopFlag_ = false;
+    std::atomic<bool> needVibrate_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

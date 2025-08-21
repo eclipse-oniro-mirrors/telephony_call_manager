@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,7 @@ namespace {
 
 namespace OHOS {
 namespace Telephony {
-
+constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
 std::shared_ptr<VoiceAssistantRingSubscriber> VoiceAssistantRingSubscriber::subscriber_ = nullptr;
 std::shared_ptr<CallVoiceAssistantManager> CallVoiceAssistantManager::mInstance_ =
     std::make_shared<CallVoiceAssistantManager>();
@@ -683,6 +683,31 @@ void VoiceAssistantRingSubscriber::Release()
     }
 }
 
+void VoiceAssistantRingSubscriber::PlayRing()
+{
+    TELEPHONY_LOGI("broadcast switch is open, start play system ring");
+    DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
+    sptr<CallBase> incomingCall =
+        CallObjectManager::GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    ContactInfo contactInfo = incomingCall->GetCallerInfo();
+    if (std::string(contactInfo.ringtonePath).empty() &&
+        DelayedSingleton<AudioControlManager>::GetInstance()->IsSystemVideoRing(incomingCall)) {
+        if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING)) !=
+            EOK) {
+            TELEPHONY_LOGE("memcpy_s ringtonePath fail");
+        };
+    }
+    if (DelayedSingleton<AudioControlManager>::GetInstance()->NeedPlayVideoRing(contactInfo, incomingCall)) {
+        AAFwk::WantParams params = incomingCall->GetExtraParams();
+        params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfo.ringtonePath)));
+        incomingCall->SetExtraParams(params);
+        CallAttributeInfo info;
+        incomingCall->GetCallAttributeBaseInfo(info);
+        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
+    }
+    DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+}
+
 void VoiceAssistantRingSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &eventData)
 {
     callVoiceAssistantQueue.submit([=]() {
@@ -705,20 +730,7 @@ void VoiceAssistantRingSubscriber::OnReceiveEvent(const EventFwk::CommonEventDat
         std::string isplay = want.GetStringParam(voicePtr->IS_PLAY_RING);
         bool isPlayRing = voicePtr->GetIsPlayRing();
         if (isplay == voicePtr->SWITCH_TURN_ON && isPlayRing) {
-            TELEPHONY_LOGI("broadcast switch is open, start play system ring");
-            DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
-            sptr<CallBase> incomingCall =
-                CallObjectManager::GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-            ContactInfo contactInfo = incomingCall->GetCallerInfo();
-            if (DelayedSingleton<AudioControlManager>::GetInstance()->NeedPlayVideoRing(contactInfo, incomingCall)) {
-                AAFwk::WantParams params = incomingCall->GetExtraParams();
-                params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfo.ringtonePath)));
-                incomingCall->SetExtraParams(params);
-                CallAttributeInfo info;
-                incomingCall->GetCallAttributeBaseInfo(info);
-                DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
-            }
-            DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+            PlayRing();
         }
     });
 };
