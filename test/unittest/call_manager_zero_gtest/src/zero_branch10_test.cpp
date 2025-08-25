@@ -463,6 +463,26 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioDeviceManager_001, TestSize.Level0)
 }
 
 /**
+ * @tc.number   Telephony_AudioDeviceManager_002
+ * @tc.name     test AudioDeviceManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch10Test, Telephony_AudioDeviceManager_002, TestSize.Level0)
+{
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    AudioDevice deviceHearingAid = {
+        .deviceType = AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID,
+        .deviceName = "name",
+        .address = "addr"
+    };
+    audioDeviceManager->info_.audioDeviceList.clear();
+    audioDeviceManager->info_.audioDeviceList.push_back(deviceHearingAid);
+    audioDeviceManager->UpdateBluetoothDeviceName("addr", "nameReplace");
+    EXPECT_EQ(audioDeviceManager->info_.audioDeviceList.size(), 1);
+    EXPECT_EQ(audioDeviceManager->info_.audioDeviceList.front().deviceName, "nameReplace");
+}
+
+/**
  * @tc.number   Telephony_AudioProxy_001
  * @tc.name     test AudioProxy
  * @tc.desc     Function test
