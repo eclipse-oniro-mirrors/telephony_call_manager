@@ -120,7 +120,8 @@ void AudioDeviceManager::UpdateBluetoothDeviceName(const std::string &macAddress
     std::lock_guard<std::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
-        if (it->address == macAddress && it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+        if (it->address == macAddress && (it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+            it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID)) {
             if (deviceName.length() > kMaxDeviceNameLen) {
                 TELEPHONY_LOGE("deviceName is too long");
                 return;
