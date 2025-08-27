@@ -150,6 +150,7 @@ bool CallObjectManager::IsVoipCallExist(TelCallState callState, int32_t &callId)
 
 void CallObjectManager::ClearVoipList()
 {
+    std::lock_guard<std::mutex> lock(listMutex_);
     if (voipCallObjectList_.size() != 0) {
         voipCallObjectList_.clear();
     }
@@ -172,6 +173,7 @@ int32_t CallObjectManager::UpdateOneVoipCallObjectByCallId(int32_t callId, TelCa
 CallAttributeInfo CallObjectManager::GetVoipCallInfo()
 {
     CallAttributeInfo res;
+    std::lock_guard<std::mutex> lock(listMutex_);
     std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.begin();
     if (it != voipCallObjectList_.end()) {
         res = it->second;
