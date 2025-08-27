@@ -346,7 +346,7 @@ void AudioControlManager::HandleCallStateUpdated(
     if (priorState == nextState) {
         TELEPHONY_LOGI("prior state equals next state");
         if (callObjectPtr->GetCallType() == CallType::TYPE_BLUETOOTH) {
-            ApplyFocusForBlueToothCall(callObjectPtr, nextState);
+            ApplyFocusForBlueToothCall(nextState);
         }
         return;
     }
@@ -416,7 +416,7 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
 }
 
-void AudioControlManager::ApplyFocusForBlueToothCall(sptr<CallBase> &callObjectPtr, TelCallState nextState)
+void AudioControlManager::ApplyFocusForBlueToothCall(TelCallState nextState)
 {
     if (nextState == TelCallState::CALL_STATUS_ACTIVE || nextState == TelCallState::CALL_STATUS_ALERTING) {
         TELEPHONY_LOGI("ApplyFocusForBlueToothCall: handle ExcludeBluetoothSco start");
