@@ -419,11 +419,10 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
 void AudioControlManager::ApplyFocusForBlueToothCall(TelCallState nextState)
 {
     if (nextState == TelCallState::CALL_STATUS_ACTIVE || nextState == TelCallState::CALL_STATUS_ALERTING) {
-        TELEPHONY_LOGI("ApplyFocusForBlueToothCall: handle ExcludeBluetoothSco start");
         if (!IsScoTemporarilyDisabled()) {
             ExcludeBluetoothSco();
         }
-        TELEPHONY_LOGI("ApplyFocusForBlueToothCall: first call state %{public}d from cellphone", nextState);
+        TELEPHONY_LOGI("first call state %{public}d from cellphone", nextState);
         if (soundState_ == SoundState::STOPPED) {
             PlaySoundtone();
         }
