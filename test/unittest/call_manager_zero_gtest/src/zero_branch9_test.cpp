@@ -418,6 +418,24 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_010, Function | MediumTe
 }
 
 /**
+ * @tc.number   Telephony_AudioControlManager_011
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTest | Level3)
+{
+    DialParaInfo mDialParaInfo;
+    mDialParaInfo.accountId = 0;
+    sptr<CallBase> call = new BluetoothCall(mDialParaInfo, "");
+    call->SetCallType(CallType::TYPE_BLUETOOTH);
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_ALERTING, TelCallState::CALL_STATUS_ALERTING);
+    audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_ACTIVE);
+    audioControl->GetCallList().empty();
+    ASSERT_TRUE(audioControl->GetCurrentActiveCall() == nullptr);
+}
+
+/**
  * @tc.number   Telephony_DealVideoRingPath_001
  * @tc.name     test error branch
  * @tc.desc     Function test
