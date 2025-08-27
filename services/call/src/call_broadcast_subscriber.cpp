@@ -34,8 +34,6 @@
 namespace OHOS {
 namespace Telephony {
 using namespace OHOS::EventFwk;
-static constexpr int16_t INCOMING_CALL_MISSED_CODE = 0;
-static constexpr int16_t PUBLISH_MISSCALL_EVENT_DELAY_TIME = 2000;
 CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : CommonEventSubscriber(subscriberInfo)
 {
@@ -234,17 +232,7 @@ void CallBroadcastSubscriber::ScreenUnlockedBroadcast(const EventFwk::CommonEven
     AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
     AccountSA::OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
     TELEPHONY_LOGI("isUserUnlocked: %{public}d", isUserUnlocked);
-    if (!isUserUnlocked) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(PUBLISH_MISSCALL_EVENT_DELAY_TIME));
-        AAFwk::Want want;
-        want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED);
-        EventFwk::CommonEventData eventData;
-        eventData.SetWant(want);
-        eventData.SetCode(INCOMING_CALL_MISSED_CODE);
-        EventFwk::CommonEventPublishInfo publishInfo;
-        publishInfo.SetOrdered(true);
-        EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr);
-    } else {
+    if (isUserUnlocked) {
         DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
     }
 }

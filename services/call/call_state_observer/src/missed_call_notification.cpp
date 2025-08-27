@@ -26,7 +26,6 @@
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
 #include "want.h"
-#include "os_account_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -50,14 +49,7 @@ void MissedCallNotification::CallStateUpdated(
         callObjectPtr->GetCallDirection() == CallDirection::CALL_DIRECTION_IN &&
         ((answerType == CallAnswerType::CALL_ANSWER_MISSED) ||
         (answerType == CallAnswerType::CALL_ANSWER_ACTIVED && callObjectPtr->IsAiAutoAnswer()))) {
-        int32_t userId = 0;
-        bool isUserUnlocked = false;
-        AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
-        AccountSA::OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
-        TELEPHONY_LOGI("isUserUnlocked: %{public}d", isUserUnlocked);
-        if (isUserUnlocked) {
-            PublishMissedCallEvent(callObjectPtr);
-        }
+        PublishMissedCallEvent(callObjectPtr);
     }
 }
 
