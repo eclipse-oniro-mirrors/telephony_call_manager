@@ -345,6 +345,9 @@ void AudioControlManager::HandleCallStateUpdated(
     HandleNextState(callObjectPtr, nextState);
     if (priorState == nextState) {
         TELEPHONY_LOGI("prior state equals next state");
+        if (callObjectPtr->GetCallType() == CallType::TYPE_BLUETOOTH) {
+            ApplyFocusForBlueToothCall(callObjectPtr, nextState);
+        }
         return;
     }
     HandlePriorState(callObjectPtr, priorState);
