@@ -102,6 +102,7 @@ public:
 private:
     RingState ringState_ = RingState::STOPPED;
     void HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState);
+    void ApplyFocusForBlueToothCall(sptr<CallBase> &callObjectPtr, TelCallState nextState);
     void HandlePriorState(sptr<CallBase> &callObjectPtr, TelCallState priorState);
     void HandleCallStateUpdatedForVoip(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
     void HandleCallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
