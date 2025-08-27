@@ -416,6 +416,20 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
 }
 
+void AudioControlManager::ApplyFocusForBlueToothCall(sptr<CallBase> &callObjectPtr, TelCallState nextState)
+{
+    if (nextState == TelCallState::CALL_STATUS_ACTIVE || nextState == TelCallState::CALL_STATUS_ALERTING) {
+        TELEPHONY_LOGI("ApplyFocusForBlueToothCall: handle ExcludeBluetoothSco start");
+        if (!IsScoTemporarilyDisabled()) {
+            ExcludeBluetoothSco();
+        }
+        TELEPHONY_LOGI("ApplyFocusForBlueToothCall: first call state %{public}d from cellphone", nextState);
+        if (soundState_ == SoundState::STOPPED) {
+            PlaySoundtone();
+        }
+    }
+}
+
 void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCallState priorState)
 {
     TELEPHONY_LOGI("handle prior state.");
