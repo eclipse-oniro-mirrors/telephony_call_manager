@@ -25,6 +25,7 @@
 #include "call_manager_disconnected_details.h"
 #include "distributed_data_sink_controller.h"
 #include "distributed_sink_switch_controller.h"
+#include "distributed_data_source_controller.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -216,6 +217,25 @@ HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_SwitchToSinkDe
     deviceId = "not Json string";
     ASSERT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
     ASSERT_EQ(dcManager->ParseDevIdFromAudioDevice(device), "");
+}
+
+/**
+ * @tc.number   Telephony_DcManager_CallStateUpdatedTest
+ * @tc.name     test switch to sink device
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_CallStateUpdatedTest, Function | MediumTest | Level1)
+{
+    DialParaInfo mDialParaInfo;
+    sptr<CallBase> callObjectPtr = nullptr;
+    TelCallState priorState = TelCallState::CALL_STATUS_INCOMING;
+    TelCallState nextState = TelCallState::CALL_STATUS_ACTIVE;
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    EXPECT_NO_THROW(dcManager->CallStateUpdated(callObjectPtr, priorState, nextState));
+    callObjectPtr = new CSCall(mDialParaInfo);
+    nextState = TelCallState::CALL_STATUS_DISCONNECTING;
+    ASSERT_NO_THROW(dcManager->dataController_ = std::make_shared<DistributedDataSourceController>());
+    EXPECT_NO_THROW(dcManager->CallStateUpdated(callObjectPtr, priorState, nextState));
 }
 } // namespace Telephony
 } // namespace OHOS

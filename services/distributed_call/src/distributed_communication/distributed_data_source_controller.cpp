@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr size_t SINGLE_CARRIER_CALL_COUNT = 1;
 void DistributedDataSourceController::OnDeviceOnline(const std::string &devId, const std::string &devName,
     AudioDeviceType devType)
 {
@@ -68,7 +69,10 @@ void DistributedDataSourceController::OnCallCreated(const sptr<CallBase> &call, 
 
 void DistributedDataSourceController::OnCallDestroyed()
 {
-    if (CallObjectManager::HasCallExist()) {
+    std::list<int32_t> carrierCallList;
+    CallObjectManager::GetCarrierCallList(carrierCallList);
+    // The call is deleted after current func is invoked.
+    if (carrierCallList.size() > SINGLE_CARRIER_CALL_COUNT) {
         return;
     }
     std::lock_guard<ffrt::mutex> lock(mutex_);

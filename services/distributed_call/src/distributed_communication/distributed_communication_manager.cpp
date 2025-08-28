@@ -310,6 +310,21 @@ void DistributedCommunicationManager::CallDestroyed(const DisconnectedDetails &d
     }
 }
 
+void DistributedCommunicationManager::CallStateUpdated(
+    sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    if (callObjectPtr == nullptr || dataController_ == nullptr) {
+        TELEPHONY_LOGE("callObjectPtr is null or dataController_ is null");
+        return;
+    }
+    if (nextState == TelCallState::CALL_STATUS_DISCONNECTED ||
+        nextState == TelCallState::CALL_STATUS_DISCONNECTING) {
+        TELEPHONY_LOGI("call destroyed, role %{public}hhd", role_);
+        dataController_->OnCallDestroyed();
+    }
+}
+
 bool DistributedCommunicationManager::IsDistributedDev(const std::string &devId)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
