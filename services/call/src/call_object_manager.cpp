@@ -31,7 +31,7 @@ namespace OHOS {
 namespace Telephony {
 std::list<sptr<CallBase>> CallObjectManager::callObjectPtrList_;
 std::map<int32_t, CallAttributeInfo> CallObjectManager::voipCallObjectList_;
-std::mutex CallObjectManager::listMutex_;
+ffrt::mutex CallObjectManager::listMutex_;
 int32_t CallObjectManager::callId_ = CALL_START_ID;
 std::condition_variable CallObjectManager::cv_;
 bool CallObjectManager::isFirstDialCallAdded_ = false;
@@ -65,7 +65,7 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
         TELEPHONY_LOGE("call is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallID() == call->GetCallID()) {
@@ -102,7 +102,7 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
 
 int32_t CallObjectManager::AddOneVoipCallObject(CallAttributeInfo info)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.find(info.callId);
     if (it == voipCallObjectList_.end()) {
         voipCallObjectList_[info.callId] = info;
@@ -115,7 +115,7 @@ int32_t CallObjectManager::AddOneVoipCallObject(CallAttributeInfo info)
 
 int32_t CallObjectManager::DeleteOneVoipCallObject(int32_t callId)
 {
-    std::unique_lock<std::mutex> lock(listMutex_);
+    std::unique_lock<ffrt::mutex> lock(listMutex_);
     std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.find(callId);
     if (it != voipCallObjectList_.end()) {
         voipCallObjectList_.erase(callId);
@@ -128,7 +128,7 @@ int32_t CallObjectManager::DeleteOneVoipCallObject(int32_t callId)
 
 bool CallObjectManager::IsVoipCallExist()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     bool res = (voipCallObjectList_.size() != 0);
     TELEPHONY_LOGI("has voip call exist:%{public}d", res);
     return res;
@@ -136,7 +136,7 @@ bool CallObjectManager::IsVoipCallExist()
 
 bool CallObjectManager::IsVoipCallExist(TelCallState callState, int32_t &callId)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::map<int32_t, CallAttributeInfo>::iterator it;
     for (it = voipCallObjectList_.begin(); it != voipCallObjectList_.end(); ++it) {
         if (it->second.callState == callState) {
@@ -150,7 +150,7 @@ bool CallObjectManager::IsVoipCallExist(TelCallState callState, int32_t &callId)
 
 void CallObjectManager::ClearVoipList()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     if (voipCallObjectList_.size() != 0) {
         voipCallObjectList_.clear();
     }
@@ -160,7 +160,7 @@ void CallObjectManager::ClearVoipList()
 
 int32_t CallObjectManager::UpdateOneVoipCallObjectByCallId(int32_t callId, TelCallState nextCallState)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.find(callId);
     if (it != voipCallObjectList_.end()) {
         it->second.callState = nextCallState;
@@ -173,7 +173,7 @@ int32_t CallObjectManager::UpdateOneVoipCallObjectByCallId(int32_t callId, TelCa
 CallAttributeInfo CallObjectManager::GetVoipCallInfo()
 {
     CallAttributeInfo res;
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.begin();
     if (it != voipCallObjectList_.end()) {
         res = it->second;
@@ -200,7 +200,7 @@ void CallObjectManager::DelayedDisconnectCallConnectAbility(uint64_t time = DISC
 {
     ffrt::submit_h(
         []() {
-            std::lock_guard<std::mutex> lock(listMutex_);
+            std::lock_guard<ffrt::mutex> lock(listMutex_);
             TELEPHONY_LOGI("delayed disconnect callback begin");
             auto controlManager = DelayedSingleton<CallControlManager>::GetInstance();
             if (callObjectPtrList_.size() == NO_CALL_EXIST && controlManager->ShouldDisconnectService()) {
@@ -215,7 +215,7 @@ void CallObjectManager::DelayedDisconnectCallConnectAbility(uint64_t time = DISC
 int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
 {
     TELEPHONY_LOGI("delete one call object, callId:%{public}d", callId);
-    std::unique_lock<std::mutex> lock(listMutex_);
+    std::unique_lock<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallID() == callId) {
@@ -243,7 +243,7 @@ void CallObjectManager::DeleteOneCallObject(sptr<CallBase> &call)
         TELEPHONY_LOGE("call is null!");
         return;
     }
-    std::unique_lock<std::mutex> lock(listMutex_);
+    std::unique_lock<ffrt::mutex> lock(listMutex_);
     callObjectPtrList_.remove(call);
     if (callObjectPtrList_.size() == NO_CALL_EXIST) {
         if (FoldStatusManager::IsSmallFoldDevice()) {
@@ -260,7 +260,7 @@ void CallObjectManager::DeleteOneCallObject(sptr<CallBase> &call)
 sptr<CallBase> CallObjectManager::GetOneCallObject(int32_t callId)
 {
     sptr<CallBase> retPtr = nullptr;
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = CallObjectManager::callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallID() == callId) {
@@ -278,7 +278,7 @@ sptr<CallBase> CallObjectManager::GetOneCallObject(std::string &phoneNumber)
         return nullptr;
     }
     sptr<CallBase> retPtr = nullptr;
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
         std::string networkAddress =
@@ -294,7 +294,7 @@ sptr<CallBase> CallObjectManager::GetOneCallObject(std::string &phoneNumber)
 
 int32_t CallObjectManager::HasNewCall()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() != CallType::TYPE_VOIP &&
@@ -377,7 +377,7 @@ int32_t CallObjectManager::GetCurrentCallNum()
 int32_t CallObjectManager::GetCarrierCallList(std::list<int32_t> &list)
 {
     list.clear();
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_CS || (*it)->GetCallType() == CallType::TYPE_IMS ||
@@ -392,7 +392,7 @@ int32_t CallObjectManager::GetCarrierCallList(std::list<int32_t> &list)
 int32_t CallObjectManager::GetVoipCallNum()
 {
     int32_t count = 0;
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_VOIP) {
@@ -405,7 +405,7 @@ int32_t CallObjectManager::GetVoipCallNum()
 int32_t CallObjectManager::GetVoipCallList(std::list<int32_t> &list)
 {
     list.clear();
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_VOIP) {
@@ -418,7 +418,7 @@ int32_t CallObjectManager::GetVoipCallList(std::list<int32_t> &list)
 bool CallObjectManager::HasRingingMaximum()
 {
     int32_t ringingCount = 0;
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         // Count the number of calls in the ringing state
@@ -435,7 +435,7 @@ bool CallObjectManager::HasRingingMaximum()
 bool CallObjectManager::HasDialingMaximum()
 {
     int32_t dialingCount = 0;
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         // Count the number of calls in the active state
@@ -452,7 +452,7 @@ bool CallObjectManager::HasDialingMaximum()
 int32_t CallObjectManager::HasEmergencyCall(bool &enabled)
 {
     enabled = false;
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetEmergencyState()) {
@@ -465,14 +465,14 @@ int32_t CallObjectManager::HasEmergencyCall(bool &enabled)
 int32_t CallObjectManager::GetNewCallId()
 {
     int32_t ret = 0;
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     ret = ++callId_;
     return ret;
 }
 
 bool CallObjectManager::IsCallExist(int32_t callId)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallID() == callId) {
@@ -488,7 +488,7 @@ bool CallObjectManager::IsCallExist(std::string &phoneNumber)
     if (phoneNumber.empty()) {
         return false;
     }
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
         std::string networkAddress =
@@ -503,7 +503,7 @@ bool CallObjectManager::IsCallExist(std::string &phoneNumber)
 
 bool CallObjectManager::HasCallExist()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     if (callObjectPtrList_.empty()) {
         TELEPHONY_LOGI("call list size:%{public}zu", callObjectPtrList_.size());
         return false;
@@ -513,13 +513,13 @@ bool CallObjectManager::HasCallExist()
 
 std::list<sptr<CallBase>> CallObjectManager::GetAllCallList()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     return callObjectPtrList_;
 }
 
 bool CallObjectManager::HasCellularCallExist()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_CS || (*it)->GetCallType() == CallType::TYPE_IMS ||
@@ -536,7 +536,7 @@ bool CallObjectManager::HasCellularCallExist()
 
 bool CallObjectManager::HasVoipCallExist()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_VOIP) {
@@ -548,7 +548,7 @@ bool CallObjectManager::HasVoipCallExist()
 
 bool CallObjectManager::HasIncomingCallCrsType()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING &&
@@ -561,7 +561,7 @@ bool CallObjectManager::HasIncomingCallCrsType()
 
 bool CallObjectManager::HasIncomingCallVideoRingType()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() != CallType::TYPE_VOIP &&
@@ -588,7 +588,7 @@ bool CallObjectManager::IsVideoRing(const std::string &personalNotificationRingt
 
 bool CallObjectManager::HasVideoCall()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetVideoStateType() == VideoStateType::TYPE_VIDEO && (*it)->GetCallType() != CallType::TYPE_VOIP) {
@@ -600,7 +600,7 @@ bool CallObjectManager::HasVideoCall()
 
 bool CallObjectManager::HasSatelliteCallExist()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_SATELLITE) {
@@ -613,7 +613,7 @@ bool CallObjectManager::HasSatelliteCallExist()
 int32_t CallObjectManager::GetSatelliteCallList(std::list<int32_t> &list)
 {
     list.clear();
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_SATELLITE) {
@@ -626,7 +626,7 @@ int32_t CallObjectManager::GetSatelliteCallList(std::list<int32_t> &list)
 int32_t CallObjectManager::HasRingingCall(bool &hasRingingCall)
 {
     hasRingingCall = false;
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         // Count the number of calls in the ringing state
@@ -641,7 +641,7 @@ int32_t CallObjectManager::HasRingingCall(bool &hasRingingCall)
 int32_t CallObjectManager::HasHoldCall(bool &hasHoldCall)
 {
     hasHoldCall = false;
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         // Count the number of calls in the hold state
@@ -656,7 +656,7 @@ int32_t CallObjectManager::HasHoldCall(bool &hasHoldCall)
 TelCallState CallObjectManager::GetCallState(int32_t callId)
 {
     TelCallState retState = TelCallState::CALL_STATUS_IDLE;
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = CallObjectManager::callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallID() == callId) {
@@ -669,7 +669,7 @@ TelCallState CallObjectManager::GetCallState(int32_t callId)
 
 sptr<CallBase> CallObjectManager::GetOneCallObject(CallRunningState callState)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::reverse_iterator it;
     for (it = callObjectPtrList_.rbegin(); it != callObjectPtrList_.rend(); ++it) {
         if ((*it)->GetCallRunningState() == callState) {
@@ -681,7 +681,7 @@ sptr<CallBase> CallObjectManager::GetOneCallObject(CallRunningState callState)
 
 sptr<CallBase> CallObjectManager::GetOneCarrierCallObject(CallRunningState callState)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::reverse_iterator it;
     for (it = callObjectPtrList_.rbegin(); it!= callObjectPtrList_.rend(); ++it) {
         if ((*it)->GetCallRunningState() == callState && (*it)->GetCallType() != CallType::TYPE_VOIP) {
@@ -693,7 +693,7 @@ sptr<CallBase> CallObjectManager::GetOneCarrierCallObject(CallRunningState callS
 
 sptr<CallBase> CallObjectManager::GetOneCallObjectByIndex(int32_t index)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallIndex() == index && (*it)->GetCallType() != CallType::TYPE_VOIP) {
@@ -705,7 +705,7 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndex(int32_t index)
 
 sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexAndSlotId(int32_t index, int32_t slotId)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallIndex() == index) {
@@ -720,7 +720,7 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexAndSlotId(int32_t index
 sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(int32_t index, int32_t slotId,
     CallType callType)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     if (callType == CallType::TYPE_BLUETOOTH) {
         std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
         for (; it != callObjectPtrList_.end(); ++it) {
@@ -745,7 +745,7 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(int32
 sptr<CallBase> CallObjectManager::GetOneCallObjectByVoipCallId(
     std::string voipCallId, std::string bundleName, int32_t uid)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_VOIP) {
@@ -761,7 +761,7 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByVoipCallId(
 
 bool CallObjectManager::IsCallExist(CallType callType, TelCallState callState)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == callType && (*it)->GetTelCallState() == callState) {
@@ -774,7 +774,7 @@ bool CallObjectManager::IsCallExist(CallType callType, TelCallState callState)
 
 bool CallObjectManager::IsCallExist(TelCallState callState)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == callState) {
@@ -787,7 +787,7 @@ bool CallObjectManager::IsCallExist(TelCallState callState)
 
 bool CallObjectManager::IsCallExist(TelCallState callState, int32_t &callId)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == callState) {
@@ -801,7 +801,7 @@ bool CallObjectManager::IsCallExist(TelCallState callState, int32_t &callId)
 
 bool CallObjectManager::IsConferenceCallExist(TelConferenceState state, int32_t &callId)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelConferenceState() == state) {
@@ -815,7 +815,7 @@ bool CallObjectManager::IsConferenceCallExist(TelConferenceState state, int32_t 
 
 bool CallObjectManager::HasActivedCallExist(int32_t &callId, bool isIncludeCallServiceKitCall)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE &&
@@ -836,7 +836,7 @@ bool CallObjectManager::HasActivedCallExist(int32_t &callId, bool isIncludeCallS
 int32_t CallObjectManager::GetCallNum(TelCallState callState, bool isIncludeVoipCall)
 {
     int32_t num = 0;
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == callState) {
@@ -854,7 +854,7 @@ int32_t CallObjectManager::GetCallNum(TelCallState callState, bool isIncludeVoip
 std::string CallObjectManager::GetCallNumber(TelCallState callState, bool isIncludeVoipCall)
 {
     std::string number = "";
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == callState) {
@@ -874,7 +874,7 @@ std::vector<CallAttributeInfo> CallObjectManager::GetCallInfoList(int32_t slotId
     std::vector<CallAttributeInfo> callVec;
     CallAttributeInfo info;
     callVec.clear();
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
@@ -910,7 +910,7 @@ std::vector<CallAttributeInfo> CallObjectManager::GetVoipCallInfoList()
 
 void CallObjectManager::UpdateOneCallObjectByCallId(int32_t callId, TelCallState nextCallState)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallID() == callId) {
@@ -921,7 +921,7 @@ void CallObjectManager::UpdateOneCallObjectByCallId(int32_t callId, TelCallState
 
 sptr<CallBase> CallObjectManager::GetForegroundCall(bool isIncludeVoipCall)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     sptr<CallBase> liveCall = nullptr;
     for (std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if (!isIncludeVoipCall && (*it)->GetCallType() == CallType::TYPE_VOIP) {
@@ -952,7 +952,7 @@ sptr<CallBase> CallObjectManager::GetForegroundCall(bool isIncludeVoipCall)
 
 sptr<CallBase> CallObjectManager::GetForegroundLiveCall(bool isIncludeVoipCall)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     sptr<CallBase> liveCall = nullptr;
     for (std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if (!isIncludeVoipCall && (*it)->GetCallType() == CallType::TYPE_VOIP) {
@@ -974,7 +974,7 @@ sptr<CallBase> CallObjectManager::GetForegroundLiveCall(bool isIncludeVoipCall)
 
 sptr<CallBase> CallObjectManager::GetIncomingCall(bool isIncludeVoipCall)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     sptr<CallBase> call = nullptr;
     for (std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if (!isIncludeVoipCall && (*it)->GetCallType() == CallType::TYPE_VOIP) {
@@ -1036,7 +1036,7 @@ std::vector<CallAttributeInfo> CallObjectManager::GetAllCallInfoList(bool isIncl
 {
     std::vector<CallAttributeInfo> callVec;
     callVec.clear();
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         CallAttributeInfo info;
@@ -1059,7 +1059,7 @@ std::vector<CallAttributeInfo> CallObjectManager::GetAllCallInfoList(bool isIncl
 int32_t CallObjectManager::GetCallNumByRunningState(CallRunningState callState)
 {
     int32_t count = 0;
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallRunningState() == callState) {
@@ -1073,7 +1073,7 @@ int32_t CallObjectManager::GetCallNumByRunningState(CallRunningState callState)
 
 sptr<CallBase> CallObjectManager::GetForegroundLiveCallByCallId(int32_t callId)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     sptr<CallBase> liveCall = nullptr;
     for (std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         TelCallState telCallState = (*it)->GetTelCallState();
@@ -1116,7 +1116,7 @@ bool CallObjectManager::IsNeedSilentInDoNotDisturbMode()
 #ifdef NOT_SUPPORT_MULTICALL
 bool CallObjectManager::IsTwoCallBtCallAndESIM()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     if (callObjectPtrList_.size() != CALL_MAX_COUNT) {
         return false;
     }
@@ -1146,7 +1146,7 @@ bool CallObjectManager::IsTwoCallBtCallAndESIM()
 
 bool CallObjectManager::IsTwoCallBtCall()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     if (callObjectPtrList_.size() != CALL_MAX_COUNT) {
         return false;
     }
@@ -1161,7 +1161,7 @@ bool CallObjectManager::IsTwoCallBtCall()
 
 bool CallObjectManager::IsTwoCallESIMCall()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     if (callObjectPtrList_.size() != CALL_MAX_COUNT) {
         return false;
     }
@@ -1176,7 +1176,7 @@ bool CallObjectManager::IsTwoCallESIMCall()
 
 bool CallObjectManager::IsOneNumberDualTerminal()
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     if (callObjectPtrList_.size() != CALL_MAX_COUNT) {
         return false;
     }

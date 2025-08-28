@@ -21,7 +21,7 @@
 #include <cstdlib>
 #include <list>
 #include <memory>
-#include <mutex>
+#include "ffrt.h"
 
 #include "refbase.h"
 
@@ -116,7 +116,7 @@ protected:
 private:
     static std::list<sptr<CallBase>> callObjectPtrList_;
     static std::map<int32_t, CallAttributeInfo> voipCallObjectList_;
-    static std::mutex listMutex_;
+    static ffrt::mutex listMutex_;
     static int32_t callId_;
 };
 } // namespace Telephony
