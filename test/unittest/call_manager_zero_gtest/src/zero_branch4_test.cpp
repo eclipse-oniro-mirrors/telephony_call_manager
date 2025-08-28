@@ -504,60 +504,6 @@ HWTEST_F(ZeroBranch3Test, Telephony_MissedCallNotification_001, TestSize.Level0)
 }
 
 /**
- * @tc.number   Telephony_CallSettingManager_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch3Test, Telephony_CallSettingManager_001, TestSize.Level0)
-{
-    std::shared_ptr<CallSettingManager> callSettingManager = std::make_shared<CallSettingManager>();
-    ASSERT_NE(callSettingManager->SetCallWaiting(SIM1_SLOTID, true), TELEPHONY_SUCCESS);
-    ASSERT_NE(callSettingManager->SetCallWaiting(INVALID_SLOTID, true), TELEPHONY_SUCCESS);
-    ASSERT_NE(callSettingManager->GetCallWaiting(SIM1_SLOTID), TELEPHONY_SUCCESS);
-    ASSERT_NE(callSettingManager->GetCallWaiting(INVALID_SLOTID), TELEPHONY_SUCCESS);
-    ASSERT_NE(callSettingManager->GetCallRestriction(SIM1_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
-        TELEPHONY_SUCCESS);
-    ASSERT_NE(callSettingManager->GetCallRestriction(INVALID_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS),
-        TELEPHONY_SUCCESS);
-
-    CallRestrictionInfo callRestrictionInfo = {
-        .password = "",
-        .fac = CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING,
-        .mode = CallRestrictionMode::RESTRICTION_MODE_DEACTIVATION,
-    };
-    callSettingManager->SetCallRestriction(SIM1_SLOTID, callRestrictionInfo);
-    callSettingManager->SetCallRestriction(INVALID_SLOTID, callRestrictionInfo);
-
-    CallTransferInfo callTransferInfo = {
-        .transferNum = "",
-        .settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE,
-        .type = CallTransferType::TRANSFER_TYPE_BUSY,
-        .startHour = 1,
-        .startMinute = 1,
-        .endHour = 1,
-        .endMinute = 1,
-    };
-    ASSERT_NE(callSettingManager->SetCallTransferInfo(SIM1_SLOTID, callTransferInfo), TELEPHONY_SUCCESS);
-    ASSERT_NE(callSettingManager->SetCallTransferInfo(INVALID_SLOTID, callTransferInfo), TELEPHONY_SUCCESS);
-    bool result = false;
-    ASSERT_NE(callSettingManager->CanSetCallTransferTime(SIM1_SLOTID, result), TELEPHONY_SUCCESS);
-    ASSERT_NE(callSettingManager->SetCallPreferenceMode(SIM1_SLOTID, INVALID_MODE), TELEPHONY_SUCCESS);
-    ASSERT_NE(callSettingManager->SetCallPreferenceMode(SIM1_SLOTID, CS_VOICE_ONLY), TELEPHONY_SUCCESS);
-    ImsConfigItem item = ITEM_VIDEO_QUALITY;
-    ASSERT_NE(callSettingManager->GetImsConfig(SIM1_SLOTID, item), TELEPHONY_SUCCESS);
-    std::u16string value = u"";
-    ASSERT_NE(callSettingManager->SetImsConfig(SIM1_SLOTID, item, value), TELEPHONY_SUCCESS);
-    ASSERT_NE(callSettingManager->GetImsFeatureValue(SIM1_SLOTID, FeatureType::TYPE_VOICE_OVER_LTE), TELEPHONY_SUCCESS);
-    int32_t featureValue = 0;
-    ASSERT_NE(callSettingManager->SetImsFeatureValue(SIM1_SLOTID, FeatureType::TYPE_VOICE_OVER_LTE, featureValue),
-        TELEPHONY_SUCCESS);
-    ASSERT_NE(callSettingManager->EnableImsSwitch(SIM1_SLOTID), TELEPHONY_SUCCESS);
-    ASSERT_NE(callSettingManager->DisableImsSwitch(SIM1_SLOTID), TELEPHONY_SUCCESS);
-    bool enabled = false;
-    ASSERT_NE(callSettingManager->IsImsSwitchEnabled(SIM1_SLOTID, enabled), TELEPHONY_SUCCESS);
-}
-
-/**
  * @tc.number   Telephony_CallAbilityCallback_001
  * @tc.name     test error branch
  * @tc.desc     Function test

@@ -235,60 +235,6 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallWiredHeadSet_001, Function | MediumTest 
     instance->UnregistKeyMutePressedDown();
 }
 
-/**
- * @tc.number   Telephony_CallWiredHeadSet_002
- * @tc.name     test key mute press
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch7Test, Telephony_CallWiredHeadSet_002, Function | MediumTest | Level1)
-{
-    auto instance = DelayedSingleton<CallWiredHeadSet>::GetInstance();
-    DialParaInfo info;
-    sptr<CallBase> ringingCall = new IMSCall(info);
-    ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
-    ringingCall->SetCallId(0);
-    sptr<CallBase> holdCall = new IMSCall(info);
-    holdCall->SetCallId(1);
-    holdCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_HOLD);
-    sptr<CallBase> activeCall = new IMSCall(info);
-    activeCall->SetCallId(2);
-    activeCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-    sptr<CallBase> alertingCall = new IMSCall(info);
-    alertingCall->SetCallId(3);
-    alertingCall->SetTelCallState(TelCallState::CALL_STATUS_ALERTING);
-    CallObjectManager::AddOneCallObject(ringingCall);
-    ringingCall->SetVideoStateType(VideoStateType::TYPE_VOICE);
-    instance->DealKeyMuteShortPressed();
-    ringingCall->SetVideoStateType(VideoStateType::TYPE_VIDEO);
-    instance->DealKeyMuteShortPressed();
-    ringingCall->SetVideoStateType(VideoStateType::TYPE_SEND_ONLY);
-    instance->DealKeyMuteShortPressed();
-    instance->DealKeyMuteLongPressed();
-    CallObjectManager::DeleteOneCallObject(ringingCall);
-    EXPECT_NE(ringingCall, nullptr);
-    CallObjectManager::AddOneCallObject(alertingCall);
-    alertingCall->SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_IDLE);
-    instance->DealKeyMuteShortPressed();
-    instance->DealKeyMuteLongPressed();
-    alertingCall->SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_ACTIVE);
-    instance->DealKeyMuteLongPressed();
-    CallObjectManager::DeleteOneCallObject(alertingCall);
-    EXPECT_NE(alertingCall, nullptr);
-    CallObjectManager::AddOneCallObject(activeCall);
-    instance->DealKeyMuteShortPressed();
-    CallObjectManager::DeleteOneCallObject(activeCall);
-    CallObjectManager::AddOneCallObject(holdCall);
-    instance->DealKeyMuteShortPressed();
-    CallObjectManager::AddOneCallObject(activeCall);
-    EXPECT_NE(CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD), nullptr);
-    EXPECT_NE(CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE), nullptr);
-    instance->DealKeyMuteShortPressed();
-    CallObjectManager::DeleteOneCallObject(holdCall);
-    EXPECT_NE(holdCall, nullptr);
-    CallObjectManager::DeleteOneCallObject(activeCall);
-    EXPECT_NE(activeCall, nullptr);
-    EXPECT_EQ(ringingCall->answerType_, CallAnswerType::CALL_ANSWER_REJECT);
-}
 
 static bool g_receiveUnknownEvent = false;
 

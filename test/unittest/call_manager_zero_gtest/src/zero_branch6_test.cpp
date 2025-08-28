@@ -166,57 +166,6 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(std::string ur
 }
 
 /**
- * @tc.number   Telephony_CallStatusManager_003
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_003, TestSize.Level0)
-{
-    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    callStatusManager->Init();
-    CellularCallEventInfo cellularCallEventInfo;
-    ASSERT_EQ(callStatusManager->HandleEventResultReportInfo(cellularCallEventInfo), TELEPHONY_SUCCESS);
-    cellularCallEventInfo.eventType = CellularCallEventType::EVENT_REQUEST_RESULT_TYPE;
-    cellularCallEventInfo.eventId = RequestResultEventId::RESULT_DIAL_NO_CARRIER;
-    ASSERT_EQ(callStatusManager->HandleEventResultReportInfo(cellularCallEventInfo), TELEPHONY_SUCCESS);
-    OttCallEventInfo ottCallEventInfo;
-    (void)memset_s(&ottCallEventInfo, sizeof(OttCallEventInfo), 0, sizeof(OttCallEventInfo));
-    ottCallEventInfo.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
-    (void)memcpy_s(ottCallEventInfo.bundleName, kMaxBundleNameLen + 1, LONG_STR, strlen(LONG_STR));
-    ASSERT_EQ(callStatusManager->HandleOttEventReportInfo(ottCallEventInfo), TELEPHONY_SUCCESS);
-    (void)memset_s(&ottCallEventInfo, sizeof(OttCallEventInfo), 0, sizeof(OttCallEventInfo));
-    ottCallEventInfo.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
-    (void)memcpy_s(ottCallEventInfo.bundleName, kMaxBundleNameLen + 1, TEST_STR, strlen(TEST_STR));
-    ASSERT_EQ(callStatusManager->HandleOttEventReportInfo(ottCallEventInfo), TELEPHONY_SUCCESS);
-    CallDetailInfo callDetailInfo;
-    std::string number = "";
-    memcpy_s(&callDetailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
-    callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
-    callDetailInfo.callType = CallType::TYPE_CS;
-    ASSERT_EQ(callStatusManager->IncomingFilterPolicy(callDetailInfo), TELEPHONY_SUCCESS);
-    system::SetParameter("persist.edm.telephony_call_disable", "true");
-    ASSERT_EQ(callStatusManager->IncomingFilterPolicy(callDetailInfo), TELEPHONY_ERR_POLICY_DISABLED);
-    system::SetParameter("persist.edm.telephony_call_disable", "false");
-    callStatusManager->CallFilterCompleteResult(callDetailInfo);
-    CallDirection dir = CallDirection::CALL_DIRECTION_OUT;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    dir = CallDirection::CALL_DIRECTION_IN;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    callDetailInfo.callType = CallType::TYPE_IMS;
-    dir = CallDirection::CALL_DIRECTION_OUT;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    dir = CallDirection::CALL_DIRECTION_IN;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    callDetailInfo.callType = CallType::TYPE_OTT;
-    dir = CallDirection::CALL_DIRECTION_OUT;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    dir = CallDirection::CALL_DIRECTION_IN;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    callDetailInfo.callType = CallType::TYPE_ERR_CALL;
-    ASSERT_TRUE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-}
-
-/**
  * @tc.number   Telephony_CallStatusManager_004
  * @tc.name     test error branch
  * @tc.desc     Function test

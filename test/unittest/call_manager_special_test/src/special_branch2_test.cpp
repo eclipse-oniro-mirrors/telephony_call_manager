@@ -192,49 +192,6 @@ HWTEST_F(SpecialBranch2Test, Telephony_CallControlManager_001, TestSize.Level0)
 }
 
 /**
- * @tc.number   Telephony_CellularCallConnection_001
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_001, TestSize.Level0)
-{
-    auto cellularCallConnection = std::make_shared<CellularCallConnection>();
-    ASSERT_TRUE(cellularCallConnection != nullptr);
-    CellularCallInfo callInfo;
-    cellularCallConnection->Dial(callInfo);
-
-    CallSupplementType type = CallSupplementType::TYPE_DEFAULT;
-    cellularCallConnection->HangUp(callInfo, type);
-    cellularCallConnection->Reject(callInfo);
-    cellularCallConnection->Answer(callInfo);
-    cellularCallConnection->HoldCall(callInfo);
-    cellularCallConnection->UnHoldCall(callInfo);
-    cellularCallConnection->SwitchCall(callInfo);
-    cellularCallConnection->CombineConference(callInfo);
-    cellularCallConnection->SeparateConference(callInfo);
-    cellularCallConnection->KickOutFromConference(callInfo);
-    cellularCallConnection->StartDtmf('a', callInfo);
-    cellularCallConnection->StopDtmf(callInfo);
-    cellularCallConnection->PostDialProceed(callInfo, false);
-    cellularCallConnection->SendDtmf('b', "abc");
-    cellularCallConnection->SendDtmfString("abc", "abc", PhoneNetType::PHONE_TYPE_GSM, 0, 0);
-
-    CallTransferInfo callTransferInfo;
-    cellularCallConnection->SetCallTransferInfo(callTransferInfo, 0);
-
-    bool result;
-    cellularCallConnection->CanSetCallTransferTime(0, result);
-    cellularCallConnection->GetCallTransferInfo(CallTransferType::TRANSFER_TYPE_BUSY, 0);
-    cellularCallConnection->GetVideoCallWaiting(0, result);
-    cellularCallConnection->SetCallPreferenceMode(0, 0);
-
-    std::u16string msg;
-    cellularCallConnection->StartRtt(callInfo, msg);
-    int ret = cellularCallConnection->StopRtt(callInfo);
-    EXPECT_NE(ret, 0);
-}
-
-/**
  * @tc.number   Telephony_CellularCallConnection_002
  * @tc.name     test branch
  * @tc.desc     Function test

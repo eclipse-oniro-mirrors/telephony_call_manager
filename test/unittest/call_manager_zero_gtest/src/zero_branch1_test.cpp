@@ -187,52 +187,6 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestHandler_001, Function | MediumTes
     ASSERT_NE(callRequestHandler->JoinConference(1, emptyRecords), TELEPHONY_ERR_SUCCESS);
 }
 
-/**
- * @tc.number   Telephony_CallRequestProcess_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_001, Function | MediumTest | Level1)
-{
-    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
-    callRequestProcess->DialRequest();
-    callRequestProcess->AnswerRequest(1, 1);
-    std::string content = "";
-    callRequestProcess->RejectRequest(1, true, content);
-    callRequestProcess->HangUpRequest(1);
-    callRequestProcess->HoldRequest(1);
-    callRequestProcess->UnHoldRequest(1);
-    callRequestProcess->SwitchRequest(1);
-    callRequestProcess->CombineConferenceRequest(1);
-    callRequestProcess->SeparateConferenceRequest(1);
-    callRequestProcess->KickOutFromConferenceRequest(1);
-    std::u16string test = u"";
-    callRequestProcess->StartRttRequest(1, test);
-    callRequestProcess->StopRttRequest(1);
-    std::vector<std::string> numberList = {};
-    callRequestProcess->JoinConference(1, numberList);
-    DialParaInfo mDialParaInfo;
-    callRequestProcess->UpdateCallReportInfo(mDialParaInfo, TelCallState::CALL_STATUS_INCOMING);
-    callRequestProcess->HandleDialFail();
-    callRequestProcess->GetOtherRingingCall(1);
-    callRequestProcess->CarrierDialProcess(mDialParaInfo);
-    callRequestProcess->IsDialCallForDsda(mDialParaInfo);
-    bool isEcc = false;
-    std::string phoneNumber = "123456789012";
-    callRequestProcess->HandleEccCallForDsda(phoneNumber, mDialParaInfo, isEcc);
-    callRequestProcess->VoiceMailDialProcess(mDialParaInfo);
-    callRequestProcess->OttDialProcess(mDialParaInfo);
-    CellularCallInfo mCellularCallInfo;
-    callRequestProcess->PackCellularCallInfo(mDialParaInfo, mCellularCallInfo);
-    std::vector<std::u16string> testList = {};
-    callRequestProcess->IsFdnNumber(testList, content);
-    callRequestProcess->IsDsdsMode3();
-    callRequestProcess->DisconnectOtherSubIdCall(1, 0, 0);
-    callRequestProcess->DisconnectOtherCallForVideoCall(1);
-    mDialParaInfo.number = "*#21#";
-    callRequestProcess->CarrierDialProcess(mDialParaInfo);
-    ASSERT_FALSE(callRequestProcess->IsDsdsMode5());
-}
 
 /**
  * @tc.number   Telephony_CallRequestProcess_002

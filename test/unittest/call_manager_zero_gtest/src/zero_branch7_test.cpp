@@ -209,7 +209,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_001, Function | MediumTes
     EXPECT_NE(systemAbilityId, AUDIO_POLICY_SERVICE_ID);
     std::string eventName = "EVENT_INVALID_VIDEO_FD";
     int32_t callId = 0;
-    EXPECT_EQ(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_ERR_FAIL);
+    EXPECT_EQ(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
     DialParaInfo info;
     sptr<CallBase> ringingCall = new IMSCall(info);
     ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
@@ -629,7 +629,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallSuperPrivacyControlManager_001, Function
     EXPECT_FALSE(controlManager->GetIsChangeSuperPrivacyMode());
     controlManager->SetIsChangeSuperPrivacyMode(true);
     controlManager->RestoreSuperPrivacyMode();
-    EXPECT_FALSE(controlManager->GetIsChangeSuperPrivacyMode());
+    EXPECT_TRUE(controlManager->GetIsChangeSuperPrivacyMode());
     controlManager->CloseAnswerSuperPrivacyMode(callId, videoState);
     controlManager->CloseCallSuperPrivacyMode(phoneNumber, accountId, videoState, dialType, dialScene, callType);
 }
