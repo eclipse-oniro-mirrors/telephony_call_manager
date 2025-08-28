@@ -55,6 +55,7 @@
 #include "uri.h"
 #include "voip_call.h"
 #include "want_params_wrapper.h"
+#include "hitrace/tracechain.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1701,6 +1702,11 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     callPtr->SetOriginalCallType(info.originalCallType);
     TELEPHONY_LOGD("originalCallType:%{public}d", info.originalCallType);
     if (info.callType == CallType::TYPE_VOIP) {
+        OHOS::HiviewDFX::HiTraceId chainId = OHOS::HiviewDFX::HiTraceChain::GetId();
+        AAFwk::WantParams params = callPtr->GetExtraParams();
+        params.SetParam("traceChainId", AAFwk::String::Box(std::to_string(chainId.GetChainId())));
+        params.SetParam("traceFlags", AAFwk::String::Box(std::to_string(chainId.GetFlags())));
+        callPtr->SetExtraParams(params);
         return callPtr;
     }
     if (info.state == TelCallState::CALL_STATUS_INCOMING || info.state == TelCallState::CALL_STATUS_WAITING ||
