@@ -39,6 +39,7 @@
 #include "distributed_communication_manager.h"
 #include "ffrt.h"
 #include "hitrace_meter.h"
+#include "hitrace/tracechain.h"
 #include "ims_call.h"
 #include "notification_helper.h"
 #include "motion_recognition.h"
@@ -55,7 +56,6 @@
 #include "uri.h"
 #include "voip_call.h"
 #include "want_params_wrapper.h"
-#include "hitrace/tracechain.h"
 
 namespace OHOS {
 namespace Telephony {
