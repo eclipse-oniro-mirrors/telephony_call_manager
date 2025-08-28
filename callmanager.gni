@@ -210,6 +210,7 @@ call_manager_external_deps = [
   "hilog:libhilog",
   "hisysevent:libhisysevent",
   "hitrace:hitrace_meter",
+  "hitrace:libhitracechain",
   "init:libbegetutil",
   "input:libmmi-client",
   "ipc:ipc_single",
