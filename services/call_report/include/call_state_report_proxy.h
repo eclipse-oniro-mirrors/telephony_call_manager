@@ -37,6 +37,7 @@ public:
     void UpdateCallStateForVoIPOrRestart();
 private:
     TelCallState GetVoipCallState();
+    void SendVoipCallStateChanged(int32_t uid, TelCallState state);
 
 private:
     TelCallState currentCallState_ = TelCallState::CALL_STATUS_UNKNOWN;

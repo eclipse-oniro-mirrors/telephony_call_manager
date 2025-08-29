@@ -42,11 +42,36 @@ void CallStateReportProxy::CallStateUpdated(
         return;
     }
     if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
-        TELEPHONY_LOGI("voip call no need to report call state");
+        if (!CallObjectManager::IsVoipCallExist() && !DelayedSingleton<CallControlManager>::GetInstance()->HasCall()) {
+            auto voipCall = static_cast<VOIPCall *>(callObjectPtr.GetRefPtr());
+            SendVoipCallStateChanged(voipCall->GetVoipUid(), nextState);
+        }
         return;
     }
+
     UpdateCallState(callObjectPtr, nextState);
     UpdateCallStateForSlotId(callObjectPtr, nextState);
+}
+
+void CallStateReportProxy::SendVoipCallStateChanged(int32_t uid, TelCallState state)
+{
+    AAFwk::Want want;
+    want.SetParam("slotId", -1);
+    want.SetParam("state", static_cast<int32_t>(state));
+    want.SetParam("voipUid", uid);
+    want.SetParam("usual.event.VOIP_CALL_STATE_CHANGED");
+
+    EventFwk::CommonEventData data;
+    data.SendEvent(want);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    publishInfo.SetOrdered(false);
+    std::vector<std::string> callPermissions;
+    callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
+    publishInfo.SetSubscriberPermissions(callPermissions);
+    bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+    if (!publishResult) {
+        TELEPHONY_LOGE("SendCallStateChanged PublishBroadcastEvent result fail");
+    }
 }
 
 void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCallState nextState)
