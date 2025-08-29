@@ -667,7 +667,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_MuteRinger_001, TestSize.Level1)
     sptr<CallBase> call1 = new VoIPCall(info);
     call1->SetCallType(CallType::TYPE_VOIP);
     call1->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
-    callControlManager->VoIpCallState_ = CallStateToApp::CALL_STATE_UNKNOWN;
+    callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_UNKNOWN;
     CallObjectManager::AddOneCallObject(call1);
     audioControlManager->ringState_ = RingState::STOPPED;
     EXPECT_EQ(callControlManager->HasCall(), false);
@@ -683,7 +683,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_MuteRinger_001, TestSize.Level1)
     audioControlManager->MuteRinger();
     CallObjectManager::callObjectPtrList_.clear();
     sptr<CallBase> call3 = new IMSCall(info);
-    call2->SetCallType(CallType::TYPE_VOIP);
+    call3->SetCallType(CallType::TYPE_VOIP);
     callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_ANSWERED;
     CallObjectManager::AddOneCallObject(call3);
     audioControlManager->MuteRinger();
@@ -694,7 +694,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_MuteRinger_001, TestSize.Level1)
  * @tc.name     test CallStateUpdated
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch10Test, Telephony_MuteRinger_001, TestSize.Level1)
+HWTEST_F(ZeroBranch10Test, CallStateReportProxy_CallStateUpdated_001, TestSize.Level1)
 {
     auto callStateProxy = DelayedSingleton<CallStateReportProxy>::GetInstance();
     auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
@@ -702,12 +702,12 @@ HWTEST_F(ZeroBranch10Test, Telephony_MuteRinger_001, TestSize.Level1)
     info.accountId = 0;
     sptr<CallBase> call1 = new VoIPCall(info);
     CallObjectManager::voipCallObjectList_.clear();
-    call1->SetType(CallType::TYPE_VOIP);
+    call1->SetCallType(CallType::TYPE_VOIP);
     call1->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
     CallObjectManager::AddOneCallObject(call1);
     callStateProxy->CallStateUpdated(call1, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
     CallAttributeInfo voipInfo;
-    sptr<CallBase> calll2 = new VoIPCall(info);
+    sptr<CallBase> call2 = new VoIPCall(info);
     CallObjectManager::voipCallObjectList_[1] = voipInfo;
     callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_ANSWERED;
     callStateProxy->CallStateUpdated(call1, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);

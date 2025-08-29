@@ -26,7 +26,9 @@
 #include "call_manager_inner_type.h"
 #include "call_object_manager.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_permission.h"
 #include "telephony_state_registry_client.h"
+#include "voip_call.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -43,7 +45,7 @@ void CallStateReportProxy::CallStateUpdated(
     }
     if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
         if (!CallObjectManager::IsVoipCallExist() && !DelayedSingleton<CallControlManager>::GetInstance()->HasCall()) {
-            auto voipCall = static_cast<VOIPCall *>(callObjectPtr.GetRefPtr());
+            auto voipCall = static_cast<VoIPCall *>(callObjectPtr.GetRefPtr());
             SendVoipCallStateChanged(voipCall->GetVoipUid(), nextState);
         }
         return;
@@ -59,10 +61,10 @@ void CallStateReportProxy::SendVoipCallStateChanged(int32_t uid, TelCallState st
     want.SetParam("slotId", -1);
     want.SetParam("state", static_cast<int32_t>(state));
     want.SetParam("voipUid", uid);
-    want.SetParam("usual.event.VOIP_CALL_STATE_CHANGED");
+    want.SetAction("usual.event.VOIP_CALL_STATE_CHANGED");
 
     EventFwk::CommonEventData data;
-    data.SendEvent(want);
+    data.SendWant(want);
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetOrdered(false);
     std::vector<std::string> callPermissions;
