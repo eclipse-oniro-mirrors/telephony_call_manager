@@ -64,7 +64,7 @@ void CallStateReportProxy::SendVoipCallStateChanged(int32_t uid, TelCallState st
     want.SetAction("usual.event.VOIP_CALL_STATE_CHANGED");
 
     EventFwk::CommonEventData data;
-    data.SendWant(want);
+    data.SetWant(want);
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetOrdered(false);
     std::vector<std::string> callPermissions;
