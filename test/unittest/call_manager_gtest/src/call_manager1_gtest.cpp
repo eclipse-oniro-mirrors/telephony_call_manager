@@ -638,9 +638,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0200, Function | Medium
         0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
-    bool isRet = CallManagerGtest::clientPtr_->HasCall();
-    isRet = CallManagerGtest::clientPtr_->HasCall(false);
-    isRet = CallManagerGtest::clientPtr_->HasCall(true);
+    CallManagerGtest::clientPtr_->HasCall();
+    CallManagerGtest::clientPtr_->HasCall(false);
+    CallManagerGtest::clientPtr_->HasCall(true);
 }
 
 /**
@@ -654,9 +654,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0300, Function | Medium
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    bool isRet = CallManagerGtest::clientPtr_->HasCall();
-    isRet = CallManagerGtest::clientPtr_->HasCall(false);
-    isRet = CallManagerGtest::clientPtr_->HasCall(true);
+    CallManagerGtest::clientPtr_->HasCall();
+    CallManagerGtest::clientPtr_->HasCall(false);
+    CallManagerGtest::clientPtr_->HasCall(true);
 }
 
 /**
