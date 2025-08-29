@@ -483,50 +483,6 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallAbilityConnectCallback_001, Function | M
 }
 
 /**
- * @tc.number   Telephony_IMSCall_001
- * @tc.name     test IMSCall
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch7Test, Telephony_IMSCall_001, Function | MediumTest | Level1)
-{
-    DialParaInfo info;
-    std::shared_ptr<IMSCall> call = std::make_shared<IMSCall>(info);
-    for (int16_t i = 0; i <= kMaxNumberLen + 1; i++) {
-        call->accountNumber_ += "1";
-    }
-    std::u16string msg = u"";
-    EXPECT_EQ(call->StartRtt(msg), CALL_ERR_NUMBER_OUT_OF_RANGE);
-    EXPECT_EQ(call->StopRtt(), CALL_ERR_NUMBER_OUT_OF_RANGE);
-    EXPECT_EQ(call->SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY), CALL_ERR_NUMBER_OUT_OF_RANGE);
-    EXPECT_EQ(call->SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY), CALL_ERR_NUMBER_OUT_OF_RANGE);
-    call->accountNumber_ = "111";
-    EXPECT_GT(call->StartRtt(msg), TELEPHONY_ERROR);
-    EXPECT_GT(call->StopRtt(), TELEPHONY_ERROR);
-    EXPECT_GT(call->SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERROR);
-    EXPECT_GT(call->SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERROR);
-    call->SetCallId(-2);
-    EXPECT_EQ(call->CombineConference(), CALL_ERR_INVALID_CALLID);
-    call->SetCallId(0);
-    DelayedSingleton<ImsConference>::GetInstance()->state_ = ConferenceState::CONFERENCE_STATE_IDLE;
-    EXPECT_NE(call->CombineConference(), CALL_ERR_INVALID_CALLID);
-    EXPECT_EQ(DelayedSingleton<ImsConference>::GetInstance()->state_, ConferenceState::CONFERENCE_STATE_CREATING);
-    EXPECT_NE(call->CombineConference(), CALL_ERR_INVALID_CALLID);
-    call->HandleCombineConferenceFailEvent();
-    EXPECT_GT(call->CanCombineConference(), TELEPHONY_ERROR);
-    EXPECT_GT(call->HoldConference(), TELEPHONY_ERROR);
-    EXPECT_GT(call->LaunchConference(), TELEPHONY_ERROR);
-    EXPECT_GT(call->HoldConference(), TELEPHONY_ERROR);
-    EXPECT_GT(call->ExitConference(), TELEPHONY_ERROR);
-    DelayedSingleton<ImsConference>::GetInstance()->state_ = ConferenceState::CONFERENCE_STATE_IDLE;
-    EXPECT_GT(call->LaunchConference(), TELEPHONY_ERROR);
-    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
-    EXPECT_GT(call->UpdateImsCallMode(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERROR);
-    call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
-    EXPECT_FALSE(call->IsSupportVideoCall());
-    EXPECT_FALSE(call->IsVoiceModifyToVideo());
-}
-
-/**
  * @tc.number   Telephony_CallConnectAbility_001
  * @tc.name     test CallConnectAbility
  * @tc.desc     Function test

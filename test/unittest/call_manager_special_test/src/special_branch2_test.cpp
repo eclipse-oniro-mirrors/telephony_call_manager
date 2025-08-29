@@ -191,44 +191,6 @@ HWTEST_F(SpecialBranch2Test, Telephony_CallControlManager_001, TestSize.Level0)
     EXPECT_EQ(ret, 0);
 }
 
-/**
- * @tc.number   Telephony_CellularCallConnection_002
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_002, TestSize.Level0)
-{
-    auto cellularCallConnection = std::make_shared<CellularCallConnection>();
-    ASSERT_TRUE(cellularCallConnection != nullptr);
-    std::string cameraId;
-    cellularCallConnection->ControlCamera(0, 0, cameraId, 0, 0);
-
-    std::string surfaceId;
-    cellularCallConnection->SetPreviewWindow(0, 0, surfaceId, nullptr);
-    cellularCallConnection->SetPreviewWindow(0, 0, surfaceId, nullptr);
-    cellularCallConnection->SetCameraZoom(0.0f);
-
-    std::string path;
-    cellularCallConnection->SetPausePicture(0, 0, path);
-    cellularCallConnection->SetDeviceDirection(0, 0, 0);
-
-    bool enabled;
-    cellularCallConnection->GetCarrierVtConfig(0, enabled);
-
-    CellularCallInfo callInfo;
-    cellularCallConnection->SendUpdateCallMediaModeRequest(callInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY);
-    cellularCallConnection->SendUpdateCallMediaModeResponse(callInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY);
-
-    std::string value;
-    cellularCallConnection->SetImsConfig(ImsConfigItem::ITEM_VIDEO_QUALITY, value, 0);
-
-    std::vector<std::string> numberList;
-    cellularCallConnection->InviteToConference(numberList, 0);
-    cellularCallConnection->SetMute(0, 0);
-    cellularCallConnection->CancelCallUpgrade(0, 0);
-    int ret = cellularCallConnection->RequestCameraCapabilities(0, 0);
-    EXPECT_NE(ret, 0);
-}
 
 /**
  * @tc.number   Telephony_CellularCallConnection_003

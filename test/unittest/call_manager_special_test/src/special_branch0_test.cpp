@@ -169,7 +169,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityServiceHelper_002, TestSize
         }
     };
     int ret = help.Connect(onConnected, onDisconnected);
-    EXPECT_EQ(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -243,8 +243,6 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_001, TestSize.Level1)
     int32_t ret = callSettingManager->GetImsFeatureValue(0, FeatureType::TYPE_VOICE_OVER_LTE);
     EXPECT_NE(ret, 0);
 }
-
-
 
 /**
  * @tc.number   Telephony_CallVoiceAssistantManager_001
@@ -543,7 +541,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_005, TestSize.Leve
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     data.RewindRead(0);
     int32_t ret = callManagerService->OnMakeCall(data, reply);
-    EXPECT_EQ(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**

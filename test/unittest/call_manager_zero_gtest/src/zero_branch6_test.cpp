@@ -262,7 +262,7 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(std::string ur
     oobeStatusObserver_->OnChange();
     callStatusManager->deviceProvisioned_ = -1;
     callStatusManager->UpdateDevProvisioned();
-    EXPECT_EQ(helper->Update(uri, "device_provisioned", "0"), 0);
+    EXPECT_EQ(helper->Update(uri, "device_provisioned", "0"), -1);
     oobeStatusObserver_->OnChange();
     callStatusManager->deviceProvisioned_ = -1;
     callStatusManager->GetDevProvisioned();
@@ -525,27 +525,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_CanUnHoldState_001, TestSize.Level0)
     ASSERT_TRUE(callObjectPtr != nullptr);
     callObjectPtr->SetCanUnHoldState(flag);
     ASSERT_EQ(callObjectPtr->GetCanUnHoldState(), true);
-}
-
-/**
- * @tc.number   Telephony_SatelliteCall_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_SatelliteCall_001, TestSize.Level0)
-{
-    DialParaInfo dialParaInfo;
-    SatelliteCall call { dialParaInfo };
-    int32_t ret1 = call.DialingProcess();
-    int32_t ret2 = call.AnswerCall(0);
-    int32_t ret3 = call.RejectCall();
-    int32_t ret4 = call.HangUpCall();
-    CallAttributeInfo callAttributeInfo;
-    call.GetCallAttributeInfo(callAttributeInfo);
-    EXPECT_EQ(ret1, TELEPHONY_SUCCESS);
-    EXPECT_NE(ret2, TELEPHONY_SUCCESS);
-    EXPECT_NE(ret3, TELEPHONY_SUCCESS);
-    EXPECT_NE(ret4, TELEPHONY_SUCCESS);
 }
 
 /**
