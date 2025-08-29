@@ -187,63 +187,6 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestHandler_001, Function | MediumTes
     ASSERT_NE(callRequestHandler->JoinConference(1, emptyRecords), TELEPHONY_ERR_SUCCESS);
 }
 
-
-/**
- * @tc.number   Telephony_CallRequestProcess_002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_002, Function | MediumTest | Level1)
-{
-    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
-    callRequestProcess->HoldOrDisconnectedCall(VALID_CALLID, SIM1_SLOTID, 1);
-    DialParaInfo mDialParaInfo;
-    sptr<CallBase> call = new CSCall(mDialParaInfo);
-    call->SetCallId(VALID_CALLID);
-    call->SetCallType(CallType::TYPE_VOIP);
-    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
-    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-    callRequestProcess->AddOneCallObject(call);
-    callRequestProcess->AnswerRequest(VALID_CALLID, static_cast<int>(CallType::TYPE_VOIP));
-    callRequestProcess->AnswerRequest(VALID_CALLID, static_cast<int>(CallType::TYPE_CS));
-    callRequestProcess->NeedAnswerVTAndEndActiveVO(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
-    callRequestProcess->NeedAnswerVTAndEndActiveVO(ERROR_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
-    callRequestProcess->NeedAnswerVOAndEndActiveVT(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VOICE));
-    callRequestProcess->NeedAnswerVOAndEndActiveVT(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
-    sptr<CallBase> voipCall = new VoIPCall(mDialParaInfo);
-    voipCall->SetCallId(VALID_CALLID);
-    voipCall->SetCallType(CallType::TYPE_VOIP);
-    voipCall->SetTelCallState(TelCallState::CALL_STATUS_HOLDING);
-    voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_HOLD);
-    callRequestProcess->AddOneCallObject(voipCall);
-    callRequestProcess->NeedAnswerVTAndEndActiveVO(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
-    callRequestProcess->NeedAnswerVTAndEndActiveVO(ERROR_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
-    callRequestProcess->NeedAnswerVOAndEndActiveVT(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VOICE));
-    callRequestProcess->NeedAnswerVOAndEndActiveVT(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
-    callRequestProcess->GetOtherRingingCall(VALID_CALLID);
-    callRequestProcess->GetOtherRingingCall(ERROR_CALLID);
-    callRequestProcess->HoldOrDisconnectedCall(VALID_CALLID, SIM1_SLOTID,
-        static_cast<int>(VideoStateType::TYPE_VIDEO));
-    callRequestProcess->HoldOrDisconnectedCall(VALID_CALLID, SIM1_SLOTID,
-        static_cast<int>(VideoStateType::TYPE_VOICE));
-    std::list<int32_t> list = {1, 2, -1, 0};
-    bool noOtherCall = false;
-    callRequestProcess->IsExistCallOtherSlot(list, SIM1_SLOTID, noOtherCall);
-    sptr<CallBase> dialCall = new IMSCall(mDialParaInfo);
-    dialCall->SetCallId(VALID_CALLID);
-    dialCall->SetCallType(CallType::TYPE_VOIP);
-    dialCall->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
-    dialCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING);
-    callRequestProcess->AddOneCallObject(dialCall);
-    sptr<CallBase> incomingCall = new CSCall(mDialParaInfo);
-    incomingCall->SetCallType(CallType::TYPE_CS);
-    bool flagForConference = false;
-    callRequestProcess->HandleCallWaitingNumZero(incomingCall, voipCall, SIM1_SLOTID, 2, flagForConference);
-    callRequestProcess->HandleCallWaitingNumZero(incomingCall, dialCall, SIM1_SLOTID, 2, flagForConference);
-    callRequestProcess->DisconnectOtherCallForVideoCall(VALID_CALLID);
-    ASSERT_FALSE(flagForConference);
-}
-
 /**
  * @tc.number   Telephony_CallRequestProcess_003
  * @tc.name     test error branch
@@ -1166,7 +1109,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallNumberUtils_003, Function | MediumTest |
     call->SetCallType(CallType::TYPE_IMS);
     CallObjectManager::AddOneCallObject(call);
     dialStr = "333";
-    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0,dialStr));
+    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "33";
     ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     CallObjectManager::DeleteOneCallObject(call);

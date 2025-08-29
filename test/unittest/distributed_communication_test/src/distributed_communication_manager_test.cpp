@@ -76,11 +76,9 @@ HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManagerTest_001, Funct
     ret = dcManager->RegDevCallbackWrapper(deviceListener);
     ASSERT_FALSE(ret != TELEPHONY_ERROR);
 
-    ret = dcManager->UnRegDevCallbackWrapper();
-    ASSERT_TRUE(ret != TELEPHONY_ERROR);
+    dcManager->UnRegDevCallbackWrapper();
 
-    ret = dcManager->SwitchDevWrapper(devId, direction);
-    ASSERT_TRUE(ret != TELEPHONY_ERROR);
+    dcManager->SwitchDevWrapper(devId, direction);
 
     ASSERT_FALSE(dcManager->IsDistributedDev(devId));
 

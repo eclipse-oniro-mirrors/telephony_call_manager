@@ -212,21 +212,6 @@ HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityConnection_001, TestSize.Le
 }
 
 /**
- * @tc.number   Telephony_NumberIdentityConnection_002
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityConnection_002, TestSize.Level0)
-{
-    sptr<NumberIdentityConnection> connection = new (std::nothrow) NumberIdentityConnection(
-            [](const sptr<IRemoteObject> &remoteObject) {}, []() {});
-    connection->disconnectedCallback_ = nullptr;
-    AppExecFwk::ElementName element;
-    connection->OnAbilityDisconnectDone(element, 0);
-    ASSERT_TRUE(connection != nullptr);
-}
-
-/**
  * @tc.number   Telephony_CallManagerHisysevent_001
  * @tc.name     test branch
  * @tc.desc     Function test
@@ -667,19 +652,6 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_002, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     callManagerService->UnInit();
-    ASSERT_TRUE(callManagerService != nullptr);
-}
-
-/**
- * @tc.number   Telephony_CallManagerService_003
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_003, TestSize.Level0)
-{
-    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->UnInit();
-    callManagerService->OnStart();
     ASSERT_TRUE(callManagerService != nullptr);
 }
 

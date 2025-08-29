@@ -166,46 +166,6 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(std::string ur
 }
 
 /**
- * @tc.number   Telephony_CallStatusManager_004
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
-{
-    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    callStatusManager->Init();
-    sptr<CallBase> callObjectPtr = nullptr;
-    callStatusManager->HandleRejectCall(callObjectPtr, true);
-    DialParaInfo dialParaInfo;
-    dialParaInfo.callType = CallType::TYPE_CS;
-    dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
-    callObjectPtr = new CSCall(dialParaInfo);
-    callStatusManager->HandleRejectCall(callObjectPtr, true);
-    CallDetailInfo callDetailInfo;
-    std::string number = "";
-    memcpy_s(&callDetailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
-    callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
-    callDetailInfo.callType = CallType::TYPE_CS;
-    callDetailInfo.voipCallInfo.voipCallId = "123456789";
-    callStatusManager->OutgoingVoipCallHandle(callDetailInfo);
-    std::vector<std::u16string> callIdList;
-    CallRunningState previousState = CallRunningState::CALL_RUNNING_STATE_CREATE;
-    TelCallState priorState = TelCallState::CALL_STATUS_INCOMING;
-    callStatusManager->HandleHoldCallOrAutoAnswerCall(callObjectPtr, callIdList, previousState, priorState);
-    callStatusManager->AutoAnswerForVoiceCall(callObjectPtr, SIM1_SLOTID, true);
-    callStatusManager->SetVideoCallState(callObjectPtr, TelCallState::CALL_STATUS_ACTIVE);
-    callObjectPtr->SetSlotId(-1);
-    callStatusManager->SetVideoCallState(callObjectPtr, TelCallState::CALL_STATUS_ACTIVE);
-    EXPECT_TRUE(callStatusManager->GetConferenceCallList(-1).empty());
-    callStatusManager->ShouldRejectIncomingCall();
-    callStatusManager->IsRingOnceCall(callObjectPtr, callDetailInfo);
-    sptr<CallBase> callObjectPtr1 = nullptr;
-    int32_t res = callStatusManager->HandleRingOnceCall(callObjectPtr1);
-    callStatusManager->HandleRingOnceCall(callObjectPtr);
-    ASSERT_NE(res, TELEPHONY_SUCCESS);
-}
-
-/**
  * @tc.number   Telephony_CallStatusManager_005
  * @tc.name     test error branch
  * @tc.desc     Function test

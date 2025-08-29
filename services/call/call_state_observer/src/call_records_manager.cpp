@@ -137,7 +137,7 @@ void CallRecordsManager::CallStateUpdated(
     }
 
     if (nextState == TelCallState::CALL_STATUS_DISCONNECTED &&
-        callObjectPtr->GetCallDirection() == CallDirection::CALL_DIRECTION_IN && 
+        callObjectPtr->GetCallDirection() == CallDirection::CALL_DIRECTION_IN &&
         callObjectPtr->IsAiAutoAnswer()) {
         info.answerType = CallAnswerType::CALL_ANSWER_MISSED;
     }

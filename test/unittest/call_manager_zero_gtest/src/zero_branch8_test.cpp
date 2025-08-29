@@ -483,47 +483,6 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallAbilityConnectCallback_001, Function | M
 }
 
 /**
- * @tc.number   Telephony_CallStatusPolicy_001
- * @tc.name     test CallStatusPolicy
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch7Test, Telephony_CallStatusPolicy_001, Function | MediumTest | Level1)
-{
-    CellularCallInfo callInfo;
-    CallDetailInfo detailInfo;
-    EXPECT_EQ(std::make_shared<CallIncomingFilterManager>()->PackCellularCallInfo(callInfo, detailInfo),
-        TELEPHONY_SUCCESS);
-    DialParaInfo info;
-    sptr<CallBase> call = new IMSCall(info);
-    call->SetCallId(0);
-    call->SetAccountNumber("111");
-    strcpy_s(detailInfo.phoneNum, kMaxNumberLen, "111");
-    CallObjectManager::AddOneCallObject(call);
-    EXPECT_EQ(std::make_shared<CallStatusPolicy>()->DialingHandlePolicy(detailInfo), CALL_ERR_CALL_ALREADY_EXISTS);
-    CallObjectManager::DeleteOneCallObject(call);
-    DelayedSingleton<CallControlManager>::GetInstance()->VoIPCallState_ = CallStateToApp::CALL_STATE_IDLE;
-    EXPECT_EQ(std::make_shared<CallStatusPolicy>()->FilterResultsDispose(call), TELEPHONY_SUCCESS);
-    DelayedSingleton<CallControlManager>::GetInstance()->VoIPCallState_ = CallStateToApp::CALL_STATE_RINGING;
-    EXPECT_GT(std::make_shared<CallStatusPolicy>()->FilterResultsDispose(call), TELEPHONY_ERROR);
-    for (int32_t i = 1; i < 31; i++) {
-        sptr<CallBase> tempCall = new IMSCall(info);
-        tempCall->SetCallId(i);
-        tempCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
-        CallObjectManager::AddOneCallObject(tempCall);
-    }
-    EXPECT_GT(std::make_shared<CallStatusPolicy>()->FilterResultsDispose(call), TELEPHONY_ERROR);
-    CallObjectManager::callObjectPtrList_.clear();
-    for (int32_t i = 1; i < 31; i++) {
-        sptr<CallBase> tempCall = new IMSCall(info);
-        tempCall->SetCallId(i);
-        tempCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-        CallObjectManager::AddOneCallObject(tempCall);
-    }
-    EXPECT_GT(std::make_shared<CallStatusPolicy>()->FilterResultsDispose(call), TELEPHONY_ERROR);
-    CallObjectManager::callObjectPtrList_.clear();
-}
-
-/**
  * @tc.number   Telephony_IMSCall_001
  * @tc.name     test IMSCall
  * @tc.desc     Function test

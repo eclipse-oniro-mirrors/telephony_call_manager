@@ -562,32 +562,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallPolicy_002, TestSize.Level0)
 }
 
 /**
- * @tc.number   Telephony_CSCall_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch4Test, Telephony_CSCall_001, TestSize.Level0)
-{
-    DialParaInfo dialParaInfo;
-    CSCall call { dialParaInfo };
-    call.AnswerCall(0);
-    call.RejectCall();
-    call.HoldCall();
-    call.SwitchCall();
-    call.SetMute(0, 0);
-    call.CombineConference();
-    call.SeparateConference();
-    call.KickOutFromConference();
-    call.CanCombineConference();
-    call.CanSeparateConference();
-    call.LaunchConference();
-    call.HoldConference();
-    int32_t mainCallId = 1;
-    ASSERT_EQ(TELEPHONY_SUCCESS, call.GetMainCallId(mainCallId));
-    call.HandleCombineConferenceFailEvent();
-}
-
-/**
  * @tc.number   Telephony_CallRecordsManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test

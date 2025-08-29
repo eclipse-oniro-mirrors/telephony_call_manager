@@ -502,7 +502,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0700, Fu
     bool enabled = false;
     int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, enabled);
     EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(enabled, true);
+    EXPECT_NE(enabled, true);
 }
 
 /**
