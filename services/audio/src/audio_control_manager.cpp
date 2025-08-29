@@ -1079,7 +1079,7 @@ int32_t AudioControlManager::MuteRinger()
     }
     if (incomingCall != nullptr && incomingCall->GetCallType() == CallType::TYPE_VOIP &&
         !DelayedSingleton<CallControlManager>::GetInstance()->HasCall()) {
-        sptr<VoIPCall> voipCall = static_cast<VoIPCall *>(static_cast<void *>(incomingCall.GetRefPtr()));
+        auto voipCall = static_cast<VoIPCall *>(incomingCall.GetRefPtr());
         int32_t uid = voipCall->GetVoipUid();
         AudioStandard::AudioSystemManager::GetInstance()->SetAppRingMuted(uid, true);
         return TELEPHONY_SUCCESS;
