@@ -33,6 +33,7 @@
 #include "os_account_manager.h"
 #include "ringtone_player.h"
 #include "int_wrapper.h"
+#include "voip_call.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1075,6 +1076,13 @@ int32_t AudioControlManager::MuteRinger()
             TELEPHONY_LOGI("Mute network ring tone.");
             MuteNetWorkRingTone(true);
         }
+    }
+    if (incomingCall != nullptr && incomingCall->GetCallType() == CallType::TYPE_VOIP &&
+        !DelayedSingleton<CallControlManager>::GetInstance()->HasCall()) {
+        auto voipCall = static_cast<VoIPCall *>(incomingCall.GetRefPtr());
+        int32_t uid = voipCall->GetVoipUid();
+        AudioStandard::AudioSystemManager::GetInstance()->SetAppRingMuted(uid, true);
+        return TELEPHONY_SUCCESS;
     }
     SendMuteRingEvent();
     if (ringState_ == RingState::STOPPED) {

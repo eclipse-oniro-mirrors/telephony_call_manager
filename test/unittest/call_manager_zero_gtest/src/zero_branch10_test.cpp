@@ -27,6 +27,7 @@
 #include "call_ability_report_proxy.h"
 #include "call_control_manager.h"
 #include "ims_call.h"
+#include "voip_call.h"
 #include "incoming_flash_reminder.h"
 #include "nativetoken_kit.h"
 #include "nearlink_call_client.h"
@@ -38,10 +39,12 @@
 #ifdef ABILITY_SCREENLOCKMGR_SUPPORT
 #include "screenlock_manager.h"
 #endif
+#include "call_state_report_proxy.h"
 
 namespace OHOS::Telephony {
 using namespace testing::ext;
 constexpr int WAIT_TIME = 3;
+constexpr int32_t CRS_TYPE = 2;
 class ZeroBranch10Test : public testing::Test {
 public:
     void SetUp();
@@ -646,5 +649,68 @@ HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_003, TestSize.Level1)
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_->isFlashRemindUsed_ = true;
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_->HandleStopFlashRemind();
     EXPECT_EQ(DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_MuteRinger_001
+ * @tc.name     test MuteRinger
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch10Test, Telephony_MuteRinger_001, TestSize.Level1)
+{
+    auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    audioControlManager->isVideoRingVibrating_ = false;
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo info;
+    info.accountId = 0;
+    sptr<CallBase> call1 = new VoIPCall(info);
+    call1->SetCallType(CallType::TYPE_VOIP);
+    call1->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_UNKNOWN;
+    CallObjectManager::AddOneCallObject(call1);
+    audioControlManager->ringState_ = RingState::STOPPED;
+    EXPECT_EQ(callControlManager->HasCall(), false);
+    audioControlManager->MuteRinger();
+    CallObjectManager::callObjectPtrList_.clear();
+    audioControlManager->isVideoRingVibrating_ = true;
+    EXPECT_EQ(audioControlManager->isVideoRingVibrating_, false);
+    sptr<CallBase> call2 = new IMSCall(info);
+    call2->SetCallType(CallType::TYPE_IMS);
+    call2->SetCrsType(CRS_TYPE);
+    callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_UNKNOWN;
+    CallObjectManager::AddOneCallObject(call2);
+    audioControlManager->MuteRinger();
+    CallObjectManager::callObjectPtrList_.clear();
+    sptr<CallBase> call3 = new IMSCall(info);
+    call3->SetCallType(CallType::TYPE_VOIP);
+    callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_ANSWERED;
+    CallObjectManager::AddOneCallObject(call3);
+    audioControlManager->MuteRinger();
+}
+
+/**
+ * @tc.number   CallStateReportProxy_CallStateUpdated_001
+ * @tc.name     test CallStateUpdated
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch10Test, CallStateReportProxy_CallStateUpdated_001, TestSize.Level1)
+{
+    auto callStateProxy = DelayedSingleton<CallStateReportProxy>::GetInstance();
+    auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    DialParaInfo info;
+    info.accountId = 0;
+    sptr<CallBase> call1 = new VoIPCall(info);
+    CallObjectManager::voipCallObjectList_.clear();
+    call1->SetCallType(CallType::TYPE_VOIP);
+    call1->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    CallObjectManager::AddOneCallObject(call1);
+    callStateProxy->CallStateUpdated(call1, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
+    EXPECT_EQ(callControlManager->HasCall(), false);
+    CallAttributeInfo voipInfo;
+    sptr<CallBase> call2 = new VoIPCall(info);
+    CallObjectManager::voipCallObjectList_[1] = voipInfo;
+    callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_ANSWERED;
+    callStateProxy->CallStateUpdated(call1, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
 }
 }

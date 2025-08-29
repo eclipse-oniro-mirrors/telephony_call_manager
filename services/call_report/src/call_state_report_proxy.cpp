@@ -26,7 +26,9 @@
 #include "call_manager_inner_type.h"
 #include "call_object_manager.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_permission.h"
 #include "telephony_state_registry_client.h"
+#include "voip_call.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -42,11 +44,36 @@ void CallStateReportProxy::CallStateUpdated(
         return;
     }
     if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
-        TELEPHONY_LOGI("voip call no need to report call state");
+        if (!CallObjectManager::IsVoipCallExist() && !DelayedSingleton<CallControlManager>::GetInstance()->HasCall()) {
+            auto voipCall = static_cast<VoIPCall *>(callObjectPtr.GetRefPtr());
+            SendVoipCallStateChanged(voipCall->GetVoipUid(), nextState);
+        }
         return;
     }
+
     UpdateCallState(callObjectPtr, nextState);
     UpdateCallStateForSlotId(callObjectPtr, nextState);
+}
+
+void CallStateReportProxy::SendVoipCallStateChanged(int32_t uid, TelCallState state)
+{
+    AAFwk::Want want;
+    want.SetParam("slotId", -1);
+    want.SetParam("state", static_cast<int32_t>(state));
+    want.SetParam("voipUid", uid);
+    want.SetAction("usual.event.VOIP_CALL_STATE_CHANGED");
+
+    EventFwk::CommonEventData data;
+    data.SetWant(want);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    publishInfo.SetOrdered(false);
+    std::vector<std::string> callPermissions;
+    callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
+    publishInfo.SetSubscriberPermissions(callPermissions);
+    bool publishResult = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+    if (!publishResult) {
+        TELEPHONY_LOGE("SendCallStateChanged PublishBroadcastEvent result fail");
+    }
 }
 
 void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCallState nextState)
