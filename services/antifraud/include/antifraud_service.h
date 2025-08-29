@@ -102,6 +102,7 @@ private:
     int32_t stoppedIndex_ = -1;
 
     ffrt::mutex mutex_;
+    ffrt::shared_mutex fraudMutex_;
  
 private:
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_ = nullptr;
