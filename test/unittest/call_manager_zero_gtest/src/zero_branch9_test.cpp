@@ -447,7 +447,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_DealVideoRingPath_001, TestSize.Level0)
     callControl->SetWearState(WEAR_STATUS_OFF);
     audioControl->NeedPlayVideoRing(contactInfo, callObjectPtr);
     callObjectPtr->SetCrsType(CRS_TYPE);
-    (audioControl->NeedPlayVideoRing(contactInfo, callObjectPtr);
+    audioControl->NeedPlayVideoRing(contactInfo, callObjectPtr);
     ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(callObjectPtr->GetCallID()));
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
