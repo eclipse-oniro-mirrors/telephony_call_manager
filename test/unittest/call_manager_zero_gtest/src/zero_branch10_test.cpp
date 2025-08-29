@@ -706,6 +706,7 @@ HWTEST_F(ZeroBranch10Test, CallStateReportProxy_CallStateUpdated_001, TestSize.L
     call1->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
     CallObjectManager::AddOneCallObject(call1);
     callStateProxy->CallStateUpdated(call1, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
+    EXPECT_EQ(callControlManager->HasCall(), false);
     CallAttributeInfo voipInfo;
     sptr<CallBase> call2 = new VoIPCall(info);
     CallObjectManager::voipCallObjectList_[1] = voipInfo;
