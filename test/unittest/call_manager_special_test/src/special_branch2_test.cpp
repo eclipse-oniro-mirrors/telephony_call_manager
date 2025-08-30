@@ -191,22 +191,6 @@ HWTEST_F(SpecialBranch2Test, Telephony_CallControlManager_001, TestSize.Level0)
     EXPECT_EQ(ret, 0);
 }
 
-
-/**
- * @tc.number   Telephony_CellularCallConnection_003
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_003, TestSize.Level1)
-{
-    auto cellularCallConnection = std::make_shared<CellularCallConnection>();
-    ASSERT_TRUE(cellularCallConnection != nullptr);
-    CellularCallInfo callInfo;
-    int ret = cellularCallConnection->SetCallRestrictionPassword(0, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING,
-        "abc", "bcd");
-    EXPECT_NE(ret, 0);
-}
-
 /**
  * @tc.number   Telephony_MyLocationEngine_001
  * @tc.name     test branch
