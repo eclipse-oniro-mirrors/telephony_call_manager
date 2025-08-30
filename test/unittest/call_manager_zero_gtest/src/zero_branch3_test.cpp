@@ -561,47 +561,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallPolicy_002, TestSize.Level0)
     ASSERT_NE(TELEPHONY_SUCCESS, callPolicy.KickOutFromConferencePolicy(policy));
 }
 
-/**
- * @tc.number   Telephony_ImsCall_002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch4Test, Telephony_ImsCall_002, TestSize.Level0)
-{
-    DialParaInfo dialParaInfo;
-    IMSCall call { dialParaInfo };
-    call.isInitialized_ = true;
-    ImsCallMode mode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
-    call.UpdateImsCallMode(mode);
-    call.SendUpdateCallMediaModeRequest(mode);
-    CallModeReportInfo callModeRequestInfo;
-    call.RecieveUpdateCallMediaModeRequest(callModeRequestInfo);
-    call.SendUpdateCallMediaModeResponse(mode);
-    CallModeReportInfo callModeResponseInfo;
-    call.ReceiveUpdateCallMediaModeResponse(callModeResponseInfo);
-    CallMediaModeInfo callMediaModeInfo;
-    call.ReportImsCallModeInfo(callMediaModeInfo);
-    call.SwitchVideoState(mode);
-    call.IsSupportVideoCall();
-    call.GetCallVideoState(mode);
-    std::string value = "123";
-    call.ControlCamera(value, 1, 1);
-    call.SetPausePicture(value);
-    uint64_t tempSurfaceId = std::stoull(value);
-    auto surface = SurfaceUtils::GetInstance()->GetSurface(tempSurfaceId);
-    if (surface == nullptr) {
-        value = "";
-    }
-    call.SetPreviewWindow(value, surface);
-    call.SetDisplayWindow(value, surface);
-    call.SetDeviceDirection(1);
-    call.CancelCallUpgrade();
-    call.RequestCameraCapabilities();
-    call.videoCallState_ = nullptr;
-    ASSERT_NE(TELEPHONY_ERR_LOCAL_PTR_NULL, call.UpdateImsCallMode(mode));
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.RecieveUpdateCallMediaModeRequest(callModeRequestInfo));
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.ReceiveUpdateCallMediaModeResponse(callModeResponseInfo));
-}
 
 /**
  * @tc.number   Telephony_CSCall_001

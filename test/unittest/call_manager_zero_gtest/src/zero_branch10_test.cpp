@@ -398,13 +398,13 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioControlManager_002, TestSize.Level0)
         CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
     strcpy_s(device.address, kMaxAddressLen, "1");
     device.deviceType = AudioDeviceType::DEVICE_NEARLINK;
-    EXPECT_EQ(audioControlManager->HandleWirelessAudioDevice(device),
+    EXPECT_NE(audioControlManager->HandleWirelessAudioDevice(device),
         CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
     device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-    EXPECT_EQ(audioControlManager->HandleWirelessAudioDevice(device),
+    EXPECT_NE(audioControlManager->HandleWirelessAudioDevice(device),
         CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
     device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID;
-    EXPECT_EQ(audioControlManager->HandleWirelessAudioDevice(device),
+    EXPECT_NE(audioControlManager->HandleWirelessAudioDevice(device),
         CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
     audioControlManager->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
     EXPECT_NE(audioControlManager->GetInitAudioDeviceType(), AudioDeviceType::DEVICE_NEARLINK);

@@ -64,10 +64,7 @@ std::shared_ptr<DataShare::DataShareHelper> CallVoiceAssistantManager::Initial()
     return DataShare::DataShareHelper::Creator(remote, SETTINGS_DATASHARE_URI, SETTINGS_DATASHARE_EXT_URI);
 };
 
-CallVoiceAssistantManager::~CallVoiceAssistantManager()
-{
-    OnStopService(true);
-}
+CallVoiceAssistantManager::~CallVoiceAssistantManager() {}
 
 void CallVoiceAssistantManager::Release()
 {

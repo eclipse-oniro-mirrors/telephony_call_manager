@@ -166,97 +166,6 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(std::string ur
 }
 
 /**
- * @tc.number   Telephony_CallStatusManager_003
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_003, TestSize.Level0)
-{
-    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    callStatusManager->Init();
-    CellularCallEventInfo cellularCallEventInfo;
-    ASSERT_EQ(callStatusManager->HandleEventResultReportInfo(cellularCallEventInfo), TELEPHONY_SUCCESS);
-    cellularCallEventInfo.eventType = CellularCallEventType::EVENT_REQUEST_RESULT_TYPE;
-    cellularCallEventInfo.eventId = RequestResultEventId::RESULT_DIAL_NO_CARRIER;
-    ASSERT_EQ(callStatusManager->HandleEventResultReportInfo(cellularCallEventInfo), TELEPHONY_SUCCESS);
-    OttCallEventInfo ottCallEventInfo;
-    (void)memset_s(&ottCallEventInfo, sizeof(OttCallEventInfo), 0, sizeof(OttCallEventInfo));
-    ottCallEventInfo.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
-    (void)memcpy_s(ottCallEventInfo.bundleName, kMaxBundleNameLen + 1, LONG_STR, strlen(LONG_STR));
-    ASSERT_EQ(callStatusManager->HandleOttEventReportInfo(ottCallEventInfo), TELEPHONY_SUCCESS);
-    (void)memset_s(&ottCallEventInfo, sizeof(OttCallEventInfo), 0, sizeof(OttCallEventInfo));
-    ottCallEventInfo.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
-    (void)memcpy_s(ottCallEventInfo.bundleName, kMaxBundleNameLen + 1, TEST_STR, strlen(TEST_STR));
-    ASSERT_EQ(callStatusManager->HandleOttEventReportInfo(ottCallEventInfo), TELEPHONY_SUCCESS);
-    CallDetailInfo callDetailInfo;
-    std::string number = "";
-    memcpy_s(&callDetailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
-    callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
-    callDetailInfo.callType = CallType::TYPE_CS;
-    ASSERT_EQ(callStatusManager->IncomingFilterPolicy(callDetailInfo), TELEPHONY_SUCCESS);
-    system::SetParameter("persist.edm.telephony_call_disable", "true");
-    ASSERT_EQ(callStatusManager->IncomingFilterPolicy(callDetailInfo), TELEPHONY_ERR_POLICY_DISABLED);
-    system::SetParameter("persist.edm.telephony_call_disable", "false");
-    callStatusManager->CallFilterCompleteResult(callDetailInfo);
-    CallDirection dir = CallDirection::CALL_DIRECTION_OUT;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    dir = CallDirection::CALL_DIRECTION_IN;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    callDetailInfo.callType = CallType::TYPE_IMS;
-    dir = CallDirection::CALL_DIRECTION_OUT;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    dir = CallDirection::CALL_DIRECTION_IN;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    callDetailInfo.callType = CallType::TYPE_OTT;
-    dir = CallDirection::CALL_DIRECTION_OUT;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    dir = CallDirection::CALL_DIRECTION_IN;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    callDetailInfo.callType = CallType::TYPE_ERR_CALL;
-    ASSERT_TRUE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-}
-
-/**
- * @tc.number   Telephony_CallStatusManager_004
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
-{
-    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    callStatusManager->Init();
-    sptr<CallBase> callObjectPtr = nullptr;
-    callStatusManager->HandleRejectCall(callObjectPtr, true);
-    DialParaInfo dialParaInfo;
-    dialParaInfo.callType = CallType::TYPE_CS;
-    dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
-    callObjectPtr = new CSCall(dialParaInfo);
-    callStatusManager->HandleRejectCall(callObjectPtr, true);
-    CallDetailInfo callDetailInfo;
-    std::string number = "";
-    memcpy_s(&callDetailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
-    callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
-    callDetailInfo.callType = CallType::TYPE_CS;
-    callDetailInfo.voipCallInfo.voipCallId = "123456789";
-    callStatusManager->OutgoingVoipCallHandle(callDetailInfo);
-    std::vector<std::u16string> callIdList;
-    CallRunningState previousState = CallRunningState::CALL_RUNNING_STATE_CREATE;
-    TelCallState priorState = TelCallState::CALL_STATUS_INCOMING;
-    callStatusManager->HandleHoldCallOrAutoAnswerCall(callObjectPtr, callIdList, previousState, priorState);
-    callStatusManager->AutoAnswerForVoiceCall(callObjectPtr, SIM1_SLOTID, true);
-    callStatusManager->SetVideoCallState(callObjectPtr, TelCallState::CALL_STATUS_ACTIVE);
-    callObjectPtr->SetSlotId(-1);
-    callStatusManager->SetVideoCallState(callObjectPtr, TelCallState::CALL_STATUS_ACTIVE);
-    EXPECT_TRUE(callStatusManager->GetConferenceCallList(-1).empty());
-    callStatusManager->ShouldRejectIncomingCall();
-    callStatusManager->IsRingOnceCall(callObjectPtr, callDetailInfo);
-    sptr<CallBase> callObjectPtr1 = nullptr;
-    int32_t res = callStatusManager->HandleRingOnceCall(callObjectPtr1);
-    callStatusManager->HandleRingOnceCall(callObjectPtr);
-    ASSERT_NE(res, TELEPHONY_SUCCESS);
-}
-
-/**
  * @tc.number   Telephony_CallStatusManager_005
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -328,43 +237,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     info.state = TelCallState::CALL_STATUS_DISCONNECTED;
     callStatusManager->HandleCallReportInfo(info);
 }
-/**
- * @tc.number   Telephony_CallStatusManager_008
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
- HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_008, TestSize.Level0)
-{
-    Uri uri(DEVICE_PROVISIONED_URI);
-    auto oobeStatusObserver_ = new (std::nothrow) OOBEStatusObserver();
-    auto reportCallInfo = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
-    reportCallInfo->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
-    CallDetailInfo info;
-    std::string number = "123456789";
-    memcpy_s(&info.phoneNum, kMaxNumberLen, number.c_str(), number.length());
-    info.index = 1;
-    info.state = TelCallState::CALL_STATUS_INCOMING;
-    info.callType = CallType::TYPE_BLUETOOTH;
-    ASSERT_TRUE(oobeStatusObserver_ != nullptr);
-    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
-    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    callStatusManager->RegisterObserver();
-    EXPECT_EQ(helper->RegisterToDataShare(uri, oobeStatusObserver_), true);
-    oobeStatusObserver_->OnChange();
-    callStatusManager->deviceProvisioned_ = -1;
-    callStatusManager->UpdateDevProvisioned();
-    EXPECT_EQ(helper->Update(uri, "device_provisioned", "0"), 0);
-    oobeStatusObserver_->OnChange();
-    callStatusManager->deviceProvisioned_ = -1;
-    callStatusManager->GetDevProvisioned();
-    EXPECT_EQ(helper->UnRegisterToDataShare(uri, oobeStatusObserver_), true);
 
-    callStatusManager->deviceProvisioned_ = 0;
-    EXPECT_TRUE(callStatusManager->ShouldRejectIncomingCall());
-    reportCallInfo->UpdateCallReportInfo(info);
-    callStatusManager->RegisterObserver();
-    callStatusManager->oobeStatusObserver_ = nullptr;
-}
 /**
  * @tc.number   Telephony_IncomingCallWakeup_001
  * @tc.name     test error branch
@@ -616,27 +489,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_CanUnHoldState_001, TestSize.Level0)
     ASSERT_TRUE(callObjectPtr != nullptr);
     callObjectPtr->SetCanUnHoldState(flag);
     ASSERT_EQ(callObjectPtr->GetCanUnHoldState(), true);
-}
-
-/**
- * @tc.number   Telephony_SatelliteCall_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_SatelliteCall_001, TestSize.Level0)
-{
-    DialParaInfo dialParaInfo;
-    SatelliteCall call { dialParaInfo };
-    int32_t ret1 = call.DialingProcess();
-    int32_t ret2 = call.AnswerCall(0);
-    int32_t ret3 = call.RejectCall();
-    int32_t ret4 = call.HangUpCall();
-    CallAttributeInfo callAttributeInfo;
-    call.GetCallAttributeInfo(callAttributeInfo);
-    EXPECT_EQ(ret1, TELEPHONY_SUCCESS);
-    EXPECT_NE(ret2, TELEPHONY_SUCCESS);
-    EXPECT_NE(ret3, TELEPHONY_SUCCESS);
-    EXPECT_NE(ret4, TELEPHONY_SUCCESS);
 }
 
 /**

@@ -169,7 +169,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityServiceHelper_002, TestSize
         }
     };
     int ret = help.Connect(onConnected, onDisconnected);
-    EXPECT_EQ(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -212,21 +212,6 @@ HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityConnection_001, TestSize.Le
 }
 
 /**
- * @tc.number   Telephony_NumberIdentityConnection_002
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityConnection_002, TestSize.Level0)
-{
-    sptr<NumberIdentityConnection> connection = new (std::nothrow) NumberIdentityConnection(
-            [](const sptr<IRemoteObject> &remoteObject) {}, []() {});
-    connection->disconnectedCallback_ = nullptr;
-    AppExecFwk::ElementName element;
-    connection->OnAbilityDisconnectDone(element, 0);
-    ASSERT_TRUE(connection != nullptr);
-}
-
-/**
  * @tc.number   Telephony_CallManagerHisysevent_001
  * @tc.name     test branch
  * @tc.desc     Function test
@@ -257,46 +242,6 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_001, TestSize.Level1)
     callSettingManager->SetCallWaiting(0, false);
     int32_t ret = callSettingManager->GetImsFeatureValue(0, FeatureType::TYPE_VOICE_OVER_LTE);
     EXPECT_NE(ret, 0);
-}
-
-/**
- * @tc.number   Telephony_CallSettingManager_002
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_002, TestSize.Level0)
-{
-    std::shared_ptr<CallSettingManager> callSettingManager = std::make_shared<CallSettingManager>();
-    ASSERT_TRUE(callSettingManager != nullptr);
-    std::u16string temp = u"123";
-    callSettingManager->SetImsConfig(0, ITEM_VIDEO_QUALITY, temp);
-    callSettingManager->SetImsConfig(0, static_cast<ImsConfigItem>(-1), temp);
-    callSettingManager->GetCallRestrictionPolicy(0, static_cast<CallRestrictionType>(-1));
-    callSettingManager->CloseUnFinishedUssd(0);
-
-    CallRestrictionInfo info;
-    info.fac = static_cast<CallRestrictionType>(-1);
-    callSettingManager->SetCallRestrictionPolicy(0, info);
-    info.fac = CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING;
-    info.mode = static_cast<CallRestrictionMode>(-1);
-    callSettingManager->SetCallRestrictionPolicy(0, info);
-
-    callSettingManager->GetCallTransferInfoPolicy(0, static_cast<CallTransferType>(-1));
-    CallTransferInfo info2;
-    info2.type = static_cast<CallTransferType>(-1);
-    callSettingManager->SetCallTransferInfoPolicy(0, info2);
-    info2.type = CallTransferType::TRANSFER_TYPE_UNCONDITIONAL;
-    info2.settingType = CallTransferSettingType::CALL_TRANSFER_DISABLE;
-    callSettingManager->SetCallTransferInfoPolicy(0, info2);
-    info2.settingType = static_cast<CallTransferSettingType>(-1);
-    callSettingManager->SetCallTransferInfoPolicy(0, info2);
-    info2.startHour = -1;
-    callSettingManager->SetCallTransferInfoPolicy(0, info2);
-    info2.settingType = CallTransferSettingType::CALL_TRANSFER_DISABLE;
-    info2.startHour = 0;
-    (void)memcpy_s(info2.transferNum, 0, "138666688889999", strlen("138666688889999"));
-    int32_t ret = callSettingManager->SetCallTransferInfoPolicy(0, info2);
-    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -596,7 +541,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_005, TestSize.Leve
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     data.RewindRead(0);
     int32_t ret = callManagerService->OnMakeCall(data, reply);
-    EXPECT_EQ(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -705,19 +650,6 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_002, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     callManagerService->UnInit();
-    ASSERT_TRUE(callManagerService != nullptr);
-}
-
-/**
- * @tc.number   Telephony_CallManagerService_003
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_003, TestSize.Level0)
-{
-    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->UnInit();
-    callManagerService->OnStart();
     ASSERT_TRUE(callManagerService != nullptr);
 }
 

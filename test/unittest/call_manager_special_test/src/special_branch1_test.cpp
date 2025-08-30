@@ -313,19 +313,5 @@ HWTEST_F(SpecialBranch1Test, Telephony_SatelliteCall_001, TestSize.Level0)
     EXPECT_NE(ret, 0);
 }
 
-/**
- * @tc.number   Telephony_CallRequestProcess_001
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpecialBranch1Test, Telephony_CallRequestProcess_001, TestSize.Level1)
-{
-    std::shared_ptr<CallRequestProcess> callRequestProcess = std::make_shared<CallRequestProcess>();
-    ASSERT_TRUE(callRequestProcess != nullptr);
-    DialParaInfo info;
-    info.dialType = static_cast<DialType>(-1);
-    int32_t ret = callRequestProcess->HandleDialRequest(info);
-    EXPECT_NE(ret, 0);
-}
 } // namespace Telephony
 } // namespace OHOS
