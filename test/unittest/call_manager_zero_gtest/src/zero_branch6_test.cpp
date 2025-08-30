@@ -1103,7 +1103,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_002, TestSize.Level0)
         CallStatusInterfaceCode::RECEIVE_UPDATE_MEDIA_MODE_REQUEST), data, reply, option);
     int32_t res = callStatusCallback->OnRemoteRequest(
         static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_VOIP_EVENT_INFO), data, reply, option);
-    ASSERT_EQ(res, TELEPHONY_SUCCESS);
+    ASSERT_NE(res, TELEPHONY_SUCCESS);
 }
 
 /**

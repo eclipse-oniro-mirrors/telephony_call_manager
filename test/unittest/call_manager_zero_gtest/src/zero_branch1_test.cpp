@@ -188,6 +188,184 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestHandler_001, Function | MediumTes
 }
 
 /**
+ * @tc.number   Telephony_CallRequestProcess_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_001, Function | MediumTest | Level1)
+{
+    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
+    callRequestProcess->DialRequest();
+    callRequestProcess->AnswerRequest(1, 1);
+    std::string content = "";
+    callRequestProcess->RejectRequest(1, true, content);
+    callRequestProcess->HangUpRequest(1);
+    callRequestProcess->HoldRequest(1);
+    callRequestProcess->UnHoldRequest(1);
+    callRequestProcess->SwitchRequest(1);
+    callRequestProcess->CombineConferenceRequest(1);
+    callRequestProcess->SeparateConferenceRequest(1);
+    callRequestProcess->KickOutFromConferenceRequest(1);
+    std::u16string test = u"";
+    callRequestProcess->StartRttRequest(1, test);
+    callRequestProcess->StopRttRequest(1);
+    std::vector<std::string> numberList = {};
+    callRequestProcess->JoinConference(1, numberList);
+    DialParaInfo mDialParaInfo;
+    callRequestProcess->UpdateCallReportInfo(mDialParaInfo, TelCallState::CALL_STATUS_INCOMING);
+    callRequestProcess->HandleDialFail();
+    callRequestProcess->GetOtherRingingCall(1);
+    callRequestProcess->CarrierDialProcess(mDialParaInfo);
+    callRequestProcess->IsDialCallForDsda(mDialParaInfo);
+    bool isEcc = false;
+    std::string phoneNumber = "123456789012";
+    callRequestProcess->HandleEccCallForDsda(phoneNumber, mDialParaInfo, isEcc);
+    callRequestProcess->VoiceMailDialProcess(mDialParaInfo);
+    callRequestProcess->OttDialProcess(mDialParaInfo);
+    CellularCallInfo mCellularCallInfo;
+    callRequestProcess->PackCellularCallInfo(mDialParaInfo, mCellularCallInfo);
+    std::vector<std::u16string> testList = {};
+    callRequestProcess->IsFdnNumber(testList, content);
+    callRequestProcess->IsDsdsMode3();
+    callRequestProcess->DisconnectOtherSubIdCall(1, 0, 0);
+    callRequestProcess->DisconnectOtherCallForVideoCall(1);
+    mDialParaInfo.number = "*#21#";
+    callRequestProcess->CarrierDialProcess(mDialParaInfo);
+    ASSERT_FALSE(callRequestProcess->IsDsdsMode5());
+}
+
+/**
+ * @tc.number   Telephony_CallRequestProcess_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_002, Function | MediumTest | Level1)
+{
+    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
+    callRequestProcess->HoldOrDisconnectedCall(VALID_CALLID, SIM1_SLOTID, 1);
+    DialParaInfo mDialParaInfo;
+    sptr<CallBase> call = new CSCall(mDialParaInfo);
+    call->SetCallId(VALID_CALLID);
+    call->SetCallType(CallType::TYPE_VOIP);
+    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    callRequestProcess->AddOneCallObject(call);
+    callRequestProcess->AnswerRequest(VALID_CALLID, static_cast<int>(CallType::TYPE_VOIP));
+    callRequestProcess->AnswerRequest(VALID_CALLID, static_cast<int>(CallType::TYPE_CS));
+    callRequestProcess->NeedAnswerVTAndEndActiveVO(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
+    callRequestProcess->NeedAnswerVTAndEndActiveVO(ERROR_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
+    callRequestProcess->NeedAnswerVOAndEndActiveVT(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VOICE));
+    callRequestProcess->NeedAnswerVOAndEndActiveVT(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
+    sptr<CallBase> voipCall = new VoIPCall(mDialParaInfo);
+    voipCall->SetCallId(VALID_CALLID);
+    voipCall->SetCallType(CallType::TYPE_VOIP);
+    voipCall->SetTelCallState(TelCallState::CALL_STATUS_HOLDING);
+    voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    callRequestProcess->AddOneCallObject(voipCall);
+    callRequestProcess->NeedAnswerVTAndEndActiveVO(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
+    callRequestProcess->NeedAnswerVTAndEndActiveVO(ERROR_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
+    callRequestProcess->NeedAnswerVOAndEndActiveVT(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VOICE));
+    callRequestProcess->NeedAnswerVOAndEndActiveVT(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
+    callRequestProcess->GetOtherRingingCall(VALID_CALLID);
+    callRequestProcess->GetOtherRingingCall(ERROR_CALLID);
+    callRequestProcess->HoldOrDisconnectedCall(VALID_CALLID, SIM1_SLOTID,
+        static_cast<int>(VideoStateType::TYPE_VIDEO));
+    callRequestProcess->HoldOrDisconnectedCall(VALID_CALLID, SIM1_SLOTID,
+        static_cast<int>(VideoStateType::TYPE_VOICE));
+    std::list<int32_t> list = {1, 2, -1, 0};
+    bool noOtherCall = false;
+    callRequestProcess->IsExistCallOtherSlot(list, SIM1_SLOTID, noOtherCall);
+    sptr<CallBase> dialCall = new IMSCall(mDialParaInfo);
+    dialCall->SetCallId(VALID_CALLID);
+    dialCall->SetCallType(CallType::TYPE_VOIP);
+    dialCall->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
+    dialCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    callRequestProcess->AddOneCallObject(dialCall);
+    sptr<CallBase> incomingCall = new CSCall(mDialParaInfo);
+    incomingCall->SetCallType(CallType::TYPE_CS);
+    bool flagForConference = false;
+    callRequestProcess->HandleCallWaitingNumZero(incomingCall, voipCall, SIM1_SLOTID, 2, flagForConference);
+    callRequestProcess->HandleCallWaitingNumZero(incomingCall, dialCall, SIM1_SLOTID, 2, flagForConference);
+    callRequestProcess->DisconnectOtherCallForVideoCall(VALID_CALLID);
+    ASSERT_FALSE(flagForConference);
+}
+
+/**
+ * @tc.number   Telephony_CallRequestProcess_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_003, Function | MediumTest | Level1)
+{
+    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
+    DialParaInfo mDialParaInfo;
+    sptr<CallBase> call = nullptr;
+    callRequestProcess->DeleteOneCallObject(call);
+    call = new CSCall(mDialParaInfo);
+    call->SetCallId(VALID_CALLID);
+    call->SetCallType(CallType::TYPE_VOIP);
+    call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    callRequestProcess->AddOneCallObject(call);
+    callRequestProcess->DisconnectOtherSubIdCall(VALID_CALLID, SIM1_SLOTID,
+        static_cast<int>(VideoStateType::TYPE_VIDEO));
+    sptr<CallBase> dialCall = new IMSCall(mDialParaInfo);
+    dialCall->SetCallId(2);
+    dialCall->SetCallType(CallType::TYPE_VOIP);
+    dialCall->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
+    dialCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    callRequestProcess->AddOneCallObject(dialCall);
+    callRequestProcess->DisconnectOtherSubIdCall(VALID_CALLID, SIM1_SLOTID,
+        static_cast<int>(VideoStateType::TYPE_VIDEO));
+    callRequestProcess->DisconnectOtherCallForVideoCall(VALID_CALLID);
+    callRequestProcess->DisconnectOtherCallForVideoCall(ERROR_CALLID);
+    std::string content = "";
+    callRequestProcess->RejectRequest(VALID_CALLID, true, content);
+    callRequestProcess->RejectRequest(2, true, content);
+    callRequestProcess->HoldRequest(VALID_CALLID);
+    callRequestProcess->HoldRequest(2);
+    callRequestProcess->CombineConferenceRequest(VALID_CALLID);
+    callRequestProcess->SeparateConferenceRequest(VALID_CALLID);
+    callRequestProcess->KickOutFromConferenceRequest(VALID_CALLID);
+    std::u16string msg = u"";
+    callRequestProcess->StartRttRequest(VALID_CALLID, msg);
+    callRequestProcess->StartRttRequest(2, msg);
+    callRequestProcess->StopRttRequest(VALID_CALLID);
+    callRequestProcess->StopRttRequest(2);
+    std::vector<std::string> numberList;
+    callRequestProcess->JoinConference(VALID_CALLID, numberList);
+    callRequestProcess->JoinConference(2, numberList);
+    callRequestProcess->isFirstDialCallAdded_ = true;
+    callRequestProcess->HandleDialFail();
+    callRequestProcess->DeleteOneCallObject(call);
+    callRequestProcess->DeleteOneCallObject(dialCall);
+    ASSERT_TRUE(callRequestProcess->isFirstDialCallAdded_);
+}
+
+/**
+ * @tc.number   Telephony_CallRequestProcess_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_004, Function | MediumTest | Level1)
+{
+    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
+    DialParaInfo info;
+    info.dialType = DialType::DIAL_CARRIER_TYPE;
+    EXPECT_GT(callRequestProcess->HandleDialRequest(info), TELEPHONY_ERROR);
+    info.dialType = DialType::DIAL_VOICE_MAIL_TYPE;
+    EXPECT_GT(callRequestProcess->HandleDialRequest(info), TELEPHONY_ERROR);
+    info.dialType = DialType::DIAL_OTT_TYPE;
+    EXPECT_GT(callRequestProcess->HandleDialRequest(info), TELEPHONY_ERROR);
+    info.dialType = DialType::DIAL_BLUETOOTH_TYPE;
+    EXPECT_GT(callRequestProcess->HandleDialRequest(info), TELEPHONY_ERROR);
+    sleep(1);
+    std::vector<std::u16string> fdnNumberList = { u"11111", u"22222" };
+    EXPECT_TRUE(callRequestProcess->IsFdnNumber(fdnNumberList, "22222"));
+    EXPECT_GT(callRequestProcess->BluetoothDialProcess(info), TELEPHONY_ERROR);
+}
+
+/**
  * @tc.number   Telephony_CallRequestProcess_005
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1034,7 +1212,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallNumberUtils_003, Function | MediumTest |
     call->SetCallType(CallType::TYPE_IMS);
     CallObjectManager::AddOneCallObject(call);
     dialStr = "333";
-    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0, dialStr));
+    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0,dialStr));
     dialStr = "33";
     ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     CallObjectManager::DeleteOneCallObject(call);

@@ -192,6 +192,103 @@ HWTEST_F(SpecialBranch2Test, Telephony_CallControlManager_001, TestSize.Level0)
 }
 
 /**
+ * @tc.number   Telephony_CellularCallConnection_001
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_001, TestSize.Level0)
+{
+    auto cellularCallConnection = std::make_shared<CellularCallConnection>();
+    ASSERT_TRUE(cellularCallConnection != nullptr);
+    CellularCallInfo callInfo;
+    cellularCallConnection->Dial(callInfo);
+
+    CallSupplementType type = CallSupplementType::TYPE_DEFAULT;
+    cellularCallConnection->HangUp(callInfo, type);
+    cellularCallConnection->Reject(callInfo);
+    cellularCallConnection->Answer(callInfo);
+    cellularCallConnection->HoldCall(callInfo);
+    cellularCallConnection->UnHoldCall(callInfo);
+    cellularCallConnection->SwitchCall(callInfo);
+    cellularCallConnection->CombineConference(callInfo);
+    cellularCallConnection->SeparateConference(callInfo);
+    cellularCallConnection->KickOutFromConference(callInfo);
+    cellularCallConnection->StartDtmf('a', callInfo);
+    cellularCallConnection->StopDtmf(callInfo);
+    cellularCallConnection->PostDialProceed(callInfo, false);
+    cellularCallConnection->SendDtmf('b', "abc");
+    cellularCallConnection->SendDtmfString("abc", "abc", PhoneNetType::PHONE_TYPE_GSM, 0, 0);
+
+    CallTransferInfo callTransferInfo;
+    cellularCallConnection->SetCallTransferInfo(callTransferInfo, 0);
+
+    bool result;
+    cellularCallConnection->CanSetCallTransferTime(0, result);
+    cellularCallConnection->GetCallTransferInfo(CallTransferType::TRANSFER_TYPE_BUSY, 0);
+    cellularCallConnection->GetVideoCallWaiting(0, result);
+    cellularCallConnection->SetCallPreferenceMode(0, 0);
+
+    std::u16string msg;
+    cellularCallConnection->StartRtt(callInfo, msg);
+    int ret = cellularCallConnection->StopRtt(callInfo);
+    EXPECT_NE(ret, 0);
+}
+
+/**
+ * @tc.number   Telephony_CellularCallConnection_002
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_002, TestSize.Level0)
+{
+    auto cellularCallConnection = std::make_shared<CellularCallConnection>();
+    ASSERT_TRUE(cellularCallConnection != nullptr);
+    std::string cameraId;
+    cellularCallConnection->ControlCamera(0, 0, cameraId, 0, 0);
+
+    std::string surfaceId;
+    cellularCallConnection->SetPreviewWindow(0, 0, surfaceId, nullptr);
+    cellularCallConnection->SetPreviewWindow(0, 0, surfaceId, nullptr);
+    cellularCallConnection->SetCameraZoom(0.0f);
+
+    std::string path;
+    cellularCallConnection->SetPausePicture(0, 0, path);
+    cellularCallConnection->SetDeviceDirection(0, 0, 0);
+
+    bool enabled;
+    cellularCallConnection->GetCarrierVtConfig(0, enabled);
+
+    CellularCallInfo callInfo;
+    cellularCallConnection->SendUpdateCallMediaModeRequest(callInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY);
+    cellularCallConnection->SendUpdateCallMediaModeResponse(callInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY);
+
+    std::string value;
+    cellularCallConnection->SetImsConfig(ImsConfigItem::ITEM_VIDEO_QUALITY, value, 0);
+
+    std::vector<std::string> numberList;
+    cellularCallConnection->InviteToConference(numberList, 0);
+    cellularCallConnection->SetMute(0, 0);
+    cellularCallConnection->CancelCallUpgrade(0, 0);
+    int ret = cellularCallConnection->RequestCameraCapabilities(0, 0);
+    EXPECT_NE(ret, 0);
+}
+
+/**
+ * @tc.number   Telephony_CellularCallConnection_003
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_003, TestSize.Level1)
+{
+    auto cellularCallConnection = std::make_shared<CellularCallConnection>();
+    ASSERT_TRUE(cellularCallConnection != nullptr);
+    CellularCallInfo callInfo;
+    int ret = cellularCallConnection->SetCallRestrictionPassword(0, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING,
+        "abc", "bcd");
+    EXPECT_NE(ret, 0);
+}
+
+/**
  * @tc.number   Telephony_MyLocationEngine_001
  * @tc.name     test branch
  * @tc.desc     Function test
@@ -288,6 +385,20 @@ HWTEST_F(SpecialBranch2Test, Telephony_NetCallBase_001, TestSize.Level0)
     netCallBase->GetNetCallType();
     int32_t ret = netCallBase->ChangeNetCallType();
     EXPECT_EQ(ret, 0);
+}
+
+/**
+ * @tc.number   Telephony_CallRequestProcess_002
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_002, TestSize.Level0)
+{
+    std::shared_ptr<CallRequestProcess> callRequestProcess = std::make_shared<CallRequestProcess>();
+    ASSERT_TRUE(callRequestProcess != nullptr);
+    DelayedSingleton<CallControlManager>::GetInstance()->dialSrcInfo_.isDialing = true;
+    int32_t ret = callRequestProcess->DialRequest();
+    EXPECT_NE(ret, 0);
 }
 
 /**

@@ -24,9 +24,7 @@ group("unittest") {
   deps += [ "call_manager_gtest:tel_call_manager6_gtest" ]
   deps += [ "call_manager_gtest:tel_call_manager7_gtest" ]
   deps += [ "call_manager_gtest:tel_call_manager8_gtest" ]
-  deps += [ "call_manager_zero_gtest:tel_call_manager_zero1_gtest" ]
   deps += [ "call_manager_zero_gtest:tel_call_manager_zero2_gtest" ]
-  deps += [ "call_manager_zero_gtest:tel_call_manager_zero3_gtest" ]
   deps += [ "call_manager_zero_gtest:tel_call_manager_zero4_gtest" ]
   deps += [ "call_manager_zero_gtest:tel_call_manager_zero5_gtest" ]
   deps += [ "call_manager_zero_gtest:tel_call_manager_zero6_gtest" ]
@@ -39,6 +37,5 @@ group("unittest") {
   deps += [ "call_voice_assistant_test:tel_call_voice_assistant_test" ]
   deps += [ "distributed_communication_test:distributed_communication_test" ]
   deps += [ "call_manager_special_test:tel_call_manager_special1_test" ]
-  deps += [ "call_manager_special_test:tel_call_manager_special2_test" ]
   deps += [ "call_manager_special_test:tel_call_manager_special3_test" ]
 }

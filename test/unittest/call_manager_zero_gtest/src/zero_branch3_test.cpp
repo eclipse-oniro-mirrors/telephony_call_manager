@@ -561,6 +561,33 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallPolicy_002, TestSize.Level0)
     ASSERT_NE(TELEPHONY_SUCCESS, callPolicy.KickOutFromConferencePolicy(policy));
 }
 
+
+/**
+ * @tc.number   Telephony_CSCall_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_CSCall_001, TestSize.Level0)
+{
+    DialParaInfo dialParaInfo;
+    CSCall call { dialParaInfo };
+    call.AnswerCall(0);
+    call.RejectCall();
+    call.HoldCall();
+    call.SwitchCall();
+    call.SetMute(0, 0);
+    call.CombineConference();
+    call.SeparateConference();
+    call.KickOutFromConference();
+    call.CanCombineConference();
+    call.CanSeparateConference();
+    call.LaunchConference();
+    call.HoldConference();
+    int32_t mainCallId = 1;
+    ASSERT_EQ(TELEPHONY_SUCCESS, call.GetMainCallId(mainCallId));
+    call.HandleCombineConferenceFailEvent();
+}
+
 /**
  * @tc.number   Telephony_CallRecordsManager_001
  * @tc.name     test error branch
@@ -727,6 +754,117 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_002, TestSize.Level0)
     ASSERT_NE(callControlManager->SetImsFeatureValue(slotId, featureType, mode), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->DisableImsSwitch(INVALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->DisableImsSwitch(slotId), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallControlManager_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_003, TestSize.Level0)
+{
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    callControlManager->UnInit();
+    callControlManager->CallStateObserve();
+    callControlManager->Init();
+    callControlManager->CallStateObserve();
+    ASSERT_NE(callControlManager->GetCallWaiting(INVALID_CALLID), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->GetCallWaiting(SIM1_SLOTID), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->SetCallWaiting(INVALID_CALLID, true), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->SetCallWaiting(SIM1_SLOTID, true), TELEPHONY_SUCCESS);
+    CallRestrictionType callRestrictionType = CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING;
+    ASSERT_NE(callControlManager->GetCallRestriction(INVALID_CALLID, callRestrictionType), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->GetCallRestriction(SIM1_SLOTID, callRestrictionType), TELEPHONY_SUCCESS);
+    CallRestrictionInfo callRestrictionInfo;
+    ASSERT_NE(callControlManager->SetCallRestriction(INVALID_CALLID, callRestrictionInfo), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->SetCallRestriction(SIM1_SLOTID, callRestrictionInfo), TELEPHONY_SUCCESS);
+    CallTransferType callTransferType = CallTransferType::TRANSFER_TYPE_BUSY;
+    ASSERT_NE(callControlManager->GetCallTransferInfo(INVALID_CALLID, callTransferType), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->GetCallTransferInfo(SIM1_SLOTID, callTransferType), TELEPHONY_SUCCESS);
+    CallTransferInfo callTransferInfo;
+    ASSERT_NE(callControlManager->SetCallTransferInfo(INVALID_CALLID, callTransferInfo), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->SetCallTransferInfo(SIM1_SLOTID, callTransferInfo), TELEPHONY_SUCCESS);
+    bool result = true;
+    ASSERT_NE(callControlManager->CanSetCallTransferTime(INVALID_CALLID, result), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->CanSetCallTransferTime(SIM1_SLOTID, result), TELEPHONY_SUCCESS);
+    int32_t mode = 1;
+    ASSERT_NE(callControlManager->SetCallPreferenceMode(INVALID_CALLID, mode), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->SetCallPreferenceMode(SIM1_SLOTID, mode), TELEPHONY_SUCCESS);
+    ImsConfigItem item = ITEM_VIDEO_QUALITY;
+    ASSERT_NE(callControlManager->GetImsConfig(INVALID_CALLID, item), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->GetImsConfig(SIM1_SLOTID, item), TELEPHONY_SUCCESS);
+    std::u16string value = u"";
+    ASSERT_NE(callControlManager->SetImsConfig(INVALID_CALLID, item, value), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->SetImsConfig(SIM1_SLOTID, item, value), TELEPHONY_SUCCESS);
+    FeatureType featureType = TYPE_VOICE_OVER_LTE;
+    ASSERT_NE(callControlManager->GetImsFeatureValue(INVALID_CALLID, featureType), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->GetImsFeatureValue(SIM1_SLOTID, featureType), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->SetImsFeatureValue(INVALID_CALLID, featureType, mode), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->SetImsFeatureValue(SIM1_SLOTID, featureType, mode), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->DisableImsSwitch(INVALID_CALLID), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->DisableImsSwitch(SIM1_SLOTID), TELEPHONY_SUCCESS);
+    bool enaled = false;
+    ASSERT_NE(callControlManager->IsImsSwitchEnabled(INVALID_CALLID, enaled), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->IsImsSwitchEnabled(SIM1_SLOTID, enaled), TELEPHONY_SUCCESS);
+    std::vector<std::u16string> numberList = { u"123", u"124" };
+    ASSERT_NE(callControlManager->JoinConference(INVALID_CALLID, numberList), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->JoinConference(SIM1_SLOTID, numberList), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallControlManager_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_004, TestSize.Level0)
+{
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    std::vector<std::u16string> numberList = { u"123", u"124" };
+    ASSERT_NE(callControlManager->JoinConference(INVALID_CALLID, numberList), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->JoinConference(SIM1_SLOTID, numberList), TELEPHONY_SUCCESS);
+    ImsCallMode mode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
+    ASSERT_EQ(callControlManager->UpdateImsCallMode(INVALID_CALLID, mode), TELEPHONY_SUCCESS);
+    std::u16string str = u"";
+    ASSERT_NE(callControlManager->StartRtt(INVALID_CALLID, str), TELEPHONY_SUCCESS);
+    AudioDevice audioDevice = {
+        .deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO,
+        .address = { 0 },
+    };
+    callControlManager->SetAudioDevice(audioDevice);
+    audioDevice.deviceType = AudioDeviceType::DEVICE_SPEAKER;
+    callControlManager->SetAudioDevice(audioDevice);
+    bool enabled = false;
+    callControlManager->IsEmergencyPhoneNumber(str, SIM1_SLOTID, enabled);
+    callControlManager->IsEmergencyPhoneNumber(str, INVALID_SLOTID, enabled);
+    std::string number = "";
+    callControlManager->NumberLegalityCheck(number);
+    number = LONG_STR;
+    callControlManager->NumberLegalityCheck(number);
+    number = "1234567";
+    callControlManager->NumberLegalityCheck(number);
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = nullptr;
+    CallControlManager::SystemAbilityListener listen;
+    int32_t systemAbilityId = 1;
+    std::string deviceId = "123";
+    listen.OnAddSystemAbility(systemAbilityId, deviceId);
+    listen.OnRemoveSystemAbility(systemAbilityId, deviceId);
+    listen.OnAddSystemAbility(COMMON_EVENT_SERVICE_ID, deviceId);
+    listen.OnRemoveSystemAbility(COMMON_EVENT_SERVICE_ID, deviceId);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
+    listen.OnAddSystemAbility(systemAbilityId, deviceId);
+    listen.OnRemoveSystemAbility(systemAbilityId, deviceId);
+    listen.OnAddSystemAbility(COMMON_EVENT_SERVICE_ID, deviceId);
+    listen.OnRemoveSystemAbility(COMMON_EVENT_SERVICE_ID, deviceId);
+    ASSERT_NE(callControlManager->StopRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->SetMuted(false), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callControlManager->MuteRinger(), TELEPHONY_SUCCESS);
+    bool enaled = false;
+    int32_t slotId = 1;
+    ASSERT_NE(callControlManager->IsImsSwitchEnabled(INVALID_CALLID, enaled), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->IsImsSwitchEnabled(slotId, enaled), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -1282,6 +1420,48 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_003, TestSize.Level0)
     // scene-2: invalid diff-CallID
     callStatusManager->AddOneCallObject(oldCall);
     newCall->SetCallId(9);
+    ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(newCall), false);
+    ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_004, TestSize.Level0)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    
+    // init
+    const std::string phoneNumber = "12345678911";
+    time_t oldCallCreateTime = time(nullptr);
+    if (oldCallCreateTime < 0) {
+        oldCallCreateTime = 0;
+    }
+    int32_t incomingMaxDuration = 10 * 1000;
+    
+    //old call
+    DialParaInfo dialParaInfoOld;
+    sptr<OHOS::Telephony::CallBase> oldCall = new BluetoothCall(dialParaInfoOld, "");
+    oldCall->SetAccountNumber(phoneNumber);
+    oldCall->SetCallId(1);
+    oldCall->SetCallCreateTime(oldCallCreateTime);
+    oldCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    oldCall->SetCallType(CallType::TYPE_BLUETOOTH);
+    //new call
+    DialParaInfo dialParaInfoNew;
+    sptr<OHOS::Telephony::CallBase> newCall = new IMSCall(dialParaInfoNew);
+    newCall->SetAccountNumber(phoneNumber);
+    newCall->SetCallId(2);
+    newCall->SetCallCreateTime(oldCallCreateTime + incomingMaxDuration + 1000);
+    newCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    newCall->SetCallType(CallType::TYPE_IMS);
+    
+    // scene-3: invalid diff-CreateTime
+    ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(newCall), false);
+    ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
+
+    // scene-4: invalid old call status
+    callStatusManager->DeleteOneCallObject(oldCall->GetCallID());
+    oldCall->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
+    callStatusManager->AddOneCallObject(oldCall);
+    newCall->SetCallCreateTime(oldCallCreateTime + incomingMaxDuration - 1000);
     ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(newCall), false);
     ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
 }
