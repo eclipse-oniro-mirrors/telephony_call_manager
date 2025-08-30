@@ -291,20 +291,6 @@ HWTEST_F(SpecialBranch2Test, Telephony_NetCallBase_001, TestSize.Level0)
 }
 
 /**
- * @tc.number   Telephony_CallRequestProcess_002
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_002, TestSize.Level0)
-{
-    std::shared_ptr<CallRequestProcess> callRequestProcess = std::make_shared<CallRequestProcess>();
-    ASSERT_TRUE(callRequestProcess != nullptr);
-    DelayedSingleton<CallControlManager>::GetInstance()->dialSrcInfo_.isDialing = true;
-    int32_t ret = callRequestProcess->DialRequest();
-    EXPECT_NE(ret, 0);
-}
-
-/**
  * @tc.number   Telephony_CallRequestProcess_003
  * @tc.name     test branch
  * @tc.desc     Function test

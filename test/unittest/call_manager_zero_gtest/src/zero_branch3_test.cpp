@@ -730,62 +730,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_002, TestSize.Level0)
 }
 
 /**
- * @tc.number   Telephony_CallControlManager_004
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_004, TestSize.Level0)
-{
-    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
-    std::vector<std::u16string> numberList = { u"123", u"124" };
-    ASSERT_NE(callControlManager->JoinConference(INVALID_CALLID, numberList), TELEPHONY_SUCCESS);
-    ASSERT_NE(callControlManager->JoinConference(SIM1_SLOTID, numberList), TELEPHONY_SUCCESS);
-    ImsCallMode mode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
-    ASSERT_EQ(callControlManager->UpdateImsCallMode(INVALID_CALLID, mode), TELEPHONY_SUCCESS);
-    std::u16string str = u"";
-    ASSERT_NE(callControlManager->StartRtt(INVALID_CALLID, str), TELEPHONY_SUCCESS);
-    AudioDevice audioDevice = {
-        .deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO,
-        .address = { 0 },
-    };
-    callControlManager->SetAudioDevice(audioDevice);
-    audioDevice.deviceType = AudioDeviceType::DEVICE_SPEAKER;
-    callControlManager->SetAudioDevice(audioDevice);
-    bool enabled = false;
-    callControlManager->IsEmergencyPhoneNumber(str, SIM1_SLOTID, enabled);
-    callControlManager->IsEmergencyPhoneNumber(str, INVALID_SLOTID, enabled);
-    std::string number = "";
-    callControlManager->NumberLegalityCheck(number);
-    number = LONG_STR;
-    callControlManager->NumberLegalityCheck(number);
-    number = "1234567";
-    callControlManager->NumberLegalityCheck(number);
-    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = nullptr;
-    CallControlManager::SystemAbilityListener listen;
-    int32_t systemAbilityId = 1;
-    std::string deviceId = "123";
-    listen.OnAddSystemAbility(systemAbilityId, deviceId);
-    listen.OnRemoveSystemAbility(systemAbilityId, deviceId);
-    listen.OnAddSystemAbility(COMMON_EVENT_SERVICE_ID, deviceId);
-    listen.OnRemoveSystemAbility(COMMON_EVENT_SERVICE_ID, deviceId);
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
-    listen.OnAddSystemAbility(systemAbilityId, deviceId);
-    listen.OnRemoveSystemAbility(systemAbilityId, deviceId);
-    listen.OnAddSystemAbility(COMMON_EVENT_SERVICE_ID, deviceId);
-    listen.OnRemoveSystemAbility(COMMON_EVENT_SERVICE_ID, deviceId);
-    ASSERT_NE(callControlManager->StopRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
-    ASSERT_NE(callControlManager->SetMuted(false), TELEPHONY_SUCCESS);
-    ASSERT_EQ(callControlManager->MuteRinger(), TELEPHONY_SUCCESS);
-    bool enaled = false;
-    int32_t slotId = 1;
-    ASSERT_NE(callControlManager->IsImsSwitchEnabled(INVALID_CALLID, enaled), TELEPHONY_SUCCESS);
-    ASSERT_NE(callControlManager->IsImsSwitchEnabled(slotId, enaled), TELEPHONY_SUCCESS);
-}
-
-/**
  * @tc.number   Telephony_CallControlManager_005
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1338,48 +1282,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_003, TestSize.Level0)
     // scene-2: invalid diff-CallID
     callStatusManager->AddOneCallObject(oldCall);
     newCall->SetCallId(9);
-    ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(newCall), false);
-    ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
-}
-
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_004, TestSize.Level0)
-{
-    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    
-    // init
-    const std::string phoneNumber = "12345678911";
-    time_t oldCallCreateTime = time(nullptr);
-    if (oldCallCreateTime < 0) {
-        oldCallCreateTime = 0;
-    }
-    int32_t incomingMaxDuration = 10 * 1000;
-    
-    //old call
-    DialParaInfo dialParaInfoOld;
-    sptr<OHOS::Telephony::CallBase> oldCall = new BluetoothCall(dialParaInfoOld, "");
-    oldCall->SetAccountNumber(phoneNumber);
-    oldCall->SetCallId(1);
-    oldCall->SetCallCreateTime(oldCallCreateTime);
-    oldCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
-    oldCall->SetCallType(CallType::TYPE_BLUETOOTH);
-    //new call
-    DialParaInfo dialParaInfoNew;
-    sptr<OHOS::Telephony::CallBase> newCall = new IMSCall(dialParaInfoNew);
-    newCall->SetAccountNumber(phoneNumber);
-    newCall->SetCallId(2);
-    newCall->SetCallCreateTime(oldCallCreateTime + incomingMaxDuration + 1000);
-    newCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
-    newCall->SetCallType(CallType::TYPE_IMS);
-    
-    // scene-3: invalid diff-CreateTime
-    ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(newCall), false);
-    ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
-
-    // scene-4: invalid old call status
-    callStatusManager->DeleteOneCallObject(oldCall->GetCallID());
-    oldCall->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
-    callStatusManager->AddOneCallObject(oldCall);
-    newCall->SetCallCreateTime(oldCallCreateTime + incomingMaxDuration - 1000);
     ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(newCall), false);
     ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
 }

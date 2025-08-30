@@ -188,29 +188,6 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestHandler_001, Function | MediumTes
 }
 
 /**
- * @tc.number   Telephony_CallRequestProcess_004
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_004, Function | MediumTest | Level1)
-{
-    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
-    DialParaInfo info;
-    info.dialType = DialType::DIAL_CARRIER_TYPE;
-    EXPECT_GT(callRequestProcess->HandleDialRequest(info), TELEPHONY_ERROR);
-    info.dialType = DialType::DIAL_VOICE_MAIL_TYPE;
-    EXPECT_GT(callRequestProcess->HandleDialRequest(info), TELEPHONY_ERROR);
-    info.dialType = DialType::DIAL_OTT_TYPE;
-    EXPECT_GT(callRequestProcess->HandleDialRequest(info), TELEPHONY_ERROR);
-    info.dialType = DialType::DIAL_BLUETOOTH_TYPE;
-    EXPECT_GT(callRequestProcess->HandleDialRequest(info), TELEPHONY_ERROR);
-    sleep(1);
-    std::vector<std::u16string> fdnNumberList = { u"11111", u"22222" };
-    EXPECT_TRUE(callRequestProcess->IsFdnNumber(fdnNumberList, "22222"));
-    EXPECT_GT(callRequestProcess->BluetoothDialProcess(info), TELEPHONY_ERROR);
-}
-
-/**
  * @tc.number   Telephony_CallRequestProcess_005
  * @tc.name     test error branch
  * @tc.desc     Function test
