@@ -17,14 +17,24 @@
 #define TELEPHONY_AUDIO_RING_H
 
 #include <memory>
+#include <atomic>
+#include <mutex>
+#include <condition_variable>
 
 #include "audio_renderer.h"
 #include "ffrt.h"
-
 #include "audio_player.h"
 #include "audio_proxy.h"
 #include "ringtone_player.h"
 #include "system_sound_manager.h"
+
+#ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
+#include "data_ability_observer_stub.h"
+#include "comfort_reminder_data.h"
+#include "settings_datashare_helper.h"
+#include "datashare_helper.h"
+#include "user_status_client.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -32,6 +42,15 @@ enum class RingState {
     RINGING = 0,
     STOPPED,
 };
+
+#ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
+class RingtoneSettingStatusObserver : public AAFwk::DataAbilityObserverStub {
+public:
+    RingtoneSettingStatusObserver() = default;
+    ~RingtoneSettingStatusObserver() = default;
+    void OnChange() override;
+};
+#endif
 
 static constexpr const char* RING_PLAY_THREAD = "ringPlayThread";
 
@@ -51,12 +70,45 @@ public:
     int32_t SetRingToneVolume(float volume);
     bool isMutedRing_ = false;
 
+#ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
+private:
+    void RegisterObserver();
+    void UnRegisterObserver();
+    void getSettingsData();
+    void onComfortReminderDataChanged(int32_t result,
+        std::shared_ptr<Msdp::UserStatusAwareness::ComfortReminderData> comfortReminderData);
+    int32_t RegisterUserStatusDataCallbackFunc();
+    int32_t SubscribeFeature();
+    int32_t UnsubscribeFeature();
+    void PrepareComfortReminder();
+    void SetRingToneVibrationState();
+    void DecreaseVolume();
+    void IncreaseVolume();
+#endif
+
 private:
     ffrt::mutex mutex_;
     AudioPlayer *audioPlayer_ = nullptr;
     std::shared_ptr<Media::SystemSoundManager> SystemSoundManager_ = nullptr;
     std::shared_ptr<Media::RingtonePlayer> RingtonePlayer_ = nullptr;
     int32_t defaultVolume_ = 1;
+
+    #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
+    static constexpr uint32_t FEATURE_COMFORT_REMINDER = 15;
+    bool ringtoneVibrationSwitchState_ = true;
+    bool swing_ = false; //注视状态：false为不注视，true为注视
+    bool quiet_ = false; //环境音状态：false为嘈杂, true为安静
+    bool isSwingMsgRecv_ = false;
+    bool isEnvMsgRecv_ = false;
+    int32_t oriRingVolLevel_ = 0;
+    float oriVolumeDb_ = 0.0f;
+    std::mutex comfortReminderMutex_;
+    std::condition_variable conditionVar_;
+    std::atomic<bool> isGentleHappend_{false};
+    std::atomic<bool> isFadeupHappend_{false};
+    std::atomic<int32_t> curRingVolLevel_{0};
+    sptr<RingtoneSettingStatusObserver> ringtoneSettingStatusObserver_ = nullptr;
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS
