@@ -25,7 +25,7 @@ namespace OHOS {
 namespace Telephony {
 static constexpr int32_t DEFAULT_SIM_SLOT_ID = 0;
 
-#indef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
+#ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
 const float START_INTENSITY = 1.0;
 const float END_INTENSITY = 100.0;
 const int32_t VOL_LEVEL_UNDER_LINE = 3;
