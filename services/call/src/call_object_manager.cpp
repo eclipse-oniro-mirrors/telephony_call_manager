@@ -120,10 +120,8 @@ int32_t CallObjectManager::DeleteOneVoipCallObject(int32_t callId)
     if (it != voipCallObjectList_.end()) {
         voipCallObjectList_.erase(callId);
         TELEPHONY_LOGI("DeleteOneVoipCallObject success! callList size:%{public}zu", voipCallObjectList_.size());
-        return TELEPHONY_SUCCESS;
     }
-    TELEPHONY_LOGI("DeleteOneVoipCallObject failed!");
-    return TELEPHONY_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 bool CallObjectManager::IsVoipCallExist()

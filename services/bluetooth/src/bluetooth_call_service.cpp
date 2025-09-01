@@ -49,6 +49,7 @@ int32_t BluetoothCallService::AnswerCall()
         TELEPHONY_LOGE("AnswerCallPolicy failed!");
         if (IsVoipCallExist()) {
             sendEventToVoip(CallAbilityEventId::EVENT_ANSWER_VOIP_CALL);
+            return TELEPHONY_SUCCESS;
         }
         return ret;
     }
@@ -91,6 +92,7 @@ int32_t BluetoothCallService::RejectCall()
         TELEPHONY_LOGE("RejectCallPolicy failed!");
         if (IsVoipCallExist()) {
             sendEventToVoip(CallAbilityEventId::EVENT_REJECT_VOIP_CALL);
+            return TELEPHONY_SUCCESS;
         }
         return ret;
     }
@@ -114,6 +116,7 @@ int32_t BluetoothCallService::HangUpCall()
         TELEPHONY_LOGE("HangUpPolicy Voip Call!");
         if (IsVoipCallExist()) {
             sendEventToVoip(CallAbilityEventId::EVENT_HANGUP_VOIP_CALL);
+            return TELEPHONY_SUCCESS;
         }
         DeleteOneVoipCallObject(callId);
         return ret;
@@ -121,7 +124,7 @@ int32_t BluetoothCallService::HangUpCall()
     if (callId >= VOIP_CALL_MINIMUM  && IsVoipCallExist()) {
         sendEventToVoip(CallAbilityEventId::EVENT_HANGUP_VOIP_CALL);
         DeleteOneVoipCallObject(callId);
-        return CALL_ERR_ILLEGAL_CALL_OPERATION;
+        return TELEPHONY_SUCCESS;
     }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->HangUpCall(callId);
