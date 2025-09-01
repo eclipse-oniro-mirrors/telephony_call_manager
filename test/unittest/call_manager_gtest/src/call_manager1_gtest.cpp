@@ -654,6 +654,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0300, Function | Medium
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    ASSERT_GE(CallManagerGtest::clientPtr_->GetCallState(), (int32_t)CallStateToApp::CALL_STATE_IDLE);
     CallManagerGtest::clientPtr_->HasCall();
     CallManagerGtest::clientPtr_->HasCall(false);
     CallManagerGtest::clientPtr_->HasCall(true);
