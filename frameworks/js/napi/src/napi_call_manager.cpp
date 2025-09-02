@@ -49,7 +49,10 @@ NapiCallManager::NapiCallManager() {}
 
 NapiCallManager::~NapiCallManager()
 {
-    DelayedSingleton<CallManagerClient>::GetInstance()->UnInit();
+    auto callManagerClient = DelayedSingleton<CallManagerClient>::GetInstance();
+    if (callManagerClient != nullptr) {
+        callManagerClient->UnInit();
+    }
 }
 
 void Init()
