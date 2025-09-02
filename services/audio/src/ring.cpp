@@ -324,7 +324,7 @@ void Ring::PrepareComfortReminder()
     RegisterUserStatusDataCallbackFunc();
     SubscribeFeature();
     std::unique_lock<std::mutex> lock(comfortReminderMutex_);
-    if (conditionVar_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_LIMIT), [this]{ return isEnvMsgRecv_; })) {
+    if (conditionVar_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_LIMIT), [this] { return isEnvMsgRecv_; })) {
         TELEPHONY_LOGI("reminder occurred");
         if (quiet_ && !swing_ && oriRingVolLevel_ > VOL_LEVEL_UNDER_LINE) {
             float endVolumeDb = audioProxy->GetSystemRingVolumeInDb(VOL_LEVEL_UNDER_LINE);
