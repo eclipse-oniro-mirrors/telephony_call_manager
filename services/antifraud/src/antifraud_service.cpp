@@ -226,15 +226,13 @@ int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int
 
 int32_t AntiFraudService::StopAntiFraudService(int32_t slotId, int32_t index)
 {
-    {
-        auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
-        int32_t antiFraudErrCode = antiFraudAdapter->StopAntiFraud();
-        if (antiFraudErrCode != 0) {
-            TELEPHONY_LOGE("Stop AntiFraud failed, ErrCode=%{public}d", antiFraudErrCode);
-            return antiFraudErrCode;
-        }
-        TELEPHONY_LOGI("AntiFraud stop detect, slotId=%{public}d, index=%{public}d", slotId, index);
+    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
+    int32_t antiFraudErrCode = antiFraudAdapter->StopAntiFraud();
+    if (antiFraudErrCode != 0) {
+        TELEPHONY_LOGE("Stop AntiFraud failed, ErrCode=%{public}d", antiFraudErrCode);
+        return antiFraudErrCode;
     }
+    TELEPHONY_LOGI("AntiFraud stop detect, slotId=%{public}d, index=%{public}d", slotId, index);
     SetStoppedSlotId(slotId);
     SetStoppedIndex(index);
     return 0;
