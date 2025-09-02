@@ -96,8 +96,8 @@ private:
     #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
     static constexpr uint32_t FEATURE_COMFORT_REMINDER = 15;
     bool ringtoneVibrationSwitchState_ = true;
-    bool swing_ = false; //注视状态：false为不注视，true为注视
-    bool quiet_ = false; //环境音状态：false为嘈杂, true为安静
+    bool swing_ = false;
+    bool quiet_ = false;
     bool isSwingMsgRecv_ = false;
     bool isEnvMsgRecv_ = false;
     int32_t oriRingVolLevel_ = 0;

@@ -32,6 +32,8 @@ const int32_t VOL_LEVEL_UNDER_LINE = 3;
 const int32_t TIMEOUT_LIMIT = 500; //ms
 const int32_t DECREASE_DURATION = 500000; //us
 const int32_t INCREASE_DURATION = 5000000; //us
+const int32_t ONE_SECOND = 1000000; //us
+const int32_t US_TO_MS = 1000;
 const std::string ADAPTIVE_SWITCH = "&key=ringtone_vibrate_adaptive_switch";
 #endif
 
@@ -217,7 +219,6 @@ void Ring::onComfortReminderDataChanged(int32_t result,
     int32_t eventType = comfortReminderData->GetEventType();
     TELEPHONY_LOGI("fusionReminderData = %{public}d, eventType = %{public}d", fusionReminderData, eventType);
 
-    //注视状态： 0为不注视，1为注视；0为嘈杂，1为安静，默认为嘈杂非注视
     std::lock_guard<std::mutex> lock(comfortReminderMutex_);
     switch (eventType) {
         case 0: // swing event
@@ -258,7 +259,7 @@ void Ring::SetRingToneVibrationState()
         }
     }else if (quiet_ && !isFadeupHappend_ && !isGentleHappend_) {
         isFadeupHappend_ = true;
-        ret = RingtonePlayer_->SetRingtoneHapticsRamp(INCREASE_DURATION / 1000, START_INTENSITY, END_INTENSITY);//渐强
+        ret = RingtonePlayer_->SetRingtoneHapticsRamp(INCREASE_DURATION / US_TO_MS, START_INTENSITY, END_INTENSITY);//渐强
         TELEPHONY_LOGI("vibration fade up, ret = %{public}d", ret);
         if (oriRingVolLevel_ > VOL_LEVEL_UNDER_LINE) {
             auto thread = std::thread([this] {this->IncreaseVolume();});
@@ -320,14 +321,10 @@ void Ring::PrepareComfortReminder()
     curRingVolLevel_ = oriRingVolLevel_;
     oriVolumeDb_ = audioProxy->GetSystemRingVolumeInDb(oriRingVolLevel_);
     TELEPHONY_LOGI("oriVolumeDb_:%{public}f", oriVolumeDb_);
-    //订阅舒心提醒
     RegisterUserStatusDataCallbackFunc();
     SubscribeFeature();
-    //延迟等待是否上报环境变量
     std::unique_lock<std::mutex> lock(comfortReminderMutex_);
-    if (conditionVar_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_LIMIT), [this]{ return isEnvMsgRecv_;}))
-    {
-        //事件发生，继续执行
+    if (conditionVar_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_LIMIT), [this]{ return isEnvMsgRecv_;})) {
         TELEPHONY_LOGI("reminder occurred");
         if (quiet_ && !swing_ && oriRingVolLevel_ > VOL_LEVEL_UNDER_LINE) {
             float endVolumeDb = audioProxy->GetSystemRingVolumeInDb(VOL_LEVEL_UNDER_LINE);
@@ -335,12 +332,10 @@ void Ring::PrepareComfortReminder()
             SetRingToneVolume(endVolumeDb / oriVolumeDb_);
             curRingVolLevel_ = VOL_LEVEL_UNDER_LINE;
         } else {
-            isFadeupHappend_ = true;//响铃前非安静，不再渐强，防止音量突变
+            isFadeupHappend_ = true;
         }
-    }
-    else {
-        //超时。继续执行
-        isFadeupHappend_ = true;// 超时不在渐强，防止音量突变
+    } else {
+        isFadeupHappend_ = true;
         TELEPHONY_LOGI("reminder timeout");
     }
 }
@@ -350,7 +345,7 @@ void Ring::DecreaseVolume()
     auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
     int32_t ringVolume = curRingVolLevel_;
     int totalSteps = curRingVolLevel_ - VOL_LEVEL_UNDER_LINE;
-    const int interval = DECREASE_DURATION / totalSteps; //每次递减的时间间隔
+    const int interval = DECREASE_DURATION / totalSteps;
     TELEPHONY_LOGI("DecreaseVolume totalSteps %{public}d, interval %{public}d", totalSteps, interval);
     for (int i = 0; i < totalSteps; ++i) {
         ffrt_usleep(interval);
@@ -366,24 +361,21 @@ void Ring::IncreaseVolume()
     auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
     int32_t ringVolume = VOL_LEVEL_UNDER_LINE;
     int totalSteps = oriRingVolLevel_ - VOL_LEVEL_UNDER_LINE;
-    const int interval = (INCREASE_DURATION -1000000) / totalSteps; //每次递增的时间间隔
+    const int interval = (INCREASE_DURATION - ONE_SECOND) / totalSteps;
     TELEPHONY_LOGI("IncreaseVolume totalSteps %{public}d, interval %{public}d", totalSteps, interval);
-    ffrt_usleep(1000000); //前1s保持低音量，防止一渐强就上报swing做渐弱，体验差
+    ffrt_usleep(ONE_SECOND);
     for (int i = 0; i < totalSteps; ++i) {
         if (isGentleHappend_) {
             TELEPHONY_LOGI("IncreaseVolume interrupt");
             return;
         }
+        ringVolume++;
         TELEPHONY_LOGI("index %{public}d, vol_level %{public}d", i, ringVolume);
         float endVolumeDb = audioProxy->GetSystemRingVolumeInDb(ringVolume);
         SetRingToneVolume(endVolumeDb / oriVolumeDb_);
         curRingVolLevel_ = ringVolume;
-        ringVolume++;
         ffrt_usleep(interval);
     }
-    TELEPHONY_LOGI("index %{public}d, vol_level %{public}d", totalSteps, oriRingVolLevel_);
-    SetRingToneVolume(defaultVolume_);
-    curRingVolLevel_ = oriRingVolLevel_;
 }
 #endif //OHOS_SUBSCRIBE_USER_STATUS_ENABLE
 } // namespace Telephony
