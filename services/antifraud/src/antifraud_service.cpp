@@ -108,7 +108,6 @@ bool AntiFraudService::IsUserImprovementPlanSwitchOn()
  
 void AntiFraudService::InitParams()
 {
-    std::unique_lock<ffrt::shared_mutex> lock(fraudMutex_);
     fraudDetectErr_ = 0;
     isResultFraud_ = false;
     fraudDetectVersion_ = 0;
@@ -152,7 +151,7 @@ void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFrau
         return;
     }
 
-    std::unique_lock<ffrt::shared_mutex> lock(fraudMutex_);
+    std::lock_guard<ffrt::mutex> lock(fraudMutex_);
     fraudDetectErr_ = antiFraudResult.errCode;
     isResultFraud_ = antiFraudResult.result;
     fraudDetectVersion_ = antiFraudResult.modelVersion;
@@ -216,7 +215,7 @@ int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int
         return antiFraudErrCode;
     }
     TELEPHONY_LOGI("AntiFraud begin detect, slotId=%{public}d, index=%{public}d", slotId, index);
-    std::unique_lock<ffrt::shared_mutex> lock(fraudMutex_);
+    std::lock_guard<ffrt::mutex> lock(fraudMutex_);
     antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_STARTED);
     if (callStatusManagerPtr_ != nullptr) {
         callStatusManagerPtr_->TriggerAntiFraud(antiFraudState_);
@@ -311,7 +310,6 @@ int AntiFraudService::AnonymizeText()
         TELEPHONY_LOGE("IdentifyAnonymize fail");
         return ret;
     } else {
-        std::unique_lock<ffrt::shared_mutex> lock(fraudMutex_);
         fraudDetectText_ = (std::string)output->data;
     }
     anonymizeAdapter->ReleaseConfig(&config);

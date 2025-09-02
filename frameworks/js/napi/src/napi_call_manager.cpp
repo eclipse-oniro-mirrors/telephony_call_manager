@@ -49,11 +49,10 @@ NapiCallManager::NapiCallManager() {}
 
 NapiCallManager::~NapiCallManager()
 {
-    std::shared_ptr<CallManagerClient> callManagerClientPtr = DelayedSingleton<CallManagerClient>::GetInstance();
-    if (callManagerClientPtr == nullptr) {
-        return;
+    auto callManagerClient = DelayedSingleton<CallManagerClient>::GetInstance();
+    if (callManagerClient != nullptr) {
+        callManagerClient->UnInit();
     }
-    callManagerClientPtr->UnInit();
 }
 
 void Init()

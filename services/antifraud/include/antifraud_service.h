@@ -60,7 +60,6 @@ public:
     bool IsSwitchOn(const std::string switchName);
     bool IsAntiFraudSwitchOn();
     bool IsUserImprovementPlanSwitchOn();
-    void InitParams();
     void RecordDetectResult(const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult,
         std::string resultPhoneNum, int32_t slotId, int32_t index);
     int32_t StartAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index);
@@ -90,6 +89,7 @@ private:
     };
  
 private:
+    void InitParams();
     bool isResultFraud_ = false;
     int fraudDetectErr_ = 0;
     int fraudDetectVersion_ = 0;
@@ -102,7 +102,7 @@ private:
     int32_t stoppedIndex_ = -1;
 
     ffrt::mutex mutex_;
-    ffrt::shared_mutex fraudMutex_;
+    ffrt::mutex fraudMutex_;
  
 private:
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_ = nullptr;
