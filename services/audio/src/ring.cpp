@@ -257,9 +257,9 @@ void Ring::SetRingToneVibrationState()
             auto thread = std::thread([this] {this->DecreaseVolume();});
             thread.detach();
         }
-    }else if (quiet_ && !isFadeupHappend_ && !isGentleHappend_) {
+    } else if (quiet_ && !isFadeupHappend_ && !isGentleHappend_) {
         isFadeupHappend_ = true;
-        ret = RingtonePlayer_->SetRingtoneHapticsRamp(INCREASE_DURATION / US_TO_MS, START_INTENSITY, END_INTENSITY);//渐强
+        ret = RingtonePlayer_->SetRingtoneHapticsRamp(INCREASE_DURATION / US_TO_MS, START_INTENSITY, END_INTENSITY);
         TELEPHONY_LOGI("vibration fade up, ret = %{public}d", ret);
         if (oriRingVolLevel_ > VOL_LEVEL_UNDER_LINE) {
             auto thread = std::thread([this] {this->IncreaseVolume();});
@@ -270,7 +270,7 @@ void Ring::SetRingToneVibrationState()
 
 int32_t Ring::RegisterUserStatusDataCallbackFunc()
 {
-    if(!ringtoneVibrationSwitchState_) {
+    if (!ringtoneVibrationSwitchState_) {
         return TELEPHONY_SUCCESS;
     }
     Msdp::UserStatusAwareness::UserStatusDataCallbackFunc callback = [this] (int32_t result,
@@ -324,7 +324,7 @@ void Ring::PrepareComfortReminder()
     RegisterUserStatusDataCallbackFunc();
     SubscribeFeature();
     std::unique_lock<std::mutex> lock(comfortReminderMutex_);
-    if (conditionVar_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_LIMIT), [this]{ return isEnvMsgRecv_;})) {
+    if (conditionVar_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_LIMIT), [this]{ return isEnvMsgRecv_; })) {
         TELEPHONY_LOGI("reminder occurred");
         if (quiet_ && !swing_ && oriRingVolLevel_ > VOL_LEVEL_UNDER_LINE) {
             float endVolumeDb = audioProxy->GetSystemRingVolumeInDb(VOL_LEVEL_UNDER_LINE);
