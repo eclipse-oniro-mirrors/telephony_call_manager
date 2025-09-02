@@ -531,4 +531,42 @@ HWTEST_F(ZeroBranch9Test, Telephony_SwitchIncoming_001, Function | MediumTest | 
     ASSERT_NO_THROW(CallObjectManager::DeleteOneCallObject(crsCallObjectPtr->GetCallID()));
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
+
+HWTEST_F(ZeroBranch9Test, Telephony_GetParamsByKey_001, Function | MediumTest | Level3)
+{
+    DialParaInfo info;
+    sptr<CallBase> ringingCall = new IMSCall(info);
+    int value = ringingCall->GetParamsByKey("SetParamForTest", 0);
+    EXPECT_EQ(value, 0);
+
+    AAFwk::WantParams params = ringingCall->GetExtraParams();
+    params.SetParam("SetParamForTest", AAFwk::Integer::Box(1));
+    ringingCall->SetExtraParams(params);
+    value = ringingCall->GetParamsByKey("SetParamForTest", 0);
+    EXPECT_EQ(value, 1);
+}
+
+HWTEST_F(ZeroBranch9Test, Telephony_IsNeedSilentInDoNotDisturbMode_001, Function | MediumTest | Level3)
+{
+    CallObjectManager::callObjectPtrList_.clear();
+    EXPECT_EQ(CallObjectManager::IsNeedSilentInDoNotDisturbMode(), false);
+    DialParaInfo dailInfo;
+    sptr<CallBase> imsCall = new IMSCall(dailInfo);
+    imsCall->callId_ = 1;
+    imsCall->SetSlotId(0);
+    imsCall->SetCallType(CallType::TYPE_IMS);
+    imsCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    AAFwk::WantParams params = imsCall->GetExtraParams();
+    params.SetParam("IsNeedSilentInDoNotDisturbMode", AAFwk::Integer::Box(1));
+    imsCall->SetExtraParams(params);
+    CallObjectManager::AddOneCallObject(imsCall);
+    EXPECT_EQ(CallObjectManager::IsNeedSilentInDoNotDisturbMode(), true);
+    CallObjectManager::DeleteOneCallObject(imsCall);
+
+    params.SetParam("IsNeedSilentInDoNotDisturbMode", AAFwk::Integer::Box(0));
+    imsCall->SetExtraParams(params);
+    CallObjectManager::AddOneCallObject(imsCall);
+    EXPECT_EQ(CallObjectManager::IsNeedSilentInDoNotDisturbMode(), false);
+    CallObjectManager::DeleteOneCallObject(imsCall);
+}
 }

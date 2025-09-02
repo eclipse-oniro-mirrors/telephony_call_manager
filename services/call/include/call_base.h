@@ -136,6 +136,7 @@ public:
     void SetCeliaCallType(int32_t celiaCallType);
     int32_t GetCeliaCallType();
     void SetExtraParams(AAFwk::WantParams extraParams);
+    int GetParamsByKey(const std::string &key, int defaultValue);
     void SetCallDirection(CallDirection direction);
     CallDirection GetCallDirection();
     int32_t GetAccountId();

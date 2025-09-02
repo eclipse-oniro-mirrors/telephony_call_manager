@@ -1102,8 +1102,7 @@ bool CallObjectManager::IsNeedSilentInDoNotDisturbMode()
     }
     TelCallState telCallState = foregroundCall->GetTelCallState();
     if (telCallState == TelCallState::CALL_STATUS_INCOMING) {
-        AAFwk::WantParams params = foregroundCall->GetExtraParams();
-        int value = params.GetIntParam("IsNeedSilentInDoNotDisturbMode", 0);
+        int value = foregroundCall->GetParamsByKey("IsNeedSilentInDoNotDisturbMode", 0);
         TELEPHONY_LOGI("CallObjectManager::IsNeedSilentInDoNotDisturbMode: %{public}d", value);
         if (value == 1) {
             return true;

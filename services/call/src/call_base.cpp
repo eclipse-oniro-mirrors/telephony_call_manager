@@ -146,6 +146,12 @@ void CallBase::SetExtraParams(AAFwk::WantParams extraParams)
     extraParams_ = extraParams;
 }
 
+int CallBase::GetParamsByKey(const std::string &key, int defaultValue)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return extraParams_.GetIntParam(key, defaultValue);
+}
+
 void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
 {
     std::lock_guard<std::mutex> lock(mutex_);
