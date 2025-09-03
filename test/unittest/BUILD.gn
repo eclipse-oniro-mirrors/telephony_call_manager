@@ -43,7 +43,7 @@ ohos_static_library("call_manager_test_base") {
     "${CALL_MANAGER_PATH}/frameworks/native/src/native_call_manager_utils.cpp",
     "${CALL_MANAGER_PATH}/frameworks/native/src/nearlink_call_client.cpp",
     "${CALL_MANAGER_PATH}/frameworks/native/src/super_privacy_manager_client.cpp",
-    ${CALL_MANAGER_PATH}/frameworks/native/src/voip_call_manager_proxy.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/voip_call_manager_proxy.cpp",
   ]
 
   public_configs = [ ":call_manager_config" ]
