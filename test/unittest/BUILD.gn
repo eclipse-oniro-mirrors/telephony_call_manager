@@ -28,7 +28,6 @@ ohos_static_library("call_manager_test_base") {
     debug = false
   }
   branch_protector_ret = "pac_ret"
-  version_script = "tel_call_manager_api.versionscript"
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/bluetooth_call_client.cpp",
     "${CALL_MANAGER_PATH}/frameworks/native/src/bluetooth_call_proxy.cpp",
