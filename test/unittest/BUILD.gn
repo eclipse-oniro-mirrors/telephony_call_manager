@@ -97,7 +97,6 @@ ohos_static_library("call_manager_test_base") {
   }
 
   part_name = "call_manager"
-  innerapi_tags = [ "platformsdk" ]
   subsystem_name = "telephony"
 }
 
