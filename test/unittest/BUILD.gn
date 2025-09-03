@@ -57,7 +57,7 @@ ohos_static_library("call_manager_test_base") {
     "common_event_service:cesfwk_innerkits",
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
-    "core_service:ffrt_mocked"
+    "core_service:ffrt_mocked",
     "graphic_surface:surface",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
