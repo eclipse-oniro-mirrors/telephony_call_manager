@@ -936,10 +936,8 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallProxy_001, TestSize.Level0)
  */
 HWTEST_F(ZeroBranch5Test, Telephony_BluetoothCallManager_001, TestSize.Level0)
 {
-    int32_t state = 0;
     int32_t numActive = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
     int32_t numHeld = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_HOLDING);
-    int32_t numDial = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_DIALING);
     int32_t callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
     std::string number = CallObjectManager::GetCallNumber(TelCallState::CALL_STATUS_HOLDING);
     BluetoothCallManager bluetoothCallManager;

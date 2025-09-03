@@ -1534,7 +1534,6 @@ void CallStatusManager::SetVideoCallState(sptr<CallBase> &call, TelCallState nex
         return;
     }
     int slotId = call->GetSlotId();
-    bool isSlotIdValid = false;
     if (slotId >= SLOT_NUM || slotId < 0) {
         return;
     }

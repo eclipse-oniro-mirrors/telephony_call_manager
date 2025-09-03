@@ -396,7 +396,6 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_004, TestSize.Level0)
 HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_005, TestSize.Level0)
 {
     AccessFalseToken token;
-    float zoomRatio = 1;
     std::u16string test = u"";
     int32_t callId = 1;
     int32_t value = 1;

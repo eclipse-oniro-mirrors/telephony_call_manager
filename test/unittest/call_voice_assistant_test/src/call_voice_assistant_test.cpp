@@ -94,10 +94,8 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001,
  */
 HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002, TestSize.Level0)
 {
-    const int32_t callId = -1;
     const int32_t accountId = -1;
     const std::string controlSwitch = "incoming_call_voice_control_switch";
-    const std::string incoming = "come";
     const std::string dialing = "dial";
     std::string value = "";
     ContactInfo contactInfo;

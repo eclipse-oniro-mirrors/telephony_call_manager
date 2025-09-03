@@ -46,12 +46,14 @@ ohos_unittest("tel_call_manager1_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [
@@ -92,12 +94,13 @@ ohos_unittest("tel_call_manager2_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps
+  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [
@@ -138,12 +141,13 @@ ohos_unittest("tel_call_manager3_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps
+  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [
@@ -184,12 +188,13 @@ ohos_unittest("tel_call_manager4_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps
+  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [
@@ -230,12 +235,13 @@ ohos_unittest("tel_call_manager5_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps
+  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [
@@ -276,12 +282,13 @@ ohos_unittest("tel_call_manager6_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps
+  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [
@@ -322,12 +329,13 @@ ohos_unittest("tel_call_manager7_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps
+  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [
@@ -368,12 +376,13 @@ ohos_unittest("tel_call_manager8_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps
+  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [

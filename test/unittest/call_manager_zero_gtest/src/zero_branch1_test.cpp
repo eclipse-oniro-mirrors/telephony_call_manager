@@ -1278,7 +1278,6 @@ HWTEST_F(ZeroBranch2Test, Telephony_EdmCallPolicy_002, Function | MediumTest | L
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
     std::string number = "11111111";
-    bool isModifyParameter = false;
     std::shared_ptr<EdmCallPolicy> edmCallPolicy = std::make_shared<EdmCallPolicy>();
     edmCallPolicy->SetCallPolicy(false, dialingList, false, incomingList);
     EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), true);

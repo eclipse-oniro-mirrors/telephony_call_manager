@@ -151,9 +151,9 @@ void AudioProxy::PreventInterruption(VibrationType type)
 
 int32_t AudioProxy::StartVibrator()
 {
-    VibrationType type = VibrationType::VIBRATION_RINGTONE;
     int32_t result = TELEPHONY_SUCCESS;
 #ifdef SUPPORT_VIBRATOR
+    VibrationType type = VibrationType::VIBRATION_RINGTONE;
     bool setUsageRet = Sensors::SetUsage(VIBRATOR_USAGE_MAP.at(type));
     result = Sensors::StartVibrator(EFFECT_ID_MAP.at(type).c_str());
     TELEPHONY_LOGI("setUsageRet %{public}d, result %{public}d", setUsageRet, result);

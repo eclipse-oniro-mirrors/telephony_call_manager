@@ -466,7 +466,6 @@ void DistributedCallManager::ReportDistributedDeviceInfo(const AudioDevice& devi
     }
     std::vector<std::shared_ptr<AudioDeviceDescriptor>> descs = audioSystemMananger
         ->GetDevices(DeviceFlag::DISTRIBUTED_OUTPUT_DEVICES_FLAG);
-    size_t size = descs.size();
     if (descs.size() <= 0) {
         TELEPHONY_LOGW("no distributed device");
         return;
@@ -503,7 +502,6 @@ void DistributedCallManager::ReportDistributedDeviceInfoForSwitchOff()
     }
     std::vector<std::shared_ptr<AudioDeviceDescriptor>> descs = audioSystemMananger
         ->GetDevices(DeviceFlag::OUTPUT_DEVICES_FLAG);
-    size_t size = descs.size();
     if (descs.size() <= 0) {
         TELEPHONY_LOGW("no distributed device");
         return;

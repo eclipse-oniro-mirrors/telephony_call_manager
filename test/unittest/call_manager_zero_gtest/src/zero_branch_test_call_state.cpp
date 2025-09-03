@@ -829,7 +829,6 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_003, TestSize.Level0)
  */
 HWTEST_F(CallStateTest, Telephony_CallRequestProcess_004, TestSize.Level0)
 {
-    int32_t defaultCallId = 1;
     std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
     DialParaInfo mDialParaInfo;
     mDialParaInfo.accountId = 0;
@@ -846,7 +845,6 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_004, TestSize.Level0)
     callRequestProcess->HandleDsdaIncomingCall(callBase1, 0, DEFAULT_SLOT_ID, 0, incomingCall);
     sptr<OHOS::Telephony::CallBase> callBase2 = new IMSCall(mDialParaInfo);
     callRequestProcess->HangUpForDsdaRequest(callBase2);
-    CellularCallInfo callInfo;
     callRequestProcess->HandleStartDial(false, mDialParaInfo);
     ASSERT_EQ(callRequestProcess->EccDialPolicy(), TELEPHONY_SUCCESS);
 }
