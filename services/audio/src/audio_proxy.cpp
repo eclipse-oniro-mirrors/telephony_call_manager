@@ -489,8 +489,12 @@ bool AudioPreferDeviceChangeCallback::IsDistributedDeviceSelected(
     TELEPHONY_LOGI("desc size is: %{public}zu", size);
     for (auto iter = desc.begin(); iter != desc.end(); iter++) {
         std::string networkId = (*iter)->networkId_;
+        // When the networkId is not LocalDevice and the deviceType is SPEAKER, it represents a hicar device.
         if (LOCAL_DEVICE != networkId && (*iter)->deviceType_ == AudioStandard::DEVICE_TYPE_SPEAKER) {
             TELEPHONY_LOGI("distributed device networkId.");
+            if (!DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
+            }
             return true;
         }
         if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDistributedCarDeviceOnline() &&
