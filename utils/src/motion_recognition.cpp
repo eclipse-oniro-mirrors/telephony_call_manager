@@ -157,7 +157,6 @@ void FlipMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
 void MotionRecogntion::ReduceRingToneVolume()
 {
     int32_t count = 0;
-    float value = 0.0f;
     int32_t currentVolume = DelayedSingleton<AudioProxy>::GetInstance()->GetVolume(
         AudioStandard::AudioVolumeType::STREAM_RING);
     if (currentVolume <= 1) {
