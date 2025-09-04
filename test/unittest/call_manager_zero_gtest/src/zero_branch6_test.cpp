@@ -83,7 +83,6 @@ namespace {
 const int32_t SIM1_SLOTID = 0;
 const int32_t VALID_CALLID = 1;
 const int32_t ERROR_CALLID = -1;
-const int32_t ONE_TIME = 1;
 const int32_t IS_CELIA_CALL = 1;
 const int32_t SOURCE_CALL = 2;
 const int32_t TELEPHONY_EXT_SA_ID = 4011;
