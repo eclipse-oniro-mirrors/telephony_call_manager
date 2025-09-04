@@ -752,7 +752,6 @@ HWTEST_F(ZeroBranch2Test, Telephony_CellularCallConnection_003, Function | Mediu
  */
 HWTEST_F(ZeroBranch2Test, Telephony_CellularCallConnection_004, Function | MediumTest | Level1)
 {
-    CellularCallInfo mCellularCallInfo;
     std::shared_ptr<CellularCallConnection> cellularCallConnection =
         DelayedSingleton<CellularCallConnection>::GetInstance();
     std::u16string test = u"";
@@ -1243,7 +1242,6 @@ HWTEST_F(ZeroBranch2Test, Telephony_EdmCallPolicy_001, Function | MediumTest | L
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
     std::string number = "11111111";
-    bool isModifyParameter = false;
     std::shared_ptr<EdmCallPolicy> edmCallPolicy = std::make_shared<EdmCallPolicy>();
     edmCallPolicy->SetCallPolicy(false, dialingList, false, incomingList);
     EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), true);
