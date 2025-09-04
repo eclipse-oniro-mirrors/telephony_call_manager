@@ -36,7 +36,6 @@ constexpr int16_t SLEEP_1000_MS = 1000;
 constexpr int BASE_TIME_MS = 1000;
 constexpr int SLEEP_TIME_MS = 50;
 constexpr int MAX_LIMIT_TIME = 18000;
-constexpr int16_t SIM1_SLOTID = 0;
 
 std::unordered_map<int32_t, std::unordered_set<int32_t>> g_callStateMap;
 int32_t g_newCallId = -1;
