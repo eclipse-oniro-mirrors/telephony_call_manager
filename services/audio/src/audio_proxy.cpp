@@ -44,11 +44,12 @@ const std::unordered_map<VibrationType, std::string> EFFECT_ID_MAP = {
     // Default effectId
     {VibrationType::VIBRATION_RINGTONE, "haptic.ringtone.Dream_It_Possible"},
 };
+
+constexpr uint64_t LOOP_DURATION_2S = 2000;
 #endif
 
 const int32_t NO_DEVICE_VALID = 0;
 const int32_t RENDERER_FLAG = 0;
-constexpr uint64_t LOOP_DURATION_2S = 2000;
 const std::string LOCAL_DEVICE = "LocalDevice";
 
 AudioProxy::AudioProxy()
