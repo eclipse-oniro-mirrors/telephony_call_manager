@@ -34,7 +34,6 @@ namespace Telephony {
 using namespace testing::ext;
 constexpr int16_t SIM2_SLOTID = 1;
 constexpr int16_t RETURN_VALUE_IS_ZERO = 0;
-constexpr int16_t INVALID_POSITIVE_ID = 100;
 constexpr int16_t SLEEP_1000_MS = 1000;
 constexpr int BASE_TIME_MS = 1000;
 constexpr int SLEEP_TIME_MS = 50;
