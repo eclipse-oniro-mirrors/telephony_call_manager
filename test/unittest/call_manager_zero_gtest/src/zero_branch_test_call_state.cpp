@@ -54,8 +54,6 @@ namespace Telephony {
 using namespace testing::ext;
 constexpr int WAIT_TIME = 3;
 constexpr int DEFAULT_SLOT_ID = 0;
-constexpr int VALID_CALL_ID = 1;
-constexpr const char* NUMBER = "10086";
 constexpr const char* NAME = "test";
 
 class CallStateTest : public testing::Test {
