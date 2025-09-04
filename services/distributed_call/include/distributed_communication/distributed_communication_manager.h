@@ -65,6 +65,7 @@ public:
 
     void NewCallCreated(sptr<CallBase> &call) override;
     void CallDestroyed(const DisconnectedDetails &details) override;
+    void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
 
 private:
     bool IsDistributedDev(const std::string &devId);
