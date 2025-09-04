@@ -681,7 +681,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_007, TestSize.Level0
     MessageParcel data2;
     data2.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     data2.WriteInt32(callId);
-    CallTransferInfo callTransferInfo;
     length = sizeof(CallTransferInfo);
     data2.WriteRawData((const void *)&callRestrictionInfo, length);
     data2.RewindRead(0);
