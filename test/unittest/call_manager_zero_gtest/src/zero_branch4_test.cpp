@@ -84,7 +84,6 @@ namespace {
 const int32_t INVALID_SLOTID = 2;
 const int32_t SIM1_SLOTID = 0;
 const int32_t INVALID_MODE = 0;
-const int32_t VALID_CALLID = 1;
 const int32_t STEP_1 = 1;
 constexpr const char *TEST_STR = "123";
 } // namespace
