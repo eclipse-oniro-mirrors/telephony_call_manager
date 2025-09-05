@@ -72,7 +72,7 @@ void InteroperableCommunicationManager::OnDeviceOffline(const DistributedHardwar
     std::string devName = deviceInfo.deviceName;
     uint16_t devType = deviceInfo.deviceTypeId;
     std::string ownType = system::GetParameter("const.product.devicetype", "");
-    if (devType != 0x6D && devType != 0x83 && ownType != "wearable" && ownType != "car") {    // 0x0E手机
+    if (devType != 0x6D && devType != 0x83 && ownType != "wearable" && ownType != "car") {
         TELEPHONY_LOGE("not interoperable device");
         return;
     }
