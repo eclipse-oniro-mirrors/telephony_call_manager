@@ -94,7 +94,7 @@ void InteroperableDataController::HandleMuted(const cJSON *msg)
 void InteroperableDataController::HandleMuteRinger()
 {
     TELEPHONY_LOGI("set mute ringer");
-    auto controlManager = DelayedSingleton<CallControlManager>::GetInstance()->MuteRinger();
+    DelayedSingleton<CallControlManager>::GetInstance()->MuteRinger();
 }
  
 std::string InteroperableDataController::CreateMuteMsg(InteroperableMsgType msgType, bool isMute)

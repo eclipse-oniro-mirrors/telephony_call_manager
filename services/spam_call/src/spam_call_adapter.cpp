@@ -32,7 +32,6 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t DEFAULT_USER_ID = -1;
-constexpr int16_t INCOMING_CALL_MISSED_CODE = 0;
 constexpr char REMINDER_RESULT[] = "reminderResult";
 constexpr char SLOT_ID[] = "slotId";
 constexpr char DETECT_RESULT[] = "detectResult";

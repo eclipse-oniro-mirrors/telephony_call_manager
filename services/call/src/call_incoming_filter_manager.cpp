@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace Telephony {
-CallIncomingFilterManager::CallIncomingFilterManager() : isFirstIncoming(true) {}
+CallIncomingFilterManager::CallIncomingFilterManager() {}
 
 CallIncomingFilterManager::~CallIncomingFilterManager() {}
 

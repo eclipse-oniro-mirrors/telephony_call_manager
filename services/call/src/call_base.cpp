@@ -87,7 +87,6 @@ void CallBase::HangUpVoipCall()
     std::vector<CallAttributeInfo>::iterator it = callAttributeInfo.begin();
     while (it != callAttributeInfo.end()) {
         CallAttributeInfo callinfo = (*it);
-        TelCallState callState = callinfo.callState;
         ++it;
         if (callinfo.callType == CallType::TYPE_VOIP) {
             sptr<CallBase> tempCall = CallObjectManager::GetOneCallObject(callinfo.callId);

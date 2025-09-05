@@ -32,6 +32,11 @@ namespace OHOS {
 namespace Telephony {
 using namespace AudioStandard;
 namespace {
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+const int32_t DEFAULT_DCALL_HFP_FLAG_VALUE = -1;
+const int32_t DCALL_BT_HEADSET_UNWEAR_ACTION = 1;
+#endif
+
 const size_t INT32_MIN_ID_LENGTH = 3;
 const size_t INT32_SHORT_ID_LENGTH = 20;
 const size_t INT32_PLAINTEXT_LENGTH = 4;
@@ -39,8 +44,6 @@ const int32_t DCALL_SWITCH_DEVICE_TYPE_SOURCE = 0;
 const int32_t DCALL_SWITCH_DEVICE_TYPE_SINK = 1;
 const int32_t DISTRIBUTED_CALL_SOURCE_SA_ID = 9855;
 const int32_t IS_CELIA_CALL = 1;
-const int32_t DEFAULT_DCALL_HFP_FLAG_VALUE = -1;
-const int32_t DCALL_BT_HEADSET_UNWEAR_ACTION = 1;
 const std::string CALLBACK_NAME = "telephony";
 const std::string DISTRIBUTED_AUDIO_DEV_CAR = "dCar";
 const std::string DISTRIBUTED_AUDIO_DEV_PHONE = "dPhone";
@@ -466,7 +469,6 @@ void DistributedCallManager::ReportDistributedDeviceInfo(const AudioDevice& devi
     }
     std::vector<std::shared_ptr<AudioDeviceDescriptor>> descs = audioSystemMananger
         ->GetDevices(DeviceFlag::DISTRIBUTED_OUTPUT_DEVICES_FLAG);
-    size_t size = descs.size();
     if (descs.size() <= 0) {
         TELEPHONY_LOGW("no distributed device");
         return;
@@ -503,7 +505,6 @@ void DistributedCallManager::ReportDistributedDeviceInfoForSwitchOff()
     }
     std::vector<std::shared_ptr<AudioDeviceDescriptor>> descs = audioSystemMananger
         ->GetDevices(DeviceFlag::OUTPUT_DEVICES_FLAG);
-    size_t size = descs.size();
     if (descs.size() <= 0) {
         TELEPHONY_LOGW("no distributed device");
         return;

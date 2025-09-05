@@ -410,7 +410,6 @@ HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_014, Function | Medi
     std::string name = "test";
     std::string stringValue = "";
     int32_t intValue = 0;
-    cJSON *dataJson = cJSON_GetObjectItem(msg, name.c_str());
     EXPECT_TRUE(controller->GetInt32Value(msg, name, intValue));
     EXPECT_TRUE(iController->GetInt32Value(msg, name, intValue));
     EXPECT_FALSE(controller->GetStringValue(msg, name, stringValue));

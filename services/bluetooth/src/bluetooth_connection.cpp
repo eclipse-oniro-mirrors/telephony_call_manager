@@ -30,7 +30,10 @@ constexpr int32_t VIRTUAL_DEVICE_REMOVE = 1;
 
 namespace OHOS {
 namespace Telephony {
+#ifdef ABILITY_BLUETOOTH_SUPPORT
 constexpr int32_t DEFAULT_BT_VALUE = -1;
+#endif
+
 BluetoothConnection::BluetoothConnection() : connectedScoAddr_("") {}
 
 BluetoothConnection::~BluetoothConnection()

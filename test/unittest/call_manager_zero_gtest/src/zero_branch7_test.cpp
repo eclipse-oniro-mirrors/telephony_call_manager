@@ -94,23 +94,7 @@ using namespace testing::ext;
 namespace {
 const int32_t INVALID_SLOTID = 2;
 const int32_t SIM1_SLOTID = 0;
-const int32_t DEFAULT_INDEX = 1;
-const int16_t CAMERA_ROTATION_0 = 0;
-const int16_t CAMERA_ROTATION_90 = 90;
-const int16_t CAMERA_ROTATION_180 = 180;
-const int16_t CAMERA_ROTATION_270 = 270;
-const int32_t INVALID_MODE = 0;
-const int32_t VALID_CALLID = 1;
-const int32_t ERROR_CALLID = -1;
-const int32_t ONE_TIME = 1;
-const int32_t STEP_1 = 1;
-const int32_t SOURCE_CALL = 2;
 const int32_t FIVE_SECOND = 5;
-constexpr int16_t DEFAULT_TIME = 0;
-constexpr const char *TEST_STR = "123";
-constexpr const char *LONG_STR =
-    "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-    "111111111";
 static constexpr const char *OHOS_PERMISSION_SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
 static constexpr const char *OHOS_PERMISSION_PLACE_CALL = "ohos.permission.PLACE_CALL";
 } // namespace
@@ -396,7 +380,6 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_004, TestSize.Level0)
 HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_005, TestSize.Level0)
 {
     AccessFalseToken token;
-    float zoomRatio = 1;
     std::u16string test = u"";
     int32_t callId = 1;
     int32_t value = 1;

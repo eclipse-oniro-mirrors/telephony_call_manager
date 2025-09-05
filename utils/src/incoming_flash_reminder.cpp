@@ -28,7 +28,10 @@
 
 namespace OHOS {
 namespace Telephony {
+#ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
 constexpr int64_t DELAY_SET_TORCH_MODE_TIME = 300;
+#endif
+
 constexpr uint32_t DELAY_SET_TORCH_EVENT = 1000000;
 constexpr uint32_t STOP_FLASH_REMIND_EVENT = 1000001;
 constexpr uint32_t START_FLASH_REMIND_EVENT = 1000002;

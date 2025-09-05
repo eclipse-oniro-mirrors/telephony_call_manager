@@ -44,12 +44,14 @@ ohos_unittest("tel_call_manager_zero1_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [
@@ -86,12 +88,14 @@ ohos_unittest("tel_call_manager_zero2_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [
@@ -128,14 +132,16 @@ ohos_unittest("tel_call_manager_zero3_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [
@@ -173,12 +179,14 @@ ohos_unittest("tel_call_manager_zero4_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [
@@ -215,12 +223,14 @@ ohos_unittest("tel_call_manager_zero5_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [
@@ -257,12 +267,14 @@ ohos_unittest("tel_call_manager_zero6_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [
@@ -305,12 +317,14 @@ ohos_unittest("tel_call_manager_zero7_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [
@@ -347,12 +361,14 @@ ohos_unittest("tel_call_manager_zero8_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
   defines = [
@@ -392,12 +408,14 @@ ohos_unittest("tel_call_manager_zero9_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
   defines = [
@@ -434,12 +452,14 @@ ohos_unittest("tel_call_manager_zero10_gtest") {
     "access_token:libnativetoken_shared",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
   defines = [

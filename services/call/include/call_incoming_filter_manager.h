@@ -34,7 +34,6 @@ public:
     int32_t DoIncomingFilter(const CallDetailInfo &info);
 
 private:
-    bool isFirstIncoming;
     std::vector<std::string> phones_;
 };
 } // namespace Telephony

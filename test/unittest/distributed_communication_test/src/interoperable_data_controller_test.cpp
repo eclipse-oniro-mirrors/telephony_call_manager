@@ -102,7 +102,6 @@ Function | MediumTest | Level1)
     std::string name = "test";
     std::string stringValue = "";
     int32_t intValue = 0;
-    cJSON *dataJson = cJSON_GetObjectItem(msg, name.c_str());
     EXPECT_TRUE(dataController->GetInt32Value(msg, name, intValue));
     EXPECT_FALSE(dataController->GetStringValue(msg, name, stringValue));
     cJSON_Delete(msg);

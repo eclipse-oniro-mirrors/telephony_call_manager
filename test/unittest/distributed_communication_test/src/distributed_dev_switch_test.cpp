@@ -37,7 +37,6 @@ public:
  */
 HWTEST_F(DistributedDevSwitchTest, Telephony_DcDevSwitch_001, Function | MediumTest | Level1)
 {
-    int32_t direction = 0;
     std::string devId = "UnitTestDeviceId";
     std::string devName = "UnitTestDeviceName";
     DistributedRole devRole = DistributedRole::SINK;

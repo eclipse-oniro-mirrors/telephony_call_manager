@@ -184,7 +184,7 @@ CallAttributeInfo CallObjectManager::GetActiveVoipCallInfo()
 {
     CallAttributeInfo res;
     std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.begin();
-    for (it; it != voipCallObjectList_.end(); ++it) {
+    for (; it != voipCallObjectList_.end(); ++it) {
         if (it->second.callState == TelCallState::CALL_STATUS_ACTIVE) {
             res = it->second;
             return res;

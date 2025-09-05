@@ -89,17 +89,8 @@ const int16_t CAMERA_ROTATION_0 = 0;
 const int16_t CAMERA_ROTATION_90 = 90;
 const int16_t CAMERA_ROTATION_180 = 180;
 const int16_t CAMERA_ROTATION_270 = 270;
-const int32_t INVALID_MODE = 0;
 const int32_t VALID_CALLID = 1;
 const int32_t ERROR_CALLID = -1;
-const int32_t ONE_TIME = 1;
-const int32_t STEP_1 = 1;
-const int32_t SOURCE_CALL = 2;
-constexpr int16_t DEFAULT_TIME = 0;
-constexpr const char *TEST_STR = "123";
-constexpr const char *LONG_STR =
-    "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-    "111111111";
 } // namespace
 
 class DemoHandler : public AppExecFwk::EventHandler {
@@ -761,7 +752,6 @@ HWTEST_F(ZeroBranch2Test, Telephony_CellularCallConnection_003, Function | Mediu
  */
 HWTEST_F(ZeroBranch2Test, Telephony_CellularCallConnection_004, Function | MediumTest | Level1)
 {
-    CellularCallInfo mCellularCallInfo;
     std::shared_ptr<CellularCallConnection> cellularCallConnection =
         DelayedSingleton<CellularCallConnection>::GetInstance();
     std::u16string test = u"";
@@ -1252,7 +1242,6 @@ HWTEST_F(ZeroBranch2Test, Telephony_EdmCallPolicy_001, Function | MediumTest | L
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
     std::string number = "11111111";
-    bool isModifyParameter = false;
     std::shared_ptr<EdmCallPolicy> edmCallPolicy = std::make_shared<EdmCallPolicy>();
     edmCallPolicy->SetCallPolicy(false, dialingList, false, incomingList);
     EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), true);
@@ -1278,7 +1267,6 @@ HWTEST_F(ZeroBranch2Test, Telephony_EdmCallPolicy_002, Function | MediumTest | L
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
     std::string number = "11111111";
-    bool isModifyParameter = false;
     std::shared_ptr<EdmCallPolicy> edmCallPolicy = std::make_shared<EdmCallPolicy>();
     edmCallPolicy->SetCallPolicy(false, dialingList, false, incomingList);
     EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), true);

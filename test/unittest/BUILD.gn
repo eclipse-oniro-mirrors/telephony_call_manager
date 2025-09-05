@@ -13,6 +13,94 @@
 
 import("//build/test.gni")
 
+CALL_MANAGER_PATH = "../.."
+config("call_manager_config") {
+  include_dirs = [
+    "${CALL_MANAGER_PATH}/frameworks/native/include",
+    "${CALL_MANAGER_PATH}/interfaces/innerkits",
+    "${CALL_MANAGER_PATH}/utils/include",
+  ]
+}
+ohos_static_library("call_manager_test_base") {
+  sanitize = {
+    cfi = false  # client target, not required to enable cfi
+    cfi_cross_dso = false
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+  sources = [
+    "${CALL_MANAGER_PATH}/frameworks/native/src/bluetooth_call_client.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/bluetooth_call_proxy.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/call_ability_callback.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/call_ability_callback_stub.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_client.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_proxy.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/call_status_callback_proxy.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/cellular_call_proxy.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/native_call_manager_hisysevent.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/native_call_manager_utils.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/nearlink_call_client.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/super_privacy_manager_client.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/voip_call_manager_proxy.cpp",
+  ]
+
+  public_configs = [ ":call_manager_config" ]
+
+  external_deps = [
+    "ability_base:base",
+    "ability_base:want",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "core_service:libtel_common",
+    "core_service:tel_core_service_api",
+    "core_service:ffrt_mocked",
+    "graphic_surface:surface",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:libhitracechain",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+
+  cflags_cc = [
+    "-Wunused",
+    "-Wunreachable-code",
+    "-fno-exceptions",
+    "-fno-rtti",
+    "-fstack-protector-all",
+    "-Os",
+    "-flto",
+    "-Wno-unused-but-set-variable",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
+    "-fno-exceptions" ,
+  ]
+
+  ldflags = [
+    "-flto",
+    "-Wl,--gc-sections",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerApi\"",
+    "LOG_DOMAIN = 0xD001F10",
+  ]
+
+  if (device_name == "rk3568") {
+    defines += [ "CALL_MANAGER_AUTO_START_OPTIMIZE" ]
+  }
+
+  part_name = "call_manager"
+  subsystem_name = "telephony"
+}
+
 group("unittest") {
   testonly = true
   deps = []

@@ -48,14 +48,16 @@ ohos_unittest("distributed_communication_test") {
 
   external_deps = [
     "cJSON:cjson",
+    "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
   deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
   defines = [

@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t PARAM_NUM = 3;
 
 void SpamCallConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
     const sptr<IRemoteObject> &remoteObject, int32_t resultCode)
