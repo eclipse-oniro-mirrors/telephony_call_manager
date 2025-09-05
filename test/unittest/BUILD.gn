@@ -80,7 +80,7 @@ ohos_static_library("call_manager_test_base") {
     "-ffunction-sections",
     "-fno-asynchronous-unwind-tables",
     "-fno-unwind-tables",
-    "-fno-exception" ,
+    "-fno-exceptions" ,
   ]
 
   ldflags = [
