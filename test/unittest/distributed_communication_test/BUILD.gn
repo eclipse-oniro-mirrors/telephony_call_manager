@@ -51,7 +51,8 @@ ohos_unittest("distributed_communication_test") {
     "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
+  external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 

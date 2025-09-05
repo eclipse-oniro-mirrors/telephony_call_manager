@@ -47,7 +47,8 @@ ohos_unittest("tel_call_manager_zero1_gtest") {
     "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
+  external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
     "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
@@ -90,7 +91,8 @@ ohos_unittest("tel_call_manager_zero2_gtest") {
     "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
+  external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
     "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
@@ -133,7 +135,8 @@ ohos_unittest("tel_call_manager_zero3_gtest") {
     "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
+  external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
@@ -179,7 +182,8 @@ ohos_unittest("tel_call_manager_zero4_gtest") {
     "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
+  external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
     "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
@@ -222,7 +226,8 @@ ohos_unittest("tel_call_manager_zero5_gtest") {
     "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
+  external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
     "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
@@ -265,7 +270,8 @@ ohos_unittest("tel_call_manager_zero6_gtest") {
     "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
+  external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
     "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
@@ -314,7 +320,8 @@ ohos_unittest("tel_call_manager_zero7_gtest") {
     "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
+  external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
     "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
@@ -357,7 +364,8 @@ ohos_unittest("tel_call_manager_zero8_gtest") {
     "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
+  external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
     "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
@@ -403,7 +411,8 @@ ohos_unittest("tel_call_manager_zero9_gtest") {
     "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
+  external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
     "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
@@ -446,7 +455,8 @@ ohos_unittest("tel_call_manager_zero10_gtest") {
     "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
   ]
-  external_deps += call_manager_external_deps external_deps -= ["ffrt:libffrt"]
+  external_deps += call_manager_external_deps
+  external_deps -= ["ffrt:libffrt"]
 
   deps = [
     "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
