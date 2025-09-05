@@ -336,7 +336,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
  HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_008, TestSize.Level0)
 {
     Uri uri(DEVICE_PROVISIONED_URI);
-    auto oobeStatusObserver_ = new (std::nothrow) OOBEStatusObserver();
+    sptr<OOBEStatusObserver> oobeStatusObserver_(new (std::nothrow) OOBEStatusObserver());
     auto reportCallInfo = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
     reportCallInfo->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
     CallDetailInfo info;
