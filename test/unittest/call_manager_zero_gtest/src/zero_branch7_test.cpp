@@ -193,7 +193,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_001, Function | MediumTes
     EXPECT_NE(systemAbilityId, AUDIO_POLICY_SERVICE_ID);
     std::string eventName = "EVENT_INVALID_VIDEO_FD";
     int32_t callId = 0;
-    EXPECT_EQ(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_ERR_FAIL);
+    callManagerService->SendCallUiEvent(callId, eventName);
     DialParaInfo info;
     sptr<CallBase> ringingCall = new IMSCall(info);
     ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);

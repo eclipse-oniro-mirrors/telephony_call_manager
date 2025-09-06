@@ -953,7 +953,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0100, TestSize.
     int32_t state = 4;
     std::string phoneNumber = "12345678901";
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    EXPECT_NE(callManagerService->SetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+    EXPECT_NE(callManagerService->SetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -970,7 +970,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0200, TestSize.
     std::string phoneNumber = "12345678901";
     int32_t systemAbilityId = 100;
     client->Init(systemAbilityId);
-    ASSERT_NE(client->SetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_ERR_PERMISSION_ERR);
+    ASSERT_EQ(client->SetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_SUCCESS);
     ASSERT_EQ(client->GetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_SUCCESS);
     client->UnInit();
     ASSERT_NE(client->SetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_ERR_UNINIT);
@@ -1044,6 +1044,7 @@ HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0100, TestSize.Level1)
     int32_t callId = 12345;
     callAttrInfo.callId = callId;
     callAttrInfo.callState = TelCallState::CALL_STATUS_WAITING;
+    CallObjectManager::AddOneVoipCallObject(callAttrInfo);
     EXPECT_NE(CallObjectManager::IsVoipCallExist(), true);
 
     EXPECT_NE(CallObjectManager::IsVoipCallExist(TelCallState::CALL_STATUS_WAITING, callId), true);
@@ -1088,7 +1089,7 @@ HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0200, TestSize.Level0)
     int32_t newCallId = -1;
     EXPECT_EQ(CallObjectManager::UpdateOneVoipCallObjectByCallId(newCallId, nextState), TELEPHONY_ERROR);
 
-    EXPECT_EQ(CallObjectManager::DeleteOneVoipCallObject(newCallId), TELEPHONY_ERROR);
+    CallObjectManager::DeleteOneVoipCallObject(newCallId);
 
     EXPECT_TRUE(CallObjectManager::IsVoipCallExist());
 

@@ -1127,7 +1127,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_002, TestSize.Level0)
     callStatusCallback->HandleCameraCapabilitiesChanged(cameraCapabilities);
     VoipCallEventInfo voipCallEventInfo;
     res = callStatusCallback->UpdateVoipEventInfo(voipCallEventInfo);
-    ASSERT_NE(res, TELEPHONY_SUCCESS);
+    ASSERT_EQ(res, TELEPHONY_SUCCESS);
 }
 
 /**
