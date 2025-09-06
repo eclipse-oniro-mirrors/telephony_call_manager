@@ -447,9 +447,10 @@ void UserSwitchEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 {
     OHOS::EventFwk::Want want = data.GetWant();
     std::string action = data.GetWant().GetAction();
-    TELEPHONY_LOGI("action = %{public}s", action.c_str());
-    if (action == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
-        int32_t userId = data.GetCode();
+    int32_t userId = data.GetCode();
+    TELEPHONY_LOGI("action = %{public}s, current active user id is :%{public}d", action.c_str(), userId);
+
+    if (action == CommonEventSupport::COMMON_EVENT_USER_SWITCHED && userId == ACTIVE_USER_ID) {
         DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(userId);
     }
 }
@@ -463,7 +464,9 @@ void DataShareReadyEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         DelayedSingleton<CallRecordsManager>::GetInstance()->SetDataShareReady(true);
         std::vector<int32_t> activeList = { 0 };
         DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
-        DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(activeList[0]);
+        if (activeList[0] == ACTIVE_USER_ID) {
+            DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(activeList[0]);
+        }
         LocationSystemAbilityListener::SystemAbilitySubscriber();
         DelayedSingleton<CallControlManager>::GetInstance()->RegisterObserver();
 #ifdef SUPPORT_MUTE_BY_DATABASE
