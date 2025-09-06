@@ -482,7 +482,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioDeviceManager_002, TestSize.Level0)
     audioDeviceManager->info_.audioDeviceList.push_back(deviceHearingAid);
     audioDeviceManager->UpdateBluetoothDeviceName("addr", "nameReplace");
     EXPECT_EQ(audioDeviceManager->info_.audioDeviceList.size(), 1);
-    EXPECT_EQ(audioDeviceManager->info_.audioDeviceList.front().deviceName, "nameReplace");
+    EXPECT_EQ(std::string(audioDeviceManager->info_.audioDeviceList.front().deviceName), "nameReplace");
 }
 
 /**

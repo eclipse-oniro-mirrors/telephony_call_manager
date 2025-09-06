@@ -116,7 +116,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_002, TestSize.Lev
     CallManagerServiceProxy proxy(impl);
     EXPECT_EQ(proxy.SetCallPreferenceMode(0, 0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     std::u16string msg = u"";
-    EXPECT_EQ(proxy.StartRtt(0, msg), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.StartRtt(0, msg), TELEPHONY_ERR_ARGUMENT_INVALID);
     EXPECT_EQ(proxy.StopRtt(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.CombineConference(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.SeparateConference(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -155,7 +155,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_002, TestSize.Lev
     EXPECT_EQ(proxy.GetVoNRState(0, callId), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.JoinConference(0, callIdList), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     std::vector<OttCallDetailsInfo> ottVec;
-    EXPECT_EQ(proxy.ReportOttCallDetailsInfo(ottVec), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.ReportOttCallDetailsInfo(ottVec), TELEPHONY_ERR_ARGUMENT_INVALID);
     OttCallEventInfo eventInfo;
     EXPECT_EQ(proxy.ReportOttCallEventInfo(eventInfo), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
@@ -231,7 +231,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_VoipCallManagerProxy_001, TestSize.Level1
     EXPECT_EQ(proxy.Answer(events, 0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.HangUp(events), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.Reject(events), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-    EXPECT_EQ(proxy.RegisterCallManagerCallBack(nullptr), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.RegisterCallManagerCallBack(nullptr), TELEPHONY_ERR_ARGUMENT_INVALID);
     sptr<ICallStatusCallback> statusCallback = (std::make_unique<CallStatusCallback>()).release();
     EXPECT_EQ(proxy.RegisterCallManagerCallBack(statusCallback), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.UnRegisterCallManagerCallBack(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
