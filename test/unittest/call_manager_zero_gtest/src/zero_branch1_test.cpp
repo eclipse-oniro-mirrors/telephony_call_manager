@@ -1202,7 +1202,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallNumberUtils_003, Function | MediumTest |
     call->SetCallType(CallType::TYPE_IMS);
     CallObjectManager::AddOneCallObject(call);
     dialStr = "333";
-    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0,dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "33";
     ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     CallObjectManager::DeleteOneCallObject(call);
