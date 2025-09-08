@@ -57,11 +57,12 @@ void AudioControlManager::Init()
 {
     DelayedSingleton<AudioDeviceManager>::GetInstance()->Init();
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->Init();
+    ring_ = std::make_shared();
     if (ring_ == nullptr) {
-        ring_ = std::make_shared<Ring>();
-    } else {
-        ring_->Init();
+        TELEPHONY_LOGE("create ring object failed");
+        return;
     }
+
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
     ring_->RegisterObserver();
 #endif

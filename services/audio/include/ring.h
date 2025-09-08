@@ -84,6 +84,7 @@ private:
     void SetRingToneVibrationState();
     void DecreaseVolume();
     void IncreaseVolume();
+    void ResetComfortReminder();
 #endif
 
 private:

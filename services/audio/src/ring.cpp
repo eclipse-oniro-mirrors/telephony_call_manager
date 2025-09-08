@@ -319,8 +319,7 @@ int32_t Ring::UnsubscribeFeature()
     if (!isAdaptiveSwitchOn_) {
         return TELEPHONY_SUCCESS;
     }
-    int32_t ret =
-        MSdp::UserStatusAwareness::UserStatusClient::GetInstance().Unsubscribe(FEATURE_COMFORT_REMINDER);
+    int32_t ret = Msdp::UserStatusAwareness::UserStatusClient::GetInstance().Unsubscribe(FEATURE_COMFORT_REMINDER);
     TELEPHONY_LOGI("ring Unsubscribe feature, ret = %{public}d", ret);
     return TELEPHONY_SUCCESS;
 }
