@@ -21,7 +21,6 @@
 #include "call_object_manager.h"
 #include "telephony_log_wrapper.h"
 #include "nlohmann/json.hpp"
-#include "i_distributed_device_callback.h"
 #ifdef ABILITY_BLUETOOTH_SUPPORT
 #include "bluetooth_device.h"
 #endif

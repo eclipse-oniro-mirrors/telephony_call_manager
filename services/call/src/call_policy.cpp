@@ -219,12 +219,14 @@ int32_t CallPolicy::CanDialMulityCall(AppExecFwk::PacMap &extras, bool isEcc)
             return CALL_ERR_DIAL_IS_BUSY;
         }
     }
+#ifdef SUPPORT_DSOFTBUS
     if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsConnected() &&
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole() &&
         HasCellularCallExist()) {
         TELEPHONY_LOGE("dc-call sink can not dial call when any call exist!");
         return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
     }
+#endif
     return TELEPHONY_SUCCESS;
 }
 

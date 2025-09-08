@@ -28,7 +28,9 @@
 #include "distributed_call_manager.h"
 #include "audio_system_manager.h"
 #include "audio_device_info.h"
+#ifdef SUPPORT_DSOFTBUS
 #include "distributed_communication_manager.h"
+#endif
 #include "bluetooth_call_connection.h"
 
 namespace OHOS {
@@ -586,17 +588,19 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
 {
     if (audioDeviceType_ == AudioDeviceType::DEVICE_UNKNOWN) {
         audioDeviceType_ = DelayedSingleton<AudioControlManager>::GetInstance()->GetInitAudioDeviceType();
-        info_.currentAudioDevice.deviceType = audioDeviceType_;
-    } else {
-        info_.currentAudioDevice.deviceType = audioDeviceType_;
     }
+    info_.currentAudioDevice.deviceType = audioDeviceType_;
     std::string address = device.address;
     std::string deviceName = device.deviceName;
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         UpdateBtDevice(address, deviceName);
-    } else if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsDistributedDev(device)) {
+    }
+#ifdef SUPPORT_DSOFTBUS
+    else if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsDistributedDev(device)) {
         TELEPHONY_LOGI("audio device is distributed communication dev");
-    } else if (IsDistributedAudioDeviceType(audioDeviceType_)) {
+    }
+#endif
+    else if (IsDistributedAudioDeviceType(audioDeviceType_)) {
         address = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallDeviceAddr();
     } else if (audioDeviceType_ == AudioDeviceType::DEVICE_NEARLINK) {
         UpdateNearlinkDevice(address, deviceName);
