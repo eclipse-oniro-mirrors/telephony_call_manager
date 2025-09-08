@@ -45,9 +45,11 @@
 #include "audio_device_manager.h"
 #include "distributed_call_manager.h"
 #include "call_superprivacy_control_manager.h"
-#include "distributed_communication_manager.h"
 #include "call_voice_assistant_manager.h"
+#ifdef SUPPORT_DSOFTBUS
 #include "interoperable_communication_manager.h"
+#include "distributed_communication_manager.h"
+#endif
 #include "settings_datashare_helper.h"
 
 #ifdef ABILITY_POWER_SUPPORT
@@ -1659,8 +1661,10 @@ void CallControlManager::CallStateObserve()
     callStateListenerPtr_->AddOneObserver(missedCallNotification_);
     callStateListenerPtr_->AddOneObserver(incomingCallWakeup_);
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallRecordsManager>::GetInstance());
+#ifdef SUPPORT_DSOFTBUS
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<DistributedCommunicationManager>::GetInstance());
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<InteroperableCommunicationManager>::GetInstance());
+#endif
     callStateListenerPtr_->AddOneObserver(CallVoiceAssistantManager::GetInstance());
 }
 

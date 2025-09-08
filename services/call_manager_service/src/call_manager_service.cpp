@@ -37,11 +37,13 @@
 #include "voip_call_connection.h"
 #include "distributed_call_manager.h"
 #include "call_earthquake_alarm_subscriber.h"
-#include "distributed_communication_manager.h"
 #include "want_params_wrapper.h"
 #include "string_wrapper.h"
 #include "bluetooth_call_connection.h"
+#ifdef SUPPORT_DSOFTBUS
 #include "interoperable_communication_manager.h"
+#include "distributed_communication_manager.h"
+#endif
 #include "voip_call_connection.h"
 #include "audio_control_manager.h"
 
@@ -104,7 +106,9 @@ bool CallManagerService::Init()
     DelayedSingleton<CallRecordsManager>::GetInstance()->Init();
     DelayedSingleton<BluetoothConnection>::GetInstance()->Init();
     DelayedSingleton<DistributedCallManager>::GetInstance()->Init();
+#ifdef SUPPORT_DSOFTBUS
     DelayedSingleton<DistributedCommunicationManager>::GetInstance()->Init();
+#endif
     AddSystemAbilityListener(AUDIO_POLICY_SERVICE_ID);
     AddSystemAbilityListener(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
     return true;
@@ -120,7 +124,9 @@ void CallManagerService::OnAddSystemAbility(int32_t systemAbilityId, const std::
             DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
             break;
         case DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID:
+#ifdef SUPPORT_DSOFTBUS
             DelayedSingleton<InteroperableDeviceObserver>::GetInstance()->Init();
+#endif
             break;
         default:
             TELEPHONY_LOGE("OnAddSystemAbility unhandle id : %{public}d", systemAbilityId);
@@ -347,6 +353,7 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
 
 void CallManagerService::BtCallWaitSlotId(AppExecFwk::PacMap &dialInfo, const std::u16string &number)
 {
+#ifdef SUPPORT_DSOFTBUS
     TELEPHONY_LOGE("BtCallWaitSlotId enter");
     std::string phoneNum(Str16ToStr8(number));
     auto slotId = DelayedSingleton<InteroperableCommunicationManager>::GetInstance()->GetBtCallSlotId(phoneNum);
@@ -356,6 +363,7 @@ void CallManagerService::BtCallWaitSlotId(AppExecFwk::PacMap &dialInfo, const st
         TELEPHONY_LOGI("bt call, slotId[%{public}d]", slotId);
         dialInfo.PutIntValue(SLOT_ID, slotId);
     }
+#endif
 }
 
 int32_t CallManagerService::MakeCall(std::string number)
@@ -917,10 +925,12 @@ int32_t CallManagerService::SetMuted(bool isMute)
     }
     if (callControlManagerPtr_ != nullptr) {
         auto ret = callControlManagerPtr_->SetMuted(isMute);
+#ifdef SUPPORT_DSOFTBUS
         if (ret == TELEPHONY_SUCCESS) {
             DelayedSingleton<DistributedCommunicationManager>::GetInstance()->SetMuted(isMute);
             DelayedSingleton<InteroperableCommunicationManager>::GetInstance()->SetMuted(isMute);
         }
+#endif
         return ret;
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
@@ -940,6 +950,7 @@ int32_t CallManagerService::MuteRinger()
     }
     if (callControlManagerPtr_ != nullptr) {
         auto ret = callControlManagerPtr_->MuteRinger();
+#ifdef SUPPORT_DSOFTBUS
         if (ret == TELEPHONY_SUCCESS) {
             DelayedSingleton<DistributedCommunicationManager>::GetInstance()->MuteRinger();
             DelayedSingleton<InteroperableCommunicationManager>::GetInstance()->MuteRinger();
@@ -947,6 +958,7 @@ int32_t CallManagerService::MuteRinger()
             InteroperableSettingsHandler::SendMuteRinger();
 #endif
         }
+#endif
         return ret;
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");

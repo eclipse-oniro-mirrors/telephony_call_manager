@@ -24,7 +24,9 @@
 #include "bluetooth_hfp_ag.h"
 #include "call_manager_connect.h"
 #include "call_manager_service.h"
+#ifdef SUPPORT_DSOFTBUS
 #include "interoperable_settings_handler.h"
+#endif
 #include "surface_utils.h"
 #include "telephony_types.h"
 #include "voip_call.h"
@@ -993,7 +995,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0300, Functi
     int32_t rotation = CAMERA_ROTATION_90;
     EXPECT_NE(CallManagerGtest::clientPtr_->SetDeviceDirection(callId, rotation), RETURN_VALUE_IS_ZERO);
 }
-
+#ifdef SUPPORT_DSOFTBUS
 /**
  * @tc.number   Telephony_InteroperableSettingsHandlerTest_001
  * @tc.name     test interoperable settings handler
@@ -1009,5 +1011,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_InteroperableSettingsHandlerTes
     EXPECT_EQ(helper->Update(uri, "nokey", "0"), -1);
     EXPECT_EQ(helper->Insert(uri, SYNERGY_MUTE_KEY, "0"), -1);
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS
