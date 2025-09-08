@@ -93,17 +93,19 @@ private:
     std::shared_ptr<Media::RingtonePlayer> RingtonePlayer_ = nullptr;
     int32_t defaultVolume_ = 1;
 
-    #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
-    static constexpr uint32_t FEATURE_COMFORT_REMINDER = 15;
-    bool ringtoneVibrationSwitchState_ = true;
-    bool swing_ = false;
-    bool quiet_ = false;
+#ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
+    bool isAdaptiveSwitchOn_= true;
+    bool isSwing_ = false;
+    bool isQuiet_ = false;
     bool isSwingMsgRecv_ = false;
     bool isEnvMsgRecv_ = false;
     int32_t oriRingVolLevel_ = 0;
     float oriVolumeDb_ = 0.0f;
-    std::mutex comfortReminderMutex_;
-    std::condition_variable conditionVar_;
+    ffrt::mutex comfortReminderMutex_;
+    ffrt::condition_variable conditionVar_;
+    ffrt::mutex ringStopMutex_;
+    ffrt::condition_variable ringStopCv_;
+    bool isRingStopped_ = false;
     std::atomic<bool> isGentleHappend_{false};
     std::atomic<bool> isFadeupHappend_{false};
     std::atomic<int32_t> curRingVolLevel_{0};
