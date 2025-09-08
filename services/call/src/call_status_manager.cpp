@@ -51,6 +51,7 @@
 #include "satellite_call_control.h"
 #include "screen_sensor_plugin.h"
 #include "settings_datashare_helper.h"
+#include "sim_state_type.h"
 #include "spam_call_adapter.h"
 #include "telephony_log_wrapper.h"
 #include "uri.h"
@@ -1890,9 +1891,17 @@ bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDet
         TELEPHONY_LOGW("yellowpage or contact, no need check ring once call");
         return false;
     }
+
+    SimLabel simLabel;
+    std::string key = "";
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimLabel(info.accountId, simLabel);
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
     std::string is_check_ring_once {"0"};
-    std::string key = "spamshield_sim" + std::to_string(info.accountId + 1) + "_phone_switch_ring_once";
+    if (simLabel.simType == SimType::ESIM) {
+        key = "spamshield_eRule" + std::to_string(info.accountId + 1) + "_phone_switch_ring_once";
+    } else {
+        key = "spamshield_sim" + std::to_string(info.accountId + 1) + "_phone_switch_ring_once";
+    }
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=" + key);
     int32_t ret = datashareHelper->Query(uri, key, is_check_ring_once);
