@@ -48,11 +48,6 @@
 #include "audio_scene_processor.h"
 #include "core_service_connection.h"
 #include "ringtone_player.h"
-#include "data_ability_observer_stub.h"
-#include "comfort_reminder_data.h"
-#include "settings_datashare_helper.h"
-#include "datashare_helper.h"
-#include "user_status_client.h"
 
 namespace OHOS {
 namespace Telephony {
