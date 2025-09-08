@@ -25,7 +25,8 @@
         ],
         "features": [
             "call_manager_feature_hfp_async_enable",
-            "call_manager_feature_not_support_multicall"
+            "call_manager_feature_not_support_multicall",
+            "call_manager_feature_support_dsoftbus"
         ],
         "adapted_system_type": [
             "standard"

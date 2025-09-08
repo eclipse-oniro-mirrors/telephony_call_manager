@@ -25,7 +25,9 @@
 #include "audio_control_manager.h"
 #include "audio_group_manager.h"
 #include "distributed_call_manager.h"
+#ifdef SUPPORT_DSOFTBUS
 #include "distributed_communication_manager.h"
+#endif
 #include "voip_call.h"
 
 namespace OHOS {
@@ -436,11 +438,13 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         TELEPHONY_LOGE("desc size is zero");
         return;
     }
+#ifdef SUPPORT_DSOFTBUS
     if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink() &&
         !DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole()) {
         TELEPHONY_LOGI("has already switch to distributed communication device");
         return;
     }
+#endif
     TELEPHONY_LOGI("OnPreferredOutputDeviceUpdated type: %{public}d", desc[0]->deviceType_);
 
     if (IsDistributedDeviceSelected(desc)) {

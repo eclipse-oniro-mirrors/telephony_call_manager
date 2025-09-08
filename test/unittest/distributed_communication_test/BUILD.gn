@@ -15,6 +15,7 @@ import("//build/test.gni")
 import("../../../callmanager.gni")
 CALL_MANAGER_PATH = "../../.."
 
+sources = []
 ohos_unittest("distributed_communication_test") {
   install_enable = true
   subsystem_name = "telephony"
@@ -29,18 +30,20 @@ ohos_unittest("distributed_communication_test") {
   }
   branch_protector_ret = "pac_ret"
 
-  sources = [
-    "src/distributed_communication_manager_test.cpp",
-    "src/distributed_data_test.cpp",
-    "src/distributed_dev_observer_test.cpp",
-    "src/distributed_dev_switch_test.cpp",
-    "src/distributed_transmission_test.cpp",
-    "src/interoperable_client_manager_test.cpp",
-    "src/interoperable_communication_manager_test.cpp",
-    "src/interoperable_data_controller_test.cpp",
-    "src/interoperable_device_observer_test.cpp",
-    "src/interoperable_server_manager_test.cpp",
-  ]
+  if (call_manager_feature_support_dsoftbus) {
+    sources = [
+      "src/distributed_communication_manager_test.cpp",
+      "src/distributed_data_test.cpp",
+      "src/distributed_dev_observer_test.cpp",
+      "src/distributed_dev_switch_test.cpp",
+      "src/distributed_transmission_test.cpp",
+      "src/interoperable_client_manager_test.cpp",
+      "src/interoperable_communication_manager_test.cpp",
+      "src/interoperable_data_controller_test.cpp",
+      "src/interoperable_device_observer_test.cpp",
+      "src/interoperable_server_manager_test.cpp",
+    ]
+  }
   sources += call_manager_sources
 
   include_dirs = []

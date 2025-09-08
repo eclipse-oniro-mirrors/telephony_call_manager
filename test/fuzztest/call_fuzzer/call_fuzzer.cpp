@@ -528,7 +528,7 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
         phoneNum, slotId, index);
     listener->HandleAntiFraudDetectRes(antiFraudResult);
 }
-
+#ifdef SUPPORT_DSOFTBUS
 void InterOperableCommunicationManagerFunc(const uint8_t *data, size_t size)
 {
     int index = 0;
@@ -558,7 +558,7 @@ void InterOperableDeviceObserverFunc(const uint8_t *data, size_t size)
     stateCallback->OnDeviceOnline(deviceInfo);
     stateCallback->OnDeviceOffline(deviceInfo);
 }
-
+#endif
 void BluetoothCallConnectionFunc(const uint8_t *data, size_t size)
 {
     int index = 0;
@@ -666,8 +666,10 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     OttVideoCallWindowFunc(data, size);
     SatelliteCallFunc(data, size);
     AntiFraudServiceFunc(data, size);
+#ifdef SUPPORT_DSOFTBUS
     InterOperableCommunicationManagerFunc(data, size);
     InterOperableDeviceObserverFunc(data, size);
+#endif
     BluetoothCallConnectionFunc(data, size);
     BluetoothCallStateFunc(data, size);
     CallMangerServiceFunc(data, size);
