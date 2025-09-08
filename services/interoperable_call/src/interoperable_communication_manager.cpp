@@ -174,5 +174,15 @@ int32_t InteroperableCommunicationManager::GetBtCallSlotId(const std::string &ph
     dataController_->DeleteBtSlotIdByPhoneNumber(phoneNum); // delete after query
     return btCallSlot;
 }
+
+bool InteroperableCommunicationManager::IsSlotIdVisible()
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    if (dataController_ == nullptr) {
+        TELEPHONY_LOGE("dataController is nullptr");
+        return false;
+    }
+    return dataController_->IsSlotIdVisible();
+}
 }
 }

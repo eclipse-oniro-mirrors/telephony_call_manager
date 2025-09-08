@@ -125,6 +125,9 @@ void CallRecordsManager::CallStateUpdated(
     }
     (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
     callObjectPtr->GetCallAttributeBaseInfo(info);
+    if (info.callType == CallType::TYPE_BLUETOOTH && callObjectPtr->GetBtCallSlotId() == BT_CALL_INVALID_SLOT) {
+        info.accountId = BT_CALL_INVALID_SLOT;
+    }
     ContactInfo contactInfo = callObjectPtr->GetCallerInfo();
     if (contactInfo.name.empty() && !info.name.empty()) {
         info.namePresentation = 1;
@@ -145,18 +148,6 @@ void CallRecordsManager::CallStateUpdated(
         info.newCallUseBox = 1;
     } else {
         info.newCallUseBox = 0;
-    }
-    AddOneCallRecord(info);
-}
-
-void CallRecordsManager::AddOneCallRecord(sptr<CallBase> call, CallAnswerType answerType)
-{
-    CallAttributeInfo info;
-    (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
-    call->GetCallAttributeBaseInfo(info);
-    if (info.numberMarkInfo.markType == MarkType::MARK_TYPE_DEFAULT) {
-        TELEPHONY_LOGI("markType is default.");
-        info.numberMarkInfo.markType = MarkType::MARK_TYPE_NONE;
     }
     AddOneCallRecord(info);
 }

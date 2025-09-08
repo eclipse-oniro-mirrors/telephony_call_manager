@@ -26,6 +26,8 @@
 #include "system_ability.h"
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
+#include "call_object_manager.h"
+#include "interoperable_communication_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -168,12 +170,14 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     std::string bundleInfo = "";
+    CallAttributeInfo newInfo = info;
+    UpdateBtCallSlotId(newInfo);
     std::lock_guard<std::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
             bundleInfo = (*it)->GetBundleInfo();
-            ret = (*it)->OnCallDetailsChange(info);
+            ret = (*it)->OnCallDetailsChange(newInfo);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGD(
                     "OnCallDetailsChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret, bundleInfo.c_str());
@@ -466,5 +470,20 @@ int32_t CallAbilityReportProxy::ReportPhoneStateChange(int32_t numActive, int32_
     TELEPHONY_LOGI("ReportPhoneStateChange success");
     return ret;
 }
+
+void CallAbilityReportProxy::UpdateBtCallSlotId(CallAttributeInfo &info)
+{
+    auto callPtr = CallObjectManager::GetOneCallObject(info.callId);
+    if (callPtr == nullptr || callPtr->GetCallType() != CallType::TYPE_BLUETOOTH) {
+        return;
+    }
+    if (callPtr->GetBtCallSlotId() == BT_CALL_INVALID_SLOT &&
+        !DelayedSingleton<InteroperableCommunicationManager>::GetInstance()->IsSlotIdVisible()) {
+        info.accountId = BT_CALL_INVALID_SLOT;
+    } else {
+        callPtr->SetBtCallSlotId(callPtr->GetAccountId());
+    }
+}
+
 } // namespace Telephony
 } // namespace OHOS

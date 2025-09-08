@@ -52,7 +52,9 @@ public:
     void DeleteBtSlotIdByPhoneNumber(const std::string &phoneNum);
     void WaitForBtSlotId(const std::string &phoneNum);
     int32_t GetBtSlotIdByPhoneNumber(const std::string &phoneNum);
- 
+    bool IsSlotIdVisible();
+    void SetIsSlotIdVisible(bool isVisible);
+
     virtual void OnCallCreated(const sptr<CallBase> &call, const std::string &networkId) = 0;
     virtual void OnCallDestroyed() = 0;
     virtual void HandleSpecificMsg(int32_t msgType, const cJSON *msg) = 0;
@@ -65,8 +67,10 @@ protected:
     std::string CreateQueryRequisitesDataMsg(InteroperableMsgType msgType, const std::string &phoneNum);
     void ClearBtSlotId();
  
+protected:
     std::shared_ptr<SessionAdapter> session_{nullptr};
- 
+    std::atomic<bool> isSlotIdVisible_{false};
+
 private:
     void HandleMuted(const cJSON *msg);
     void HandleMuteRinger();

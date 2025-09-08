@@ -42,6 +42,7 @@ public:
     void NewCallCreated(sptr<CallBase> &call) override;
     void CallDestroyed(const DisconnectedDetails &details) override {}
     int32_t GetBtCallSlotId(const std::string &phoneNum);
+    bool IsSlotIdVisible();
  
 private:
     ffrt::mutex mutex_{};

@@ -225,6 +225,8 @@ void InteroperableDataController::HandleRequisitesData(const cJSON *msg)
         slotIdCv_.notify_all();
         return;
     }
+    TELEPHONY_LOGI("recv slotId, set true");
+    SetIsSlotIdVisible(true);
     CallAttributeInfo info;
     callPtr->SetAccountId(slotId);
     callPtr->GetCallAttributeBaseInfo(info);
@@ -328,6 +330,20 @@ int32_t InteroperableDataController::GetBtSlotIdByPhoneNumber(const std::string 
         return slotIdMap_[phoneNum];
     }
     return BT_CALL_INVALID_SLOT;
+}
+
+bool InteroperableDataController::IsSlotIdVisible()
+{
+    if (session_ == nullptr || !session_->IsReady()) {
+        TELEPHONY_LOGE("session invalid");
+        return false;
+    }
+    return isSlotIdVisible_.load();
+}
+
+void InteroperableDataController::SetIsSlotIdVisible(bool isVisible)
+{
+    isSlotIdVisible_.store(isVisible);
 }
 }
 }
