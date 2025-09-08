@@ -141,7 +141,7 @@ private:
     bool isCrsStartSoundTone_ = false;
     bool isVideoRingVibrating_ = false;
     std::set<sptr<CallBase>> totalCalls_;
-    std::unique_ptr<Ring> ring_;
+    std::shared_ptr<Ring> ring_{nullptr};
     std::unique_ptr<Tone> tone_;
     std::unique_ptr<Sound> sound_;
     std::mutex mutex_;

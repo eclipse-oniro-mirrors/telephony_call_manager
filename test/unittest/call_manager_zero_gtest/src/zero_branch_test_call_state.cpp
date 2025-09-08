@@ -451,6 +451,36 @@ HWTEST_F(CallStateTest, Telephony_Ring_001, TestSize.Level0)
 }
 
 /**
+ * @tc.number   Telephony_Ring_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_Ring_002, TestSize.Level0)
+{
+    auto ring = std::make_shared<Ring>();
+    auto comfortReminder = std::make_shared<Msdp::UserStatusAwareness::ComfortReminderData>();
+    confortReminder->SetFusionReminderData(0);
+    comfortReminder->SetEventType(1);
+    ring->isAdaptiveSwitchOn_ = true;
+    ring->isEnvMsgRecv_ = true;
+    ring->isQuiet_ = true;
+    ffrt::submit([=]() {
+        ffrt_usleep(100000);
+        ring->OnComfortReminderDataChanged(0, comfortReminder);
+    });
+    ring->Play(DEFAULT_SLOT_ID, "", Media::HapticStartupMode::DEFAULT);
+    sleep(WAIT_TIME);
+    comfortReminder->SetFusionReminderData(0);
+    comfortReminder->SetEventType(0);
+    ring->isSwingMsgRecv_ = true;
+    ring->isSwing_ = true;
+    ring->OnComfortReminderDataChanged(0, comfortReminder);
+    sleep(WAIT_TIME);
+    ASSERT_NE(ring->Stop(), TELEPHONY_SUCCESS);
+    ring->ReleaseRenderer();
+}
+
+/**
  * @tc.number   Telephony_Tone_001
  * @tc.name     test error branch
  * @tc.desc     Function test

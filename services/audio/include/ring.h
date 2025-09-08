@@ -58,13 +58,15 @@ static constexpr const char* RING_PLAY_THREAD = "ringPlayThread";
  * @class Ring
  * plays the default or specific ringtone.
  */
-class Ring {
+class Ring : public std::enable_shared_from_this<Ring> {
 public:
     Ring();
     virtual ~Ring();
     void Init();
     int32_t Play(int32_t slotId, std::string ringtonePath, Media::HapticStartupMode mode);
     int32_t Stop();
+    void RegisterObserver();
+    void UnRegisterObserver();
     void ReleaseRenderer();
     int32_t SetMute();
     int32_t SetRingToneVolume(float volume);
@@ -72,10 +74,8 @@ public:
 
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
 private:
-    void RegisterObserver();
-    void UnRegisterObserver();
-    void getSettingsData();
-    void onComfortReminderDataChanged(int32_t result,
+    void GetSettingsData();
+    void OnComfortReminderDataChanged(int32_t result,
         std::shared_ptr<Msdp::UserStatusAwareness::ComfortReminderData> comfortReminderData);
     int32_t RegisterUserStatusDataCallbackFunc();
     int32_t SubscribeFeature();
