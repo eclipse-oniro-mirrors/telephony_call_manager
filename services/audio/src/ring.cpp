@@ -91,6 +91,7 @@ int32_t Ring::Play(int32_t slotId, std::string ringtonePath, Media::HapticStartu
     }
 
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
+    GetSettingsData();
     PrepareComfortReminder();
 #endif
 
@@ -179,7 +180,6 @@ void Ring::RegisterObserver()
     if (!helper->RegisterToDataShare(ringtoneSettingStatusUri, ringtoneSettingStatusObserver_)) {
         TELEPHONY_LOGE("RegisterObserver failed");
     }
-    GetSettingsData();
 }
 
 void Ring::UnRegisterObserver()
@@ -339,7 +339,6 @@ void Ring::PrepareComfortReminder()
     if (!isAdaptiveSwitchOn_) {
         return;
     }
-    SubscribeFeature();
     isRingStopped_ = false;
     auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
     oriRingVolLevel_ = audioProxy->GetVolume(AudioStandard::AudioVolumeType::STREAM_RING);
@@ -347,6 +346,7 @@ void Ring::PrepareComfortReminder()
     oriVolumeDb_ = audioProxy->GetSystemRingVolumeInDb(oriRingVolLevel_);
     TELEPHONY_LOGI("oriVolumeDb_:%{public}f", oriVolumeDb_);
     RegisterUserStatusDataCallbackFunc();
+    SubscribeFeature();
     std::unique_lock<ffrt::mutex> lock(comfortReminderMutex_);
     if (conditionVar_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_LIMIT), [this] { return isEnvMsgRecv_; })) {
         TELEPHONY_LOGI("reminder occurred");

@@ -95,7 +95,7 @@ private:
     int32_t defaultVolume_ = 1;
 
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
-    bool isAdaptiveSwitchOn_ = false;
+    std::atomic<bool> isAdaptiveSwitchOn_ = true;
     bool isSwing_ = false;
     bool isQuiet_ = false;
     bool isSwingMsgRecv_ = false;
