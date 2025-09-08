@@ -37,7 +37,7 @@ constexpr int32_t US_TO_MS = 1000;
 const std::string ADAPTIVE_SWITCH = "ringtone_vibrate_adaptive_switch";
 #endif
 
-Ring::Ring() : audioPlayer_(new (std::nothrow) AudioPlayer())
+Ring::Ring()
 {
     Init();
 }
@@ -45,11 +45,6 @@ Ring::Ring() : audioPlayer_(new (std::nothrow) AudioPlayer())
 Ring::~Ring()
 {
     TELEPHONY_LOGI("~Ring");
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    if (audioPlayer_ != nullptr) {
-        delete audioPlayer_;
-        audioPlayer_ = nullptr;
-    }
 }
 
 void Ring::Init()
