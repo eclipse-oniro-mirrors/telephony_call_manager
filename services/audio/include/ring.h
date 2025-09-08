@@ -89,6 +89,7 @@ private:
 private:
     ffrt::mutex mutex_;
     AudioPlayer *audioPlayer_ = nullptr;
+    std::unique_ptr<AudioPlayer> audioPlayer_{nullptr};
     std::shared_ptr<Media::SystemSoundManager> SystemSoundManager_ = nullptr;
     std::shared_ptr<Media::RingtonePlayer> RingtonePlayer_ = nullptr;
     int32_t defaultVolume_ = 1;
