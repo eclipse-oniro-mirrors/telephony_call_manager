@@ -18,8 +18,6 @@
 
 #include <memory>
 #include <atomic>
-#include <mutex>
-#include <condition_variable>
 
 #include "audio_renderer.h"
 #include "ffrt.h"
@@ -65,12 +63,14 @@ public:
     void Init();
     int32_t Play(int32_t slotId, std::string ringtonePath, Media::HapticStartupMode mode);
     int32_t Stop();
-    void RegisterObserver();
-    void UnRegisterObserver();
     void ReleaseRenderer();
     int32_t SetMute();
     int32_t SetRingToneVolume(float volume);
     bool isMutedRing_ = false;
+#ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
+    void RegisterObserver();
+    void UnRegisterObserver();
+#endif
 
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
 private:
@@ -94,7 +94,7 @@ private:
     int32_t defaultVolume_ = 1;
 
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
-    bool isAdaptiveSwitchOn_ = true;
+    bool isAdaptiveSwitchOn_ = false;
     bool isSwing_ = false;
     bool isQuiet_ = false;
     bool isSwingMsgRecv_ = false;

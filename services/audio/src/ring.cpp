@@ -26,25 +26,28 @@ namespace Telephony {
 static constexpr int32_t DEFAULT_SIM_SLOT_ID = 0;
 
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
-constexpr START_INTENSITY = 1.0;
-constexpr END_INTENSITY = 100.0;
+constexpr float START_INTENSITY = 1.0;
+constexpr float END_INTENSITY = 100.0;
 constexpr int32_t VOL_LEVEL_UNDER_LINE = 3;
 constexpr int32_t TIMEOUT_LIMIT = 500; //ms
 constexpr int32_t DECREASE_DURATION = 500000; //us
 constexpr int32_t INCREASE_DURATION = 5000000; //us
-constexpr int32_t ONE_SECOND = 1000000; //us
+constexpr int32_t ONE_SECOND = 1; //s
+constexpr int32_t ONE_SECOND_US = 1000000; //us
 constexpr int32_t US_TO_MS = 1000;
+constexpr uint32_t FEATURE_COMFORT_REMINDER = 15;
 const std::string ADAPTIVE_SWITCH = "ringtone_vibrate_adaptive_switch";
 #endif
 
 Ring::Ring()
 {
+    TELEPHONY_LOGI("Ring Create");
     Init();
 }
 
 Ring::~Ring()
 {
-    TELEPHONY_LOGI("~Ring");
+    TELEPHONY_LOGI("~Ring Destory");
 }
 
 void Ring::Init()
@@ -114,10 +117,10 @@ int32_t Ring::Stop()
     std::unique_lock<ffrt::mutex> lock(ringStopMutex_);
     isRingStopped_ = true;
     lock.unlock();
+    ringStopCv_.notify_all();
     UnRegisterObserver();
     UnsubscribeFeature();
-    isGentleHappend_ = false;
-    isFadeupHappend_ = false;
+    ResetComfortReminder();
 #endif
     return result;
 }
@@ -325,7 +328,7 @@ int32_t Ring::UnsubscribeFeature()
 void Ring::ResetComfortReminder()
 {
     isAdaptiveSwitchOn_ = false;
-    isSing_ = false;
+    isSwing_ = false;
     isQuiet_ = false;
     isSwingMsgRecv_ = false;
     isEnvMsgRecv_ = false;
@@ -345,10 +348,10 @@ void Ring::PrepareComfortReminder()
     oriVolumeDb_ = audioProxy->GetSystemRingVolumeInDb(oriRingVolLevel_);
     TELEPHONY_LOGI("oriVolumeDb_:%{public}f", oriVolumeDb_);
     RegisterUserStatusDataCallbackFunc();
-    std::unique_lock<std::mutex> lock(comfortReminderMutex_);
+    std::unique_lock<ffrt::mutex> lock(comfortReminderMutex_);
     if (conditionVar_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_LIMIT), [this] { return isEnvMsgRecv_; })) {
         TELEPHONY_LOGI("reminder occurred");
-        if (isQuiet_ && !swing_ && oriRingVolLevel_ > VOL_LEVEL_UNDER_LINE && oriVolumeDb_ > 0.0f {
+        if (isQuiet_ && !isSwing_ && oriRingVolLevel_ > VOL_LEVEL_UNDER_LINE && oriVolumeDb_ > 0.0f) {
             float endVolumeDb = audioProxy->GetSystemRingVolumeInDb(VOL_LEVEL_UNDER_LINE);
             TELEPHONY_LOGI("ready to fade up, reset VolumeDb:%{public}f", endVolumeDb);
             SetRingToneVolume(endVolumeDb / oriVolumeDb_);
@@ -376,7 +379,7 @@ void Ring::DecreaseVolume()
     for (int i = 0; i < totalSteps; ++i) {
         std::unique_lock<ffrt::mutex> lock(ringStopMutex_);
         if (ringStopCv_.wait_for(lock, std::chrono::microseconds(interval),
-            [this] {return isRingStoped_; })) {
+            [this] {return isRingStopped_; })) {
             TELEPHONY_LOGI("DecreaseVolume interrupt by ring stop");
             return;
             }
@@ -399,7 +402,7 @@ void Ring::IncreaseVolume()
     const int interval = (INCREASE_DURATION - ONE_SECOND_US) / totalSteps;
     TELEPHONY_LOGI("IncreaseVolume totalSteps %{public}d, interval %{public}d", totalSteps, interval);
     std::unique_lock<ffrt::mutex> lock(ringStopMutex_);
-    if (ringStopCv_.wait_for(lock, std::chrono::seconds(ONE_SECOND), [this] { return isRingStoped_; })) {
+    if (ringStopCv_.wait_for(lock, std::chrono::seconds(ONE_SECOND), [this] { return isRingStopped_; })) {
         TELEPHONY_LOGI("IncreaseVolume interrupt by ring stop in 1sec");
         return;
     }
@@ -407,7 +410,7 @@ void Ring::IncreaseVolume()
     for (int i = 0; i < totalSteps; ++i) {
         std::unique_lock<ffrt::mutex> innerLock(ringStopMutex_);
         if (ringStopCv_.wait_for(innerLock, std::chrono::microseconds(interval),
-            [this] { return isRingStoped_; })) {
+            [this] { return isRingStopped_; })) {
             TELEPHONY_LOGI("IncreaseVolume interrupt by ring stop");
             return;
         }
