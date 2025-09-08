@@ -21,6 +21,9 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr uint16_t DEV_PHONE = 0x0E;
+constexpr uint16_t DEV_WATCH = 0x6D;
+constexpr uint16_t DEV_CAR = 0x83;
 InteroperableCommunicationManager::InteroperableCommunicationManager()
 {
     devObserver_ = DelayedSingleton<InteroperableDeviceObserver>::GetInstance();
@@ -39,9 +42,9 @@ void InteroperableCommunicationManager::OnDeviceOnline(const DistributedHardware
     {
         std::lock_guard<ffrt::mutex> lock(mutex_);
         std::string ownType = system::GetParameter("const.product.devicetype", "");
-        if (devType == 0x0E && (ownType == "wearable" || ownType == "car")) {    // 0x0E手机
+        if (devType == DEV_PHONE && (ownType == "wearable" || ownType == "car")) {
             role_ = InteroperableRole::OTHERS;
-        } else if (devType == 0x6D || devType == 0x83) {    // 0x6D手表，0x83车机
+        } else if (devType == DEV_WATCH || devType == DEV_CAR) {
             role_ = InteroperableRole::PHONE;
         } else {
             TELEPHONY_LOGE("not interoperable device");
@@ -72,7 +75,7 @@ void InteroperableCommunicationManager::OnDeviceOffline(const DistributedHardwar
     std::string devName = deviceInfo.deviceName;
     uint16_t devType = deviceInfo.deviceTypeId;
     std::string ownType = system::GetParameter("const.product.devicetype", "");
-    if (devType != 0x6D && devType != 0x83 && ownType != "wearable" && ownType != "car") {
+    if (devType != DEV_WATCH && devType != DEV_CAR && ownType != "wearable" && ownType != "car") {
         TELEPHONY_LOGE("not interoperable device");
         return;
     }
