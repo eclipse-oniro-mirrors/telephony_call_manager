@@ -459,7 +459,7 @@ HWTEST_F(CallStateTest, Telephony_Ring_002, TestSize.Level0)
 {
     auto ring = std::make_shared<Ring>();
     auto comfortReminder = std::make_shared<Msdp::UserStatusAwareness::ComfortReminderData>();
-    confortReminder->SetFusionReminderData(0);
+    comfortReminder->SetFusionReminderData(0);
     comfortReminder->SetEventType(1);
     ring->isAdaptiveSwitchOn_ = true;
     ring->isEnvMsgRecv_ = true;
