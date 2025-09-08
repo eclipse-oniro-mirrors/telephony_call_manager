@@ -40,6 +40,7 @@ ohos_shared_library("cj_telephony_call_ffi") {
     "image_framework:image",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_single",
     "libuv:uv",
     "napi:ace_napi",
     "napi:cj_bind_ffi",
