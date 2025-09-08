@@ -266,7 +266,7 @@ void Ring::SetRingToneVibrationState()
                 strongPtr->DecreaseVolume();
             }
         });
-    }else if (isQuiet_ && !isFadeupHappend_ && !isGentleHappend_) {
+    } else if (isQuiet_ && !isFadeupHappend_ && !isGentleHappend_) {
         isFadeupHappend_ = true;
         ret = RingtonePlayer_->SetRingtoneHapticsRamp(INCREASE_DURATION / US_TO_MS, START_INTENSITY, END_INTENSITY);
         TELEPHONY_LOGI("vibration fade up, ret = %{public}d", ret);
