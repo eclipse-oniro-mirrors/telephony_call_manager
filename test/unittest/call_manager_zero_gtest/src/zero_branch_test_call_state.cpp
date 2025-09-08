@@ -462,6 +462,7 @@ HWTEST_F(CallStateTest, Telephony_Ring_001, TestSize.Level0)
  */
 HWTEST_F(CallStateTest, Telephony_Ring_002, TestSize.Level0)
 {
+    #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
     auto ring = std::make_shared<Ring>();
     auto comfortReminder = std::make_shared<Msdp::UserStatusAwareness::ComfortReminderData>();
     comfortReminder->SetFusionReminderData(0);
@@ -483,6 +484,7 @@ HWTEST_F(CallStateTest, Telephony_Ring_002, TestSize.Level0)
     sleep(WAIT_TIME);
     ASSERT_NE(ring->Stop(), TELEPHONY_SUCCESS);
     ring->ReleaseRenderer();
+    #endif
 }
 
 /**
