@@ -25,7 +25,9 @@
 #include "call_control_manager.h"
 #include "call_superprivacy_control_manager.h"
 #include "call_manager_base.h"
+#ifdef SUPPORT_DSOFTBUS
 #include "distributed_communication_manager.h"
+#endif
 #include "cellular_call_connection.h"
 
 namespace OHOS {

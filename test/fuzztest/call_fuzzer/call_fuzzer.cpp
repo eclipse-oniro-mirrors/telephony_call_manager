@@ -27,8 +27,10 @@
 #include "surface_utils.h"
 #include "voip_call.h"
 #include "antifraud_service.h"
+#ifdef SUPPORT_DSOFTBUS
 #include "interoperable_device_observer.h"
 #include "interoperable_communication_manager.h"
+#endif
 #include "bluetooth_call_connection.h"
 #include "bluetooth_call_state.h"
 #include "antifraud_adapter.h"
