@@ -114,9 +114,9 @@ int32_t Ring::Stop()
     result = RingtonePlayer_->Stop();
     isMutedRing_ = false;
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
-    std::unique_lock<ffrt::mutex> lock(ringStopMutex_);
+    std::unique_lock<ffrt::mutex> lockRing(ringStopMutex_);
     isRingStopped_ = true;
-    lock.unlock();
+    lockRing.unlock();
     ringStopCv_.notify_all();
     UnRegisterObserver();
     UnsubscribeFeature();
