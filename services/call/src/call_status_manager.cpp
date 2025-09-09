@@ -36,7 +36,9 @@
 #include "cs_call.h"
 #include "core_service_client.h"
 #include "datashare_predicates.h"
+#ifdef SUPPORT_DSOFTBUS
 #include "distributed_communication_manager.h"
+#endif
 #include "ffrt.h"
 #include "hitrace_meter.h"
 #include "hitrace/tracechain.h"
@@ -569,8 +571,10 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         }
         callObjectPtr->SetCallerInfo(contactInfoTemp);
         CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfoTemp, callObjectPtr->GetCallID());
+#ifdef SUPPORT_DSOFTBUS
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
             DistributedDataType::NAME);
+#endif
     });
 }
 
@@ -1720,17 +1724,16 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
                 return;
             }
             DelayedSingleton<CallNumberUtils>::GetInstance()->NumberLocationUpdate(callBasePtr);
+#ifdef SUPPORT_DSOFTBUS
             DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callBasePtr,
                 DistributedDataType::LOCATION);
+#endif
             if (info.state == TelCallState::CALL_STATUS_DIALING) {
                 DelayedSingleton<CallNumberUtils>::GetInstance()->YellowPageAndMarkUpdate(callBasePtr);
             }
         });
     }
-    time_t createTime = time(nullptr);
-    if (createTime < 0) {
-        createTime = 0;
-    }
+    time_t createTime = std::max(time(nullptr), static_cast<time_t>(0));
     callPtr->SetCallCreateTime(createTime);
     return callPtr;
 }
@@ -2262,8 +2265,11 @@ void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, 
                 TELEPHONY_LOGI("RefreshCallDisconnectReason message[%{public}s]", message.c_str());
                 std::string lowerStr = message;
                 std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
-                if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole() ||
-                    lowerStr.find("elsewhere") != std::string::npos) {
+                bool isSinkRole = false;
+#ifdef SUPPORT_DSOFTBUS
+                isSinkRole = DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole();
+#endif
+                if (isSinkRole || lowerStr.find("elsewhere") != std::string::npos) {
                     call->SetAnswerType(CallAnswerType::CALL_ANSWERED_ELSEWHER);
                     TELEPHONY_LOGI("call answered elsewhere");
                 }

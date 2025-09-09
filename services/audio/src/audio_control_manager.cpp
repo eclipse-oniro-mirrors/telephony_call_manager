@@ -29,7 +29,9 @@
 #include "audio_device_descriptor.h"
 #include "voip_call_connection.h"
 #include "settings_datashare_helper.h"
+#ifdef SUPPORT_DSOFTBUS
 #include "distributed_communication_manager.h"
+#endif
 #include "os_account_manager.h"
 #include "ringtone_player.h"
 #include "int_wrapper.h"
@@ -217,6 +219,10 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
     VideoStateType nextVideoState, AudioDeviceType &initDeviceType, AudioDevice &device)
 {
     TelCallState telCallState = callObjectPtr->GetTelCallState();
+    bool isAudioOnSink = false;
+#ifdef SUPPORT_DSOFTBUS
+    isAudioOnSink = DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink();
+#endif
     if (!IsVideoCall(priorVideoState) && IsVideoCall(nextVideoState) &&
         (telCallState != TelCallState::CALL_STATUS_INCOMING && telCallState != TelCallState::CALL_STATUS_WAITING)) {
         if (callObjectPtr->GetOriginalCallType() == VOICE_TYPE &&
@@ -230,8 +236,8 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
         SetAudioDevice(device);
-    } else if (!DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink() &&
-               !isSetAudioDeviceByUser_ && IsVideoCall(priorVideoState) && !IsVideoCall(nextVideoState)) {
+    } else if (!isAudioOnSink && !isSetAudioDeviceByUser_ && IsVideoCall(priorVideoState) &&
+               !IsVideoCall(nextVideoState)) {
         device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
         if (IsExternalAudioDevice(initDeviceType)) {
             device.deviceType = initDeviceType;
@@ -624,9 +630,11 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
 int32_t AudioControlManager::SwitchAudioDevice(AudioDeviceType audioDeviceType)
 {
     if (audioDeviceType != AudioDeviceType::DEVICE_UNKNOWN) {
+#ifdef SUPPORT_DSOFTBUS
         if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink()) {
             DelayedSingleton<DistributedCommunicationManager>::GetInstance()->SwitchToSourceDevice();
         }
+#endif
         if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
             DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOffDCallDeviceSync();
         }
@@ -639,12 +647,14 @@ int32_t AudioControlManager::SwitchAudioDevice(AudioDeviceType audioDeviceType)
 
 int32_t AudioControlManager::HandleDistributeAudioDevice(const AudioDevice &device)
 {
+#ifdef SUPPORT_DSOFTBUS
     if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsDistributedDev(device)) {
         if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->SwitchToSinkDevice(device)) {
             return TELEPHONY_SUCCESS;
         }
         return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
     }
+#endif
     if (!DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
         if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOnDCallDeviceSync(device)) {
             return TELEPHONY_SUCCESS;
@@ -984,6 +994,7 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
     if (audioInterruptState_ == AudioInterruptState::INTERRUPT_STATE_DEACTIVATED) {
         return AudioDeviceType::DEVICE_DISABLE;
     } else {
+#ifdef SUPPORT_DSOFTBUS
         if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsConnected()) {
             AudioDevice device = {
                 .deviceType = AudioDeviceType::DEVICE_UNKNOWN,
@@ -991,7 +1002,7 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
             (void)DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device);
             return device.deviceType;
         }
-
+#endif
         /**
          * Init audio device type according to the priority in different call state:
          * In voice call state, bluetooth sco > wired headset > earpiece > speaker

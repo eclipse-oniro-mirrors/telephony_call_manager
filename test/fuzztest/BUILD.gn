@@ -13,6 +13,7 @@
 
 import("//build/config/features.gni")
 import("//build/test.gni")
+import("../../callmanager.gni")
 
 group("fuzztest") {
   testonly = true
@@ -35,5 +36,7 @@ group("fuzztest") {
   deps += [ "setpausepicture_fuzzer:fuzztest" ]
   deps += [ "startdtmf_fuzzer:fuzztest" ]
   deps += [ "telephonyinteraction_fuzzer:fuzztest" ]
-  deps += [ "distributedcommunication_fuzzer:fuzztest" ]
+  if (call_manager_feature_support_dsoftbus) {
+    deps += [ "distributedcommunication_fuzzer:fuzztest" ]
+  }
 }

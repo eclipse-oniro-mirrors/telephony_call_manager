@@ -27,8 +27,10 @@
 #include "surface_utils.h"
 #include "voip_call.h"
 #include "antifraud_service.h"
+#ifdef SUPPORT_DSOFTBUS
 #include "interoperable_device_observer.h"
 #include "interoperable_communication_manager.h"
+#endif
 #include "bluetooth_call_connection.h"
 #include "bluetooth_call_state.h"
 #include "antifraud_adapter.h"
@@ -528,7 +530,7 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
         phoneNum, slotId, index);
     listener->HandleAntiFraudDetectRes(antiFraudResult);
 }
-
+#ifdef SUPPORT_DSOFTBUS
 void InterOperableCommunicationManagerFunc(const uint8_t *data, size_t size)
 {
     int index = 0;
@@ -558,7 +560,7 @@ void InterOperableDeviceObserverFunc(const uint8_t *data, size_t size)
     stateCallback->OnDeviceOnline(deviceInfo);
     stateCallback->OnDeviceOffline(deviceInfo);
 }
-
+#endif
 void BluetoothCallConnectionFunc(const uint8_t *data, size_t size)
 {
     int index = 0;
@@ -666,8 +668,10 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     OttVideoCallWindowFunc(data, size);
     SatelliteCallFunc(data, size);
     AntiFraudServiceFunc(data, size);
+#ifdef SUPPORT_DSOFTBUS
     InterOperableCommunicationManagerFunc(data, size);
     InterOperableDeviceObserverFunc(data, size);
+#endif
     BluetoothCallConnectionFunc(data, size);
     BluetoothCallStateFunc(data, size);
     CallMangerServiceFunc(data, size);
