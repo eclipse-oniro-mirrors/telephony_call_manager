@@ -73,7 +73,8 @@
                 "device_manager",
                 "openssl",
                 "libphonenumber",
-                "screenlock_mgr"
+                "screenlock_mgr",
+                "user_status_awareness"
             ],
             "third_party": [
                 "libphonenumber",

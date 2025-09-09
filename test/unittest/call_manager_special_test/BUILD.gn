@@ -151,6 +151,12 @@ ohos_unittest("tel_call_manager_special1_test") {
       global_parts_info.multimedia_camera_framework) {
     external_deps += [ "camera_framework:camera_framework" ]
   }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.msdp_user_status_awareness) &&
+      global_parts_info.msdp_user_status_awareness) {
+    external_deps += [ "user_status_awareness::user_status_client" ]
+  }
 }
 
 ohos_unittest("tel_call_manager_special2_test") {
@@ -288,6 +294,12 @@ ohos_unittest("tel_call_manager_special2_test") {
       defined(global_parts_info.multimedia_camera_framework) &&
       global_parts_info.multimedia_camera_framework) {
     external_deps += [ "camera_framework:camera_framework" ]
+  }
+    
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.msdp_user_status_awareness) &&
+      global_parts_info.msdp_user_status_awareness) {
+    external_deps += [ "user_status_awareness::user_status_client" ]
   }
 }
 
@@ -427,5 +439,11 @@ ohos_unittest("tel_call_manager_special3_test") {
       defined(global_parts_info.multimedia_camera_framework) &&
       global_parts_info.multimedia_camera_framework) {
     external_deps += [ "camera_framework:camera_framework" ]
+  }
+    
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.msdp_user_status_awareness) &&
+      global_parts_info.msdp_user_status_awareness) {
+    external_deps += [ "user_status_awareness::user_status_client" ]
   }
 }

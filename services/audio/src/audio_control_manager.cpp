@@ -57,6 +57,15 @@ void AudioControlManager::Init()
 {
     DelayedSingleton<AudioDeviceManager>::GetInstance()->Init();
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->Init();
+    ring_ = std::make_shared<Ring>();
+    if (ring_ == nullptr) {
+        TELEPHONY_LOGE("create ring object failed");
+        return;
+    }
+
+#ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
+    ring_->RegisterObserver();
+#endif
 }
 
 void AudioControlManager::UnInit()
@@ -64,6 +73,9 @@ void AudioControlManager::UnInit()
     DelayedSingleton<AudioProxy>::GetInstance()->UnsetDeviceChangeCallback();
     DelayedSingleton<AudioProxy>::GetInstance()->UnsetAudioPreferDeviceChangeCallback();
     DelayedSingleton<AudioProxy>::GetInstance()->UnsetAudioMicStateChangeCallback();
+#ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
+    ring_->UnRegisterObserver();
+#endif
 }
 
 void AudioControlManager::UpdateForegroundLiveCall()
@@ -764,11 +776,6 @@ bool AudioControlManager::PlayRingtone()
     int32_t ret;
     if (!ShouldPlayRingtone()) {
         TELEPHONY_LOGE("should not play ringtone");
-        return false;
-    }
-    ring_ = std::make_unique<Ring>();
-    if (ring_ == nullptr) {
-        TELEPHONY_LOGE("create ring object failed");
         return false;
     }
     sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
