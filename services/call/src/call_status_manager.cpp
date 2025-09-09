@@ -1733,7 +1733,7 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
             }
         });
     }
-    time_t createTime = std::max(time(nullptr), 0L);
+    time_t createTime = std::max(time(nullptr), static_cast<time_t>(0));
     callPtr->SetCallCreateTime(createTime);
     return callPtr;
 }
