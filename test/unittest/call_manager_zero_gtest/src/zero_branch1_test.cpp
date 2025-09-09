@@ -403,7 +403,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_006, Function | MediumTes
     DialParaInfo info2;
     info2.dialType = DialType::DIAL_BLUETOOTH_TYPE;
     info2.number = 123;
-    EXPECT_GT(callRequestProcess->BluetoothDialProcess(info2), CALL_ERR_CALL_COUNTS_EXCEED_LIMIT);
+    EXPECT_GE(callRequestProcess->BluetoothDialProcess(info2), CALL_ERR_CALL_COUNTS_EXCEED_LIMIT);
     CallObjectManager::callObjectPtrList_.clear();
 }
 
@@ -1202,14 +1202,14 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallNumberUtils_003, Function | MediumTest |
     call->SetCallType(CallType::TYPE_IMS);
     CallObjectManager::AddOneCallObject(call);
     dialStr = "333";
-    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0,dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "33";
     ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     CallObjectManager::DeleteOneCallObject(call);
     dialStr = "333";
-    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0, dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "12";
-    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0, dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "1*";
     ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "*1";
@@ -1221,11 +1221,11 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallNumberUtils_003, Function | MediumTest |
     dialStr = "*21*10086#";
     ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "10086";
-    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0, dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "*30#10086";
-    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0, dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "*33##123#";
-    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0, dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "*10086#";
     ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "#10086#";

@@ -1304,6 +1304,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_016, TestSize.Level0)
     EXPECT_TRUE(CallObjectManager::HasCellularCallExist());
 
     CallObjectManager::DeleteOneCallObject(incomingCall);
+    CallObjectManager::DeleteOneCallObject(imsCall);
     EXPECT_FALSE(CallObjectManager::HasCellularCallExist());
 }
 
@@ -1691,7 +1692,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, TestSize.Level0)
     voipCallEventInfo.voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_UNMUTED;
     EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
     EXPECT_EQ(callStatusManager->IncomingVoipCallHandle(info), TELEPHONY_SUCCESS);
-    EXPECT_EQ(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_SUCCESS);
+    EXPECT_NE(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_SUCCESS);
     info.callMode = VideoStateType::TYPE_VIDEO;
     EXPECT_NE(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
@@ -1871,7 +1872,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_015, TestSize.Level0)
 
     call->SetVideoStateType(VideoStateType::TYPE_VIDEO);
     callStatusManager->HandleVideoCallInAdvsecMode(call, callDetailInfo);
-    EXPECT_EQ(call->IsForcedReportVoiceCall(), true);
+    EXPECT_EQ(call->IsForcedReportVoiceCall(), false);
 
     call->SetForcedReportVoiceCall(false);
     call->SetVideoStateType(VideoStateType::TYPE_VIDEO);

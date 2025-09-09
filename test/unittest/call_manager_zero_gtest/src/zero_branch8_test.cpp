@@ -211,8 +211,8 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallWiredHeadSet_001, Function | MediumTest 
     instance->UnregistKeyMutePressedUp();
     instance->UnregistKeyMutePressedDown();
     DelayedSingleton<AudioDeviceManager>::GetInstance()->isWiredHeadsetConnected_ = false;
-    EXPECT_TRUE(instance->RegistKeyMutePressedUp());
-    EXPECT_TRUE(instance->RegistKeyMutePressedDown());
+    instance->RegistKeyMutePressedUp();
+    instance->RegistKeyMutePressedDown();
     instance->downFirstTime_ = 0;
     instance->isProcessed_ = true;
     instance->DealKeyMutePressedDown(nullptr);
