@@ -86,5 +86,12 @@ void InteroperableClientManager::CallCreated(const sptr<CallBase> &call, const s
         SendRequisiteDataQueryToPeer(call->GetAccountNumber()); // multi-call
     }
 }
+
+void InteroperableClientManager::OnDeviceOffline(const std::string &networkId,
+    const std::string &devName, uint16_t devType)
+{
+    TELEPHONY_LOGI("client offline, set false");
+    SetIsSlotIdVisible(false);
+}
 } // namespace Telephony
 } // namespace OHOS

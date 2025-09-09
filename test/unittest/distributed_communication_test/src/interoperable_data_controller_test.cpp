@@ -150,5 +150,24 @@ Function | MediumTest | Level1)
     CallObjectManager::callObjectPtrList_.clear();
     cJSON_Delete(msg);
 }
+
+/**
+ * @tc.number   Telephony_InteroperableDataControllerTest_005
+ * @tc.name     test data controller is slot id visible
+ * @tc.desc     Function test
+ */
+HWTEST_F(InteroperableClientManagerTest, Telephony_InteroperableDataControllerTest_005,
+Function | MediumTest | Level1)
+{
+    std::shared_ptr<InteroperableDataController> dataController = std::make_shared<InteroperableServerManager>();
+    std::shared_ptr<ISessionCallback> callback = std::make_shared<SessionCallbackForTest>();
+    auto session = std::make_shared<ServerSession>(callback);
+    EXPECT_NO_THROW(dataController->SetIsSlotIdVisible(true));
+    dataController->session_ = session;
+    dataController->session_->socket_ = INVALID_SOCKET_ID;
+    EXPECT_FALSE(dataController->IsSlotIdVisible());
+    dataController->session_->socket_ = INVALID_SOCKET_ID + 1;
+    EXPECT_TRUE(dataController->IsSlotIdVisible());
+}
 } // namespace Telephony
 } // namespace OHOS

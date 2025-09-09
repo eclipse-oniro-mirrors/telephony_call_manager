@@ -764,5 +764,17 @@ int32_t CallBase::GetNewCallUseBox()
 {
     return newCallUseBox_;
 }
+
+int32_t CallBase::GetBtCallSlotId()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return btCallSlotId_;
+}
+
+void CallBase::SetBtCallSlotId(int32_t slotId)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    btCallSlotId_ = slotId;
+}
 } // namespace Telephony
 } // namespace OHOS

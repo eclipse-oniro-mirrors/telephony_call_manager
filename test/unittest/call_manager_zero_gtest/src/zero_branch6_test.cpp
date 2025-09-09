@@ -551,6 +551,32 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_003, TestSize.Level0)
 }
 
 /**
+ * @tc.number   Telephony_CallAbilityReportProxy_004
+ * @tc.name     test update bt call slotId
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_004, TestSize.Level0)
+{
+    std::shared_ptr<CallAbilityReportProxy> callAbilityReportProxy = std::make_shared<CallAbilityReportProxy>();
+    CallAttributeInfo info;
+    info.callId = -1;
+    callAbilityReportProxy->UpdateBtCallSlotId(info);
+
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_IMS;
+    dialParaInfo.callId = 1;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    info.callId = 1;
+    call->SetBtCallSlotId(BT_CALL_INVALID_SLOT);
+    auto tempSize = CallObjectManager::callObjectPtrList_.size();
+    CallObjectManager::callObjectPtrList_.push_back(call);
+    callAbilityReportProxy->UpdateBtCallSlotId(info);
+    call->SetBtCallSlotId(BT_CALL_INVALID_SLOT + 1);
+    callAbilityReportProxy->UpdateBtCallSlotId(info);
+    EXPECT_EQ(tempSize + 1, CallObjectManager::callObjectPtrList_.size());
+}
+
+/**
  * @tc.number   Telephony_CallAbilityConnectCallback_001
  * @tc.name     test error branch
  * @tc.desc     Function test

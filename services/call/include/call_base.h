@@ -154,6 +154,8 @@ public:
     void SetIsAnsweredByPhone(bool isAnsweredByPhone);
     void SetNewCallUseBox(int32_t newCallUseBox);
     int32_t GetNewCallUseBox();
+    int32_t GetBtCallSlotId();
+    void SetBtCallSlotId(int32_t slotId);
 
 protected:
     int32_t callId_;
@@ -210,6 +212,7 @@ private:
     bool isForcedReportVoiceCall_{false};
     bool isAnsweredByPhone_{false};
     int32_t newCallUseBox_ = 0;
+    int32_t btCallSlotId_{BT_CALL_INVALID_SLOT};
 };
 } // namespace Telephony
 } // namespace OHOS

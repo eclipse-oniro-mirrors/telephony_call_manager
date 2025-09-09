@@ -121,5 +121,21 @@ HWTEST_F(InteroperableCommunicationManagerTest,
     EXPECT_NO_THROW(dcManager->NewCallCreated(call));
     dcManager->peerDevices_.clear();
 }
+
+/**
+ * @tc.number   Telephony_InteroperableCommunicationManagerTest_004
+ * @tc.name     test dc manager is slot id visible
+ * @tc.desc     Function test
+ */
+HWTEST_F(InteroperableCommunicationManagerTest,
+         Telephony_InteroperableCommunicationManagerTest_004, Function | MediumTest | Level1)
+{
+    auto dcManager = DelayedSingleton<InteroperableCommunicationManager>::GetInstance();
+    dcManager->dataController_ = nullptr;
+    EXPECT_FALSE(dcManager->IsSlotIdVisible());
+    dcManager->dataController_ = std::make_shared<InteroperableClientManager>();
+    dcManager->dataController_->session_ = nullptr;
+    EXPECT_FALSE(dcManager->IsSlotIdVisible());
+}
 } // namespace Telephony
 } // namespace OHOS
