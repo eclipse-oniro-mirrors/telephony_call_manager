@@ -27,7 +27,9 @@
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
 #include "call_object_manager.h"
+#ifdef SUPPORT_DSOFTBUS
 #include "interoperable_communication_manager.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -473,6 +475,7 @@ int32_t CallAbilityReportProxy::ReportPhoneStateChange(int32_t numActive, int32_
 
 void CallAbilityReportProxy::UpdateBtCallSlotId(CallAttributeInfo &info)
 {
+#ifdef SUPPORT_DSOFTBUS
     auto callPtr = CallObjectManager::GetOneCallObject(info.callId);
     if (callPtr == nullptr || callPtr->GetCallType() != CallType::TYPE_BLUETOOTH) {
         return;
@@ -483,6 +486,7 @@ void CallAbilityReportProxy::UpdateBtCallSlotId(CallAttributeInfo &info)
     } else {
         callPtr->SetBtCallSlotId(callPtr->GetAccountId());
     }
+#endif
 }
 
 } // namespace Telephony
