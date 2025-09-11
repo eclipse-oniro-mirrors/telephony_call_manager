@@ -29,9 +29,22 @@
 using namespace taihe;
 using namespace OHOS::Telephony;
 namespace {
+const int32_t TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID = 4005;
+class CallManagerClientInitializer {
+public:
+    CallManagerClientInitializer()
+    {
+        static bool isInit = false;
+        if (!isInit) {
+            OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+            isInit = true;
+        }
+    }
+};
 
 void makeCallSync(::taihe::string_view phoneNumber)
 {
+    CallManagerClientInitializer init;
     auto errCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->MakeCall(std::string(phoneNumber));
     if (errCode != TELEPHONY_ERR_SUCCESS) {
         set_business_error(errCode, "makeCall return error");
@@ -41,6 +54,7 @@ void makeCallSync(::taihe::string_view phoneNumber)
 
 void makeCallSync2(uintptr_t context, ::taihe::string_view phoneNumber)
 {
+    CallManagerClientInitializer init;
     auto errCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->MakeCall(std::string(phoneNumber));
     if (errCode != TELEPHONY_ERR_SUCCESS) {
         set_business_error(errCode, "makeCall2 return error");
@@ -50,6 +64,7 @@ void makeCallSync2(uintptr_t context, ::taihe::string_view phoneNumber)
 
 bool HasVoiceCapability()
 {
+    CallManagerClientInitializer init;
     auto ret = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->HasVoiceCapability();
     return static_cast<ani_boolean>(ret);
 }
@@ -57,6 +72,7 @@ bool HasVoiceCapability()
 void formatPhoneNumberSync(
     ::taihe::string_view phoneNumber, ::ohos::telephony::call::NumberFormatOptions const& options)
 {
+    CallManagerClientInitializer init;
     std::u16string phoneNum = OHOS::Str8ToStr16(std::string(phoneNumber));
     std::u16string countryCode = OHOS::Str8ToStr16(std::string(options.countryCode));
     std::u16string formatNum = OHOS::Str8ToStr16("");
@@ -70,6 +86,7 @@ void formatPhoneNumberSync(
 
 void formatPhoneNumberSync2(::taihe::string_view phoneNumber)
 {
+    CallManagerClientInitializer init;
     std::u16string phoneNum = OHOS::Str8ToStr16(std::string(phoneNumber));
     std::u16string countryCode = OHOS::Str8ToStr16("");
     std::u16string formatNum = OHOS::Str8ToStr16("");
@@ -83,6 +100,7 @@ void formatPhoneNumberSync2(::taihe::string_view phoneNumber)
 
 ::ohos::telephony::call::CallState getCallStateSync()
 {
+    CallManagerClientInitializer init;
     int32_t callState = static_cast<int32_t>(CallStateToApp::CALL_STATE_UNKNOWN);
     callState = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->GetCallState();
     return static_cast<::ohos::telephony::call::CallState::key_t>(callState);
@@ -90,6 +108,7 @@ void formatPhoneNumberSync2(::taihe::string_view phoneNumber)
 
 bool HasCallSync()
 {
+    CallManagerClientInitializer init;
     auto ret = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->HasCall();
     return static_cast<ani_boolean>(ret);
 }
