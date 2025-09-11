@@ -32,7 +32,8 @@ namespace {
 const int32_t TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID = 4005;
 class CallManagerClientInitializer {
 public:
-    CallManagerClientInitializer() {
+    CallManagerClientInitializer() 
+    {
         static bool isInit = false;
         if (!isInit) {
             OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
