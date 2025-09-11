@@ -40,7 +40,7 @@ public:
             isInit = true;
         }
     }
-}
+};
 
 void makeCallSync(::taihe::string_view phoneNumber)
 {
