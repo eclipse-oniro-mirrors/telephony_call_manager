@@ -30,7 +30,11 @@ const int32_t UNEXPECT_DISCONNECT_CODE = -1;
 void CallAbilityConnectCallback::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
+<<<<<<< HEAD
     HILOG_COMM_WARN("connect callui result code: %{public}d", resultCode);
+=======
+    HILOG_COMM_INFO("connect callui result code: %{public}d", resultCode);
+>>>>>>> 02879f92d64acbc6bf3ade3f21f77c28bd32c9c9
     if (resultCode == CONNECT_ABILITY_SUCCESS) {
         DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectFlag(true);
         DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectingFlag(false);

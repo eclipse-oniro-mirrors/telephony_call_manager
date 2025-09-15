@@ -44,7 +44,11 @@ void CallConnectAbility::ConnectAbility()
         SetConnectingFlag(false);
         return;
     }
+<<<<<<< HEAD
     HILOG_COMM_WARN("Connect callui ability");
+=======
+    HILOG_COMM_INFO("Connect callui ability");
+>>>>>>> 02879f92d64acbc6bf3ade3f21f77c28bd32c9c9
     std::lock_guard<std::mutex> lock(connectAbilityMutex_);
     AAFwk::Want want;
     AppExecFwk::ElementName element("", "com.ohos.callui", "com.ohos.callui.ServiceAbility");
