@@ -38,6 +38,7 @@ ohos_shared_library("tel_call_manager") {
   external_deps = [
     "cJSON:cjson",
     "libphonenumber:phonenumber_standard",
+    "hilog:libhilog",
   ]
 
   external_deps += call_manager_external_deps
@@ -67,6 +68,7 @@ ohos_shared_library("tel_call_manager") {
   defines = [
     "TELEPHONY_LOG_TAG = \"CallManager\"",
     "LOG_DOMAIN = 0xD001F10",
+    "LOG_TAG = \"CallManager\"",
   ]
 
   if (call_manager_feature_hfp_async_enable) {

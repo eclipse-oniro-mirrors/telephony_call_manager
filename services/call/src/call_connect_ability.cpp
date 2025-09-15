@@ -44,7 +44,7 @@ void CallConnectAbility::ConnectAbility()
         SetConnectingFlag(false);
         return;
     }
-    TELEPHONY_LOGW("Connect callui ability");
+    HILOG_COMM_WARN("Connect callui ability");
     std::lock_guard<std::mutex> lock(connectAbilityMutex_);
     AAFwk::Want want;
     AppExecFwk::ElementName element("", "com.ohos.callui", "com.ohos.callui.ServiceAbility");
