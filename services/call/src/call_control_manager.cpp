@@ -1449,7 +1449,7 @@ int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::
     switch (state) {
         case (int32_t)TelCallState::CALL_STATUS_DIALING: {
             bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(false);
-            TELEPHPNY_LOGI("SetVirtualCall res: %{public}d.", res);
+            TELEPHONY_LOGI("SetVirtualCall res: %{public}d.", res);
             break;
         }
         case (int32_t)TelCallState::CALL_STATUS_IDLE: {
