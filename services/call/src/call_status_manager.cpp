@@ -480,12 +480,12 @@ int32_t CallStatusManager::IncomingHandleExt(const CallDetailInfo &info)
     SetContactInfo(call, std::string(info.phoneNum));
     bool block = false;
     if (IsRejectCall(call, info, block)) {
-        DeleteOneCallObjecta(call->GetCallID());
+        DeleteOneCallObject(call->GetCallID());
         return HandleRejectCall(call, block);
     }
     if (info.callType != CallType::TYPE_VOIP && info.callType != CallType::TYPE_BLUETOOTH &&
         IsRingOnceCall(call, info)) {
-        DeleteOneCallObjecta(call->GetCallID());
+        DeleteOneCallObject(call->GetCallID());
         return HandleRingOnceCall(call);
     }
     HandleVideoCallInAdvsecMode(call, info);
