@@ -293,7 +293,7 @@ void AudioControlManager::UpdateDeviceTypeForCrs(AudioDeviceType deviceType)
                 device.deviceType = initDeviceType;
             }
         }
-        TELEPHONY_LOGI("update deviceType = %{public}d,initCrsDeviceType_ %{public}d",
+        HILOG_COMM_INFO("update deviceType = %{public}d,initCrsDeviceType_ %{public}d",
             deviceType, initCrsDeviceType_);
         initCrsDeviceType_ = deviceType;
         if (device.deviceType == deviceType) {
@@ -343,7 +343,7 @@ void AudioControlManager::HandleCallStateUpdated(
         return;
     }
     auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
-    TELEPHONY_LOGI("HandleCallStateUpdated priorState:%{public}d, nextState:%{public}d", priorState, nextState);
+    HILOG_COMM_INFO("HandleCallStateUpdated priorState:%{public}d, nextState:%{public}d", priorState, nextState);
     if ((nextState == TelCallState::CALL_STATUS_DISCONNECTING || nextState == TelCallState::CALL_STATUS_DISCONNECTED) &&
         callObjectPtr->GetAnsweredByPhone()) {
         callStateProcessor->DeleteCall(callObjectPtr->GetCallID(), TelCallState::CALL_STATUS_ACTIVE);
@@ -594,7 +594,7 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
         TELEPHONY_LOGE("no call exists, set audio device failed");
         return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
     }
-    TELEPHONY_LOGI("set audio device, type: %{public}d", static_cast<int32_t>(device.deviceType));
+    HILOG_COMM_INFO("set audio device, type: %{public}d", static_cast<int32_t>(device.deviceType));
     AudioDeviceType audioDeviceType = AudioDeviceType::DEVICE_UNKNOWN;
     if (CallObjectManager::HasSatelliteCallExist() && device.deviceType == AudioDeviceType::DEVICE_EARPIECE) {
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("SATELLITE_CALL_NOT_SUPPORT_EARPIECE");
@@ -817,7 +817,7 @@ bool AudioControlManager::PlayRingtone()
         TELEPHONY_LOGE("play ringtone failed");
         return false;
     }
-    TELEPHONY_LOGI("play ringtone success");
+    HILOG_COMM_INFO("play ringtone success");
     PostProcessRingtone();
     return true;
 }
@@ -861,7 +861,7 @@ bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &rin
             return true;
         }
         AdjustVolumesForCrs();
-        TELEPHONY_LOGE("play soundtone fail.");
+        HILOG_COMM_INFO("play soundtone fail.");
         return false;
     }
     TELEPHONY_LOGI("type_crs but not play ringtone");
@@ -942,7 +942,7 @@ bool AudioControlManager::StopSoundtone()
         return false;
     }
     sound_->ReleaseRenderer();
-    TELEPHONY_LOGI("stop soundtone success");
+    HILOG_COMM_INFO("stop soundtone success");
     RestoreVoiceValumeIfNecessary();
     isCrsStartSoundTone_ = false;
     return true;
@@ -966,7 +966,7 @@ bool AudioControlManager::StopRingtone()
         return false;
     }
     ring_->ReleaseRenderer();
-    TELEPHONY_LOGI("stop ringtone success");
+    HILOG_COMM_INFO("stop ringtone success");
     return true;
 }
 
@@ -1061,7 +1061,7 @@ int32_t AudioControlManager::SetMute(bool isMute)
     if (DelayedSingleton<CallControlManager>::GetInstance()->IsCallExist(CallType::TYPE_BLUETOOTH,
         TelCallState::CALL_STATUS_ACTIVE)) {
         std::string strMute = isMute ? "true" : "false";
-        TELEPHONY_LOGI("SetMute strMute=%{public}s", strMute.c_str());
+        HILOG_COMM_INFO("SetMute strMute=%{public}s", strMute.c_str());
         std::vector<std::pair<std::string, std::string>> vec = {
             std::pair<std::string, std::string>("hfp_set_mic_mute", strMute)
         };
@@ -1431,7 +1431,7 @@ void AudioControlManager::MuteNetWorkRingTone(bool isMute)
     if (soundState_ == SoundState::SOUNDING) {
         DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(isMute);
     }
-    TELEPHONY_LOGI("Set Voice Ringtone mute,isMute: %{public}d", isMute);
+    HILOG_COMM_INFO("Set Voice Ringtone mute,isMute: %{public}d", isMute);
     if (isCrsVibrating_ && isMute) {
         DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
         isCrsVibrating_ = false;
@@ -1579,7 +1579,7 @@ void AudioControlManager::AdjustVolumesForCrs()
     auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
     int32_t ringVolume = audioProxy->GetVolume(AudioStandard::AudioVolumeType::STREAM_RING);
     int32_t voiceVolume = audioProxy->GetVolume(AudioStandard::AudioVolumeType::STREAM_VOICE_CALL);
-    TELEPHONY_LOGI("now ringVolume is %{public}d, voiceVolume is %{public}d", ringVolume, voiceVolume);
+    HILOG_COMM_INFO("now ringVolume is %{public}d, voiceVolume is %{public}d", ringVolume, voiceVolume);
     audioProxy->SetVolume(AudioStandard::AudioVolumeType::STREAM_VOICE_CALL, ringVolume);
     SaveVoiceVolume(voiceVolume);
 }
