@@ -861,11 +861,7 @@ bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &rin
             return true;
         }
         AdjustVolumesForCrs();
-<<<<<<< HEAD
         HILOG_COMM_ERROR("play soundtone fail.");
-=======
-        HILOG_COMM_INFO("play soundtone fail.");
->>>>>>> 02879f92d64acbc6bf3ade3f21f77c28bd32c9c9
         return false;
     }
     TELEPHONY_LOGI("type_crs but not play ringtone");
