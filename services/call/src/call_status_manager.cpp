@@ -462,6 +462,12 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
             return ret;
         }
     }
+    return IncomingHandleExt(info);
+}
+
+int32_t CallStatusManager::IncomingHandleExt(const CallDetailInfo &info)
+{
+    int32_t ret = TELEPHONY_SUCCESS;
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateNewCall failed!");
@@ -470,17 +476,19 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     if (IsFromTheSameNumberAtTheSameTime(call)) {
         ModifyEsimType();
     }
+    AddOneCallObject(call);
     SetContactInfo(call, std::string(info.phoneNum));
     bool block = false;
     if (IsRejectCall(call, info, block)) {
+        DeleteOneCallObject(call->GetCallID());
         return HandleRejectCall(call, block);
     }
     if (info.callType != CallType::TYPE_VOIP && info.callType != CallType::TYPE_BLUETOOTH &&
         IsRingOnceCall(call, info)) {
+        DeleteOneCallObject(call->GetCallID());
         return HandleRingOnceCall(call);
     }
     HandleVideoCallInAdvsecMode(call, info);
-    AddOneCallObject(call);
     StartInComingCallMotionRecognition();
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
