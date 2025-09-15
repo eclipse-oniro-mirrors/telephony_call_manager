@@ -579,6 +579,34 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_004, Function | MediumTest
 }
 
 /**
+ * @tc.number   Telephony_CallObjectManager_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_005, Function | MediumTest | Level1)
+{
+#ifdef NOT_SUPPORT_MULTICALL
+    DialParaInfo mDialParaInfo;
+    sptr<CallBase> csCall = new CSCall(mDialParaInfo);
+    csCall->callId_ = 0;
+    csCall->SetCallIndex(0);
+    csCall->SetSlotId(0);
+    csCall->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    csCall->SetCallType(CallType::TYPE_CS);
+    CallObjectManager::AddOneCallObject(csCall);
+    DialParaInfo dialInfo;
+    sptr<CallBase> call = new IMSCall(dialInfo);
+    call->callId_ = 1;
+    call->SetCallIndex(1);
+    call->SetSlotId(0);
+    call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    call->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::AddOneCallObject(call);
+    ASSERT_TRUE(CallObjectManager::IsTwoCallESIMCall());
+#endif
+}
+
+/**
  * @tc.number   Telephony_CallNumberUtils_001
  * @tc.name     test error branch
  * @tc.desc     Function test

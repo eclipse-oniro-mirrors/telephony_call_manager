@@ -14,11 +14,6 @@
 import("//build/ohos.gni")
 import("callmanager.gni")
 
-declare_args() {
-  call_manager_feature_hfp_async_enable = false
-  call_manager_feature_not_support_multicall = false
-}
-
 ohos_shared_library("tel_call_manager") {
   sanitize = {
     cfi = true
@@ -69,15 +64,6 @@ ohos_shared_library("tel_call_manager") {
     "LOG_DOMAIN = 0xD001F10",
   ]
 
-  if (call_manager_feature_hfp_async_enable) {
-    print("Support hfp async enable.")
-    defines += [ "HFP_ASYNC_ENABLE" ]
-  }
-
-  if (call_manager_feature_not_support_multicall) {
-    print("not Support multi call.")
-    defines += [ "NOT_SUPPORT_MULTICALL" ]
-  }
   defines += call_manager_defines
 
   part_name = "call_manager"
