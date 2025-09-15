@@ -138,9 +138,5 @@ MockNativeToken::~MockNativeToken()
 {
     SetSelfTokenID(selfToken_);
 }
-
-
-
-
 }  // namespace TELEPHONY
 }  // namespace OHOS
