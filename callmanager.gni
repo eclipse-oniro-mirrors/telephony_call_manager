@@ -12,6 +12,8 @@
 # limitations under the License.
 
 declare_args() {
+  call_manager_feature_hfp_async_enable = false
+  call_manager_feature_not_support_multicall = false
   call_manager_feature_support_dsoftbus = true
 }
 
@@ -327,4 +329,14 @@ if (defined(global_parts_info) &&
     defined(global_parts_info.multimedia_camera_framework) &&
     global_parts_info.multimedia_camera_framework) {
   call_manager_external_deps += [ "camera_framework:camera_framework" ]
+}
+
+if (call_manager_feature_hfp_async_enable) {
+  print("Support hfp async enable.")
+  call_manager_defines += [ "HFP_ASYNC_ENABLE" ]
+}
+ 
+if (call_manager_feature_not_support_multicall) {
+  print("not Support multi call.")
+  call_manager_defines += [ "NOT_SUPPORT_MULTICALL" ]
 }
