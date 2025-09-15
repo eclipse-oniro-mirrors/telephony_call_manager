@@ -33,7 +33,8 @@ CallAbilityCallbackStub::~CallAbilityCallbackStub()
     memberFuncMap_.clear();
 }
 
-int32_t CallAbilityCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t CallAbilityCallbackStub::OnRemoteRequest(uint32_t code,
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     std::u16string myDesc = CallAbilityCallbackStub::GetDescriptor();
     std::u16string remoteDesc = data.ReadInterfaceToken();
