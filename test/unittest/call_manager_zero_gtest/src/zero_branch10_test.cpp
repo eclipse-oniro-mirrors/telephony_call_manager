@@ -379,6 +379,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioControlManager_001, TestSize.Level0)
     audioControlManager->SetAudioDevice(device, false);
     CallObjectManager::DeleteOneCallObject(call);
     EXPECT_TRUE(audioControlManager->IsExternalAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID));
+    EXPECT_TRUE(audioControlManager->dealCrsScene(AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL));
 }
 
 /**
