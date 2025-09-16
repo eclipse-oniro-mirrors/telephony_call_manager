@@ -30,16 +30,22 @@
 #include "common_event.h"
 #include "common_event_manager.h"
 #include "core_service_client.h"
+#include "privacy_test_common.h"
 
 namespace OHOS {
 namespace Telephony {
 constexpr int16_t SLEEP_ONE_SECONDS = 1;
+static AccessTokenID g_selfTokenId = 0;
+static MockNativeToken* g_mock = nullptr;
 
 class CallManagerGtest : public testing::Test {
 public:
     // execute before first testcase
     static void SetUpTestCase()
     {
+        g_selfTokenId = GetSelfTokenID();
+        PrivacyTestCommon::SetTestEvironment(g_selfTokenId);
+        g_mock = new (std::nothrow) MockNativeToken("foundation");
         std::cout << "---------- warning ------------" << std::endl;
         std::cout << "---Please modify PHONE_NUMBER first in the file call_manager_gtest.cpp---" << std::endl;
         std::cout << "---------- gtest start ------------" << std::endl;
@@ -158,6 +164,12 @@ public:
     // execute after last testcase
     static void TearDownTestCase()
     {
+        PrivacyTestCommon::ResetTestEvironment();
+        if (g_mock != nullptr) {
+            delete g_mock;
+            g_mock = nullptr;
+        }
+        
         if (clientPtr_ != nullptr) {
             clientPtr_->UnInit();
         }

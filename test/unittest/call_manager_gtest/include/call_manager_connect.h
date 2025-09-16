@@ -256,39 +256,9 @@ private:
 
 class CallAbilityCallbackStub : public IRemoteStub<ICallAbilityCallback> {
 public:
-    CallAbilityCallbackStub()
-    {
-        memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_STATE_INFO)] =
-            &CallAbilityCallbackStub::OnUpdateCallStateInfoRequest;
-        memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_EVENT)] =
-            &CallAbilityCallbackStub::OnUpdateCallEventRequest;
-        memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_ASYNC_RESULT_REQUEST)] =
-            &CallAbilityCallbackStub::OnUpdateAsyncResultRequest;
-    }
-
-    ~CallAbilityCallbackStub()
-    {
-        memberFuncMap_.clear();
-    }
-
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
-    {
-        std::u16string myDesc = CallAbilityCallbackStub::GetDescriptor();
-        std::u16string remoteDesc = data.ReadInterfaceToken();
-        if (myDesc != remoteDesc) {
-            TELEPHONY_LOGE("descriptor checked failed");
-            return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
-        }
-        TELEPHONY_LOGI("OnReceived, code = %{public}u", code);
-        auto itFunction = memberFuncMap_.find(code);
-        if (itFunction != memberFuncMap_.end()) {
-            auto memberFunc = itFunction->second;
-            if (memberFunc != nullptr) {
-                return (this->*memberFunc)(data, reply);
-            }
-        }
-        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-    }
+    CallAbilityCallbackStub();
+    ~CallAbilityCallbackStub();
+    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
     int32_t OnCallDetailsChange(const CallAttributeInfo &info)
     {
