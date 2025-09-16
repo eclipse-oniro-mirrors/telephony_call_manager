@@ -17,6 +17,7 @@
 
 #include <thread>
 #include <chrono>
+#include <dlfcn.h>
 #include "audio_player.h"
 #include "call_base.h"
 #include "telephony_log_wrapper.h"
@@ -32,11 +33,23 @@ constexpr int32_t VOL_LEVEL_UNDER_LINE = 3;
 constexpr int32_t TIMEOUT_LIMIT = 500; //ms
 constexpr int32_t DECREASE_DURATION = 500000; //us
 constexpr int32_t INCREASE_DURATION = 5000000; //us
-constexpr int32_t ONE_SECOND = 1; //s
-constexpr int32_t ONE_SECOND_US = 1000000; //us
+constexpr int32_t ONE_AND_HALF_SECOND = 1500; //ms
+constexpr int32_t ONE_AND_HALF_SECOND_US = 1500000; //us
 constexpr int32_t US_TO_MS = 1000;
 constexpr uint32_t FEATURE_COMFORT_REMINDER = 15;
 const std::string ADAPTIVE_SWITCH = "ringtone_vibrate_adaptive_switch";
+constexpr const char* USER_STATUS_SO_NAME = "libuser_status_client.z.so";
+constexpr const char* MSDP_SUBSCRIBE_CALLBACK_FUNC_NAME = "SubscribeCallback";
+const char* MSDP_SUBSCRIBE_FUNC_NAME = "Subscribe";
+const char* MSDP_UNSUBSCRIBE_FUNC_NAME = "Unsubscribe";
+const char* MSDP_GETFUSIONREMINDERDATA_FUNC_NAME = "GetFusionReminderData";
+const char* MSDP_GETEVENTTYPE_FUNC_NAME = "GetEventType";
+
+typedef int32_t (*SubscribeCallbackFunc)(uint32_t feature, UserStatusDataCallbackFunc &callback);
+typedef int32_t (*SubscribeFunc)(uint32_t feature);
+typedef int32_t (*UnsubscribeFunc)(uint32_t feature);
+typedef int32_t (*GetFusionReminderDataFunc)(std::shared_ptr<UserStatusData> userStatusData);
+typedef int32_t (*GetEventTypeFunc)(std::shared_ptr<UserStatusData> userStatusData);
 #endif
 
 Ring::Ring()
@@ -60,7 +73,6 @@ void Ring::Init()
     }
 
     audioPlayer_ = std::make_unique<AudioPlayer>();
-
     if (RingtonePlayer_ != nullptr) {
         RingtonePlayer_->Stop();
         RingtonePlayer_->Release();
@@ -91,6 +103,11 @@ int32_t Ring::Play(int32_t slotId, std::string ringtonePath, Media::HapticStartu
     }
 
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
+    userHandle_ = dlopen(USER_STATUS_SO_NAME, RTLD_NOW);
+    if (userHandle_ == nullptr) {
+        TELEPHONY_LOGE("user status dlopen failed : %{public}s", dlerror());
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     GetSettingsData();
     PrepareComfortReminder();
 #endif
@@ -119,9 +136,12 @@ int32_t Ring::Stop()
     isRingStopped_ = true;
     lockRing.unlock();
     ringStopCv_.notify_all();
-    UnRegisterObserver();
     UnsubscribeFeature();
     ResetComfortReminder();
+    if (userHandle_ != nullptr) {
+        dlclose(userHandle_);
+        userHandle_ = nullptr;
+    }
 #endif
     return result;
 }
@@ -211,15 +231,27 @@ void Ring::GetSettingsData()
     isAdaptiveSwitchOn_ = ringtoneSettingStatus == "true";
 }
 
-void Ring::OnComfortReminderDataChanged(int32_t result,
-    std::shared_ptr<Msdp::UserStatusAwareness::ComfortReminderData> comfortReminderData)
+void Ring::OnComfortReminderDataChanged(int32_t result, std::shared_ptr<UserStatusData> userStatusData)
 {
-    if (!isAdaptiveSwitchOn_) {
+    if (!isAdaptiveSwitchOn_ || userHandle_ == nullptr) {
         return;
     }
 
-    int32_t fusionReminderData = comfortReminderData->GetFusionReminderData();
-    int32_t eventType = comfortReminderData->GetEventType();
+    GetFusionReminderDataFunc getReminderDataFunc = reinterpret_cast<GetFusionReminderDataFunc>(dlsym(userHandle_,
+        MSDP_GETFUSIONREMINDERDATA_FUNC_NAME));
+    if (getReminderDataFunc == nullptr) {
+        TELEPHONY_LOGE("dlsym getReminderDataFunc failed : %{public}s", dlerror());
+        return;
+    }
+    GetEventTypeFunc getEventTypeFunc = reinterpret_cast<GetEventTypeFunc>(dlsym(userHandle_,
+        MSDP_GETEVENTTYPE_FUNC_NAME));
+    if (getEventTypeFunc == nullptr) {
+        TELEPHONY_LOGE("dlsym getEventTypeFunc failed : %{public}s", dlerror());
+        return;
+    }
+
+    int32_t fusionReminderData = getReminderDataFunc(userStatusData);
+    int32_t eventType = getEventTypeFunc(userStatusData);
     TELEPHONY_LOGI("fusionReminderData = %{public}d, eventType = %{public}d", fusionReminderData, eventType);
 
     std::lock_guard<ffrt::mutex> lock(comfortReminderMutex_);
@@ -285,41 +317,57 @@ void Ring::SetRingToneVibrationState()
 
 int32_t Ring::RegisterUserStatusDataCallbackFunc()
 {
-    if (!isAdaptiveSwitchOn_) {
+    if (!isAdaptiveSwitchOn_ || userHandle_ == nullptr) {
         return TELEPHONY_SUCCESS;
     }
-    Msdp::UserStatusAwareness::UserStatusDataCallbackFunc callback = [this] (int32_t result,
-        std::shared_ptr<Msdp::UserStatusAwareness::UserStatusData> userStatusData) {
-        auto comfortReminderData =
-            std::static_pointer_cast<Msdp::UserStatusAwareness::ComfortReminderData>(userStatusData);
-            if (comfortReminderData != nullptr) {
-                OnComfortReminderDataChanged(result, comfortReminderData);
-            }
-        };
-        int32_t subRet = Msdp::UserStatusAwareness::UserStatusClient::GetInstance().SubscribeCallback(
-            FEATURE_COMFORT_REMINDER, callback);
-        TELEPHONY_LOGI("Subscribe User Status Data ret: %{public}d", subRet);
-        return subRet;
+
+    SubscribeCallbackFunc subscribeCallbackFunc = reinterpret_cast<SubscribeCallbackFunc>(dlsym(userHandle_,
+        MSDP_SUBSCRIBE_CALLBACK_FUNC_NAME));
+    if (subscribeCallbackFunc == nullptr) {
+        TELEPHONY_LOGE("dlsym subscribeCallbackFunc failed : %{public}s", dlerror());
+        return TELEPHONY_ERROR;
+    }
+
+    std::function<void(int32_t, std::shared_ptr<UserStatusData>)> callback = [this] (int32_t result,
+        std::shared_ptr<UserStatusData> userStatusData) {
+        if (userStatusData != nullptr) {
+            OnComfortReminderDataChanged(result, userStatusData);
+        }
+    };
+
+    int32_t subRet = subscribeCallbackFunc(FEATURE_COMFORT_REMINDER, callback);
+    TELEPHONY_LOGI("Subscribe User Status Data ret: %{public}d", subRet);
+    return subRet;
 }
 
 int32_t Ring::SubscribeFeature()
 {
-    if (!isAdaptiveSwitchOn_) {
+    if (!isAdaptiveSwitchOn_ || userHandle_ == nullptr) {
         return TELEPHONY_SUCCESS;
     }
-    const std::vector<OHOS::Msdp::UserStatusAwareness::DeviceInfo> deviceInfoList;
-    int32_t ret = Msdp::UserStatusAwareness::UserStatusClient::GetInstance().Subscribe(
-        FEATURE_COMFORT_REMINDER, deviceInfoList);
+
+    SubscribeFunc subscribeFunc = reinterpret_cast<SubscribeFunc>(dlsym(userHandle_, MSDP_SUBSCRIBE_FUNC_NAME));
+    if (subscribeFunc == nullptr) {
+        TELEPHONY_LOGE("dlsym SubscribeFunc failed : %{public}s", dlerror());
+        return TELEPHONY_ERROR;
+    }
+    int32_t ret = subscribeFunc(FEATURE_COMFORT_REMINDER);
     TELEPHONY_LOGI("ring Subscribe feature, ret = %{public}d", ret);
     return TELEPHONY_SUCCESS;
 }
 
 int32_t Ring::UnsubscribeFeature()
 {
-    if (!isAdaptiveSwitchOn_) {
+    if (!isAdaptiveSwitchOn_ || userHandle_ == nullptr) {
         return TELEPHONY_SUCCESS;
     }
-    int32_t ret = Msdp::UserStatusAwareness::UserStatusClient::GetInstance().Unsubscribe(FEATURE_COMFORT_REMINDER);
+
+    UnsubscribeFunc unsubscribeFunc = reinterpret_cast<UnsubscribeFunc>(dlsym(userHandle_, MSDP_UNSUBSCRIBE_FUNC_NAME));
+    if (unsubscribeFunc == nullptr) {
+        TELEPHONY_LOGE("dlsym UnsubscribeFunc failed : %{public}s", dlerror());
+        return TELEPHONY_ERROR;
+    }
+    int32_t ret = unsubscribeFunc(FEATURE_COMFORT_REMINDER);
     TELEPHONY_LOGI("ring Unsubscribe feature, ret = %{public}d", ret);
     return TELEPHONY_SUCCESS;
 }
@@ -334,6 +382,7 @@ void Ring::ResetComfortReminder()
     isGentleHappend_ = false;
     isFadeupHappend_ = false;
 }
+
 void Ring::PrepareComfortReminder()
 {
     if (!isAdaptiveSwitchOn_) {
@@ -350,7 +399,13 @@ void Ring::PrepareComfortReminder()
     std::unique_lock<ffrt::mutex> lock(comfortReminderMutex_);
     if (conditionVar_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_LIMIT), [this] { return isEnvMsgRecv_; })) {
         TELEPHONY_LOGI("reminder occurred");
-        if (isQuiet_ && !isSwing_ && oriRingVolLevel_ > VOL_LEVEL_UNDER_LINE && oriVolumeDb_ > 0.0f) {
+        if (isSwing_ && oriRingVolLevel_ > VOL_LEVEL_UNDER_LINE && oriVolumeDb_ > 0.0f) {
+            float endVolumeDb = audioProxy->GetSystemRingVolumeInDb(VOL_LEVEL_UNDER_LINE);
+            TELEPHONY_LOGI("keep gentle, reset VolumeDb:%{public}f", endVolumeDb);
+            SetRingToneVolume(endVolumeDb / oriVolumeDb_);
+            curRingVolLevel_ = VOL_LEVEL_UNDER_LINE;
+            isFadeupHappend_ = true;
+        } else if (isQuiet_ && !isSwing_ && oriRingVolLevel_ > VOL_LEVEL_UNDER_LINE && oriVolumeDb_ > 0.0f) {
             float endVolumeDb = audioProxy->GetSystemRingVolumeInDb(VOL_LEVEL_UNDER_LINE);
             TELEPHONY_LOGI("ready to fade up, reset VolumeDb:%{public}f", endVolumeDb);
             SetRingToneVolume(endVolumeDb / oriVolumeDb_);
@@ -381,8 +436,8 @@ void Ring::DecreaseVolume()
             [this] {return isRingStopped_; })) {
             TELEPHONY_LOGI("DecreaseVolume interrupt by ring stop");
             return;
-            }
-            lock.unlock();
+        }
+        lock.unlock();
         ringVolume--;
         float endVolumeDb = audioProxy->GetSystemRingVolumeInDb(ringVolume);
         SetRingToneVolume(endVolumeDb / oriVolumeDb_);
@@ -398,11 +453,11 @@ void Ring::IncreaseVolume()
     }
     auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
     int32_t ringVolume = VOL_LEVEL_UNDER_LINE;
-    const int interval = (INCREASE_DURATION - ONE_SECOND_US) / totalSteps;
+    const int interval = (INCREASE_DURATION - ONE_AND_HALF_SECOND_US) / totalSteps;
     TELEPHONY_LOGI("IncreaseVolume totalSteps %{public}d, interval %{public}d", totalSteps, interval);
     std::unique_lock<ffrt::mutex> lock(ringStopMutex_);
-    if (ringStopCv_.wait_for(lock, std::chrono::seconds(ONE_SECOND), [this] { return isRingStopped_; })) {
-        TELEPHONY_LOGI("IncreaseVolume interrupt by ring stop in 1sec");
+    if (ringStopCv_.wait_for(lock, std::chrono::milliseconds(ONE_AND_HALF_SECOND), [this] { return isRingStopped_; })) {
+        TELEPHONY_LOGI("IncreaseVolume interrupt by ring stop in 1.5 sec");
         return;
     }
     lock.unlock();

@@ -28,10 +28,9 @@
 
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
 #include "data_ability_observer_stub.h"
-#include "comfort_reminder_data.h"
 #include "settings_datashare_helper.h"
 #include "datashare_helper.h"
-#include "user_status_client.h"
+#include "msdp_manager.h"
 #endif
 
 namespace OHOS {
@@ -75,8 +74,7 @@ public:
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
 private:
     void GetSettingsData();
-    void OnComfortReminderDataChanged(int32_t result,
-        std::shared_ptr<Msdp::UserStatusAwareness::ComfortReminderData> comfortReminderData);
+    void OnComfortReminderDataChanged(int32_t result, std::shared_ptr<UserStatusData> userStatusData);
     int32_t RegisterUserStatusDataCallbackFunc();
     int32_t SubscribeFeature();
     int32_t UnsubscribeFeature();
@@ -111,6 +109,7 @@ private:
     std::atomic<bool> isFadeupHappend_{false};
     std::atomic<int32_t> curRingVolLevel_{0};
     sptr<RingtoneSettingStatusObserver> ringtoneSettingStatusObserver_ = nullptr;
+    void* userHandle_ = nullptr;
 #endif
 };
 } // namespace Telephony
