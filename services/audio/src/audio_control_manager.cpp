@@ -59,14 +59,14 @@ void AudioControlManager::Init()
 {
     DelayedSingleton<AudioDeviceManager>::GetInstance()->Init();
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->Init();
+    std::lock_guard<ffrt::recursive_mutex> lock(ringMutex_);
     ring_ = std::make_shared<Ring>();
-    if (ring_ == nullptr) {
-        TELEPHONY_LOGE("create ring object failed");
-        return;
-    }
-
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
-    ring_->RegisterObserver();
+    if (ring_ != nullptr) {
+        ring_->RegisterObserver();
+    } else {
+        TELEPHONY_LOGE("ring_ is nullptr ignore RegisterObserver");
+    }
 #endif
 }
 
@@ -76,7 +76,12 @@ void AudioControlManager::UnInit()
     DelayedSingleton<AudioProxy>::GetInstance()->UnsetAudioPreferDeviceChangeCallback();
     DelayedSingleton<AudioProxy>::GetInstance()->UnsetAudioMicStateChangeCallback();
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
-    ring_->UnRegisterObserver();
+    std::lock_guard<ffrt::recursive_mutex> lock(ringMutex_);
+    if (ring_ != nullptr) {
+        ring_->UnRegisterObserver();
+    } else {
+        TELEPHONY_LOGE("ring_ is nullptr ignore UnRegisterObserver");
+    }
 #endif
 }
 
@@ -808,6 +813,7 @@ bool AudioControlManager::PlayRingtone()
         }
         return true;
     }
+    std::lock_guard<ffrt::recursive_mutex> lock(ringMutex_);
     if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
         ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST);
     } else {
@@ -950,6 +956,7 @@ bool AudioControlManager::StopSoundtone()
 
 bool AudioControlManager::StopRingtone()
 {
+    std::lock_guard<ffrt::recursive_mutex> lock(ringMutex_);
     if (isPlayForNoRing_) {
         return StopForNoRing();
     }
@@ -1112,6 +1119,7 @@ int32_t AudioControlManager::MuteRinger()
         }
         return TELEPHONY_SUCCESS;
     }
+    std::lock_guard<ffrt::recursive_mutex> lock(ringMutex_);
     if (ring_ == nullptr) {
         TELEPHONY_LOGE("ring is nullptr");
         return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
@@ -1492,6 +1500,7 @@ bool AudioControlManager::IsBtCallDisconnected()
 
 void AudioControlManager::SetRingToneVolume(float volume)
 {
+    std::lock_guard<ffrt::recursive_mutex> lock(ringMutex_);
     if (ring_ == nullptr) {
         TELEPHONY_LOGE("ring_ is nullptr ignore SetRingToneVolume");
         return;

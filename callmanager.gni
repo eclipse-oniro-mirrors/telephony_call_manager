@@ -314,7 +314,6 @@ if (defined(global_parts_info) && defined(global_parts_info.msdp_motion) &&
 if (defined(global_parts_info) &&
     defined(global_parts_info.msdp_user_status_awareness) &&
     global_parts_info.msdp_user_status_awareness) {
-  call_manager_external_deps += [ "user_status_awareness:user_status_client" ]
   call_manager_defines += [ "OHOS_SUBSCRIBE_USER_STATUS_ENABLE" ]
 }
 
