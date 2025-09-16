@@ -192,7 +192,7 @@ void CallStatusManager::HandleBluetoothCallReportInfo(const CallDetailInfo &info
         if (call == nullptr) {
             call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
         }
-        if (call != nullptr) {
+        if ((call == nullptr && info.state == TelCallState::CALL_STATUS_DISCONNECTED) || call != nullptr) {
             return;
         }
     } else {
