@@ -1447,6 +1447,11 @@ int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::
     int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE, false);
     int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING, false);
     switch (state) {
+        case (int32_t)TelCallState::CALL_STATUS_DIALING: {
+            bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(false);
+            TELEPHONY_LOGI("SetVirtualCall res: %{public}d.", res);
+            break;
+        }
         case (int32_t)TelCallState::CALL_STATUS_IDLE: {
             HandleVoipConnected(numActive, callId);
             break;
