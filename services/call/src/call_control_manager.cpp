@@ -607,7 +607,7 @@ bool CallControlManager::NotifyCallStateUpdated(
         return false;
     }
     if (callStateListenerPtr_ != nullptr) {
-        TELEPHONY_LOGI("NotifyCallStateUpdated priorState:%{public}d,nextState:%{public}d", priorState, nextState);
+        HILOG_COMM_INFO("NotifyCallStateUpdated priorState:%{public}d,nextState:%{public}d", priorState, nextState);
         callStateListenerPtr_->CallStateUpdated(callObjectPtr, priorState, nextState);
         if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
             return true;
