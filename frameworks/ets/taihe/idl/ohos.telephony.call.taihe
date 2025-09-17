@@ -16,28 +16,8 @@
 @!sts_inject_into_module("import Context from 'application.Context';")
 @!namespace("@ohos.telephony.call", "call")
 @!sts_inject("""
-static { loadLibrary("telephony_call_taihe_native.z") } 
+static { loadLibrary("telephony_call_taihe_native.z") }
 """)
-
-@gen_async("makeCall")
-@gen_promise("makeCall")
-function MakeCallSync(phoneNumber: String): void;
-
-@gen_promise("makeCall")
-function MakeCallSync2(context: @sts_type("Context") Opaque, phoneNumber: String): void;
-
-function HasVoiceCapability(): bool;
-
-@gen_async("formatPhoneNumber")
-@gen_promise("formatPhoneNumber")
-function FormatPhoneNumberSync(phoneNumber: String, options: NumberFormatOptions): void;
-
-@gen_async("formatPhoneNumber")
-function FormatPhoneNumberSync2(phoneNumber: String): void;
-
-function GetCallStateSync(): CallState;
-
-function HasCallSync(): bool;
 
 enum CallState: i32 {
     CALL_STATE_UNKNOWN = -1,
@@ -46,8 +26,20 @@ enum CallState: i32 {
     CALL_STATE_OFFHOOK = 2,
     CALL_STATE_ANSWERED = 3
 }
-
-
+enum VideoStateType: i32 {
+    TYPE_VOICE = 0,
+    TYPE_VIDEO,
+    TYPE_VIDEO_SEND_ONLY = 1,
+    TYPE_VIDEO_RECEIVE_ONLY,
+    TYPE_VIDEO_BIDIRECTIONAL,
+}
+enum CallType: i32 {
+    TYPE_CS = 0,
+    TYPE_IMS = 1,
+    TYPE_OTT = 2,
+    TYPE_ERR_CALL = 3,
+    TYPE_VOIP = 4,
+}
 enum DetailedCallState: i32 {
     CALL_STATUS_ACTIVE = 0,
     CALL_STATUS_HOLDING = 1,
@@ -59,45 +51,12 @@ enum DetailedCallState: i32 {
     CALL_STATUS_DISCONNECTING = 7,
     CALL_STATUS_IDLE = 8
 }
-
-enum CallType: i32 {
-    TYPE_CS = 0,
-    TYPE_IMS = 1,
-    TYPE_OTT = 2,
-    TYPE_ERR_CALL = 3,
-    TYPE_VOIP = 4,
+enum ConferenceState: i32 {
+    TEL_CONFERENCE_IDLE = 0,
+    TEL_CONFERENCE_ACTIVE,
+    TEL_CONFERENCE_DISCONNECTING,
+    TEL_CONFERENCE_DISCONNECTED,
 }
-
-struct CallAttributeOptions {
-    callType: CallType;
-    callId: i32;
-    callState: DetailedCallState;
-}
-
-struct PeerDimensionsDetail {
-    callId: i32;
-}
-
-struct CameraCapabilities {
-    callId: i32;
-}
-
-struct ImsCallModeInfo {
-    callId: i32;
-}
-
-struct CallSessionEvent {
-    callId: i32;
-}
-
-struct NumberFormatOptions {
-    countryCode: String;
-}
-
-struct CallEventOptions {
-    eventId: CallAbilityEventId;
-}
-
 enum CallAbilityEventId: i32 {
     EVENT_DIAL_NO_CARRIER = 1,
     EVENT_INVALID_FDN_NUMBER = 2,
@@ -108,12 +67,6 @@ enum CallAbilityEventId: i32 {
     EVENT_SHOW_FULL_SCREEN = 7,
     EVENT_SHOW_FLOAT_WINDOW = 8,
 }
-
-struct DisconnectedDetails {
-    reason: DisconnectedReason;
-    message: String;
-}
-
 enum DisconnectedReason: i32 {
     UNASSIGNED_NUMBER = 1,
     NO_ROUTE_TO_DESTINATION = 3,
@@ -195,29 +148,10 @@ enum DisconnectedReason: i32 {
     SIM_INVALID = 1045,
     UNKNOWN = 1279
 }
-
-struct MmiCodeResults {
-    result: MmiCodeResult;
-    message: String;
-}
-
 enum MmiCodeResult: i32 {
     MMI_CODE_SUCCESS = 0,
     MMI_CODE_FAILED = 1
 }
-
-struct AudioDeviceCallbackInfo {
-    audioDeviceList: Array<AudioDevice>;
-    currentAudioDevice: AudioDevice;
-    isMuted: bool;
-}
-
-struct AudioDevice {
-    deviceType: AudioDeviceType;
-    address: Optional<String>;
-    deviceName: Optional<String>;
-}
-
 enum AudioDeviceType: i32 {
     DEVICE_EARPIECE,
     DEVICE_SPEAKER,
@@ -225,3 +159,179 @@ enum AudioDeviceType: i32 {
     DEVICE_BLUETOOTH_SCO,
     DEVICE_DISTRIBUTED_AUTOMOTIVE
 }
+enum VideoRequestResultType: i32 {
+    TYPE_REQUEST_SUCCESS = 0,
+    TYPE_REQUEST_FAILURE,
+    TYPE_REQUEST_INVALID,
+    TYPE_REQUEST_TIMED_OUT,
+    TYPE_REQUEST_REJECTED_BY_REMOTE,
+    TYPE_REQUEST_UPGRADE_CANCELED,
+    TYPE_DOWNGRADE_RTP_OR_RTCP_TIMEOUT = 100,
+    TYPE_DOWNGRADE_RTP_AND_RTCP_TIMEOUT,
+}
+enum ImsCallMode: i32 {
+    CALL_MODE_AUDIO_ONLY = 0,
+    CALL_MODE_SEND_ONLY,
+    CALL_MODE_RECEIVE_ONLY,
+    CALL_MODE_SEND_RECEIVE,
+    CALL_MODE_VIDEO_PAUSED,
+}
+enum CallSessionEventId: i32 {
+    EVENT_CONTROL_CAMERA_FAILURE = 0,
+    EVENT_CONTROL_CAMERA_READY,
+    EVENT_DISPLAY_SURFACE_RELEASED = 100,
+    EVENT_PREVIEW_SURFACE_RELEASED,
+}
+
+struct NumberFormatOptions {
+    countryCode: String;
+}
+struct CallAttributeOptions {
+    accountNumber: String;
+    speakerphoneOn: bool;
+    accountId: i32;
+    videoState: VideoStateType;
+    startTime: f64;
+    isEcc: bool;
+    callType: CallType;
+    callId: i32;
+    callState: DetailedCallState;
+    conferenceState: ConferenceState;
+    crsType: i32;
+    originalCallType: i32;
+    numberLocation: Optional<String>;
+}
+struct CallEventOptions {
+    eventId: CallAbilityEventId;
+}
+struct DisconnectedDetails {
+    reason: DisconnectedReason;
+    message: String;
+}
+struct MmiCodeResults {
+    result: MmiCodeResult;
+    message: String;
+}
+struct AudioDevice {
+    deviceType: AudioDeviceType;
+    address: Optional<String>;
+    deviceName: Optional<String>;
+}
+struct AudioDeviceCallbackInfo {
+    audioDeviceList: Array<AudioDevice>;
+    currentAudioDevice: AudioDevice;
+    isMuted: bool;
+}
+struct ImsCallModeInfo {
+    callId: i32;
+    result: VideoRequestResultType;
+    isRequestInfo: bool;
+    imsCallMode: ImsCallMode;
+}
+struct CallSessionEvent {
+    callId: i32;
+    eventId: CallSessionEventId;
+}
+struct PeerDimensionsDetail {
+    callId: i32;
+    width: i32;
+    height: i32;
+}
+struct CameraCapabilities {
+    callId: i32;
+    width: i32;
+    height: i32;
+}
+
+@gen_async("makeCall")
+@gen_promise("makeCall")
+function MakeCallSync(phoneNumber: String): void;
+
+@gen_promise("makeCall")
+function MakeCallSync2(context: @sts_type("Context") Opaque, phoneNumber: String): void;
+
+function HasVoiceCapability(): bool;
+
+@gen_async("formatPhoneNumber")
+@gen_promise("formatPhoneNumber")
+function FormatPhoneNumberSync(phoneNumber: String, options: NumberFormatOptions): void;
+
+@gen_async("formatPhoneNumber")
+function FormatPhoneNumberSync2(phoneNumber: String): void;
+
+function GetCallStateSync(): CallState;
+
+function HasCallSync(): bool;
+
+@!sts_inject("""
+export function on(type: string, cb: (arg_0: Object) => void) {
+    switch(type) {
+        case "callDetailsChange": return OnCallDetailsChange(cb);
+        case "callEventChange": return OnCallEventChange(cb);
+        case "callDisconnectedCause": return OnCallDisconnectedCauses(cb);
+        case "mmiCodeResult": return OnMmiCodeResult(cb);
+        case "audioDeviceChange": return OnAudioDeviceChange(cb);
+        case "postDialDelay": return OnPostDialDelay(cb);
+        case "imsCallModeChange": return OnImsCallModeChange(cb);
+        case "callSessionEvent": return OnCallSessionEvent(cb);
+        case "peerDimensionsChange": return OnPeerDimensionsChange(cb);
+        case "cameraCapabilitiesChange": return OnCameraCapabilitiesChange(cb);
+        default: throw new Error(`Unknown type: ${type}`);
+    }
+}
+export function off(type: string, cb?: (arg_0: Object) => void) {
+    switch(type) {
+        case "callDetailsChange": return OffCallDetailsChange(cb as (((data: CallAttributeOptions) => void) | undefined));
+        case "callEventChange": return OffCallEventChange(cb as (((data: CallEventOptions) => void) | undefined));
+        case "callDisconnectedCause": return OffCallDisconnectedCauses(cb as (((data: DisconnectedDetails) => void) | undefined));
+        case "mmiCodeResult": return OffMmiCodeResult(cb as (((data: MmiCodeResults) => void) | undefined));
+        case "audioDeviceChange": return OffAudioDeviceChange(cb as (((data: AudioDeviceCallbackInfo) => void) | undefined));
+        case "postDialDelay": return OffPostDialDelay(cb as (((data: string) => void) | undefined));
+        case "imsCallModeChange": return OffImsCallModeChange(cb as (((data: ImsCallModeInfo) => void) | undefined));
+        case "callSessionEvent": return OffCallSessionEvent(cb as (((data: CallSessionEvent) => void) | undefined));
+        case "peerDimensionsChange": return OffPeerDimensionsChange(cb as (((data: PeerDimensionsDetail) => void) | undefined));
+        case "cameraCapabilitiesChange": return OffCameraCapabilitiesChange(cb as (((data: CameraCapabilities) => void) | undefined));
+        default: throw new Error(`Unknown type: ${type}`);
+    }
+}
+""")
+
+// 通话详情变化回调
+function OnCallDetailsChange(callback: (data: CallAttributeOptions) => void): void;
+function OffCallDetailsChange(callback: Optional<(data: CallAttributeOptions) => void>): void;
+
+// 通话事件变化回调
+function OnCallEventChange(callback: (data: CallEventOptions) => void): void;
+function OffCallEventChange(callback: Optional<(data: CallEventOptions) => void>): void;
+
+// 通话断开原因回调
+function OnCallDisconnectedCauses(callback: (data: DisconnectedDetails) => void): void;
+function OffCallDisconnectedCauses(callback: Optional<(data: DisconnectedDetails) => void>): void;
+
+// MMI码结果回调
+function OnMmiCodeResult(callback: (data: MmiCodeResults) => void): void;
+function OffMmiCodeResult(callback: Optional<(data: MmiCodeResults) => void>): void;
+
+// 音频设备变化回调
+function OnAudioDeviceChange(callback: (data: AudioDeviceCallbackInfo) => void): void;
+function OffAudioDeviceChange(callback: Optional<(data: AudioDeviceCallbackInfo) => void>): void;
+
+// 拨号后延迟回调
+function OnPostDialDelay(callback: (data: String) => void): void;
+function OffPostDialDelay(callback: Optional<(data: String) => void>): void;
+
+// IMS通话模式变化回调
+function OnImsCallModeChange(callback: (data: ImsCallModeInfo) => void): void;
+function OffImsCallModeChange(callback: Optional<(data: ImsCallModeInfo) => void>): void;
+
+// 通话会话事件回调
+function OnCallSessionEvent(callback: (data: CallSessionEvent) => void): void;
+function OffCallSessionEvent(callback: Optional<(data: CallSessionEvent) => void>): void;
+
+// 对端尺寸变化回调
+function OnPeerDimensionsChange(callback: (data: PeerDimensionsDetail) => void): void;
+function OffPeerDimensionsChange(callback: Optional<(data: PeerDimensionsDetail) => void>): void;
+
+// 相机能力变化回调
+function OnCameraCapabilitiesChange(callback: (data: CameraCapabilities) => void): void;
+function OffCameraCapabilitiesChange(callback: Optional<(data: CameraCapabilities) => void>): void;
