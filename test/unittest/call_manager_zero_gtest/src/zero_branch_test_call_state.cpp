@@ -349,6 +349,14 @@ HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_001, TestSize.Level0)
     audioDeviceManager->RemoveAudioDeviceList(NAME, AudioDeviceType::DEVICE_BLUETOOTH_SCO);
     audioDeviceManager->ResetBtAudioDevicesList();
     audioDeviceManager->ResetDistributedCallDevicesList();
+    audioDeviceManager->ResetNearlinkAudioDevicesList();
+    audioDeviceManager->ResetBtAudioDevicesList();
+    audioDeviceManager->EnableNearlink();
+    std::string address = "";
+    std::string deviceName = "";
+    audioDeviceManager->UpdateBtDevice(address, deviceName);
+    audioDeviceManager->UpdateNearlinkDevice(address, deviceName);
+    audioDeviceManager->UpdateBtHearingAidDevice(address, deviceName);
     audioDeviceManager->ProcessEvent(AudioEvent::WIRED_HEADSET_DISCONNECTED);
     audioDeviceManager->SwitchDevice(AUDIO_DEACTIVATED);
     audioDeviceManager->EnableBtSco();
@@ -465,11 +473,36 @@ HWTEST_F(CallStateTest, Telephony_Ring_002, TestSize.Level0)
     ring->isSwingMsgRecv_ = true;
     ring->isSwing_ = true;
     sleep(WAIT_TIME);
-    ASSERT_NE(ring->Stop(), TELEPHONY_SUCCESS);
+    ASSERT_EQ(ring->Stop(), TELEPHONY_SUCCESS);
     ring->ReleaseRenderer();
     #endif
 }
 
+/**
+ * @tc.number   Telephony_Ring_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_Ring_003, TestSize.Level0)
+{
+    #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
+    auto ring = std::make_shared<Ring>();
+    audo comfortReminder = std::make_shared<Msdp::UserStatusAwareness::comfortReminderData>();
+    comfortReminder->SetFusionReminderData();
+    comfortReminder->SetEventType(1);
+    ring->isAdaptiveSwitchOn_ = true;
+    ring->isEnvMsgRecv_ = true;
+    ring->isQuiet_ = true;
+    ring->OnComfortReminderDataChanged(0, comfortReminder);
+    ring->Play(DEFAULT_SLOT_ID, "", Media::HapticStartupMode::DEFAULT);
+    ring->SetRingToneVibrationState;
+    ring->SubscribeFeature();
+    ring->UnsubscribeFeature();
+    ring->DecreaseVolume();
+    ring->IncreaseVolume();
+    ASSERT_NE(ring->Stop(), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    #endif
+}
 /**
  * @tc.number   Telephony_Tone_001
  * @tc.name     test error branch

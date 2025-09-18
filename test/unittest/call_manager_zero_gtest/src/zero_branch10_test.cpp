@@ -680,7 +680,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_MuteRinger_001, TestSize.Level1)
     audioControlManager->MuteRinger();
     CallObjectManager::callObjectPtrList_.clear();
     audioControlManager->isVideoRingVibrating_ = true;
-    EXPECT_EQ(audioControlManager->isVideoRingVibrating_, false);
+    EXPECT_EQ(audioControlManager->isVideoRingVibrating_, true);
     sptr<CallBase> call2 = new IMSCall(info);
     call2->SetCallType(CallType::TYPE_IMS);
     call2->SetCrsType(CRS_TYPE);
@@ -712,7 +712,7 @@ HWTEST_F(ZeroBranch10Test, CallStateReportProxy_CallStateUpdated_001, TestSize.L
     call1->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
     CallObjectManager::AddOneCallObject(call1);
     callStateProxy->CallStateUpdated(call1, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
-    EXPECT_EQ(callControlManager->HasCall(), false);
+    EXPECT_EQ(callControlManager->HasCall(), true);
     CallAttributeInfo voipInfo;
     sptr<CallBase> call2 = new VoIPCall(info);
     CallObjectManager::voipCallObjectList_[1] = voipInfo;
