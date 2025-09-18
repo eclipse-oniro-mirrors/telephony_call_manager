@@ -434,7 +434,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
     audioControl->GetCallList().empty();
     ASSERT_TRUE(audioControl->GetCurrentActiveCall() == nullptr);
     std::string address = "";
-    audioControl->GetWirelessAudioDeviceAddress(AudioDeviceType::DEVICE_BLUETOOTH_SCO, adddress);
+    audioControl->GetWirelessAudioDeviceAddress(AudioDeviceType::DEVICE_BLUETOOTH_SCO, address);
     audioControl->GetWirelessAudioDeviceAddress(AudioDeviceType::DEVICE_NEARLINK, address);
     AudioDevice device;
     device.deviceType = AudioDeviceType::DEVICE_TYPE_BLUETOOTH_SCO;
