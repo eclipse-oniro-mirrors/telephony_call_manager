@@ -88,7 +88,7 @@ void formatPhoneNumberSync2(::taihe::string_view phoneNumber)
 {
     CallManagerClientInitializer init;
     std::u16string phoneNum = OHOS::Str8ToStr16(std::string(phoneNumber));
-    std::u16string countryCode = OHOS::Str8ToStr16("");
+    std::u16string countryCode = OHOS::Str8ToStr16("cn");
     std::u16string formatNum = OHOS::Str8ToStr16("");
     auto errCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->FormatPhoneNumber(
         phoneNum, countryCode, formatNum);
