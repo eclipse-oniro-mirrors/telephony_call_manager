@@ -56,6 +56,13 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
         return TELEPHONY_SUCCESS;
     }
 
+#ifdef NOT_SUPPORT_MULTICALL
+    if (CallObjectManager::IsCallExist(TelCallState::CALL_STATUS_ACTIVE) &&
+        info.state == TelCallState::CALL_STATUS_ACTIVE) {
+        TELEPHONY_LOGI("do not report callui when already exist active call");
+        return TELEPHONY_SUCCESS;
+    }
+#endif
     CallDetailInfo callDetailInfo = info;
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
     TELEPHONY_LOGW("UpdateCallReportInfo submit task enter");
