@@ -161,6 +161,7 @@ private:
     void StopCallMotionRecognition(TelCallState nextState);
     bool UpdateDialingHandle(const CallDetailInfo &info, bool &isDistributedDeviceDialing);
     bool RefreshDialingStateByOtherState(sptr<CallBase> &call, const CallDetailInfo &info);
+    void UpdateExtraParams(sptr<CallBase> &call, const CallDetailInfo &info);
 
 private:
     CallDetailInfo callReportInfo_;
