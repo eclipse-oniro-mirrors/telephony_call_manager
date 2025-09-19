@@ -1087,6 +1087,29 @@ HWTEST_F(ZeroBranch2Test, Telephony_ReportCallInfoHandler_001, Function | Medium
 }
 
 /**
+ * @tc.number   Telephony_ReportCallInfoHandler_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_ReportCallInfoHandler_002, Function | MediumTest | Level1)
+{
+    DialParaInfo info;
+    sptr<CallBase> imsCall = new IMSCall(info);
+    imsCall->SetCallType(CallType::TYPE_IMS);
+    imsCall->SetCallIndex(0);
+    imsCall->SetCallId(VALID_CALLID);
+    imsCall->SetSlotId(0);
+    imsCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
+    imsCall->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    CallObjectManager::AddOneCallObject(imsCall);
+
+    CallDetailInfo callDetailInfo;
+    callDetailInfo.callType = CallType::TYPE_BLUETOOTH;
+    callDetailInfo.state = TelCallState::CALL_STATUS_ACTIVE;
+    DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(callDetailInfo);
+}
+
+/**
  * @tc.number   Telephony_VideoControlManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
