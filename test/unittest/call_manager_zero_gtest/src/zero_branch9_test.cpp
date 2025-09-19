@@ -437,7 +437,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
     audioControl->GetWirelessAudioDeviceAddress(AudioDeviceType::DEVICE_BLUETOOTH_SCO, address);
     audioControl->GetWirelessAudioDeviceAddress(AudioDeviceType::DEVICE_NEARLINK, address);
     AudioDevice device;
-    device.deviceType = AudioDeviceType::DEVICE_TYPE_BLUETOOTH_SCO;
+    device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
     audioControl->SetAudioDevice(device);
     audioControl->HandleWirelessAudioDevice(device);
     strcpy_s(device.address, sizeof(device.address), "address");
