@@ -46,6 +46,7 @@ public:
         g_selfTokenId = GetSelfTokenID();
         PrivacyTestCommon::SetTestEvironment(g_selfTokenId);
         g_mock = new (std::nothrow) MockNativeToken("foundation");
+        std::cout<<"---------g_selfTokenId = "<<g_selfTokenId<<std::endl;
         std::cout << "---------- warning ------------" << std::endl;
         std::cout << "---Please modify PHONE_NUMBER first in the file call_manager_gtest.cpp---" << std::endl;
         std::cout << "---------- gtest start ------------" << std::endl;

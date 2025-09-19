@@ -433,6 +433,20 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
     audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_ACTIVE);
     audioControl->GetCallList().empty();
     ASSERT_TRUE(audioControl->GetCurrentActiveCall() == nullptr);
+    std::string address = "";
+    audioControl->GetWirelessAudioDeviceAddress(AudioDeviceType::DEVICE_BLUETOOTH_SCO, address);
+    audioControl->GetWirelessAudioDeviceAddress(AudioDeviceType::DEVICE_NEARLINK, address);
+    AudioDevice device;
+    device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
+    audioControl->SetAudioDevice(device);
+    audioControl->HandleWirelessAudioDevice(device);
+    strcpy_s(device.address, sizeof(device.address), "address");
+    device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
+    audioControl->HandleWirelessAudioDevice(device);
+    device.deviceType = AudioDeviceType::DEVICE_NEARLINK;
+    audioControl->HandleWirelessAudioDevice(device);
+    audioControl->dealCrsScene(AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL);
+    audioControl->AdjustVolumesForCrs();
 }
 
 /**

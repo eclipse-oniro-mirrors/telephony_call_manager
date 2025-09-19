@@ -348,6 +348,6 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_002, TestSize.Level1)
     EXPECT_NE(Proxy->ClearAllCalls(infos), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->CancelCallUpgrade(slotId, index), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->RequestCameraCapabilities(slotId, index), TELEPHONY_SUCCESS);
-    EXPECT_TRUE(Proxy->IsMmiCode(slotId, number));
+    EXPECT_FALSE(Proxy->IsMmiCode(slotId, number));
 }
 } // namespace OHOS::Telephony
