@@ -443,7 +443,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
     strcpy_s(device.address, sizeof(device.address), "address");
     device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
     audioControl->HandleWirelessAudioDevice(device);
-    device.deviceType = AudioDeviceType:DEVICE_NEARLINK;
+    device.deviceType = AudioDeviceType::DEVICE_NEARLINK;
     audioControl->HandleWirelessAudioDevice(device);
     audioControl->dealCrsScene(AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL);
     audioControl->AdjustVolumesForCrs();
