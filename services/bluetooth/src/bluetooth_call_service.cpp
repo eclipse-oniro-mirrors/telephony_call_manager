@@ -383,7 +383,7 @@ int32_t BluetoothCallService::SeparateConference()
 
 int32_t BluetoothCallService::KickOutFromConference()
 {
-    if (!TelephonyPermission::CheckPermission(Permission::ANSWER_CALL)) {
+    if (!TelephonyPermission::CheckPermission(Permission::PLACE_CALL)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
