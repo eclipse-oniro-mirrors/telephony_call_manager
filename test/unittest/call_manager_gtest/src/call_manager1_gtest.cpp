@@ -192,7 +192,7 @@ public:
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_RejectCall_0100, Function | MediumTest | Level2)
 {
-    AccessToken token;
+    MockNativeToken mock("accesstoken_service");
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
