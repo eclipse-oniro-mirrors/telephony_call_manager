@@ -101,7 +101,7 @@ private:
     AudioDevice currentAudioDevice_;
     std::map<std::string, AudioDevice> onlineDCallDevices_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
-    std::mutex dcallProxyMtx_;
+    ffrt::mutex dcallProxyMtx_;
     std::shared_ptr<DistributedCallProxy> dcallProxy_ = nullptr;
     std::shared_ptr<DistributedCallDeviceListener> dcallDeviceListener_ = nullptr;
     bool isSwitching_ = false;
