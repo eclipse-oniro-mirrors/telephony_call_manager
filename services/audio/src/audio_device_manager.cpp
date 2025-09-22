@@ -104,7 +104,7 @@ void AudioDeviceManager::UpdateEarpieceDevice()
         return;
     }
     isUpdateEarpieceDevice_ = true;
-    std::lock_guard<std::mutex> lock(infoMutex_);
+    std::lock_guard<ffrt::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
         if (it->deviceType == AudioDeviceType::DEVICE_EARPIECE) {
@@ -119,7 +119,7 @@ void AudioDeviceManager::UpdateEarpieceDevice()
 
 void AudioDeviceManager::UpdateBluetoothDeviceName(const std::string &macAddress, const std::string &deviceName)
 {
-    std::lock_guard<std::mutex> lock(infoMutex_);
+    std::lock_guard<ffrt::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
         if (it->address == macAddress && (it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
@@ -147,7 +147,7 @@ void AudioDeviceManager::UpdateBluetoothDeviceName(const std::string &macAddress
 void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType,
     const std::string &deviceName)
 {
-    std::lock_guard<std::mutex> lock(infoMutex_);
+    std::lock_guard<ffrt::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
         if (it->address == address && it->deviceType == deviceType) {
@@ -199,7 +199,7 @@ void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDev
 
 void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType)
 {
-    std::lock_guard<std::mutex> lock(infoMutex_);
+    std::lock_guard<ffrt::mutex> lock(infoMutex_);
     bool needAddEarpiece = true;
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
@@ -260,7 +260,7 @@ void AudioDeviceManager::AddEarpiece()
 
 void AudioDeviceManager::ResetBtAudioDevicesList()
 {
-    std::lock_guard<std::mutex> lock(infoMutex_);
+    std::lock_guard<ffrt::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     bool hadBtActived = false;
     while (it != info_.audioDeviceList.end()) {
@@ -280,7 +280,7 @@ void AudioDeviceManager::ResetBtAudioDevicesList()
 
 void AudioDeviceManager::ResetDistributedCallDevicesList()
 {
-    std::lock_guard<std::mutex> lock(infoMutex_);
+    std::lock_guard<ffrt::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
         if (IsDistributedAudioDeviceType(it->deviceType)) {
@@ -299,7 +299,7 @@ void AudioDeviceManager::ResetDistributedCallDevicesList()
 
 void AudioDeviceManager::ResetNearlinkAudioDevicesList()
 {
-    std::unique_lock<std::mutex> lock(infoMutex_);
+    std::unique_lock<ffrt::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     bool hadNearlinkActived = false;
     while (it != info_.audioDeviceList.end()) {
@@ -323,7 +323,7 @@ void AudioDeviceManager::ResetNearlinkAudioDevicesList()
 
 void AudioDeviceManager::ResetBtHearingAidDeviceList()
 {
-    std::unique_lock<std::mutex> lock(infoMutex_);
+    std::unique_lock<ffrt::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     bool hadBtHearingAidActived = false;
     while (it != info_.audioDeviceList.end()) {
@@ -409,7 +409,7 @@ bool AudioDeviceManager::SwitchDevice(AudioEvent event)
 bool AudioDeviceManager::SwitchDevice(AudioDeviceType device)
 {
     bool result = false;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     switch (device) {
         case AudioDeviceType::DEVICE_EARPIECE:
             result = EnableEarpiece();
@@ -563,7 +563,7 @@ void AudioDeviceManager::SetCurrentAudioDevice(const AudioDevice &device)
 bool AudioDeviceManager::CheckAndSwitchDistributedAudioDevice()
 {
     TELEPHONY_LOGI("check and switch distributed audio device.");
-    std::lock_guard<std::mutex> lock(infoMutex_);
+    std::lock_guard<ffrt::mutex> lock(infoMutex_);
     DelayedSingleton<DistributedCallManager>::GetInstance()->SetCallState(true);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {

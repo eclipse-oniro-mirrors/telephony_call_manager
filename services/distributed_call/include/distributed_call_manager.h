@@ -21,7 +21,7 @@
 #include <map>
 #include <mutex>
 #include <atomic>
-
+#include "ffrt.h"
 #include "singleton.h"
 #include "idcall_device_callback.h"
 #include "iservice_registry.h"
@@ -94,8 +94,8 @@ private:
 private:
     std::atomic<bool> isCallActived_ = false;
     std::atomic<bool> dCallDeviceSwitchedOn_ = false;
-    std::mutex connectedDevMtx_;
-    std::mutex onlineDeviceMtx_;
+    ffrt::mutex connectedDevMtx_;
+    ffrt::mutex onlineDeviceMtx_;
     std::string connectedDevId_;
     AudioDevice connectedAudioDevice_;
     AudioDevice currentAudioDevice_;
