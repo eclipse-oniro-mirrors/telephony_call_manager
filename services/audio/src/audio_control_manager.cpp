@@ -854,13 +854,23 @@ bool AudioControlManager::PlayForNoRing()
 
 bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &ringMode)
 {
+    std::lock_guard<ffrt::mutex> lock(crsMutex_);
     if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
         if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
             isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
         }
     }
-    if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
+    bool isNormalRingMode = (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL);
+    if (isNormalRingMode || IsBtOrWireHeadPlugin()) {
         isCrsStartSoundTone_ = true;
+        if (!IsVoIPCallActived() && isNormalRingMode) {
+            AudioDevice device = {
+                .deviceType = AudioDeviceType::DEVICE_SPEAKER,
+                .address = { 0 },
+            };
+            TELEPHONY_LOGI("crs ring tone should be speaker");
+            SetAudioDevice(device);
+        }
         if (PlaySoundtone()) {
             TELEPHONY_LOGI("play soundtone success");
             AdjustVolumesForCrs();
