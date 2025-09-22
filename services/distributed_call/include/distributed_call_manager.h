@@ -19,7 +19,6 @@
 #include <string>
 #include <memory>
 #include <map>
-#include <mutex>
 #include <atomic>
 #include "ffrt.h"
 #include "singleton.h"
@@ -106,7 +105,7 @@ private:
     std::shared_ptr<DistributedCallDeviceListener> dcallDeviceListener_ = nullptr;
     bool isSwitching_ = false;
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     std::shared_ptr<DCallHfpListener> dcallHfpListener_{nullptr};
 #endif
 };
