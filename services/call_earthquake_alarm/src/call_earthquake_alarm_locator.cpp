@@ -300,10 +300,10 @@ std::map<std::string, bool> OOBESwitchObserver::keyStatus = {
     {"is_ota_finished", false}
 };
 
-ffrt::ffrt OOBESwitchObserver::mutex_;
+ffrt::mutex OOBESwitchObserver::mutex_;
 void OOBESwitchObserver::OnChange()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (!keyStatus[mKey]) {
         keyStatus[mKey] = MyLocationEngine::IsSwitchOn(mKey, mValue);
     }
@@ -330,7 +330,7 @@ void OOBESwitchObserver::OnChange()
     });
 }
 
-ffrt::ffrt EmergencyCallConnectCallback::mutex_;
+ffrt::mutex EmergencyCallConnectCallback::mutex_;
 bool EmergencyCallConnectCallback::isStartEccService = false;
 int32_t EmergencyCallConnectCallback::nowCallId = -1;
 sptr<AAFwk::IAbilityConnection> EmergencyCallConnectCallback::connectCallback_ = nullptr;
@@ -355,7 +355,7 @@ void MyLocationEngine::ConnectAbility(std::string value, sptr<AAFwk::IAbilityCon
 
 void MyLocationEngine::StartEccService(sptr<CallBase> call, const CallDetailInfo &info)
 {
-    std::lock_guard<ffrt::ffrt> lock(EmergencyCallConnectCallback::mutex_);
+    std::lock_guard<ffrt::mutex> lock(EmergencyCallConnectCallback::mutex_);
     if (call == nullptr) {
         TELEPHONY_LOGE("call is nullptr");
         return;
@@ -385,7 +385,7 @@ void MyLocationEngine::StartEccService(sptr<CallBase> call, const CallDetailInfo
 
 void MyLocationEngine::StopEccService(int32_t callId)
 {
-    std::lock_guard<ffrt::ffrt> lock(EmergencyCallConnectCallback::mutex_);
+    std::lock_guard<ffrt::mutex> lock(EmergencyCallConnectCallback::mutex_);
     if (EmergencyCallConnectCallback::connectCallbackEcc == nullptr) {
         TELEPHONY_LOGE("ecc callback is nullptr");
         return;

@@ -24,7 +24,7 @@ namespace Telephony {
 bool InactiveDeviceState::ProcessEvent(int32_t event)
 {
     bool result = false;
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     switch (event) {
         case AudioEvent::AUDIO_ACTIVATED:
         case AudioEvent::AUDIO_RINGING:

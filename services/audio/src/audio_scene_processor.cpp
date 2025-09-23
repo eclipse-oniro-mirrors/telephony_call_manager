@@ -135,7 +135,7 @@ bool AudioSceneProcessor::SwitchState(CallStateType stateType)
 {
     TELEPHONY_LOGI("switch state, stateType: %{public}d.", stateType);
     bool result = false;
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     switch (stateType) {
         case CallStateType::DIALING_STATE:
             result = SwitchDialing();

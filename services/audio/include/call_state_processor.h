@@ -46,7 +46,7 @@ private:
     std::set<int32_t> alertingCalls_;
     std::set<int32_t> incomingCalls_;
     std::set<int32_t> dialingCalls_;
-    ffrt::ffrt mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

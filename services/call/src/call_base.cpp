@@ -73,7 +73,7 @@ CallBase::~CallBase() {}
 
 int32_t CallBase::DialCallBase()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     callRunningState_ = CallRunningState::CALL_RUNNING_STATE_CONNECTING;
     TELEPHONY_LOGI("start to set audio");
     // Set audio, set hands-free
@@ -113,7 +113,7 @@ void CallBase::HangUpVoipCall()
 
 int32_t CallBase::IncomingCallBase()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     callRunningState_ = CallRunningState::CALL_RUNNING_STATE_RINGING;
     return TELEPHONY_SUCCESS;
 }
@@ -135,25 +135,25 @@ int32_t CallBase::RejectCallBase()
 
 AAFwk::WantParams CallBase::GetExtraParams()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return extraParams_;
 }
 
 void CallBase::SetExtraParams(AAFwk::WantParams extraParams)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     extraParams_ = extraParams;
 }
 
 int CallBase::GetParamsByKey(const std::string &key, int defaultValue)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return extraParams_.GetIntParam(key, defaultValue);
 }
 
 void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     (void)memset_s(info.accountNumber, kMaxNumberLen, 0, kMaxNumberLen);
     if (accountNumber_.length() > static_cast<size_t>(kMaxNumberLen)) {
         TELEPHONY_LOGE("Number out of limit!");
@@ -219,7 +219,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
 
 int32_t CallBase::GetCallID()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return callId_;
 }
 
@@ -230,14 +230,14 @@ CallType CallBase::GetCallType()
 
 CallRunningState CallBase::GetCallRunningState()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return callRunningState_;
 }
 
 // transfer from external call state to callmanager local state
 int32_t CallBase::SetTelCallState(TelCallState nextState)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callRunningState_ != CallRunningState::CALL_RUNNING_STATE_CREATE && callState_ == nextState &&
         nextState != TelCallState::CALL_STATUS_DIALING) {
         TELEPHONY_LOGI("Call state duplication %{public}d", nextState);
@@ -348,279 +348,279 @@ void CallBase::StateChangesToAlerting()
 
 TelCallState CallBase::GetTelCallState()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return callState_;
 }
 
 void CallBase::SetAutoAnswerState(bool flag)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     autoAnswerState_ = flag;
     TELEPHONY_LOGI("NeedAutoAnswer:%{public}d", autoAnswerState_);
 }
 
 bool CallBase::GetAutoAnswerState()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return autoAnswerState_;
 }
 
 void CallBase::SetAnswerVideoState(int32_t videoState)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     answerVideoState_ = videoState;
     TELEPHONY_LOGI("set answer video state :%{public}d", answerVideoState_);
 }
 
 int32_t CallBase::GetAnswerVideoState()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return answerVideoState_;
 }
 
 void CallBase::SetCanUnHoldState(bool flag)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     canUnHoldState_ = flag;
     TELEPHONY_LOGI("CanUnHoldState:%{public}d", canUnHoldState_);
 }
 
 bool CallBase::GetCanUnHoldState()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     TELEPHONY_LOGI("CanUnHoldState:%{public}d", canUnHoldState_);
     return canUnHoldState_;
 }
 
 void CallBase::SetCanSwitchCallState(bool flag)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     canSwitchCallState_ = flag;
     TELEPHONY_LOGI("CanSwitchCallState:%{public}d", canSwitchCallState_);
 }
 
 bool CallBase::GetCanSwitchCallState()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     TELEPHONY_LOGI("CanSwitchCallState:%{public}d", canSwitchCallState_);
     return canSwitchCallState_;
 }
 
 void CallBase::SetTelConferenceState(TelConferenceState state)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     conferenceState_ = state;
     TELEPHONY_LOGI("SetTelConferenceState, callId:%{public}d, state:%{public}d", callId_, state);
 }
 
 TelConferenceState CallBase::GetTelConferenceState()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return conferenceState_;
 }
 
 VideoStateType CallBase::GetVideoStateType()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return videoState_;
 }
 
 void CallBase::SetVideoStateType(VideoStateType mediaType)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     videoState_ = mediaType;
 }
 
 int32_t CallBase::GetCrsType()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return crsType_;
 }
 
 void CallBase::SetCrsType(int32_t crsType)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     crsType_ = crsType;
 }
 
 int32_t CallBase::GetOriginalCallType()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return originalCallType_;
 }
 
 void CallBase::SetOriginalCallType(int32_t originalCallType)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     originalCallType_ = originalCallType;
 }
 
 void CallBase::SetIsEccContact(bool isEccContact)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     isEccContact_ = isEccContact;
 }
 
 void CallBase::SetNumberLocation(std::string numberLocation)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     numberLocation_ = numberLocation;
 }
 
 int32_t CallBase::GetAccountId()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return accountId_;
 }
 
 void CallBase::SetAccountId(int32_t accountId)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     accountId_ = accountId;
 }
 
 std::string CallBase::GetNumberLocation()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return numberLocation_;
 }
 
 void CallBase::SetPolicyFlag(PolicyFlag flag)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     policyFlag_ |= flag;
 }
 
 uint64_t CallBase::GetPolicyFlag()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return policyFlag_;
 }
 
 ContactInfo CallBase::GetCallerInfo()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return contactInfo_;
 }
 
 void CallBase::SetCallerInfo(const ContactInfo &info)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     contactInfo_ = info;
 }
 
 NumberMarkInfo CallBase::GetNumberMarkInfo()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return numberMarkInfo_;
 }
 
 void CallBase::SetNumberMarkInfo(const NumberMarkInfo &numberMarkInfo)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     numberMarkInfo_ = numberMarkInfo;
 }
 
 void CallBase::SetBlockReason(const int32_t &blockReason)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     blockReason_ = blockReason;
 }
 
 void CallBase::SetDetectDetails(std::string detectDetails)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     detectDetails_ = detectDetails;
 }
 
 std::string CallBase::GetDetectDetails()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return detectDetails_;
 }
 
 void CallBase::SetCallRunningState(CallRunningState callRunningState)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     callRunningState_ = callRunningState;
 }
 
 void CallBase::SetStartTime(int64_t startTime)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     startTime_ = startTime;
 }
 
 void CallBase::SetCallBeginTime(time_t callBeginTime)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     callBeginTime_ = callBeginTime;
 }
 
 void CallBase::SetCallCreateTime(time_t callCreateTime)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     callCreateTime_ = callCreateTime;
 }
 
 void CallBase::SetCallEndTime(time_t callEndTime)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     callEndTime_ = callEndTime;
 }
 
 void CallBase::SetRingBeginTime(time_t ringBeginTime)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     ringBeginTime_ = ringBeginTime;
 }
 
 void CallBase::SetRingEndTime(time_t ringEndTime)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     ringEndTime_ = ringEndTime;
 }
 
 void CallBase::SetAnswerType(CallAnswerType answerType)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     answerType_ = answerType;
 }
 
 CallAnswerType CallBase::GetAnswerType()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return answerType_;
 }
 
 CallEndedType CallBase::GetCallEndedType()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return callEndedType_;
 }
 
 int32_t CallBase::SetCallEndedType(CallEndedType callEndedType)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     callEndedType_ = callEndedType;
     return TELEPHONY_SUCCESS;
 }
 
 void CallBase::SetCallId(int32_t callId)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     callId_ = callId;
 }
 
 void CallBase::SetCeliaCallType(int32_t celiaCallType)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     celiaCallType_ = celiaCallType;
 }
 
 int32_t CallBase::GetCeliaCallType()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return celiaCallType_;
 }
 
@@ -641,7 +641,7 @@ bool CallBase::IsSpeakerphoneEnabled()
 
 bool CallBase::IsCurrentRinging()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return (callRunningState_ == CallRunningState::CALL_RUNNING_STATE_RINGING) ? true : false;
 }
 
@@ -657,13 +657,13 @@ void CallBase::SetAccountNumber(const std::string accountNumber)
 
 bool CallBase::IsAnsweredCall()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return isAnswered_;
 }
 
 void CallBase::SetAnsweredCall(bool isAnswered)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     isAnswered_ = isAnswered;
 }
 
@@ -767,13 +767,13 @@ int32_t CallBase::GetNewCallUseBox()
 
 int32_t CallBase::GetBtCallSlotId()
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return btCallSlotId_;
 }
 
 void CallBase::SetBtCallSlotId(int32_t slotId)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     btCallSlotId_ = slotId;
 }
 } // namespace Telephony

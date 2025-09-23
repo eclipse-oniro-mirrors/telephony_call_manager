@@ -25,7 +25,7 @@ namespace Telephony {
 bool CSCallState::ProcessEvent(int32_t event)
 {
     bool result = false;
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     TELEPHONY_LOGI("ProcessEvent event=%{public}d", event);
     switch (event) {
         case AudioEvent::NEW_INCOMING_CALL:

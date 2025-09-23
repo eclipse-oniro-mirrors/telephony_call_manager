@@ -39,7 +39,7 @@ public:
 
 private:
     std::set<std::shared_ptr<CallStateListenerBase>> listenerSet_;
-    ffrt::ffrt mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

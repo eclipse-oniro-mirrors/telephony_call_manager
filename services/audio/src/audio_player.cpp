@@ -305,7 +305,7 @@ void AudioPlayer::RingCallback::OnInterrupt(const AudioStandard::InterruptEvent 
 
 void AudioPlayer::RegisterRingCallback(std::shared_ptr<Media::RingtonePlayer> &RingtonePlayer)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     ringCallback_ = std::make_shared<RingCallback>();
     if (ringCallback_ == nullptr) {
         TELEPHONY_LOGE("ringCallback_ is nullptr");

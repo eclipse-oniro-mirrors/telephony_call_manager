@@ -43,7 +43,7 @@ private:
     OHOS::DistributedHardware::IDCallClient* GetDCallClient();
 
 private:
-    ffrt::ffrt dcallClientMtx_;
+    ffrt::mutex dcallClientMtx_;
     OHOS::DistributedHardware::IDCallClient* dcallClient_ = nullptr;
     void *dCallClientHandler_ = nullptr;
 };

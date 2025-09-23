@@ -104,7 +104,7 @@ void CallControlManager::UnInit()
         }
     }
     {
-        std::lock_guard<ffrt::ffrt> lock(voipMutex_);
+        std::lock_guard<ffrt::mutex> lock(voipMutex_);
         if (appMgrProxy != nullptr && appStateObserver != nullptr) {
             appMgrProxy->UnregisterApplicationStateObserver(appStateObserver);
             appMgrProxy = nullptr;
@@ -208,7 +208,7 @@ int32_t CallControlManager::CanDial(std::u16string &number, AppExecFwk::PacMap &
 
 void CallControlManager::PackageDialInformation(AppExecFwk::PacMap &extras, std::string accountNumber, bool isEcc)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     dialSrcInfo_.callId = ERR_ID;
     dialSrcInfo_.number = accountNumber;
     dialSrcInfo_.isDialing = true;
@@ -1312,13 +1312,13 @@ int32_t CallControlManager::CloseUnFinishedUssd(int32_t slotId)
 
 void CallControlManager::GetDialParaInfo(DialParaInfo &info)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     info = dialSrcInfo_;
 }
 
 void CallControlManager::GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap &extras)
 {
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     info = dialSrcInfo_;
     extras = extras_;
 }
@@ -1400,7 +1400,7 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
     CallVoiceAssistantManager::GetInstance()->UpdateVoipCallState(state);
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE ||
         VoIPCallState_ == CallStateToApp::CALL_STATE_UNKNOWN) {
-        std::lock_guard<ffrt::ffrt> lock(voipMutex_);
+        std::lock_guard<ffrt::mutex> lock(voipMutex_);
         if (appMgrProxy != nullptr && appStateObserver != nullptr) {
             appMgrProxy->UnregisterApplicationStateObserver(appStateObserver);
             appMgrProxy = nullptr;
@@ -1593,7 +1593,7 @@ int32_t CallControlManager::GetVoIPCallInfo(int32_t &callId, int32_t &state, std
 
 void CallControlManager::AppStateObserver()
 {
-    std::lock_guard<ffrt::ffrt> lock(voipMutex_);
+    std::lock_guard<ffrt::mutex> lock(voipMutex_);
     if (appStateObserver == nullptr) {
         appStateObserver = new (std::nothrow) ApplicationStateObserver();
         if (appStateObserver == nullptr) {
@@ -2107,13 +2107,13 @@ void CallControlManager::UnRegisterObserver()
 
 void CallControlManager::SetWearState(int32_t state)
 {
-    std::lock_guard<ffrt::ffrt> lock(wearStatusMutex_);
+    std::lock_guard<ffrt::mutex> lock(wearStatusMutex_);
     wearStatus_ = state;
 }
 
 bool CallControlManager::IsNotWearOnWrist()
 {
-    std::lock_guard<ffrt::ffrt> lock(wearStatusMutex_);
+    std::lock_guard<ffrt::mutex> lock(wearStatusMutex_);
     if (wearStatus_ == WEAR_STATUS_OFF) {
         return true;
     }

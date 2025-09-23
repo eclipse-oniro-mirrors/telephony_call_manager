@@ -25,7 +25,7 @@ namespace Telephony {
 bool IncomingState::ProcessEvent(int32_t event)
 {
     bool result = false;
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     switch (event) {
         case AudioEvent::NO_MORE_INCOMING_CALL:
             result = DelayedSingleton<CallStateProcessor>::GetInstance()->UpdateCurrentCallState();

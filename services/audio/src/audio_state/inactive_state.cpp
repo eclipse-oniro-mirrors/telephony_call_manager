@@ -25,7 +25,7 @@ namespace Telephony {
 bool InActiveState::ProcessEvent(int32_t event)
 {
     bool result = false;
-    std::lock_guard<ffrt::ffrt> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     switch (event) {
         case AudioEvent::NEW_DIALING_CALL:
             // should switch alerting state while only one alerting call exists

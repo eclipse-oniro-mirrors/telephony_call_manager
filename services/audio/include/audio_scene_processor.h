@@ -47,7 +47,7 @@ public:
     bool ProcessEvent(AudioEvent event);
 
 private:
-    ffrt::ffrt mutex_;
+    ffrt::mutex mutex_;
     bool SwitchState(AudioEvent event);
     bool SwitchState(CallStateType state);
     bool SwitchCS();

@@ -226,7 +226,7 @@ private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     DialParaInfo dialSrcInfo_;
     AppExecFwk::PacMap extras_;
-    ffrt::ffrt mutex_;
+    ffrt::mutex mutex_;
     CallStateToApp VoIPCallState_ = CallStateToApp::CALL_STATE_IDLE;
     bool shouldDisconnect = true;
     static bool alarmSeted;
@@ -246,10 +246,10 @@ private:
     sptr<ApplicationStateObserver> appStateObserver = nullptr;
     sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
     
-    ffrt::ffrt voipMutex_;
+    ffrt::mutex voipMutex_;
     sptr<WearStatusObserver> wearStatusObserver_ = nullptr;
     int32_t wearStatus_ = WEAR_STATUS_INVALID;
-    ffrt::ffrt wearStatusMutex_;
+    ffrt::mutex wearStatusMutex_;
     ffrt::mutex reminderMutex_;
     std::shared_ptr<IncomingFlashReminder> incomingFlashReminder_ {nullptr};
 };

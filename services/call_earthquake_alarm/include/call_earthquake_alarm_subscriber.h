@@ -84,7 +84,7 @@ public:
     static bool GetSystemAbility(int32_t systemAbilityId);
     
 private:
-    ffrt::ffrt mutex_;
+    ffrt::mutex mutex_;
     bool startService = false;
     static sptr<ISystemAbilityStatusChange> statusChangeListener_;
     static std::map<int32_t, bool> systemAbilityStatus;

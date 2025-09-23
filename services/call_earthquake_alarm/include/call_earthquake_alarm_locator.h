@@ -56,7 +56,7 @@ public:
 private:
     std::string mKey = "";
     std::string mValue = "";
-    static ffrt::ffrt mutex_;
+    static ffrt::mutex mutex_;
 };
 
 class MyLocationEngine {
@@ -136,7 +136,7 @@ public:
     static sptr<AAFwk::IAbilityConnection> connectCallback_;
     static sptr<AAFwk::IAbilityConnection> connectCallbackEcc;
     static bool isStartEccService;
-    static ffrt::ffrt mutex_;
+    static ffrt::mutex mutex_;
     static int32_t nowCallId;
 };
 

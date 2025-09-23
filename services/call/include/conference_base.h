@@ -66,7 +66,7 @@ protected:
     ConferenceState state_;
     ConferenceState oldState_;
     std::set<int32_t> subCallIdSet_;
-    ffrt::ffrt conferenceMutex_;
+    ffrt::mutex conferenceMutex_;
     time_t beginTime_;
     CallType conferenceType_;
 };

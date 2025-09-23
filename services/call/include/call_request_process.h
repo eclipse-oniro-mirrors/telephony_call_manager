@@ -83,7 +83,7 @@ private:
     void GetDialingCall(sptr<CallBase> &call);
 
 private:
-    ffrt::ffrt mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

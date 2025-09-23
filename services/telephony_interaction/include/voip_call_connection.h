@@ -63,7 +63,7 @@ private:
     sptr<IVoipCallManagerService> voipCallManagerInterfacePtr_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     bool connectCallManagerState_ = false;
-    ffrt::ffrt mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

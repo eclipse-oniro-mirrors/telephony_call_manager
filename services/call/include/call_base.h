@@ -198,7 +198,7 @@ private:
     int32_t crsType_;
     int32_t originalCallType_;
     bool isMuted_;
-    ffrt::ffrt mutex_;
+    ffrt::mutex mutex_;
     std::string numberLocation_;
     NumberMarkInfo numberMarkInfo_;
     int32_t blockReason_;

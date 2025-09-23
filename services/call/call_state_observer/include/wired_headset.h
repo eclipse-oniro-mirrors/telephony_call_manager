@@ -55,7 +55,7 @@ public:
 private:
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop_;
     std::shared_ptr<WiredHeadsetHandler> handler_;
-    ffrt::ffrt mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -47,7 +47,7 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
     auto &helper = DelayedRefSingleton<HsdrHelper>().GetInstance();
     std::string metaData = GeneratePayload(antiFraudResult);
     std::weak_ptr<AntiFraudCloudService> weakPtr = shared_from_this();
-    std::unique_lock<ffrt::ffrt> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     isSettled_ = false;
     std::string auth;
     helper.ConnectHsdr([weakPtr, metaData, &auth](sptr<IRemoteObject> remoteObject) {
@@ -57,7 +57,7 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
             helper.DisconnectHsdr();
             return;
         }
-        std::lock_guard<ffrt::ffrt> lock(ptr->mutex_);
+        std::lock_guard<ffrt::mutex> lock(ptr->mutex_);
         auto pair = ptr->EncryptSync(metaData, remoteObject);
         auto ak = pair.first;
         if (ak.empty()) {

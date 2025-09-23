@@ -49,7 +49,7 @@ private:
  
     void DispatchHandleAntiFraudDetectRes(const AntiFraudInnerResult &antiFraudInnerResult);
  
-    ffrt::ffrt listenerMutex_;
+    ffrt::mutex listenerMutex_;
     std::shared_ptr<AntiFraudDetectResListener> listener_;
  
     OnDetectResCallbackFunc callbackFunc_;
