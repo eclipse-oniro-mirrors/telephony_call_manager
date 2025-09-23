@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace Telephony {
-std::condition_variable CallConnectAbility::cv_;
+ffrt::condition_variable CallConnectAbility::cv_;
 
 CallConnectAbility::~CallConnectAbility() {}
 

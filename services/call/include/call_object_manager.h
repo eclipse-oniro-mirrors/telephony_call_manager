@@ -108,7 +108,7 @@ public:
     static bool IsOneNumberDualTerminal();
 #endif
 protected:
-    static std::condition_variable cv_;
+    static ffrt::condition_variable cv_;
     static bool isFirstDialCallAdded_;
     static bool needWaitHold_;
     static CellularCallInfo dialCallInfo_;
