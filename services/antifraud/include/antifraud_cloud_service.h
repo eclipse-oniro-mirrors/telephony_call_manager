@@ -34,6 +34,7 @@ private:
     std::string phoneNum_;
     ffrt::mutex mutex_;
     ffrt::condition_variable cv_;
+    
     std::pair<std::string, std::string> EncryptSync(const std::string &metaData, sptr<IRemoteObject> remoteObject);
     std::pair<std::string, std::string> ProcessEncryptResult(const std::string &encryptResult);
     std::string GenerateRequestJson(const std::map<std::string, std::string> &headersMap, const std::string &body);
