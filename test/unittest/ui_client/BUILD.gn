@@ -46,6 +46,7 @@ ohos_executable("tel_call_manager_ui_test") {
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "ffrt:libffrt",
+    
     "eventhandler:libeventhandler",
     "graphic_surface:surface",
     "hilog:libhilog",
