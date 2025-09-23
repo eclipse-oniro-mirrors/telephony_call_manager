@@ -49,6 +49,7 @@ private:
     std::shared_ptr<PowerMgr::RunningLock> phoneRunningLock_;
     std::shared_ptr<PowerMgr::RunningLock> incomingRunningLock_;
     const int32_t INCOMING_LOCK_TIMEOUT = 6000;
+    const int32_t WAKEUP_DEVICE_LOCK_TIMEOUT = 310000;
 #endif
     bool isPhoneLocked = false;
     bool isScreenOnLocked = false;
