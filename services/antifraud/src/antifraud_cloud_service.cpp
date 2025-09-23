@@ -72,7 +72,7 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
     });
 
     while (!isSettled_) {
-        if (cv_.wait_for(lock, std::chrono::milliseconds(COMMON_TIME_OUT)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lock, std::chrono::milliseconds(COMMON_TIME_OUT)) == ffrt::cv_status::timeout) {
             TELEPHONY_LOGE("get auth timeout.");
             helper.DisconnectHsdr();
             return false;
