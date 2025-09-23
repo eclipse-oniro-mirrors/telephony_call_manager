@@ -131,7 +131,7 @@ bool CallConnectAbility::WaitForConnectResult()
     if (!isConnected_) {
         std::unique_lock<ffrt::mutex> lock(mutex_);
         while (!isConnected_) {
-            if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == std::cv_status::timeout) {
+            if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == ffrt::cv_status::timeout) {
                 TELEPHONY_LOGE("callui is not connected, no need to disconnect ability");
                 return false;
             }

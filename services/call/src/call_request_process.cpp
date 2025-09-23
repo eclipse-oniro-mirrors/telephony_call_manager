@@ -792,7 +792,7 @@ int32_t CallRequestProcess::HandleDialFail()
     std::unique_lock<ffrt::mutex> lock(mutex_);
     sptr<CallBase> call = nullptr;
     while (!isFirstDialCallAdded_) {
-        if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == ffrt::cv_status::timeout) {
             TELEPHONY_LOGE("CarrierDialProcess call is not added");
             GetDialingCall(call);
             if (call != nullptr) {
