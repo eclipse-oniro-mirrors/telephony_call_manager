@@ -66,7 +66,7 @@ void IncomingCallWakeup::WakeupDevice(sptr<CallBase> &callObjectPtr)
             CreateRunningLock("phonerunninglock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
     }
     if (phoneRunningLock_ != nullptr && !isPhoneLocked) {
-        phoneRunningLock_->Lock();
+        phoneRunningLock_->Lock(WAKEUP_DEVICE_LOCK_TIMEOUT);
         isPhoneLocked = true;
         TELEPHONY_LOGI("phoneRunningLock_ locked");
     }
@@ -75,7 +75,7 @@ void IncomingCallWakeup::WakeupDevice(sptr<CallBase> &callObjectPtr)
             CreateRunningLock("screenonrunninglock", PowerMgr::RunningLockType::RUNNINGLOCK_SCREEN);
     }
     if (screenRunningLock_ != nullptr && !isScreenOnLocked) {
-        screenRunningLock_->Lock();
+        screenRunningLock_->Lock(WAKEUP_DEVICE_LOCK_TIMEOUT);
         isScreenOnLocked = true;
         TELEPHONY_LOGI("screenRunningLock_ locked");
     }
