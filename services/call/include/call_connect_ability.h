@@ -17,7 +17,7 @@
 #define CALL_CONNECT_ABILITY_H
 
 #include <condition_variable>
-#include <mutex>
+#include "ffrt.h"
 
 #include "ability_connect_callback_interface.h"
 #include "call_manager_inner_type.h"

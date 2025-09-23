@@ -16,7 +16,7 @@
 #ifndef CALL_EARTHQUAKE_ALARM_SUBSCRIBER_H
 #define CALL_EARTHQUAKE_ALARM_SUBSCRIBER_H
 
-#include <mutex>
+#include "ffrt.h"
 #include <unordered_map>
 #include <memory>
 

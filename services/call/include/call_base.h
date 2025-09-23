@@ -19,7 +19,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <memory>
-#include <mutex>
+#include "ffrt.h"
 
 #include "refbase.h"
 #include "pac_map.h"

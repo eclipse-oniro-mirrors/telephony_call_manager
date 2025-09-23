@@ -16,7 +16,6 @@
 #ifndef TELEPHONY_AUDIO_MANAGER_H
 #define TELEPHONY_AUDIO_MANAGER_H
 
-#include <mutex>
 #include <set>
 
 #include "audio_device_manager.h"

@@ -16,7 +16,7 @@
 #ifndef ANTIFRAUD_SERVICE_H
 #define ANTIFRAUD_SERVICE_H
  
-#include <mutex>
+#include "ffrt.h"
 #include <queue>
 #include "call_status_manager.h"
 #include "anti_fraud_service_client.h"

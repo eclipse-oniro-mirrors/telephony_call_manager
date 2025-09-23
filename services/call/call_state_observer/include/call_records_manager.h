@@ -16,7 +16,7 @@
 #ifndef TELEPHONY_CALL_RECORDS_MANAGER_H
 #define TELEPHONY_CALL_RECORDS_MANAGER_H
 
-#include <mutex>
+#include "ffrt.h"
 #include <set>
 
 #include "call_records_handler.h"

@@ -19,7 +19,7 @@
 #include <cstring>
 #include <list>
 #include <memory>
-#include <mutex>
+
 
 #include "app_state_observer.h"
 #include "call_broadcast_subscriber.h"

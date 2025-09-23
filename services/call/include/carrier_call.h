@@ -18,6 +18,7 @@
 
 #include "call_base.h"
 #include "cellular_call_connection.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {

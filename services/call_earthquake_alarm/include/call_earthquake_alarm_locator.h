@@ -42,6 +42,7 @@
 #include "call_object_manager.h"
 #include "data_ability_observer_stub.h"
 #include "call_base.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {

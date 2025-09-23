@@ -16,7 +16,7 @@
 #ifndef BLUETOOTH_CALL_CONNECTION_H
 #define BLUETOOTH_CALL_CONNECTION_H
 
-#include <mutex>
+#include "ffrt.h"
 
 #include "common_type.h"
 #include "singleton.h"

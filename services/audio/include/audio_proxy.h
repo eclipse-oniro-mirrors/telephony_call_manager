@@ -18,7 +18,7 @@
 
 #include <cstdint>
 #include <memory>
-#include <mutex>
+#include "ffrt.h"
 
 #include "audio_system_manager.h"
 #include "call_manager_errors.h"

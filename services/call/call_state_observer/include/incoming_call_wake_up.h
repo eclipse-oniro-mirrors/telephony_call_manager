@@ -18,7 +18,7 @@
 #ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
 #endif
-#include <mutex>
+#include "ffrt.h"
 #include "call_object_manager.h"
 #include "call_state_listener_base.h"
 

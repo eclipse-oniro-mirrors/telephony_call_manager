@@ -16,7 +16,7 @@
 #ifndef TELEPHONY_CALL_STATE_PROCESSOR_H
 #define TELEPHONY_CALL_STATE_PROCESSOR_H
 
-#include <mutex>
+#include "ffrt.h"
 #include <set>
 #include <string>
 

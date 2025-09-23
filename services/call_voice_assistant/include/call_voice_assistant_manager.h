@@ -17,7 +17,7 @@
 #define CALL_VOICE_ASSISTANT_MANAGER_H
 
 #include <map>
-#include <mutex>
+#include "ffrt.h"
 #include <string_ex.h>
 
 #include "call_earthquake_alarm_locator.h"

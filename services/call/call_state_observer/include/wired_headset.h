@@ -16,7 +16,7 @@
 #ifndef TELEPHONY_WIRED_HEADSET_H
 #define TELEPHONY_WIRED_HEADSET_H
 #include <memory>
-#include <mutex>
+#include "ffrt.h"
 
 #include "event_handler.h"
 #include "event_runner.h"

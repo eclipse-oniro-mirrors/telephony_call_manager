@@ -16,7 +16,7 @@
 #ifndef CELLULAR_CALL_CONNECTION_H
 #define CELLULAR_CALL_CONNECTION_H
 
-#include <mutex>
+#include "ffrt.h"
 
 #include "call_status_callback.h"
 #include "cellular_call_interface.h"

@@ -23,6 +23,7 @@
 #include "call_manager_service_stub.h"
 #include "call_state_report_proxy.h"
 #include "call_status_manager.h"
+#include "ffrt.h"
 #include "i_call_status_callback.h"
 #include "iremote_stub.h"
 #include "iservice_registry.h"

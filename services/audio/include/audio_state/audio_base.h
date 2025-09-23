@@ -17,7 +17,7 @@
 #define TELEPHONY_AUDIO_BASE_H
 
 #include <cstdint>
-#include <mutex>
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {

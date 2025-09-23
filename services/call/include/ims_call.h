@@ -19,6 +19,7 @@
 #include "carrier_call.h"
 #include "net_call_base.h"
 #include "video_call_state.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
