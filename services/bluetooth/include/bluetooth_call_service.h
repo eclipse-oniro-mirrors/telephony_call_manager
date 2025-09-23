@@ -179,7 +179,7 @@ private:
     std::shared_ptr<CallControlManager> callControlManagerPtr_;
     bool sendDtmfState_;
     int32_t sendDtmfCallId_;
-    std::mutex lock_;
+    ffrt::ffrt lock_;
 };
 } // namespace Telephony
 } // namespace OHOS

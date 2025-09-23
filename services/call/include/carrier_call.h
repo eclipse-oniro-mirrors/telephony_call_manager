@@ -56,7 +56,7 @@ private:
     int32_t slotId_;
     int32_t index_;
     bool isEcc_;
-    std::mutex mutex_;
+    ffrt::ffrt mutex_;
     std::shared_ptr<CellularCallConnection> cellularCallConnectionPtr_;
 };
 } // namespace Telephony

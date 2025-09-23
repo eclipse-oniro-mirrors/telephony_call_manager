@@ -139,7 +139,7 @@ void CallManagerService::UnInit()
     DelayedSingleton<CellularCallConnection>::GetInstance()->UnInit();
     DelayedSingleton<CallControlManager>::GetInstance()->UnInit();
     callControlManagerPtr_ = nullptr;
-    std::lock_guard<std::mutex> guard(bluetoothCallCallbackLock_);
+    std::lock_guard<ffrt::ffrt> guard(bluetoothCallCallbackLock_);
     if (bluetoothCallCallbackPtr_ != nullptr) {
         bluetoothCallCallbackPtr_ = nullptr;
     }
@@ -149,7 +149,7 @@ void CallManagerService::OnStart()
 {
     using namespace std::chrono;
     time_point<high_resolution_clock> beginTime = high_resolution_clock::now();
-    std::lock_guard<std::mutex> guard(lock_);
+    std::lock_guard<ffrt::ffrt> guard(lock_);
     if (state_ == ServiceRunningState::STATE_RUNNING) {
         return;
     }
@@ -187,7 +187,7 @@ void CallManagerService::OnStart()
 
 void CallManagerService::OnStop()
 {
-    std::lock_guard<std::mutex> guard(lock_);
+    std::lock_guard<ffrt::ffrt> guard(lock_);
     struct tm *timeNow = nullptr;
     struct tm nowTime = { 0 };
     time_t second = time(0);
@@ -549,7 +549,7 @@ int32_t CallManagerService::RegisterVoipCallManagerCallback()
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    std::lock_guard<std::mutex> guard(lock_);
+    std::lock_guard<ffrt::ffrt> guard(lock_);
     DelayedSingleton<VoipCallConnection>::GetInstance()->Init(TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID);
     sptr<ICallStatusCallback> voipCallCallbackPtr = (std::make_unique<CallStatusCallback>()).release();
     if (voipCallCallbackPtr == nullptr) {
@@ -570,7 +570,7 @@ int32_t CallManagerService::UnRegisterVoipCallManagerCallback()
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    std::lock_guard<std::mutex> guard(lock_);
+    std::lock_guard<ffrt::ffrt> guard(lock_);
     return DelayedSingleton<VoipCallConnection>::GetInstance()->UnRegisterCallManagerCallBack();
 }
 
@@ -1590,7 +1590,7 @@ int32_t CallManagerService::GetVoIPCallInfo(int32_t &callId, int32_t &state, std
 
 sptr<IRemoteObject> CallManagerService::GetProxyObjectPtr(CallManagerProxyType proxyType)
 {
-    std::lock_guard<std::mutex> guard(lock_);
+    std::lock_guard<ffrt::ffrt> guard(lock_);
     auto it = proxyObjectPtrMap_.find(static_cast<uint32_t>(proxyType));
     if (it != proxyObjectPtrMap_.end()) {
         TELEPHONY_LOGI("GetProxyObjectPtr success! proxyType:%{public}d", proxyType);
@@ -1800,7 +1800,7 @@ sptr<ICallStatusCallback> CallManagerService::RegisterBluetoothCallManagerCallba
         TELEPHONY_LOGE("CallManagerService RegisterBluetoothCallManagerCallbackPtr, Permission denied!");
         return nullptr;
     }
-    std::lock_guard<std::mutex> guard(bluetoothCallCallbackLock_);
+    std::lock_guard<ffrt::ffrt> guard(bluetoothCallCallbackLock_);
     if (bluetoothCallCallbackPtr_ == nullptr) {
         bluetoothCallCallbackPtr_ = new (std::nothrow) CallStatusCallback();
         if (bluetoothCallCallbackPtr_ == nullptr) {

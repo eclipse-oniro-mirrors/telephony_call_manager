@@ -69,7 +69,7 @@ public:
     virtual bool ProcessEvent(int32_t event) = 0;
 
 protected:
-    std::mutex mutex_;
+    ffrt::ffrt mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

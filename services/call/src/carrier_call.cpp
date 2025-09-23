@@ -185,7 +185,7 @@ int32_t CarrierCall::CarrierSetMute(int32_t mute, int32_t slotId)
 
 void CarrierCall::GetCallAttributeCarrierInfo(CallAttributeInfo &info)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     info.isEcc = isEcc_;
     info.accountId = slotId_;
     info.index = index_;
@@ -194,7 +194,7 @@ void CarrierCall::GetCallAttributeCarrierInfo(CallAttributeInfo &info)
 
 bool CarrierCall::GetEmergencyState()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     return isEcc_;
 }
 

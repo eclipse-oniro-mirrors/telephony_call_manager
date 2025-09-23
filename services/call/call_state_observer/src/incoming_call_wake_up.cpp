@@ -89,7 +89,7 @@ void IncomingCallWakeup::WakeupDevice(sptr<CallBase> &callObjectPtr)
 
 bool IncomingCallWakeup::IsPowerAbilityExist()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     sptr<ISystemAbilityManager> sysAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (!sysAbilityMgr) {
         TELEPHONY_LOGE("system ability manager nullptr");

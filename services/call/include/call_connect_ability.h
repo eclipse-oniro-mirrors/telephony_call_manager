@@ -40,12 +40,12 @@ public:
 
 private:
     sptr<AAFwk::IAbilityConnection> connectCallback_ = nullptr;
-    std::mutex connectAbilityMutex_;
+    ffrt::ffrt connectAbilityMutex_;
     bool isConnected_ = false;
     bool isConnecting_ = false;
     bool isDisconnecting_ = false;
     static std::condition_variable cv_;
-    std::mutex mutex_;
+    ffrt::ffrt mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -84,7 +84,7 @@ private:
     void RegisterDataShareReadySubscriber();
     void GetNumberMarkSource(int32_t userId, char *source, unsigned int size);
     std::shared_ptr<CallRecordsHandlerService> callRecordsHandlerServerPtr_;
-    std::mutex mutex_;
+    ffrt::ffrt mutex_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     std::shared_ptr<DataShareReadyEventSubscriber> dataShareReadySubscriber_ = nullptr;
     bool isDataShareReady_ = false;

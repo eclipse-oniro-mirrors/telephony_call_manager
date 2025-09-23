@@ -35,7 +35,7 @@ bool CallStateListener::AddOneObserver(const std::shared_ptr<CallStateListenerBa
         TELEPHONY_LOGE("observer is nullptr!");
         return false;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     if (listenerSet_.count(observer) > 0) {
         return true;
     }
@@ -49,14 +49,14 @@ bool CallStateListener::RemoveOneObserver(const std::shared_ptr<CallStateListene
         TELEPHONY_LOGE("observer is nullptr!");
         return false;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     listenerSet_.erase(observer);
     return true;
 }
 
 bool CallStateListener::RemoveAllObserver()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     listenerSet_.clear();
     return true;
 }
@@ -67,7 +67,7 @@ void CallStateListener::NewCallCreated(sptr<CallBase> &callObjectPtr)
         TELEPHONY_LOGE("callObjectPtr is nullptr!");
         return;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     for (auto &observer : listenerSet_) {
         observer->NewCallCreated(callObjectPtr);
     }
@@ -75,7 +75,7 @@ void CallStateListener::NewCallCreated(sptr<CallBase> &callObjectPtr)
 
 void CallStateListener::CallDestroyed(const DisconnectedDetails &details)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     for (auto &observer : listenerSet_) {
         observer->CallDestroyed(details);
     }
@@ -88,7 +88,7 @@ void CallStateListener::CallStateUpdated(
         TELEPHONY_LOGE("callObjectPtr is nullptr");
         return;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     for (auto &observer : listenerSet_) {
         observer->CallStateUpdated(callObjectPtr, priorState, nextState);
     }
@@ -97,7 +97,7 @@ void CallStateListener::CallStateUpdated(
 void CallStateListener::MeeTimeStateUpdated(
     CallAttributeInfo info, TelCallState priorState, TelCallState nextState)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     for (auto &observer : listenerSet_) {
         if (observer == nullptr) {
             TELEPHONY_LOGE("MeeTimeStateUpdated observer is nullptr");
@@ -113,7 +113,7 @@ void CallStateListener::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool i
         TELEPHONY_LOGE("callObjectPtr is nullptr");
         return;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     for (auto &observer : listenerSet_) {
         observer->IncomingCallHungUp(callObjectPtr, isSendSms, content);
     }
@@ -125,7 +125,7 @@ void CallStateListener::IncomingCallActivated(sptr<CallBase> &callObjectPtr)
         TELEPHONY_LOGE("callObjectPtr is nullptr");
         return;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     for (auto &observer : listenerSet_) {
         observer->IncomingCallActivated(callObjectPtr);
     }
@@ -133,7 +133,7 @@ void CallStateListener::IncomingCallActivated(sptr<CallBase> &callObjectPtr)
 
 void CallStateListener::CallEventUpdated(CallEventInfo &info)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     for (auto &observer : listenerSet_) {
         observer->CallEventUpdated(info);
     }

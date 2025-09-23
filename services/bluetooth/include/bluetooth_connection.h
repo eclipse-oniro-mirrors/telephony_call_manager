@@ -67,15 +67,15 @@ public:
 private:
     bool IsAudioActivated();
     std::atomic<BtScoState> btScoState_{BtScoState::SCO_STATE_DISCONNECTED};
-    std::mutex scoAddrMutex_;
-    std::mutex scoNameMutex_;
+    ffrt::ffrt scoAddrMutex_;
+    ffrt::ffrt scoNameMutex_;
     std::string connectedScoAddr_;
     std::string connectedScoName_;
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
 private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
-    std::mutex bluetoothMutex_;
+    ffrt::ffrt bluetoothMutex_;
     std::unordered_map<std::string, Bluetooth::BluetoothRemoteDevice> mapConnectedBtDevices_;
 #endif
 };

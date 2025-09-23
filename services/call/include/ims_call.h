@@ -75,7 +75,7 @@ private:
     void AssignVideoCallState(VideoStateType videoStateType);
 
 private:
-    std::mutex videoUpdateMutex_;
+    ffrt::ffrt videoUpdateMutex_;
     sptr<VideoCallState> videoCallState_;
     bool isInitialized_;
     std::map<ImsCallMode, sptr<VideoCallState>> videoStateMap_;

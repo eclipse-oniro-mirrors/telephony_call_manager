@@ -32,13 +32,13 @@ ConferenceBase::ConferenceBase()
 
 ConferenceBase::~ConferenceBase()
 {
-    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    std::lock_guard<ffrt::ffrt> lock(conferenceMutex_);
     subCallIdSet_.clear();
 }
 
 int32_t ConferenceBase::GetMainCall()
 {
-    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    std::lock_guard<ffrt::ffrt> lock(conferenceMutex_);
     return mainCallId_;
 }
 
@@ -48,32 +48,32 @@ int32_t ConferenceBase::SetMainCall(int32_t callId)
         TELEPHONY_LOGE("callId is invalid:%{public}d", callId);
         return CALL_ERR_INVALID_CALLID;
     }
-    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    std::lock_guard<ffrt::ffrt> lock(conferenceMutex_);
     mainCallId_ = callId;
     return TELEPHONY_SUCCESS;
 }
 
 ConferenceState ConferenceBase::GetConferenceState()
 {
-    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    std::lock_guard<ffrt::ffrt> lock(conferenceMutex_);
     return state_;
 }
 
 void ConferenceBase::SetConferenceState(ConferenceState state)
 {
-    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    std::lock_guard<ffrt::ffrt> lock(conferenceMutex_);
     state_ = state;
 }
 
 void ConferenceBase::SetOldConferenceState(ConferenceState state)
 {
-    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    std::lock_guard<ffrt::ffrt> lock(conferenceMutex_);
     oldState_ = state;
 }
 
 ConferenceState ConferenceBase::GetOldConferenceState()
 {
-    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    std::lock_guard<ffrt::ffrt> lock(conferenceMutex_);
     return oldState_;
 }
 
@@ -81,7 +81,7 @@ int32_t ConferenceBase::GetSubCallIdList(int32_t callId, std::vector<std::u16str
 {
     bool flag = false;
     callIdList.clear();
-    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    std::lock_guard<ffrt::ffrt> lock(conferenceMutex_);
     for (auto it = subCallIdSet_.begin(); it != subCallIdSet_.end(); ++it) {
         if (*it == callId) {
             flag = true;
@@ -99,7 +99,7 @@ int32_t ConferenceBase::GetSubCallIdList(int32_t callId, std::vector<std::u16str
 
 std::set<int32_t> ConferenceBase::GetSubCallIdList()
 {
-    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    std::lock_guard<ffrt::ffrt> lock(conferenceMutex_);
     return subCallIdSet_;
 }
 
@@ -107,7 +107,7 @@ int32_t ConferenceBase::GetCallIdListForConference(int32_t callId, std::vector<s
 {
     bool flag = false;
     callIdList.clear();
-    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    std::lock_guard<ffrt::ffrt> lock(conferenceMutex_);
     for (auto it = subCallIdSet_.begin(); it != subCallIdSet_.end(); ++it) {
         if (*it == callId) {
             flag = true;

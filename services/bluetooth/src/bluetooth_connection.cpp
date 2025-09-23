@@ -46,7 +46,7 @@ BluetoothConnection::~BluetoothConnection()
             statusChangeListener_ = nullptr;
         }
     }
-    std::lock_guard<std::mutex> lock(bluetoothMutex_);
+    std::lock_guard<ffrt::ffrt> lock(bluetoothMutex_);
     mapConnectedBtDevices_.clear();
 #endif
 }
@@ -95,7 +95,7 @@ void BluetoothConnection::Init()
 
 bool BluetoothConnection::IsBtAvailble()
 {
-    std::lock_guard<std::mutex> lock(bluetoothMutex_);
+    std::lock_guard<ffrt::ffrt> lock(bluetoothMutex_);
     if (mapConnectedBtDevices_.empty()) {
         TELEPHONY_LOGE("mapConnectedBtDevices_ is empty");
         return false;
@@ -147,7 +147,7 @@ bool BluetoothConnection::IsAudioActivated()
 
 void BluetoothConnection::ResetBtConnection()
 {
-    std::lock_guard<std::mutex> lock(bluetoothMutex_);
+    std::lock_guard<ffrt::ffrt> lock(bluetoothMutex_);
     mapConnectedBtDevices_.clear();
 }
 
@@ -164,7 +164,7 @@ void BluetoothConnection::RegisterObserver()
 
 void BluetoothConnection::AddBtDevice(const std::string &address, Bluetooth::BluetoothRemoteDevice device)
 {
-    std::lock_guard<std::mutex> lock(bluetoothMutex_);
+    std::lock_guard<ffrt::ffrt> lock(bluetoothMutex_);
     auto iter = mapConnectedBtDevices_.find(address);
     if (iter != mapConnectedBtDevices_.end()) {
         TELEPHONY_LOGI("device is existenced");
@@ -176,7 +176,7 @@ void BluetoothConnection::AddBtDevice(const std::string &address, Bluetooth::Blu
 
 void BluetoothConnection::RemoveBtDevice(const std::string &address)
 {
-    std::lock_guard<std::mutex> lock(bluetoothMutex_);
+    std::lock_guard<ffrt::ffrt> lock(bluetoothMutex_);
     if (mapConnectedBtDevices_.count(address) > 0) {
         mapConnectedBtDevices_.erase(address);
         TELEPHONY_LOGI("RemoveBtDevice success");
@@ -187,7 +187,7 @@ void BluetoothConnection::RemoveBtDevice(const std::string &address)
 
 Bluetooth::BluetoothRemoteDevice *BluetoothConnection::GetBtDevice(const std::string &address)
 {
-    std::lock_guard<std::mutex> lock(bluetoothMutex_);
+    std::lock_guard<ffrt::ffrt> lock(bluetoothMutex_);
     if (mapConnectedBtDevices_.count(address) > 0) {
         auto iter = mapConnectedBtDevices_.find(address);
         if (iter != mapConnectedBtDevices_.end()) {
@@ -299,7 +299,7 @@ std::string BluetoothConnection::GetWearBtHeadsetAddress()
     int32_t cod = DEFAULT_BT_VALUE;
     int32_t majorClass = DEFAULT_BT_VALUE;
     int32_t majorMinorClass = DEFAULT_BT_VALUE;
-    std::lock_guard<std::mutex> lock(bluetoothMutex_);
+    std::lock_guard<ffrt::ffrt> lock(bluetoothMutex_);
     for (auto &[address, device] : mapConnectedBtDevices_) {
         device.GetDeviceProductType(cod, majorClass, majorMinorClass);
         TELEPHONY_LOGI("Device type majorClass: %{public}d, majorMinorClass: %{public}d.", majorClass, majorMinorClass);

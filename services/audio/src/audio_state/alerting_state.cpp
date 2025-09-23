@@ -26,7 +26,7 @@ namespace Telephony {
 bool AlertingState::ProcessEvent(int32_t event)
 {
     bool result = false;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     switch (event) {
         case AudioEvent::NO_MORE_ALERTING_CALL:
             result = DelayedSingleton<CallStateProcessor>::GetInstance()->UpdateCurrentCallState();

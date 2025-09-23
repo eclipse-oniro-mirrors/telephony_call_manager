@@ -296,7 +296,7 @@ int32_t IMSCall::IsSupportConferenceable()
 
 int32_t IMSCall::UpdateImsCallMode(ImsCallMode mode)
 {
-    std::lock_guard<std::mutex> lock(videoUpdateMutex_);
+    std::lock_guard<ffrt::ffrt> lock(videoUpdateMutex_);
     int32_t ret = TELEPHONY_SUCCESS;
     if (GetTelCallState() != TelCallState::CALL_STATUS_ACTIVE) {
         TELEPHONY_LOGE("call state is not active");
@@ -357,7 +357,7 @@ int32_t IMSCall::SendUpdateCallMediaModeResponse(ImsCallMode mode)
 
 int32_t IMSCall::RecieveUpdateCallMediaModeRequest(CallModeReportInfo &response)
 {
-    std::lock_guard<std::mutex> lock(videoUpdateMutex_);
+    std::lock_guard<ffrt::ffrt> lock(videoUpdateMutex_);
     if (videoCallState_ == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -373,7 +373,7 @@ int32_t IMSCall::RecieveUpdateCallMediaModeRequest(CallModeReportInfo &response)
 
 int32_t IMSCall::ReceiveUpdateCallMediaModeResponse(CallModeReportInfo &response)
 {
-    std::lock_guard<std::mutex> lock(videoUpdateMutex_);
+    std::lock_guard<ffrt::ffrt> lock(videoUpdateMutex_);
     if (videoCallState_ == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

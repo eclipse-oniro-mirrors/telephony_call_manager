@@ -40,7 +40,7 @@ CallAbilityReportProxy::CallAbilityReportProxy()
 
 CallAbilityReportProxy::~CallAbilityReportProxy()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     while (it != callbackPtrList_.end()) {
         if ((*it)) {
@@ -59,7 +59,7 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     callAbilityCallbackPtr->SetBundleInfo(bundleInfo);
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     callbackPtrList_.emplace_back(callAbilityCallbackPtr);
     TELEPHONY_LOGI("%{public}s successfully registered the callback!", bundleInfo.c_str());
     if (callAbilityCallbackPtr->AsObject() != nullptr) {
@@ -76,7 +76,7 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
 
 int32_t CallAbilityReportProxy::UnRegisterCallBack(const std::string &bundleInfo)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     if (callbackPtrList_.empty()) {
         TELEPHONY_LOGE("callbackPtrList_ is null! %{public}s UnRegisterCallBack failed", bundleInfo.c_str());
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -94,7 +94,7 @@ int32_t CallAbilityReportProxy::UnRegisterCallBack(const std::string &bundleInfo
 
 int32_t CallAbilityReportProxy::UnRegisterCallBack(sptr<IRemoteObject> object)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     if (callbackPtrList_.empty()) {
         TELEPHONY_LOGE("callbackPtrList_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -153,7 +153,7 @@ void CallAbilityReportProxy::CallEventUpdated(CallEventInfo &info)
 void CallAbilityReportProxy::CallDestroyed(const DisconnectedDetails &details)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
@@ -174,7 +174,7 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
     std::string bundleInfo = "";
     CallAttributeInfo newInfo = info;
     UpdateBtCallSlotId(newInfo);
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
@@ -199,7 +199,7 @@ int32_t CallAbilityReportProxy::ReportMeeTimeStateInfo(const CallAttributeInfo &
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     std::string bundleInfo = "";
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
@@ -223,7 +223,7 @@ int32_t CallAbilityReportProxy::ReportMeeTimeStateInfo(const CallAttributeInfo &
 int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &info, std::string bundleInfo)
 {
     int32_t ret = TELEPHONY_ERROR;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     for (auto callback : callbackPtrList_) {
         if (callback->GetBundleInfo() == bundleInfo) {
             ret = callback->OnCallDetailsChange(info);
@@ -245,7 +245,7 @@ int32_t CallAbilityReportProxy::ReportCallEvent(const CallEventInfo &info)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     TELEPHONY_LOGI("report call event, eventId:%{public}d", info.eventId);
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
@@ -265,7 +265,7 @@ int32_t CallAbilityReportProxy::ReportAsyncResults(
     const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
@@ -284,7 +284,7 @@ int32_t CallAbilityReportProxy::ReportAsyncResults(
 int32_t CallAbilityReportProxy::ReportMmiCodeResult(const MmiCodeInfo &info)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
@@ -303,7 +303,7 @@ int32_t CallAbilityReportProxy::ReportMmiCodeResult(const MmiCodeInfo &info)
 int32_t CallAbilityReportProxy::OttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         std::string bundleInfo = (*it)->GetBundleInfo();
@@ -323,7 +323,7 @@ int32_t CallAbilityReportProxy::OttCallRequest(OttCallRequestId requestId, AppEx
 int32_t CallAbilityReportProxy::ReportAudioDeviceChange(const AudioDeviceInfo &info)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
@@ -342,7 +342,7 @@ int32_t CallAbilityReportProxy::ReportAudioDeviceChange(const AudioDeviceInfo &i
 int32_t CallAbilityReportProxy::ReportPostDialDelay(const std::string &str)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
@@ -361,7 +361,7 @@ int32_t CallAbilityReportProxy::ReportPostDialDelay(const std::string &str)
 int32_t CallAbilityReportProxy::ReportImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
@@ -381,7 +381,7 @@ int32_t CallAbilityReportProxy::ReportCallSessionEventChange(
     const CallSessionEvent &callSessionEventOptions)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
@@ -400,7 +400,7 @@ int32_t CallAbilityReportProxy::ReportCallSessionEventChange(
 int32_t CallAbilityReportProxy::ReportPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
@@ -419,7 +419,7 @@ int32_t CallAbilityReportProxy::ReportPeerDimensionsChange(const PeerDimensionsD
 int32_t CallAbilityReportProxy::ReportCallDataUsageChange(const int64_t dataUsage)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
@@ -438,7 +438,7 @@ int32_t CallAbilityReportProxy::ReportCallDataUsageChange(const int64_t dataUsag
 int32_t CallAbilityReportProxy::ReportCameraCapabilities(const CameraCapabilities &cameraCapabilities)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
@@ -458,7 +458,7 @@ int32_t CallAbilityReportProxy::ReportPhoneStateChange(int32_t numActive, int32_
     const std::string &number)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it) != nullptr) {

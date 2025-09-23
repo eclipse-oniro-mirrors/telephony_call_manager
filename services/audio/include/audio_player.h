@@ -103,7 +103,7 @@ private:
     bool isCapturerInitialized_ = false;
     bool isToneStop_ = false;
     bool isSoundStop_ = false;
-    std::mutex mutex_;
+    ffrt::ffrt mutex_;
     std::shared_ptr<AudioStandard::AudioRendererCallback> callback_ = nullptr;
     std::shared_ptr<Media::RingtonePlayerInterruptCallback> ringCallback_;
     bool IsStop(PlayerType playerType);

@@ -78,7 +78,7 @@ OHOS::DistributedHardware::IDCallClient* DistributedCallProxy::GetDCallClient()
 
 int32_t DistributedCallProxy::Init()
 {
-    std::lock_guard<std::mutex> lock(dcallClientMtx_);
+    std::lock_guard<ffrt::ffrt> lock(dcallClientMtx_);
     if (dCallClientHandler_ == nullptr) {
         TELEPHONY_LOGE("fail to load dcall sdk");
         return TELEPHONY_ERR_FAIL;
@@ -97,7 +97,7 @@ int32_t DistributedCallProxy::Init()
 
 int32_t DistributedCallProxy::UnInit()
 {
-    std::lock_guard<std::mutex> lock(dcallClientMtx_);
+    std::lock_guard<ffrt::ffrt> lock(dcallClientMtx_);
     if (dcallClient_ == nullptr) {
         TELEPHONY_LOGE("dcallClient_ is nullptr");
         return TELEPHONY_ERR_FAIL;
@@ -107,7 +107,7 @@ int32_t DistributedCallProxy::UnInit()
 
 int32_t DistributedCallProxy::SwitchDevice(const std::string& devId, int32_t flag)
 {
-    std::lock_guard<std::mutex> lock(dcallClientMtx_);
+    std::lock_guard<ffrt::ffrt> lock(dcallClientMtx_);
     if (dcallClient_ == nullptr) {
         TELEPHONY_LOGE("dcallClient_ is nullptr");
         return TELEPHONY_ERR_FAIL;
@@ -117,7 +117,7 @@ int32_t DistributedCallProxy::SwitchDevice(const std::string& devId, int32_t fla
 
 int32_t DistributedCallProxy::GetOnlineDeviceList(std::vector<std::string>& devList)
 {
-    std::lock_guard<std::mutex> lock(dcallClientMtx_);
+    std::lock_guard<ffrt::ffrt> lock(dcallClientMtx_);
     if (dcallClient_ == nullptr) {
         TELEPHONY_LOGE("dcallClient_ is nullptr");
         return TELEPHONY_ERR_FAIL;
@@ -128,7 +128,7 @@ int32_t DistributedCallProxy::GetOnlineDeviceList(std::vector<std::string>& devL
 int32_t DistributedCallProxy::RegisterDeviceCallback(const std::string name,
     const std::shared_ptr<OHOS::DistributedHardware::IDCallDeviceCallback>& callback)
 {
-    std::lock_guard<std::mutex> lock(dcallClientMtx_);
+    std::lock_guard<ffrt::ffrt> lock(dcallClientMtx_);
     if (dcallClient_ == nullptr) {
         TELEPHONY_LOGE("dcallClient_ is nullptr");
         return TELEPHONY_ERR_FAIL;
@@ -138,7 +138,7 @@ int32_t DistributedCallProxy::RegisterDeviceCallback(const std::string name,
 
 int32_t DistributedCallProxy::UnRegisterDeviceCallback(const std::string& name)
 {
-    std::lock_guard<std::mutex> lock(dcallClientMtx_);
+    std::lock_guard<ffrt::ffrt> lock(dcallClientMtx_);
     if (dcallClient_ == nullptr) {
         TELEPHONY_LOGE("dcallClient_ is nullptr");
         return TELEPHONY_ERR_FAIL;
@@ -149,7 +149,7 @@ int32_t DistributedCallProxy::UnRegisterDeviceCallback(const std::string& name)
 int32_t DistributedCallProxy::GetDCallDeviceInfo(const std::string &devId,
     OHOS::DistributedHardware::DCallDeviceInfo& devInfo)
 {
-    std::lock_guard<std::mutex> lock(dcallClientMtx_);
+    std::lock_guard<ffrt::ffrt> lock(dcallClientMtx_);
     if (dcallClient_ == nullptr) {
         TELEPHONY_LOGE("dcallClient_ is nullptr");
         return TELEPHONY_ERR_FAIL;
@@ -159,7 +159,7 @@ int32_t DistributedCallProxy::GetDCallDeviceInfo(const std::string &devId,
 
 bool DistributedCallProxy::IsSelectVirtualModem()
 {
-    std::lock_guard<std::mutex> lock(dcallClientMtx_);
+    std::lock_guard<ffrt::ffrt> lock(dcallClientMtx_);
     if (dcallClient_ == nullptr) {
         TELEPHONY_LOGE("dcallClient_ is nullptr");
         return false;

@@ -37,7 +37,7 @@ public:
     void ReleaseIncomingLock();
 
 private:
-    std::mutex mutex_;
+    ffrt::ffrt mutex_;
     const std::string wakeupReason_ = "incoming call";
     /**
      * Wake up the device and only Voip callType set the screen on.

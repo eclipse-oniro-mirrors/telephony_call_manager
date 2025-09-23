@@ -153,7 +153,7 @@ void AudioControlManager::CallStateUpdated(
         HandleCallStateUpdatedForVoip(callObjectPtr, priorState, nextState);
         return;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     if (totalCalls_.count(callObjectPtr) == 0) {
         int32_t callId = callObjectPtr->GetCallID();
         TelCallState callState = callObjectPtr->GetTelCallState();
@@ -1215,7 +1215,7 @@ void AudioControlManager::HandleNotNormalRingerMode(CallEndedType type)
 
 std::set<sptr<CallBase>> AudioControlManager::GetCallList()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     return totalCalls_;
 }
 
@@ -1231,7 +1231,7 @@ sptr<CallBase> AudioControlManager::GetCurrentActiveCall()
 sptr<CallBase> AudioControlManager::GetCallBase(int32_t callId)
 {
     sptr<CallBase> callBase = nullptr;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     for (auto &call : totalCalls_) {
         if (call->GetCallID() == callId) {
             callBase = call;
@@ -1243,7 +1243,7 @@ sptr<CallBase> AudioControlManager::GetCallBase(int32_t callId)
 
 bool AudioControlManager::IsEmergencyCallExists()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::ffrt> lock(mutex_);
     for (auto call : totalCalls_) {
         if (call->GetEmergencyState()) {
             return true;
