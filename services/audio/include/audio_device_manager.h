@@ -21,6 +21,7 @@
 #include "audio_base.h"
 #include "call_base.h"
 #include "call_manager_inner_type.h"
+#include "ffrt.h"
 #include "singleton.h"
 
 namespace OHOS {
@@ -100,8 +101,8 @@ private:
     void UpdateBtDevice(std::string &address, std::string &deviceName);
     void UpdateNearlinkDevice(std::string &address, std::string &deviceName);
     void UpdateBtHearingAidDevice(std::string &address, std::string &deviceName);
-    std::mutex mutex_;
-    std::mutex infoMutex_;
+    ffrt::mutex mutex_;
+    ffrt::mutex infoMutex_;
     AudioDeviceType audioDeviceType_;
     static bool isBtScoDevEnable_;
     static bool isDCallDevEnable_;

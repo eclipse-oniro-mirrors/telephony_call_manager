@@ -19,9 +19,8 @@
 #include <string>
 #include <memory>
 #include <map>
-#include <mutex>
 #include <atomic>
-
+#include "ffrt.h"
 #include "singleton.h"
 #include "idcall_device_callback.h"
 #include "iservice_registry.h"
@@ -94,19 +93,19 @@ private:
 private:
     std::atomic<bool> isCallActived_ = false;
     std::atomic<bool> dCallDeviceSwitchedOn_ = false;
-    std::mutex connectedDevMtx_;
-    std::mutex onlineDeviceMtx_;
+    ffrt::mutex connectedDevMtx_;
+    ffrt::mutex onlineDeviceMtx_;
     std::string connectedDevId_;
     AudioDevice connectedAudioDevice_;
     AudioDevice currentAudioDevice_;
     std::map<std::string, AudioDevice> onlineDCallDevices_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
-    std::mutex dcallProxyMtx_;
+    ffrt::mutex dcallProxyMtx_;
     std::shared_ptr<DistributedCallProxy> dcallProxy_ = nullptr;
     std::shared_ptr<DistributedCallDeviceListener> dcallDeviceListener_ = nullptr;
     bool isSwitching_ = false;
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     std::shared_ptr<DCallHfpListener> dcallHfpListener_{nullptr};
 #endif
 };

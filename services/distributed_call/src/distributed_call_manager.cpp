@@ -119,7 +119,7 @@ bool DistributedCallManager::CreateDAudioDevice(const std::string& devId, AudioD
     }
     OHOS::DistributedHardware::DCallDeviceInfo devInfo;
     {
-        std::lock_guard<std::mutex> lock(dcallProxyMtx_);
+        std::lock_guard<ffrt::mutex> lock(dcallProxyMtx_);
         if (dcallProxy_ == nullptr) {
             TELEPHONY_LOGE("dcallProxy_ is nullptr");
             return false;
@@ -189,14 +189,14 @@ int32_t DistributedCallManager::AddDCallDevice(const std::string& devId)
     TELEPHONY_LOGI("add dcall device, devId: %{public}s.", GetAnonyString(devId).c_str());
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard<ffrt::mutex> lock(mutex_);
         if (dcallHfpListener_ == nullptr) {
             dcallHfpListener_ = std::make_shared<DCallHfpListener>();
             Bluetooth::HandsFreeAudioGateway::GetProfile()->RegisterObserver(dcallHfpListener_);
         }
     }
 #endif
-    std::lock_guard<std::mutex> lock(onlineDeviceMtx_);
+    std::lock_guard<ffrt::mutex> lock(onlineDeviceMtx_);
 
     auto iter = onlineDCallDevices_.find(devId);
     if (iter != onlineDCallDevices_.end()) {
@@ -225,7 +225,7 @@ int32_t DistributedCallManager::AddDCallDevice(const std::string& devId)
 int32_t DistributedCallManager::RemoveDCallDevice(const std::string& devId)
 {
     TELEPHONY_LOGI("remove dcall device, devId: %{public}s.", GetAnonyString(devId).c_str());
-    std::lock_guard<std::mutex> lock(onlineDeviceMtx_);
+    std::lock_guard<ffrt::mutex> lock(onlineDeviceMtx_);
     auto iter = onlineDCallDevices_.find(devId);
     if (iter != onlineDCallDevices_.end()) {
         std::string devId = GetDevIdFromAudioDevice(iter->second);
@@ -248,7 +248,7 @@ int32_t DistributedCallManager::RemoveDCallDevice(const std::string& devId)
 void DistributedCallManager::ClearDCallDevices()
 {
     TELEPHONY_LOGI("clear dcall device.");
-    std::lock_guard<std::mutex> lock(onlineDeviceMtx_);
+    std::lock_guard<ffrt::mutex> lock(onlineDeviceMtx_);
     onlineDCallDevices_.clear();
 }
 
@@ -264,21 +264,21 @@ void DistributedCallManager::NotifyOnlineDCallDevices(std::vector<std::string> d
 
 std::string DistributedCallManager::GetConnectedDCallDeviceAddr()
 {
-    std::lock_guard<std::mutex> lock(connectedDevMtx_);
+    std::lock_guard<ffrt::mutex> lock(connectedDevMtx_);
     std::string addr = connectedAudioDevice_.address;
     return addr;
 }
 
 AudioDeviceType DistributedCallManager::GetConnectedDCallDeviceType()
 {
-    std::lock_guard<std::mutex> lock(connectedDevMtx_);
+    std::lock_guard<ffrt::mutex> lock(connectedDevMtx_);
     AudioDeviceType type = connectedAudioDevice_.deviceType;
     return type;
 }
 
 std::string DistributedCallManager::GetConnectedDCallDeviceId()
 {
-    std::lock_guard<std::mutex> lock(connectedDevMtx_);
+    std::lock_guard<ffrt::mutex> lock(connectedDevMtx_);
     std::string devId = "";
     if (dCallDeviceSwitchedOn_.load()) {
         devId = GetDevIdFromAudioDevice(connectedAudioDevice_);
@@ -288,7 +288,7 @@ std::string DistributedCallManager::GetConnectedDCallDeviceId()
 
 void DistributedCallManager::GetConnectedDCallDevice(AudioDevice& device)
 {
-    std::lock_guard<std::mutex> lock(connectedDevMtx_);
+    std::lock_guard<ffrt::mutex> lock(connectedDevMtx_);
     device.deviceType = connectedAudioDevice_.deviceType;
     if (memcpy_s(device.address, kMaxAddressLen, connectedAudioDevice_.address, kMaxAddressLen) != EOK) {
         TELEPHONY_LOGE("memcpy_s failed.");
@@ -297,7 +297,7 @@ void DistributedCallManager::GetConnectedDCallDevice(AudioDevice& device)
 
 void DistributedCallManager::SetConnectedDCallDevice(const AudioDevice& device)
 {
-    std::lock_guard<std::mutex> lock(connectedDevMtx_);
+    std::lock_guard<ffrt::mutex> lock(connectedDevMtx_);
     connectedAudioDevice_.deviceType = device.deviceType;
     if (memcpy_s(connectedAudioDevice_.address, kMaxAddressLen, device.address, kMaxAddressLen) != EOK) {
         TELEPHONY_LOGE("memcpy_s failed.");
@@ -306,7 +306,7 @@ void DistributedCallManager::SetConnectedDCallDevice(const AudioDevice& device)
 
 void DistributedCallManager::ClearConnectedDCallDevice()
 {
-    std::lock_guard<std::mutex> lock(connectedDevMtx_);
+    std::lock_guard<ffrt::mutex> lock(connectedDevMtx_);
     connectedAudioDevice_.deviceType = AudioDeviceType::DEVICE_UNKNOWN;
     if (memset_s(connectedAudioDevice_.address, kMaxAddressLen, 0, kMaxAddressLen) != EOK) {
         TELEPHONY_LOGE("memset_s failed.");
@@ -332,7 +332,7 @@ bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
     TELEPHONY_LOGI("switch dcall device on start, devId: %{public}s", GetAnonyString(devId).c_str());
     int32_t ret;
     {
-        std::lock_guard<std::mutex> lock(dcallProxyMtx_);
+        std::lock_guard<ffrt::mutex> lock(dcallProxyMtx_);
         if (dcallProxy_ == nullptr) {
             TELEPHONY_LOGE("dcallProxy_ is nullptr");
             return false;
@@ -427,7 +427,7 @@ void DistributedCallManager::SwitchOffDCallDeviceSync()
     TELEPHONY_LOGI("switch dcall device off start, devId: %{public}s", GetAnonyString(devId).c_str());
     int32_t ret;
     {
-        std::lock_guard<std::mutex> lock(dcallProxyMtx_);
+        std::lock_guard<ffrt::mutex> lock(dcallProxyMtx_);
         if (dcallProxy_ == nullptr) {
             TELEPHONY_LOGE("dcallProxy_ is nullptr");
             return;
@@ -449,7 +449,7 @@ bool DistributedCallManager::IsSelectVirtualModem()
         TELEPHONY_LOGW("no dcall device");
         return false;
     }
-    std::lock_guard<std::mutex> lock(dcallProxyMtx_);
+    std::lock_guard<ffrt::mutex> lock(dcallProxyMtx_);
     if (dcallProxy_ == nullptr) {
         TELEPHONY_LOGE("fail to create dcall proxy obj");
         return false;
@@ -546,12 +546,12 @@ int32_t DistributedCallManager::OnDCallDeviceOffline(const std::string &devId)
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     bool isAllDeviceOffline = true;
     {
-        std::lock_guard<std::mutex> lock(onlineDeviceMtx_);
+        std::lock_guard<ffrt::mutex> lock(onlineDeviceMtx_);
         isAllDeviceOffline = onlineDCallDevices_.empty();
     }
     if (isAllDeviceOffline) {
         TELEPHONY_LOGI("all dcall device offline");
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard<ffrt::mutex> lock(mutex_);
         if (dcallHfpListener_ != nullptr) {
             Bluetooth::HandsFreeAudioGateway::GetProfile()->DeregisterObserver(dcallHfpListener_);
             dcallHfpListener_ = nullptr;
@@ -578,7 +578,7 @@ void DistributedCallManager::OnDCallSystemAbilityAdded(const std::string &device
     TELEPHONY_LOGI("dcall source service is added, deviceId: %{public}s", GetAnonyString(deviceId).c_str());
     std::vector<std::string> dcallDevices;
     {
-        std::lock_guard<std::mutex> lock(dcallProxyMtx_);
+        std::lock_guard<ffrt::mutex> lock(dcallProxyMtx_);
         dcallProxy_ = std::make_shared<DistributedCallProxy>();
         if (dcallProxy_ == nullptr) {
             TELEPHONY_LOGE("fail to create dcall proxy obj");
@@ -612,7 +612,7 @@ void DistributedCallManager::OnDCallSystemAbilityRemoved(const std::string &devi
 {
     TELEPHONY_LOGI("dcall source service is removed, deviceId: %{public}s", GetAnonyString(deviceId).c_str());
     {
-        std::lock_guard<std::mutex> lock(dcallProxyMtx_);
+        std::lock_guard<ffrt::mutex> lock(dcallProxyMtx_);
         dcallDeviceListener_ = nullptr;
         dcallProxy_ = nullptr;
     }
