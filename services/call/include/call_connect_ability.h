@@ -44,7 +44,7 @@ private:
     bool isConnected_ = false;
     bool isConnecting_ = false;
     bool isDisconnecting_ = false;
-    static std::condition_variable cv_;
+    static ffrt::condition_variable cv_;
     ffrt::mutex mutex_;
 };
 } // namespace Telephony

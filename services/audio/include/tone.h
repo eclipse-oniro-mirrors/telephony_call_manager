@@ -23,6 +23,7 @@
 #include "audio_player.h"
 #include "audio_proxy.h"
 #include "tone_player.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {

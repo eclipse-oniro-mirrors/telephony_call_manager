@@ -22,6 +22,7 @@
 #include "audio_renderer.h"
 #include "ringtone_player.h"
 #include "system_sound_manager.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {

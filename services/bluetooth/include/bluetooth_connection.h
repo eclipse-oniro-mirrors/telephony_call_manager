@@ -22,7 +22,7 @@
 
 #include "singleton.h"
 #include "unordered_map"
-
+#include "ffrt.h"
 #ifdef ABILITY_BLUETOOTH_SUPPORT
 #include "bluetooth_hfp_ag.h"
 #include "iservice_registry.h"

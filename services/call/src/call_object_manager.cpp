@@ -33,7 +33,7 @@ std::list<sptr<CallBase>> CallObjectManager::callObjectPtrList_;
 std::map<int32_t, CallAttributeInfo> CallObjectManager::voipCallObjectList_;
 ffrt::mutex CallObjectManager::listMutex_;
 int32_t CallObjectManager::callId_ = CALL_START_ID;
-std::condition_variable CallObjectManager::cv_;
+ffrt::condition_variable CallObjectManager::cv_;
 bool CallObjectManager::isFirstDialCallAdded_ = false;
 bool CallObjectManager::needWaitHold_ = false;
 CellularCallInfo CallObjectManager::dialCallInfo_;
