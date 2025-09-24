@@ -268,10 +268,11 @@ void AudioDeviceChangeCallback::OnDeviceChange(const AudioStandard::DeviceChange
 {
     TELEPHONY_LOGI("AudioDeviceChangeCallback::OnDeviceChange enter");
     for (auto &audioDeviceDescriptor : deviceChangeAction.deviceDescriptors) {
-        if (audioDeviceDescriptor->deviceType_ == AudioStandard::DEVICE_TYPE_WIRED_HEADSET ||
+        if ((audioDeviceDescriptor->deviceType_ == AudioStandard::DEVICE_TYPE_WIRED_HEADSET ||
             audioDeviceDescriptor->deviceType_ == AudioStandard::DEVICE_TYPE_WIRED_HEADPHONES ||
-            audioDeviceDescriptor->deviceType_ == AudioStandard::DEVICE_TYPE_USB_HEADSET) {
-            if (deviceChangeAction.type == AudioStandard::CONNECT) {
+            audioDeviceDescriptor->deviceType_ == AudioStandard::DEVICE_TYPE_USB_HEADSET) &&
+            audioDeviceDescriptor->modemCallSupported_ == true) {
+            if (deviceChangeAction.type == AumodemdioStandard::CONNECT) {
                 TELEPHONY_LOGI("WiredHeadset connected");
                 DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetState(true);
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(
