@@ -23,6 +23,7 @@
 #include "call_manager_service_stub.h"
 #include "call_state_report_proxy.h"
 #include "call_status_manager.h"
+#include "ffrt.h"
 #include "i_call_status_callback.h"
 #include "iremote_stub.h"
 #include "iservice_registry.h"
@@ -849,8 +850,8 @@ private:
         "*#*#2846579#*#*", "#1#", "*#28465#", "*#*#121314#*#*", "*#*#19467328#*#*",
         "*#*#2589#*#*", "*#*#2845#*#*", "*#*#2846#*#*", "*#*#2847#*#*", "*#*#28465#*#*",
         "*#*#2627#*#*", "*#*#258#*#*", "*#28460" };
-    std::mutex lock_;
-    std::mutex bluetoothCallCallbackLock_;
+    ffrt::mutex lock_;
+    ffrt::mutex bluetoothCallCallbackLock_;
     const int32_t startTime_ = 1900;
     const int32_t extraMonth_ = 1;
     int64_t bindTime_ = 0L;

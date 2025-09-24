@@ -22,6 +22,7 @@
 #include "audio_renderer.h"
 #include "ringtone_player.h"
 #include "system_sound_manager.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -103,7 +104,7 @@ private:
     bool isCapturerInitialized_ = false;
     bool isToneStop_ = false;
     bool isSoundStop_ = false;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     std::shared_ptr<AudioStandard::AudioRendererCallback> callback_ = nullptr;
     std::shared_ptr<Media::RingtonePlayerInterruptCallback> ringCallback_;
     bool IsStop(PlayerType playerType);

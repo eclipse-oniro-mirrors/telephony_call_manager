@@ -16,7 +16,7 @@
 #ifndef TELEPHONY_DISTRIBUTED_CALL_PROXY_H
 #define TELEPHONY_DISTRIBUTED_CALL_PROXY_H
 
-#include <mutex>
+#include "ffrt.h"
 #include <memory>
 
 #include "idcall_device_callback.h"
@@ -43,7 +43,7 @@ private:
     OHOS::DistributedHardware::IDCallClient* GetDCallClient();
 
 private:
-    std::mutex dcallClientMtx_;
+    ffrt::mutex dcallClientMtx_;
     OHOS::DistributedHardware::IDCallClient* dcallClient_ = nullptr;
     void *dCallClientHandler_ = nullptr;
 };

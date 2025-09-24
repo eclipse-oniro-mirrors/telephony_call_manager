@@ -16,7 +16,7 @@
 #ifndef TELEPHONY_WIRED_HEADSET_H
 #define TELEPHONY_WIRED_HEADSET_H
 #include <memory>
-#include <mutex>
+#include "ffrt.h"
 
 #include "event_handler.h"
 #include "event_runner.h"
@@ -55,7 +55,7 @@ public:
 private:
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop_;
     std::shared_ptr<WiredHeadsetHandler> handler_;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

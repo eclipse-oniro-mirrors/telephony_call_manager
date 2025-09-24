@@ -24,7 +24,7 @@ namespace Telephony {
 bool BluetoothDeviceState::ProcessEvent(int32_t event)
 {
     bool result = false;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     switch (event) {
         case AudioEvent::BLUETOOTH_SCO_CONNECTED:
         case AudioEvent::AUDIO_ACTIVATED:

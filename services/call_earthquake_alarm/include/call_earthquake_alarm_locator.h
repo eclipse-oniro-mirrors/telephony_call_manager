@@ -42,6 +42,7 @@
 #include "call_object_manager.h"
 #include "data_ability_observer_stub.h"
 #include "call_base.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -56,7 +57,7 @@ public:
 private:
     std::string mKey = "";
     std::string mValue = "";
-    static std::mutex mutex_;
+    static ffrt::mutex mutex_;
 };
 
 class MyLocationEngine {
@@ -136,7 +137,7 @@ public:
     static sptr<AAFwk::IAbilityConnection> connectCallback_;
     static sptr<AAFwk::IAbilityConnection> connectCallbackEcc;
     static bool isStartEccService;
-    static std::mutex mutex_;
+    static ffrt::mutex mutex_;
     static int32_t nowCallId;
 };
 

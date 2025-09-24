@@ -16,7 +16,7 @@
 #ifndef TELEPHONY_CALL_STATE_PROCESSOR_H
 #define TELEPHONY_CALL_STATE_PROCESSOR_H
 
-#include <mutex>
+#include "ffrt.h"
 #include <set>
 #include <string>
 
@@ -46,7 +46,7 @@ private:
     std::set<int32_t> alertingCalls_;
     std::set<int32_t> incomingCalls_;
     std::set<int32_t> dialingCalls_;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

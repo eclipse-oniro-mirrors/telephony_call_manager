@@ -19,7 +19,7 @@
 #include <cstring>
 #include <list>
 #include <memory>
-#include <mutex>
+
 
 #include "app_state_observer.h"
 #include "call_broadcast_subscriber.h"
@@ -226,7 +226,7 @@ private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     DialParaInfo dialSrcInfo_;
     AppExecFwk::PacMap extras_;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     CallStateToApp VoIPCallState_ = CallStateToApp::CALL_STATE_IDLE;
     bool shouldDisconnect = true;
     static bool alarmSeted;
@@ -246,10 +246,10 @@ private:
     sptr<ApplicationStateObserver> appStateObserver = nullptr;
     sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
     
-    std::mutex voipMutex_;
+    ffrt::mutex voipMutex_;
     sptr<WearStatusObserver> wearStatusObserver_ = nullptr;
     int32_t wearStatus_ = WEAR_STATUS_INVALID;
-    std::mutex wearStatusMutex_;
+    ffrt::mutex wearStatusMutex_;
     ffrt::mutex reminderMutex_;
     std::shared_ptr<IncomingFlashReminder> incomingFlashReminder_ {nullptr};
 };

@@ -25,7 +25,7 @@ namespace Telephony {
 bool IMSCallState::ProcessEvent(int32_t event)
 {
     bool result = false;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     TELEPHONY_LOGI("ProcessEvent event=%{public}d", event);
     switch (event) {
         case AudioEvent::NO_MORE_ACTIVE_CALL:

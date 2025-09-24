@@ -158,7 +158,7 @@ std::map<int32_t, bool> LocationSystemAbilityListener::systemAbilityStatus = {
 
 void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (startService) {
         TELEPHONY_LOGE("service alredy started");
         return;

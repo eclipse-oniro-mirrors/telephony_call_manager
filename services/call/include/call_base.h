@@ -19,7 +19,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <memory>
-#include <mutex>
+#include "ffrt.h"
 
 #include "refbase.h"
 #include "pac_map.h"
@@ -198,7 +198,7 @@ private:
     int32_t crsType_;
     int32_t originalCallType_;
     bool isMuted_;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     std::string numberLocation_;
     NumberMarkInfo numberMarkInfo_;
     int32_t blockReason_;

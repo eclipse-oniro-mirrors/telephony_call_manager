@@ -21,7 +21,7 @@
 #include <cstdlib>
 #include <set>
 #include <memory>
-#include <mutex>
+#include "ffrt.h"
 
 #include "call_manager_inner_type.h"
 
@@ -66,7 +66,7 @@ protected:
     ConferenceState state_;
     ConferenceState oldState_;
     std::set<int32_t> subCallIdSet_;
-    std::mutex conferenceMutex_;
+    ffrt::mutex conferenceMutex_;
     time_t beginTime_;
     CallType conferenceType_;
 };

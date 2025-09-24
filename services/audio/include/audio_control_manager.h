@@ -16,7 +16,6 @@
 #ifndef TELEPHONY_AUDIO_MANAGER_H
 #define TELEPHONY_AUDIO_MANAGER_H
 
-#include <mutex>
 #include <set>
 
 #include "audio_device_manager.h"
@@ -144,7 +143,7 @@ private:
     std::shared_ptr<Ring> ring_{nullptr};
     std::unique_ptr<Tone> tone_;
     std::unique_ptr<Sound> sound_;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     std::recursive_mutex toneStateLock_;
     sptr<CallBase> frontCall_ = nullptr;
     bool isSetAudioDeviceByUser_ = false;

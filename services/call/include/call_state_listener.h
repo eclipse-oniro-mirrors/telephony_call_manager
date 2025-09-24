@@ -17,7 +17,7 @@
 #define CALL_STATE_LISTENER_H
 
 #include <memory>
-
+#include "ffrt.h"
 #include "call_state_listener_base.h"
 
 namespace OHOS {
@@ -39,7 +39,7 @@ public:
 
 private:
     std::set<std::shared_ptr<CallStateListenerBase>> listenerSet_;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

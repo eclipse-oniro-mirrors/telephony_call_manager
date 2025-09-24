@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace Telephony {
-std::condition_variable CallConnectAbility::cv_;
+ffrt::condition_variable CallConnectAbility::cv_;
 
 CallConnectAbility::~CallConnectAbility() {}
 
@@ -45,7 +45,7 @@ void CallConnectAbility::ConnectAbility()
         return;
     }
     HILOG_COMM_WARN("Connect callui ability");
-    std::lock_guard<std::mutex> lock(connectAbilityMutex_);
+    std::lock_guard<ffrt::mutex> lock(connectAbilityMutex_);
     AAFwk::Want want;
     AppExecFwk::ElementName element("", "com.ohos.callui", "com.ohos.callui.ServiceAbility");
     want.SetElement(element);
@@ -74,7 +74,7 @@ void CallConnectAbility::DisconnectAbility()
         SetDisconnectingFlag(false);
         return;
     }
-    std::lock_guard<std::mutex> lock(connectAbilityMutex_);
+    std::lock_guard<ffrt::mutex> lock(connectAbilityMutex_);
     if (connectCallback_ != nullptr) {
         TELEPHONY_LOGW("Disconnect callui ability");
         std::string identity = IPCSkeleton::ResetCallingIdentity();
@@ -129,9 +129,9 @@ void CallConnectAbility::NotifyAll()
 bool CallConnectAbility::WaitForConnectResult()
 {
     if (!isConnected_) {
-        std::unique_lock<std::mutex> lock(mutex_);
+        std::unique_lock<ffrt::mutex> lock(mutex_);
         while (!isConnected_) {
-            if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == std::cv_status::timeout) {
+            if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == ffrt::cv_status::timeout) {
                 TELEPHONY_LOGE("callui is not connected, no need to disconnect ability");
                 return false;
             }

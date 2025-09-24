@@ -18,7 +18,7 @@
 #ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
 #endif
-#include <mutex>
+#include "ffrt.h"
 #include "call_object_manager.h"
 #include "call_state_listener_base.h"
 
@@ -37,7 +37,7 @@ public:
     void ReleaseIncomingLock();
 
 private:
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     const std::string wakeupReason_ = "incoming call";
     /**
      * Wake up the device and only Voip callType set the screen on.

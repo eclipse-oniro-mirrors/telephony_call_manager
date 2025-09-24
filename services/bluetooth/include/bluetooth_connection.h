@@ -22,7 +22,7 @@
 
 #include "singleton.h"
 #include "unordered_map"
-
+#include "ffrt.h"
 #ifdef ABILITY_BLUETOOTH_SUPPORT
 #include "bluetooth_hfp_ag.h"
 #include "iservice_registry.h"
@@ -67,15 +67,15 @@ public:
 private:
     bool IsAudioActivated();
     std::atomic<BtScoState> btScoState_{BtScoState::SCO_STATE_DISCONNECTED};
-    std::mutex scoAddrMutex_;
-    std::mutex scoNameMutex_;
+    ffrt::mutex scoAddrMutex_;
+    ffrt::mutex scoNameMutex_;
     std::string connectedScoAddr_;
     std::string connectedScoName_;
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
 private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
-    std::mutex bluetoothMutex_;
+    ffrt::mutex bluetoothMutex_;
     std::unordered_map<std::string, Bluetooth::BluetoothRemoteDevice> mapConnectedBtDevices_;
 #endif
 };

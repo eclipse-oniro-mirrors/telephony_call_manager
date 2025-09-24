@@ -24,7 +24,7 @@ namespace Telephony {
 bool WiredHeadsetDeviceState::ProcessEvent(int32_t event)
 {
     bool result = false;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     switch (event) {
         case AudioEvent::WIRED_HEADSET_DISCONNECTED:
             // should reinitialize audio device in order to switch to a proper audio route

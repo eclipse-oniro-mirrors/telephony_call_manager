@@ -314,7 +314,7 @@ int32_t BluetoothCallService::StartDtmf(char str)
     }
     if (callControlManagerPtr_ != nullptr) {
         {
-            std::lock_guard<std::mutex> guard(lock_);
+            std::lock_guard<ffrt::mutex> guard(lock_);
             sendDtmfState_ = true;
             sendDtmfCallId_ = callId;
         }
@@ -334,7 +334,7 @@ int32_t BluetoothCallService::StopDtmf()
     int32_t callId = ERR_ID;
     if (callControlManagerPtr_ != nullptr) {
         {
-            std::lock_guard<std::mutex> guard(lock_);
+            std::lock_guard<ffrt::mutex> guard(lock_);
             callId = sendDtmfCallId_;
             sendDtmfState_ = false;
             sendDtmfCallId_ = ERR_ID;

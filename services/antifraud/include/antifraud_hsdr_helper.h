@@ -17,7 +17,6 @@
 #define ANTIFRAUD_HSDR_HELPER_H
 
 #include <functional>
-#include <mutex>
 
 #include "ability_connect_callback_stub.h"
 #include "ffrt.h"

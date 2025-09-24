@@ -17,7 +17,7 @@
 #define TELEPHONY_CALL_RECORDS_HANDLER_H
 
 #include <memory>
-#include <mutex>
+#include "ffrt.h"
 
 #include "call_data_base_helper.h"
 #include "call_status_manager.h"

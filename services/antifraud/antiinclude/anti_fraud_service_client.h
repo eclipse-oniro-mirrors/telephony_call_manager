@@ -23,7 +23,7 @@
 #include "ianti_fraud_detect_res_listener.h"
 #include <vector>
 #include <memory>
-#include <mutex>
+#include "ffrt.h"
  
 #define TAS_API __attribute__ ((visibility ("default")))
  
@@ -49,7 +49,7 @@ private:
  
     void DispatchHandleAntiFraudDetectRes(const AntiFraudInnerResult &antiFraudInnerResult);
  
-    std::mutex listenerMutex_;
+    ffrt::mutex listenerMutex_;
     std::shared_ptr<AntiFraudDetectResListener> listener_;
  
     OnDetectResCallbackFunc callbackFunc_;

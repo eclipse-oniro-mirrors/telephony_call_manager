@@ -62,7 +62,7 @@ private:
     sptr<ICallAbilityCallback> callAbilityCallbackPtr_;
     sptr<ApplicationStateObserver> appStateObserver;
     sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

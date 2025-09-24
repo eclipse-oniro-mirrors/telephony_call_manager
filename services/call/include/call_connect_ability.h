@@ -17,7 +17,7 @@
 #define CALL_CONNECT_ABILITY_H
 
 #include <condition_variable>
-#include <mutex>
+#include "ffrt.h"
 
 #include "ability_connect_callback_interface.h"
 #include "call_manager_inner_type.h"
@@ -40,12 +40,12 @@ public:
 
 private:
     sptr<AAFwk::IAbilityConnection> connectCallback_ = nullptr;
-    std::mutex connectAbilityMutex_;
+    ffrt::mutex connectAbilityMutex_;
     bool isConnected_ = false;
     bool isConnecting_ = false;
     bool isDisconnecting_ = false;
-    static std::condition_variable cv_;
-    std::mutex mutex_;
+    static ffrt::condition_variable cv_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

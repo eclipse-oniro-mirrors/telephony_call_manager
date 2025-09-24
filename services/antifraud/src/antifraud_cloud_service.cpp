@@ -47,7 +47,7 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
     auto &helper = DelayedRefSingleton<HsdrHelper>().GetInstance();
     std::string metaData = GeneratePayload(antiFraudResult);
     std::weak_ptr<AntiFraudCloudService> weakPtr = shared_from_this();
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     isSettled_ = false;
     std::string auth;
     helper.ConnectHsdr([weakPtr, metaData, &auth](sptr<IRemoteObject> remoteObject) {
@@ -57,7 +57,7 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
             helper.DisconnectHsdr();
             return;
         }
-        std::lock_guard<std::mutex> lock(ptr->mutex_);
+        std::lock_guard<ffrt::mutex> lock(ptr->mutex_);
         auto pair = ptr->EncryptSync(metaData, remoteObject);
         auto ak = pair.first;
         if (ak.empty()) {
@@ -72,7 +72,7 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
     });
 
     while (!isSettled_) {
-        if (cv_.wait_for(lock, std::chrono::milliseconds(COMMON_TIME_OUT)) == std::cv_status::timeout) {
+        if (cv_.wait_for(lock, std::chrono::milliseconds(COMMON_TIME_OUT)) == ffrt::cv_status::timeout) {
             TELEPHONY_LOGE("get auth timeout.");
             helper.DisconnectHsdr();
             return false;

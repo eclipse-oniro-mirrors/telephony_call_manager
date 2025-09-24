@@ -25,7 +25,7 @@ namespace Telephony {
 bool HoldingState::ProcessEvent(int32_t event)
 {
     bool result = false;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     switch (event) {
         case AudioEvent::NEW_ACTIVE_CS_CALL:
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->

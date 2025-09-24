@@ -23,6 +23,7 @@
 #include "audio_player.h"
 #include "audio_proxy.h"
 #include "tone_player.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -83,7 +84,7 @@ private:
     AudioStandard::ToneType ConvertToneDescriptorToToneType(ToneDescriptor tone);
     std::string GetToneDescriptorPath(ToneDescriptor tone);
     bool IsUseTonePlayer(ToneDescriptor tone);
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     AudioPlayer *audioPlayer_ = nullptr;
     std::shared_ptr<AudioStandard::TonePlayer> tonePlayer_;
     AudioStandard::StreamUsage GetStreamUsageByToneType(ToneDescriptor tone);

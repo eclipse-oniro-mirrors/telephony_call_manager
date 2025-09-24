@@ -17,7 +17,7 @@
 #define ANTIFRAUD_CLOUD_SERVICE_H
 
 #include <map>
-#include <mutex>
+#include "ffrt.h"
 #include <string>
 
 #include "anti_fraud_service_client_type.h"
@@ -32,8 +32,9 @@ public:
 private:
     bool isSettled_ = false;
     std::string phoneNum_;
-    std::mutex mutex_;
-    std::condition_variable cv_;
+    ffrt::mutex mutex_;
+    ffrt::condition_variable cv_;
+    
     std::pair<std::string, std::string> EncryptSync(const std::string &metaData, sptr<IRemoteObject> remoteObject);
     std::pair<std::string, std::string> ProcessEncryptResult(const std::string &encryptResult);
     std::string GenerateRequestJson(const std::map<std::string, std::string> &headersMap, const std::string &body);

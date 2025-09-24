@@ -17,7 +17,7 @@
 #define TELEPHONY_AUDIO_BASE_H
 
 #include <cstdint>
-#include <mutex>
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -69,7 +69,7 @@ public:
     virtual bool ProcessEvent(int32_t event) = 0;
 
 protected:
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
