@@ -49,6 +49,7 @@ const std::string SETTINGS_ANTIFRAUD_BESTMIND_SWITCH = "";
 const std::string ANTIFRAUD_CENTER_BUNDLE_NAME = "";
 const std::string BEST_MIND_BUNDLE_NAME = "";
 const std::string TELEPHONY_IDENTITY_SWITCH = "";
+const std::string SETTINGS_DB_VALUE_EXIST = "1";
 CallRecordsManager::CallRecordsManager() : callRecordsHandlerServerPtr_(nullptr) {}
 
 CallRecordsManager::~CallRecordsManager()
@@ -373,7 +374,7 @@ void CallRecordsManager::QueryUnReadMissedCallLog(int32_t userId)
         return;
     }
     TELEPHONY_LOGI("the user id is :%{public}d", userId);
-    if (userId == ACTIVE_USER_ID) {
+    if (userId == ACTIVE_USER_ID && IsBasicStatementAgree()) {
         int32_t ret = DelayedSingleton<CallRecordsHandlerService>::GetInstance()->QueryUnReadMissedCallLog();
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("Query unread missed call log failed!");
@@ -399,7 +400,8 @@ void AccountSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, c
     std::vector<int32_t> activeList = { 0 };
     DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
     TELEPHONY_LOGI("current active user id is :%{public}d", activeList[0]);
-    if (activeList[0] == ACTIVE_USER_ID) {
+    bool isBasicStatementAgree = DelayedSingleton<CallRecordsManager>::GetInstance()->IsBasicStatementAgree();
+    if (activeList[0] == ACTIVE_USER_ID && isBasicStatementAgree) {
         DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(activeList[0]);
     } else {
         MatchingSkills matchingSkills;
@@ -440,8 +442,8 @@ void UserSwitchEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     std::string action = data.GetWant().GetAction();
     int32_t userId = data.GetCode();
     TELEPHONY_LOGI("action = %{public}s, current active user id is :%{public}d", action.c_str(), userId);
-
-    if (action == CommonEventSupport::COMMON_EVENT_USER_SWITCHED && userId == ACTIVE_USER_ID) {
+    bool isBasicStatementAgree = DelayedSingleton<CallRecordsManager>::GetInstance()->IsBasicStatementAgree();
+    if (action == CommonEventSupport::COMMON_EVENT_USER_SWITCHED && userId == ACTIVE_USER_ID && isBasicStatementAgree) {
         DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(userId);
     }
 }
@@ -455,7 +457,8 @@ void DataShareReadyEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         DelayedSingleton<CallRecordsManager>::GetInstance()->SetDataShareReady(true);
         std::vector<int32_t> activeList = { 0 };
         DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
-        if (activeList[0] == ACTIVE_USER_ID) {
+        bool isBasicStatementAgree = DelayedSingleton<CallRecordsManager>::GetInstance()->IsBasicStatementAgree();
+        if (activeList[0] == ACTIVE_USER_ID && isBasicStatementAgree) {
             DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(activeList[0]);
         }
         LocationSystemAbilityListener::SystemAbilitySubscriber();
@@ -465,6 +468,21 @@ void DataShareReadyEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 #endif
         CallStatusManager::RegisterObserver();
     }
+}
+
+bool CallRecordsManager::IsBasicStatementAgree()
+{
+    std::string result = "";
+    auto settingHelper = SettingsDataShareHelper::GetInstance();
+    if (settingHelper != nullptr) {
+        OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
+        settingHelper->Query(settingUri, "basic_statement_agreed", result);
+    }
+    TELEPHONY_LOGI("query basic statement agree result: %{public}s", result.c_str());
+    if (result != SETTINGS_DB_VALUE_EXIST) {
+        return false;
+    }
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -76,6 +76,7 @@ public:
     void SetDataShareReady(bool isDataShareReady);
     void SetSystemAbilityAdd(bool isSystemAbilityAdd);
     void QueryUnReadMissedCallLog(int32_t userId);
+    bool IsBasicStatementAgree();
 
 private:
     std::string GetCountryIso();
