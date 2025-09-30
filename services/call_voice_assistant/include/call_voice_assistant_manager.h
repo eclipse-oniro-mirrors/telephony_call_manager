@@ -29,6 +29,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr uint16_t EMPTY_SIZE = 0;
 
 struct IncomingContactInformation {
     std::string dialOrCome = "";
@@ -80,6 +81,7 @@ public:
     void UpdateNumberLocation(const std::string& location, int32_t callId);
     void UpdateContactInfo(const ContactInfo &info, int32_t callId);
     static std::shared_ptr<CallVoiceAssistantManager> GetInstance();
+    void UpdateContactInfoIfNecessary(int32_t callId);
 
 private:
     std::string broadcastCheck = "0";
@@ -97,6 +99,7 @@ private:
     sptr<IRemoteObject> mRemoteObject = nullptr;
     std::map<int32_t, std::shared_ptr<IncomingContactInformation>> accountIds = {};
     static std::shared_ptr<CallVoiceAssistantManager> mInstance_;
+    std::set<int32_t> callIdNeedSendToVoiceAssisant;
 
 public:
     const char *SETTINGS_DATASHARE_URI =

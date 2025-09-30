@@ -67,6 +67,7 @@ std::shared_ptr<DataShare::DataShareHelper> CallVoiceAssistantManager::Initial()
 CallVoiceAssistantManager::~CallVoiceAssistantManager()
 {
     OnStopService(true);
+    callIdNeedSendToVoiceAssisant.clear();
 }
 
 void CallVoiceAssistantManager::Release()
@@ -334,6 +335,10 @@ void CallVoiceAssistantManager::UpdateContactInfo(const ContactInfo& info, int32
         auto it_callId = accountIds.find(callId);
         if (it_callId == accountIds.end()) {
             TELEPHONY_LOGE("iterator is end");
+            if (callIdNeedSendToVoiceAssisant.count(callId) == EMPTY_SIZE) {
+                callIdNeedSendToVoiceAssisant.insert(callId);
+                TELEPHONY_LOGI("insert callId and updateContactInfo after call add");
+            }
             return;
         }
         auto nowInfo = it_callId->second;
@@ -524,6 +529,7 @@ void CallVoiceAssistantManager::CallStateUpdated(
             case TelCallState::CALL_STATUS_INCOMING:
                 if (!CallObjectManager::IsNeedSilentInDoNotDisturbMode()) {
                     CallStatusIncoming(callId, accountId);
+                    UpdateContactInfoIfNecessary(callId);
                 } else {
                     TELEPHONY_LOGI("need silent, no need voice assistant");
                 }
@@ -535,6 +541,17 @@ void CallVoiceAssistantManager::CallStateUpdated(
                 break;
         }
     });
+}
+
+void CallVoiceAssistantManager::UpdateContactInfoIfNecessary(int32_t callId)
+{
+    if (callIdNeedSendToVoiceAssisant.count(callId) > EMPTY_SIZE) {
+        sptr<CallBase> call = CallObjectManager::GetOneCallObject(callId);
+        if (call->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING) {
+            UpdateContactInfo(call->GetCallerInfo, callId);
+            callIdNeedSendToVoiceAssisant.erase(callId);
+        }
+    }
 }
 
 void CallVoiceAssistantManager::UpdateVoipCallState(int32_t state)
