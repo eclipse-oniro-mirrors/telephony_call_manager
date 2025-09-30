@@ -548,7 +548,7 @@ void CallVoiceAssistantManager::UpdateContactInfoIfNecessary(int32_t callId)
     if (callIdNeedSendToVoiceAssisant.count(callId) > EMPTY_SIZE) {
         sptr<CallBase> call = CallObjectManager::GetOneCallObject(callId);
         if (call != nullptr && call->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING) {
-            UpdateContactInfo(call->GetCallerInfo, callId);
+            UpdateContactInfo(call->GetCallerInfo(), callId);
         }
         callIdNeedSendToVoiceAssisant.erase(callId);
     }
