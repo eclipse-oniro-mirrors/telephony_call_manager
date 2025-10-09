@@ -447,6 +447,10 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
     audioControl->HandleWirelessAudioDevice(device);
     audioControl->dealCrsScene(AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL);
     audioControl->AdjustVolumesForCrs();
+    sptr<CallBase> imsCall = new IMSCall(mDialParaInfo);
+    imsCall->SetIsAnsweredByPhone(true);
+    EXPECT_NO_THROW(audioControl->HandleCallStateUpdated(imsCall, TelCallState::CALL_STATUS_INCOMING,
+        TelCallState::CALL_STATUS_ACTIVE));
 }
 
 /**
