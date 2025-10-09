@@ -75,7 +75,6 @@ public:
 private:
     void InitCallBaseEvent();
     int32_t IncomingHandle(const CallDetailInfo &info);
-    int32_t IncomingHandleExt(const CallDetailInfo &info);
     int32_t IncomingVoipCallHandle(const CallDetailInfo &info);
     int32_t OutgoingVoipCallHandle(const CallDetailInfo &info);
     int32_t AnsweredVoipCallHandle(const CallDetailInfo &info);
@@ -161,7 +160,6 @@ private:
     void StopCallMotionRecognition(TelCallState nextState);
     bool UpdateDialingHandle(const CallDetailInfo &info, bool &isDistributedDeviceDialing);
     bool RefreshDialingStateByOtherState(sptr<CallBase> &call, const CallDetailInfo &info);
-    void UpdateExtraParams(sptr<CallBase> &call, const CallDetailInfo &info);
 
 private:
     CallDetailInfo callReportInfo_;

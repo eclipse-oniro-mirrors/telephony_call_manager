@@ -462,12 +462,6 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
             return ret;
         }
     }
-    return IncomingHandleExt(info);
-}
-
-int32_t CallStatusManager::IncomingHandleExt(const CallDetailInfo &info)
-{
-    int32_t ret = TELEPHONY_SUCCESS;
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateNewCall failed!");
@@ -476,20 +470,17 @@ int32_t CallStatusManager::IncomingHandleExt(const CallDetailInfo &info)
     if (IsFromTheSameNumberAtTheSameTime(call)) {
         ModifyEsimType();
     }
-    UpdateExtraParams(call, info);
-    AddOneCallObject(call);
     SetContactInfo(call, std::string(info.phoneNum));
     bool block = false;
     if (IsRejectCall(call, info, block)) {
-        DeleteOneCallObject(call->GetCallID());
         return HandleRejectCall(call, block);
     }
     if (info.callType != CallType::TYPE_VOIP && info.callType != CallType::TYPE_BLUETOOTH &&
         IsRingOnceCall(call, info)) {
-        DeleteOneCallObject(call->GetCallID());
         return HandleRingOnceCall(call);
     }
     HandleVideoCallInAdvsecMode(call, info);
+    AddOneCallObject(call);
     StartInComingCallMotionRecognition();
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
@@ -2030,22 +2021,6 @@ bool CallStatusManager::IsFocusModeOpen()
     return false;
 }
 
-void CallStatusManager::UpdateExtraParams(sptr<CallBase> &call, const CallDetailInfo &info)
-{
-    if (IsFocusModeOpen()) {
-        int ret = Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum, 0);
-        TELEPHONY_LOGW("IsNeedSilentInDoNotDisturbMode ret:%{public}d", ret);
-        if (ret == 0) {
-            CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
-                CALL_INCOMING_REJECT_BY_SYSTEM, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "",
-                ACTION_TYPE, REJECT_IN_FOCUSMODE);
-            AAFwk::WantParams params = call->GetExtraParams();
-            params.SetParam("IsNeedSilentInDoNotDisturbMode", AAFwk::Integer::Box(1));
-            call->SetExtraParams(params);
-        }
-    }
-}
-
 bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo &info, bool &block)
 {
     int32_t state;
@@ -2064,6 +2039,18 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
             ACTION_TYPE, REJECT_BY_NUM_BLOCK);
         block = true;
         return true;
+    }
+    if (IsFocusModeOpen()) {
+        int ret = Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum, 0);
+        TELEPHONY_LOGI("IsNeedSilentInDoNotDisturbMode ret:%{public}d", ret);
+        if (ret == 0) {
+            CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
+                CALL_INCOMING_REJECT_BY_SYSTEM, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "",
+                ACTION_TYPE, REJECT_IN_FOCUSMODE);
+            AAFwk::WantParams params = call->GetExtraParams();
+            params.SetParam("IsNeedSilentInDoNotDisturbMode", AAFwk::Integer::Box(1));
+            call->SetExtraParams(params);
+        }
     }
     return false;
 }
