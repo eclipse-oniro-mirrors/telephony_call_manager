@@ -361,10 +361,12 @@ void AudioControlManager::HandleCallStateUpdated(
         }
         MuteRinger();
     }
-    if (nextState == TelCallState::CALL_STATUS_ACTIVE && callObjectPtr->GetAnsweredByPhone() &&
+    if (nextState == TelCallState::CALL_STATUS_ACTIVE &&
         (priorState == TelCallState::CALL_STATUS_INCOMING || priorState == TelCallState::CALL_STATUS_WAITING)) {
         UnmuteSoundTone();
-        return;
+        if (callObjectPtr->GetAnsweredByPhone()) {
+            return;
+        }
     }
     HandleNextState(callObjectPtr, nextState);
     if (priorState == nextState) {
