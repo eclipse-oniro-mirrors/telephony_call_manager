@@ -216,10 +216,10 @@ void CallVoiceAssistantManager::OnStartService(const std::string& isDial, const 
         this->SendRequest(accountIds[callId], true);
         return;
     }
-    OnStopService();
     if (isDial == INCOMING) {
         IsStartVoiceBroadcast();
     }
+    OnStopService(!isBroadcastSwitchOn);
     isControlSwitchOn = IsSwitchOn(CONTROL_SWITCH);
     if (!isControlSwitchOn && !isBroadcastSwitchOn) {
         TELEPHONY_LOGE("the switch is all close");
