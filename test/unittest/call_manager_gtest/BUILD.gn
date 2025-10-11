@@ -48,6 +48,7 @@ ohos_unittest("tel_call_manager1_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "core_service:ffrt_mocked",
+    "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
@@ -97,6 +98,7 @@ ohos_unittest("tel_call_manager2_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "core_service:ffrt_mocked",
+    "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
@@ -146,6 +148,7 @@ ohos_unittest("tel_call_manager3_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "core_service:ffrt_mocked",
+    "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
@@ -195,6 +198,7 @@ ohos_unittest("tel_call_manager4_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "core_service:ffrt_mocked",
+    "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
@@ -244,6 +248,7 @@ ohos_unittest("tel_call_manager5_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "core_service:ffrt_mocked",
+    "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
@@ -293,6 +298,7 @@ ohos_unittest("tel_call_manager6_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "core_service:ffrt_mocked",
+    "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
@@ -342,6 +348,7 @@ ohos_unittest("tel_call_manager7_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "core_service:ffrt_mocked",
+    "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps
@@ -391,6 +398,7 @@ ohos_unittest("tel_call_manager8_gtest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "core_service:ffrt_mocked",
+    "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
   ]
   external_deps += call_manager_external_deps

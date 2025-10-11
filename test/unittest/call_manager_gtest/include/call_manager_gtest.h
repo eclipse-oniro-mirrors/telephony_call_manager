@@ -31,6 +31,7 @@
 #include "common_event_manager.h"
 #include "core_service_client.h"
 #include "privacy_test_common.h"
+#include "if_system_ability_manager_mock.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -41,8 +42,11 @@ static MockNativeToken* g_mock = nullptr;
 class CallManagerGtest : public testing::Test {
 public:
     // execute before first testcase
+    static inline std::shared_ptr<ISystemAbilityManagerMock> samgr =
+        std::make_shared<testing::NiceMock<ISystemAbilityManagerMock>>();
     static void SetUpTestCase()
     {
+        SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = sptr<ISystemAbilityManager>(samgr.get());
         g_selfTokenId = GetSelfTokenID();
         PrivacyTestCommon::SetTestEvironment(g_selfTokenId);
         g_mock = new (std::nothrow) MockNativeToken("foundation");
@@ -178,6 +182,8 @@ public:
             servicePtr_->UnInit();
         }
         DelayedRefSingleton<BluetoothCallClient>::GetInstance().UnInit();
+        samgr = nullptr;
+        SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = nullptr;
         std::cout << "---------- gtest end ------------" << std::endl;
     }
 
