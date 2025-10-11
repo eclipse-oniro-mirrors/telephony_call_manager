@@ -181,6 +181,8 @@ public:
 HWTEST_F(CallManagerGtest, Telephony_CallManagerService_001, TestSize.Level1)
 {
     AccessToken token;
+    sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
+    EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
     std::u16string test = u"";
     std::string test_ = "";
     bool enabled;
@@ -238,6 +240,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_001, TestSize.Level1)
 HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, TestSize.Level1)
 {
     AccessToken token;
+    sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
+    EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     float zoomRatio = 1;
     std::u16string test = u"";
@@ -287,6 +291,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, TestSize.Level1)
 HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, TestSize.Level1)
 {
     AccessToken token;
+    sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
+    EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     callManagerService->Init();
     callManagerService->RegisterCallBack(nullptr);
@@ -829,6 +835,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_009, TestSize.Level0
 HWTEST_F(CallManagerGtest, Telephony_VoipCall_001, TestSize.Level0)
 {
     AccessToken token;
+    sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
+    EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
     DialParaInfo dialInfo;
     std::shared_ptr<VoIPCall> voIPCall = std::make_shared<VoIPCall>(dialInfo);
     EXPECT_EQ(voIPCall->DialingProcess(), TELEPHONY_SUCCESS);

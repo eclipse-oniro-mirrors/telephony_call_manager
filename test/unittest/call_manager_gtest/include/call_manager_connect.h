@@ -501,6 +501,41 @@ private:
     sptr<ICallAbilityCallback> callAbilityCallbackPtr_;
     ffrt::shared_mutex clientLock_;
 };
+
+class MockRemoteObject1 : public IRemoteObject {
+public:
+    explicit MockRemoteObject1() : IRemoteObject(u"default") {}
+
+    int SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+    {
+        return 0;
+    }
+
+    int32_t GetObjectRefCount()
+    {
+        return 0;
+    }
+
+    bool AddDeathRecipient(const sptr<DeathRecipient> &recipient)
+    {
+        return true;
+    }
+
+    bool RemoveDeathRecipient(const sptr<DeathRecipient> &recipient)
+    {
+        return true;
+    }
+
+    bool IsObjectDead() const
+    {
+        return false;
+    }
+
+    int Dump(int fd, const std::vector<std::u16string> &args)
+    {
+        return 0;
+    }
+};
 } // namespace Telephony
 } // namespace OHOS
 
