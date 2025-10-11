@@ -222,10 +222,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_001, TestSize.Level1)
     ASSERT_NE(callManagerService->KickOutFromConference(0), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->SetMuted(false), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->MuteRinger(), TELEPHONY_SUCCESS);
-    AudioDevice audioDevice = {
-        .deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO,
-        .address = { 0 },
-    };
+    AudioDevice audioDevice = { .deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO, .address = { 0 }, };
     ASSERT_NE(callManagerService->SetAudioDevice(audioDevice), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->ControlCamera(1, test), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->SetPreviewWindow(1, test_, nullptr), TELEPHONY_SUCCESS);

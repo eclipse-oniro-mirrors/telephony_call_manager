@@ -42,7 +42,8 @@ static MockNativeToken* g_mock = nullptr;
 class CallManagerGtest : public testing::Test {
 public:
     // execute before first testcase
-    static inline std::shared_ptr<ISystemAbilityManagerMock> samgr = std::make_shared<testing::NiceMock<ISystemAbilityManagerMock>>();
+    static inline std::shared_ptr<ISystemAbilityManagerMock> samgr =
+        std::make_shared<testing::NiceMock<ISystemAbilityManagerMock>>();
     static void SetUpTestCase()
     {
         SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = sptr<ISystemAbilityManager>(samgr.get());
