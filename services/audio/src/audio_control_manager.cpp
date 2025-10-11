@@ -62,11 +62,7 @@ void AudioControlManager::Init()
     std::lock_guard<ffrt::recursive_mutex> lock(ringMutex_);
     ring_ = std::make_shared<Ring>();
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
-    if (ring_ != nullptr) {
-        ring_->RegisterObserver();
-    } else {
-        TELEPHONY_LOGE("ring_ is nullptr ignore RegisterObserver");
-    }
+    ring_->RegisterObserver();
 #endif
 }
 

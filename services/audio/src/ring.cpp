@@ -38,12 +38,13 @@ constexpr int32_t ONE_AND_HALF_SECOND_US = 1500000; //us
 constexpr int32_t US_TO_MS = 1000;
 constexpr uint32_t FEATURE_COMFORT_REMINDER = 15;
 const std::string ADAPTIVE_SWITCH = "ringtone_vibrate_adaptive_switch";
+const std::string RINGADAPTIVE_MODE_STATE = "const.settings.ringtone_vibration_adaptive";
 constexpr const char* USER_STATUS_SO_NAME = "libuser_status_client.z.so";
 constexpr const char* MSDP_SUBSCRIBE_CALLBACK_FUNC_NAME = "SubscribeCallback";
-const char* MSDP_SUBSCRIBE_FUNC_NAME = "Subscribe";
-const char* MSDP_UNSUBSCRIBE_FUNC_NAME = "Unsubscribe";
-const char* MSDP_GETFUSIONREMINDERDATA_FUNC_NAME = "GetFusionReminderData";
-const char* MSDP_GETEVENTTYPE_FUNC_NAME = "GetEventType";
+constexpr const char* MSDP_SUBSCRIBE_FUNC_NAME = "Subscribe";
+constexpr const char* MSDP_UNSUBSCRIBE_FUNC_NAME = "Unsubscribe";
+constexpr const char* MSDP_GETFUSIONREMINDERDATA_FUNC_NAME = "GetFusionReminderData";
+constexpr const char* MSDP_GETEVENTTYPE_FUNC_NAME = "GetEventType";
 
 typedef int32_t (*SubscribeCallbackFunc)(uint32_t feature, UserStatusDataCallbackFunc &callback);
 typedef int32_t (*SubscribeFunc)(uint32_t feature);
@@ -61,6 +62,12 @@ Ring::Ring()
 Ring::~Ring()
 {
     TELEPHONY_LOGI("~Ring Destory");
+#ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
+    if (userHandle_ != nullptr) {
+        dlclose(userHandle_);
+        userHandle_ = nullptr;
+    }
+#endif
 }
 
 void Ring::Init()
@@ -78,6 +85,17 @@ void Ring::Init()
         RingtonePlayer_->Release();
         RingtonePlayer_.reset();
     }
+#ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
+    if (OHOS::system::GetBoolParameter(RINGADAPTIVE_MODE_STATE, false)) {
+        TELEPHONY_LOGI("ringtone vibrate adaptive is disabled");
+        return;
+    }
+    userHandle_ = dlopen(USER_STATUS_SO_NAME, RTLD_NOW);
+    if (userHandle_ == nullptr) {
+        TELEPHONY_LOGE("user status dlopen failed : %{public}s", dlerror());
+        return;
+    }
+#endif
 }
 
 int32_t Ring::Play(int32_t slotId, std::string ringtonePath, Media::HapticStartupMode mode)
@@ -103,13 +121,12 @@ int32_t Ring::Play(int32_t slotId, std::string ringtonePath, Media::HapticStartu
     }
 
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
-    userHandle_ = dlopen(USER_STATUS_SO_NAME, RTLD_NOW);
-    if (userHandle_ == nullptr) {
-        TELEPHONY_LOGE("user status dlopen failed : %{public}s", dlerror());
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
     GetSettingsData();
     PrepareComfortReminder();
+    std::unique_lock<ffrt::mutex> lockRing(ringStartMutex_);
+    isRingStarted_ = true;
+    lockRing.unlock();
+    ringStartCv_.notify_all();
 #endif
 
     audioPlayer_->SetStop(PlayerType::TYPE_RING, false);
@@ -138,10 +155,6 @@ int32_t Ring::Stop()
     ringStopCv_.notify_all();
     UnsubscribeFeature();
     ResetComfortReminder();
-    if (userHandle_ != nullptr) {
-        dlclose(userHandle_);
-        userHandle_ = nullptr;
-    }
 #endif
     return result;
 }
@@ -229,6 +242,10 @@ void Ring::GetSettingsData()
     }
     TELEPHONY_LOGI("ringtone vibrate adaptive: %{public}s", ringtoneSettingStatus.c_str());
     isAdaptiveSwitchOn_ = ringtoneSettingStatus == "true";
+    if (OHOS::system::GetBoolParameter(RINGADAPTIVE_MODE_STATE, false)) {
+        TELEPHONY_LOGI("ringtone vibrate adaptive is disabled");
+        isAdaptiveSwitchOn_ = false;
+    }
 }
 
 void Ring::OnComfortReminderDataChanged(int32_t result, std::shared_ptr<UserStatusData> userStatusData)
@@ -268,9 +285,18 @@ void Ring::OnComfortReminderDataChanged(int32_t result, std::shared_ptr<UserStat
             TELEPHONY_LOGE("unknown eventType %{public}d", eventType);
             break;
     }
-    if (isEnvMsgRecv_) {
+    if (isEnvMsgRecv_ && isSwingMsgRecv_) {
         conditionVar_.notify_one();
-        SetRingToneVibrationState();
+        if (isGentleHappend_) {
+            return;
+        }
+        std::weak_ptr<Ring> weakPtr = weak_from_this();
+        ffrt::submit([weakPtr]() {
+            std::shared_ptr<Ring> strongPtr = weakPtr.lock();
+            if (strongPtr != nullptr) {
+                strongPtr->SetRingToneVibrationState();
+            }
+        });
     }
 }
 
@@ -279,6 +305,17 @@ void Ring::SetRingToneVibrationState()
     if (RingtonePlayer_ == nullptr) {
         return;
     }
+
+    std::unique_lock<ffrt::mutex> ringStartLock(ringStartMutex_);
+    if (!isRingStarted_) {
+        if (!ringStartCv_.wait_for(ringStartLock, std::chrono::milliseconds(TIMEOUT_LIMIT),
+            [this] { return isRingStarted_; })) {
+            TELEPHONY_LOGI("SetRingToneVibrationState cancel, ring not start");
+            return;
+        }
+    }
+    ringStartLock.unlock();
+
     TELEPHONY_LOGI("oriVolume %{public}d, curVolume %{public}d", oriRingVolLevel_, curRingVolLevel_.load());
     TELEPHONY_LOGI("swing = %{public}d, quiet = %{public}d", isSwing_, isQuiet_);
     TELEPHONY_LOGI("GentleHappend %{public}d, FadeupHappend %{public}d",
@@ -288,30 +325,14 @@ void Ring::SetRingToneVibrationState()
         isGentleHappend_ = true;
         ret = RingtonePlayer_->SetRingtoneHapticsFeature(Media::RingtoneHapticsFeature::RINGTONE_GENTLE_HAPTICS);
         TELEPHONY_LOGI("vibration gentle, ret = %{public}d", ret);
-        if (curRingVolLevel_ <= VOL_LEVEL_UNDER_LINE) {
-            return;
+        if (curRingVolLevel_ > VOL_LEVEL_UNDER_LINE) {
+            DecreaseVolume();
         }
-        std::weak_ptr<Ring> weakPtr = weak_from_this();
-        ffrt::submit([weakPtr]() {
-            std::shared_ptr<Ring> strongPtr = weakPtr.lock();
-            if (strongPtr != nullptr) {
-                strongPtr->DecreaseVolume();
-            }
-        });
     } else if (isQuiet_ && !isFadeupHappend_ && !isGentleHappend_) {
         isFadeupHappend_ = true;
-        ret = RingtonePlayer_->SetRingtoneHapticsRamp(INCREASE_DURATION / US_TO_MS, START_INTENSITY, END_INTENSITY);
-        TELEPHONY_LOGI("vibration fade up, ret = %{public}d", ret);
-        if (oriRingVolLevel_ <= VOL_LEVEL_UNDER_LINE) {
-            return;
+        if (oriRingVolLevel_ > VOL_LEVEL_UNDER_LINE) {
+            IncreaseVolume();
         }
-        std::weak_ptr<Ring> weakPtr = weak_from_this();
-        ffrt::submit([weakPtr]() {
-            std::shared_ptr<Ring> strongPtr = weakPtr.lock();
-            if (strongPtr != nullptr) {
-                strongPtr->IncreaseVolume();
-            }
-        });
     }
 }
 
@@ -381,11 +402,12 @@ void Ring::ResetComfortReminder()
     isEnvMsgRecv_ = false;
     isGentleHappend_ = false;
     isFadeupHappend_ = false;
+    isRingStarted_ = false;
 }
 
 void Ring::PrepareComfortReminder()
 {
-    if (!isAdaptiveSwitchOn_) {
+    if (!isAdaptiveSwitchOn_ || RingtonePlayer_ == nullptr) {
         return;
     }
     isRingStopped_ = false;
@@ -397,7 +419,8 @@ void Ring::PrepareComfortReminder()
     RegisterUserStatusDataCallbackFunc();
     SubscribeFeature();
     std::unique_lock<ffrt::mutex> lock(comfortReminderMutex_);
-    if (conditionVar_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_LIMIT), [this] { return isEnvMsgRecv_; })) {
+    if (conditionVar_.wait_for(lock, std::chrono::milliseconds(TIMEOUT_LIMIT),
+        [this] { return isEnvMsgRecv_ && isSwingMsgRecv_; })) {
         TELEPHONY_LOGI("reminder occurred");
         if (isSwing_ && oriRingVolLevel_ > VOL_LEVEL_UNDER_LINE && oriVolumeDb_ > 0.0f) {
             float endVolumeDb = audioProxy->GetSystemRingVolumeInDb(VOL_LEVEL_UNDER_LINE);
@@ -405,11 +428,16 @@ void Ring::PrepareComfortReminder()
             SetRingToneVolume(endVolumeDb / oriVolumeDb_);
             curRingVolLevel_ = VOL_LEVEL_UNDER_LINE;
             isFadeupHappend_ = true;
-        } else if (isQuiet_ && !isSwing_ && oriRingVolLevel_ > VOL_LEVEL_UNDER_LINE && oriVolumeDb_ > 0.0f) {
-            float endVolumeDb = audioProxy->GetSystemRingVolumeInDb(VOL_LEVEL_UNDER_LINE);
-            TELEPHONY_LOGI("ready to fade up, reset VolumeDb:%{public}f", endVolumeDb);
-            SetRingToneVolume(endVolumeDb / oriVolumeDb_);
-            curRingVolLevel_ = VOL_LEVEL_UNDER_LINE;
+        } else if (isQuiet_ && !isSwing_) {
+            int32_t ret = RingtonePlayer_->SetRingtoneHapticsRamp(INCREASE_DURATION / US_TO_MS,
+                START_INTENSITY, END_INTENSITY);
+            TELEPHONY_LOGI("vibration fade up, ret = %{public}d", ret);
+            if (oriRingVolLevel_ > VOL_LEVEL_UNDER_LINE && oriVolumeDb_ > 0.0f) {
+                float endVolumeDb = audioProxy->GetSystemRingVolumeInDb(VOL_LEVEL_UNDER_LINE);
+                TELEPHONY_LOGI("volume fade up, reset VolumeDb:%{public}f", endVolumeDb);
+                SetRingToneVolume(endVolumeDb / oriVolumeDb_);
+                curRingVolLevel_ = VOL_LEVEL_UNDER_LINE;
+            }
         } else {
             isFadeupHappend_ = true;
         }
@@ -422,7 +450,7 @@ void Ring::PrepareComfortReminder()
 void Ring::DecreaseVolume()
 {
     int totalSteps = curRingVolLevel_ - VOL_LEVEL_UNDER_LINE;
-    if (oriVolumeDb_ <= 0.0f || totalSteps == 0) {
+    if (oriVolumeDb_ <= 0.0f || totalSteps <= 0) {
         TELEPHONY_LOGE("invalid oriVolumeDb %{public}f or steps %{public}d", oriVolumeDb_, totalSteps);
         return;
     }
@@ -447,7 +475,7 @@ void Ring::DecreaseVolume()
 void Ring::IncreaseVolume()
 {
     int totalSteps = oriRingVolLevel_ - VOL_LEVEL_UNDER_LINE;
-    if (oriVolumeDb_ <= 0.0f || totalSteps == 0) {
+    if (oriVolumeDb_ <= 0.0f || totalSteps <= 0) {
         TELEPHONY_LOGE("invalid oriVolumeDb %{public}f or steps %{public}d", oriVolumeDb_, totalSteps);
         return;
     }
