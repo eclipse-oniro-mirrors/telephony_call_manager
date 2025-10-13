@@ -16,7 +16,7 @@
 @!sts_inject_into_module("import Context from 'application.Context';")
 @!namespace("@ohos.telephony.call", "call")
 @!sts_inject("""
-static { loadLibrary("telephony_call_taihe_native.z") }
+static { loadLibraryWithPermissionCheck("telephony_call_taihe_native.z", "@ohos.telephony.call") }
 """)
 
 enum CallState: i32 {
