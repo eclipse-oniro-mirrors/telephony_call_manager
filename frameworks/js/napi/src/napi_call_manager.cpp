@@ -64,21 +64,21 @@ void Init()
 napi_value NapiCallManager::DeclareCallBasisInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("dial", Dial),
-        DECLARE_NAPI_FUNCTION("dialCall", DialCall),
-        DECLARE_NAPI_FUNCTION("makeCall", MakeCall),
-        DECLARE_NAPI_FUNCTION("answer", AnswerCall),
-        DECLARE_NAPI_FUNCTION("reject", RejectCall),
-        DECLARE_NAPI_FUNCTION("hangup", HangUpCall),
-        DECLARE_NAPI_FUNCTION("answerCall", AnswerCall),
-        DECLARE_NAPI_FUNCTION("rejectCall", RejectCall),
-        DECLARE_NAPI_FUNCTION("hangUpCall", HangUpCall),
-        DECLARE_NAPI_FUNCTION("holdCall", HoldCall),
-        DECLARE_NAPI_FUNCTION("unHoldCall", UnHoldCall),
-        DECLARE_NAPI_FUNCTION("switchCall", SwitchCall),
-        DECLARE_NAPI_FUNCTION("setCallPreferenceMode", SetCallPreferenceMode),
-        DECLARE_NAPI_FUNCTION("hasVoiceCapability", HasVoiceCapability),
-        DECLARE_NAPI_FUNCTION("sendCallUiEvent", SendCallUiEvent),
+        DECLARE_NAPI_WRITABLE_FUNCTION("dial", Dial),
+        DECLARE_NAPI_WRITABLE_FUNCTION("dialCall", DialCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("makeCall", MakeCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("answer", AnswerCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("reject", RejectCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("hangup", HangUpCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("answerCall", AnswerCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("rejectCall", RejectCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("hangUpCall", HangUpCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("holdCall", HoldCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("unHoldCall", UnHoldCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("switchCall", SwitchCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setCallPreferenceMode", SetCallPreferenceMode),
+        DECLARE_NAPI_WRITABLE_FUNCTION("hasVoiceCapability", HasVoiceCapability),
+        DECLARE_NAPI_WRITABLE_FUNCTION("sendCallUiEvent", SendCallUiEvent),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -87,12 +87,12 @@ napi_value NapiCallManager::DeclareCallBasisInterface(napi_env env, napi_value e
 napi_value NapiCallManager::DeclareCallConferenceInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("combineConference", CombineConference),
-        DECLARE_NAPI_FUNCTION("separateConference", SeparateConference),
-        DECLARE_NAPI_FUNCTION("kickOutFromConference", KickOutFromConference),
-        DECLARE_NAPI_FUNCTION("getMainCallId", GetMainCallId),
-        DECLARE_NAPI_FUNCTION("getSubCallIdList", GetSubCallIdList),
-        DECLARE_NAPI_FUNCTION("getCallIdListForConference", GetCallIdListForConference),
+        DECLARE_NAPI_WRITABLE_FUNCTION("combineConference", CombineConference),
+        DECLARE_NAPI_WRITABLE_FUNCTION("separateConference", SeparateConference),
+        DECLARE_NAPI_WRITABLE_FUNCTION("kickOutFromConference", KickOutFromConference),
+        DECLARE_NAPI_WRITABLE_FUNCTION("getMainCallId", GetMainCallId),
+        DECLARE_NAPI_WRITABLE_FUNCTION("getSubCallIdList", GetSubCallIdList),
+        DECLARE_NAPI_WRITABLE_FUNCTION("getCallIdListForConference", GetCallIdListForConference),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -101,23 +101,23 @@ napi_value NapiCallManager::DeclareCallConferenceInterface(napi_env env, napi_va
 napi_value NapiCallManager::DeclareCallSupplementInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("getCallWaitingStatus", GetCallWaiting),
-        DECLARE_NAPI_FUNCTION("setCallWaiting", SetCallWaiting),
-        DECLARE_NAPI_FUNCTION("getCallRestrictionStatus", GetCallRestriction),
-        DECLARE_NAPI_FUNCTION("setCallRestriction", SetCallRestriction),
-        DECLARE_NAPI_FUNCTION("setCallRestrictionPassword", SetCallRestrictionPassword),
-        DECLARE_NAPI_FUNCTION("getCallTransferInfo", GetCallTransferInfo),
-        DECLARE_NAPI_FUNCTION("setCallTransfer", SetCallTransferInfo),
-        DECLARE_NAPI_FUNCTION("enableImsSwitch", EnableImsSwitch),
-        DECLARE_NAPI_FUNCTION("disableImsSwitch", DisableImsSwitch),
-        DECLARE_NAPI_FUNCTION("isImsSwitchEnabled", IsImsSwitchEnabled),
-        DECLARE_NAPI_FUNCTION("isImsSwitchEnabledSync", IsImsSwitchEnabledSync),
-        DECLARE_NAPI_FUNCTION("setVoNRState", SetVoNRState),
-        DECLARE_NAPI_FUNCTION("getVoNRState", GetVoNRState),
-        DECLARE_NAPI_FUNCTION("canSetCallTransferTime", CanSetCallTransferTime),
-        DECLARE_NAPI_FUNCTION("closeUnfinishedUssd", CloseUnFinishedUssd),
-        DECLARE_NAPI_FUNCTION("inputDialerSpecialCode", InputDialerSpecialCode),
-        DECLARE_NAPI_FUNCTION("sendUssdResponse", SendUssdResponse),
+        DECLARE_NAPI_WRITABLE_FUNCTION("getCallWaitingStatus", GetCallWaiting),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setCallWaiting", SetCallWaiting),
+        DECLARE_NAPI_WRITABLE_FUNCTION("getCallRestrictionStatus", GetCallRestriction),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setCallRestriction", SetCallRestriction),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setCallRestrictionPassword", SetCallRestrictionPassword),
+        DECLARE_NAPI_WRITABLE_FUNCTION("getCallTransferInfo", GetCallTransferInfo),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setCallTransfer", SetCallTransferInfo),
+        DECLARE_NAPI_WRITABLE_FUNCTION("enableImsSwitch", EnableImsSwitch),
+        DECLARE_NAPI_WRITABLE_FUNCTION("disableImsSwitch", DisableImsSwitch),
+        DECLARE_NAPI_WRITABLE_FUNCTION("isImsSwitchEnabled", IsImsSwitchEnabled),
+        DECLARE_NAPI_WRITABLE_FUNCTION("isImsSwitchEnabledSync", IsImsSwitchEnabledSync),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setVoNRState", SetVoNRState),
+        DECLARE_NAPI_WRITABLE_FUNCTION("getVoNRState", GetVoNRState),
+        DECLARE_NAPI_WRITABLE_FUNCTION("canSetCallTransferTime", CanSetCallTransferTime),
+        DECLARE_NAPI_WRITABLE_FUNCTION("closeUnfinishedUssd", CloseUnFinishedUssd),
+        DECLARE_NAPI_WRITABLE_FUNCTION("inputDialerSpecialCode", InputDialerSpecialCode),
+        DECLARE_NAPI_WRITABLE_FUNCTION("sendUssdResponse", SendUssdResponse),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -126,26 +126,26 @@ napi_value NapiCallManager::DeclareCallSupplementInterface(napi_env env, napi_va
 napi_value NapiCallManager::DeclareCallExtendInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("startDTMF", StartDTMF),
-        DECLARE_NAPI_FUNCTION("stopDTMF", StopDTMF),
-        DECLARE_NAPI_FUNCTION("postDialProceed", PostDialProceed),
-        DECLARE_NAPI_FUNCTION("getCallState", GetCallState),
-        DECLARE_NAPI_FUNCTION("getCallStateSync", GetCallStateSync),
-        DECLARE_NAPI_FUNCTION("isRinging", IsRinging),
-        DECLARE_NAPI_FUNCTION("hasCall", HasCall),
-        DECLARE_NAPI_FUNCTION("hasCallSync", HasCallSync),
-        DECLARE_NAPI_FUNCTION("isNewCallAllowed", IsNewCallAllowed),
-        DECLARE_NAPI_FUNCTION("isInEmergencyCall", IsInEmergencyCall),
-        DECLARE_NAPI_FUNCTION("isEmergencyPhoneNumber", IsEmergencyPhoneNumber),
-        DECLARE_NAPI_FUNCTION("formatPhoneNumber", FormatPhoneNumber),
-        DECLARE_NAPI_FUNCTION("formatPhoneNumberToE164", FormatPhoneNumberToE164),
-        DECLARE_NAPI_FUNCTION("on", ObserverOn),
-        DECLARE_NAPI_FUNCTION("off", ObserverOff),
-        DECLARE_NAPI_FUNCTION("reportOttCallDetailsInfo", ReportOttCallDetailsInfo),
-        DECLARE_NAPI_FUNCTION("reportOttCallEventInfo", ReportOttCallEventInfo),
-        DECLARE_NAPI_FUNCTION("removeMissedIncomingCallNotification", RemoveMissedIncomingCallNotification),
-        DECLARE_NAPI_FUNCTION("setVoIPCallState", SetVoIPCallState),
-        DECLARE_NAPI_FUNCTION("setVoIPCallInfo", SetVoIPCallInfo),
+        DECLARE_NAPI_WRITABLE_FUNCTION("startDTMF", StartDTMF),
+        DECLARE_NAPI_WRITABLE_FUNCTION("stopDTMF", StopDTMF),
+        DECLARE_NAPI_WRITABLE_FUNCTION("postDialProceed", PostDialProceed),
+        DECLARE_NAPI_WRITABLE_FUNCTION("getCallState", GetCallState),
+        DECLARE_NAPI_WRITABLE_FUNCTION("getCallStateSync", GetCallStateSync),
+        DECLARE_NAPI_WRITABLE_FUNCTION("isRinging", IsRinging),
+        DECLARE_NAPI_WRITABLE_FUNCTION("hasCall", HasCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("hasCallSync", HasCallSync),
+        DECLARE_NAPI_WRITABLE_FUNCTION("isNewCallAllowed", IsNewCallAllowed),
+        DECLARE_NAPI_WRITABLE_FUNCTION("isInEmergencyCall", IsInEmergencyCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("isEmergencyPhoneNumber", IsEmergencyPhoneNumber),
+        DECLARE_NAPI_WRITABLE_FUNCTION("formatPhoneNumber", FormatPhoneNumber),
+        DECLARE_NAPI_WRITABLE_FUNCTION("formatPhoneNumberToE164", FormatPhoneNumberToE164),
+        DECLARE_NAPI_WRITABLE_FUNCTION("on", ObserverOn),
+        DECLARE_NAPI_WRITABLE_FUNCTION("off", ObserverOff),
+        DECLARE_NAPI_WRITABLE_FUNCTION("reportOttCallDetailsInfo", ReportOttCallDetailsInfo),
+        DECLARE_NAPI_WRITABLE_FUNCTION("reportOttCallEventInfo", ReportOttCallEventInfo),
+        DECLARE_NAPI_WRITABLE_FUNCTION("removeMissedIncomingCallNotification", RemoveMissedIncomingCallNotification),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setVoIPCallState", SetVoIPCallState),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setVoIPCallInfo", SetVoIPCallInfo),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -154,17 +154,17 @@ napi_value NapiCallManager::DeclareCallExtendInterface(napi_env env, napi_value 
 napi_value NapiCallManager::DeclareCallMultimediaInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("setMuted", SetMuted),
-        DECLARE_NAPI_FUNCTION("cancelMuted", CancelMuted),
-        DECLARE_NAPI_FUNCTION("muteRinger", MuteRinger),
-        DECLARE_NAPI_FUNCTION("setAudioDevice", SetAudioDevice),
-        DECLARE_NAPI_FUNCTION("controlCamera", ControlCamera),
-        DECLARE_NAPI_FUNCTION("setPreviewSurface", SetPreviewWindow),
-        DECLARE_NAPI_FUNCTION("setDisplaySurface", SetDisplayWindow),
-        DECLARE_NAPI_FUNCTION("setCameraZoom", SetCameraZoom),
-        DECLARE_NAPI_FUNCTION("setDeviceDirection", SetDeviceDirection),
-        DECLARE_NAPI_FUNCTION("updateImsCallMode", UpdateImsCallMode),
-        DECLARE_NAPI_FUNCTION("cancelCallUpgrade", CancelCallUpgrade),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setMuted", SetMuted),
+        DECLARE_NAPI_WRITABLE_FUNCTION("cancelMuted", CancelMuted),
+        DECLARE_NAPI_WRITABLE_FUNCTION("muteRinger", MuteRinger),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setAudioDevice", SetAudioDevice),
+        DECLARE_NAPI_WRITABLE_FUNCTION("controlCamera", ControlCamera),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setPreviewSurface", SetPreviewWindow),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setDisplaySurface", SetDisplayWindow),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setCameraZoom", SetCameraZoom),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setDeviceDirection", SetDeviceDirection),
+        DECLARE_NAPI_WRITABLE_FUNCTION("updateImsCallMode", UpdateImsCallMode),
+        DECLARE_NAPI_WRITABLE_FUNCTION("cancelCallUpgrade", CancelCallUpgrade),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -173,9 +173,9 @@ napi_value NapiCallManager::DeclareCallMultimediaInterface(napi_env env, napi_va
 napi_value NapiCallManager::DeclareCallImsInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("startRTT", StartRTT),
-        DECLARE_NAPI_FUNCTION("stopRTT", StopRTT),
-        DECLARE_NAPI_FUNCTION("joinConference", JoinConference),
+        DECLARE_NAPI_WRITABLE_FUNCTION("startRTT", StartRTT),
+        DECLARE_NAPI_WRITABLE_FUNCTION("stopRTT", StopRTT),
+        DECLARE_NAPI_WRITABLE_FUNCTION("joinConference", JoinConference),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
