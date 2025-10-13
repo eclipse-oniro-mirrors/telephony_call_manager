@@ -424,23 +424,212 @@ struct CallEventOptions {
 
 @gen_async("makeCall")
 @gen_promise("makeCall")
-function makeCallSync(phoneNumber: String): void;
+function MakeCallSync(phoneNumber: String): void;
 
 @gen_promise("makeCall")
-function makeCallSync2(context: @sts_type("Context") Opaque, phoneNumber: String): void;
+function MakeCallSync2(context: @sts_type("Context") Opaque, phoneNumber: String): void;
 
 function HasVoiceCapability(): bool;
 
 @gen_async("formatPhoneNumber")
 @gen_promise("formatPhoneNumber")
-function formatPhoneNumberSync(phoneNumber: String, options: NumberFormatOptions): void;
+function FormatPhoneNumberSync(phoneNumber: String, options: NumberFormatOptions): void;
 
 @gen_async("formatPhoneNumber")
-function formatPhoneNumberSync2(phoneNumber: String): void;
+function FormatPhoneNumberSync2(phoneNumber: String): void;
 
-function getCallStateSync(): CallState;
+@gen_async("getCallState")
+@gen_promise("getCallState")
+function GetCallStateSync(): CallState;
 
+@gen_async("hasCall")
+@gen_promise("hasCall")
 function HasCallSync(): bool;
+
+@gen_async("isImsSwitchEnabled")
+@gen_promise("isImsSwitchEnabled")
+function IsImsSwitchEnabledSync(slotId: i32): bool;
+
+@gen_async("disableImsSwitch")
+@gen_promise("disableImsSwitch")
+function DisableImsSwitchSync(slotId: i32): void;
+
+@gen_async("enableImsSwitch")
+@gen_promise("enableImsSwitch")
+function EnableImsSwitchSync(slotId: i32): void;
+
+@gen_async("updateImsCallMode")
+@gen_promise("updateImsCallMode")
+function UpdateImsCallModeSync(callId: i32, mode: ImsCallMode): void;
+
+@gen_async("joinConference")
+@gen_promise("joinConference")
+function JoinConferenceSync(mainCallId: i32, callNumberList: Array<String>): void;
+
+@gen_async("setAudioDevice")
+@gen_promise("setAudioDevice")
+function SetAudioDeviceSync(device: AudioDevice): void;
+
+@gen_async("cancelMuted")
+@gen_promise("cancelMuted")
+function CancelMutedSync(): void;
+
+@gen_async("setMuted")
+@gen_promise("setMuted")
+function SetMutedSync(): void;
+
+@gen_async("isRinging")
+@gen_promise("isRinging")
+function IsRingingSync(): bool;
+
+@gen_async("separateConference")
+@gen_promise("separateConference")
+function SeparateConferenceSync(callId: i32): void;
+
+@gen_async("isNewCallAllowed")
+@gen_promise("isNewCallAllowed")
+function IsNewCallAllowedSync(): bool;
+
+@gen_async("isInEmergencyCall")
+@gen_promise("isInEmergencyCall")
+function IsInEmergencyCallSync(): bool;
+
+@gen_async("stopDTMF")
+@gen_promise("stopDTMF")
+function StopDTMFSync(callId: i32): void;
+
+@gen_async("startDTMF")
+@gen_promise("startDTMF")
+function StartDTMFSync(callId: i32, character: String): void;
+
+@gen_async("getCallIdListForConference")
+@gen_promise("getCallIdListForConference")
+function GetCallIdListForConferenceSync(callId: i32): Array<String>;
+
+@gen_async("getSubCallIdList")
+@gen_promise("getSubCallIdList")
+function GetSubCallIdListSync(callId: i32): Array<String>;
+
+@gen_async("getMainCallId")
+@gen_promise("getMainCallId")
+function GetMainCallIdSync(callId: i32): i32;
+
+@gen_async("combineConference")
+@gen_promise("combineConference")
+function CombineConferenceSync(callId: i32): void;
+
+@gen_async("switchCall")
+@gen_promise("switchCall")
+function SwitchCallSync(callId: i32): void;
+
+@gen_async("unHoldCall")
+@gen_promise("unHoldCall")
+function UnHoldCallSync(callId: i32): void;
+
+@gen_async("holdCall")
+@gen_promise("holdCall")
+function HoldCallSync(callId: i32): void;
+
+@gen_async("formatPhoneNumberToE164")
+@gen_promise("formatPhoneNumberToE164")
+function FormatPhoneNumberToE164Sync(phoneNumber: String, countryCode: String): String;
+
+@gen_async("isEmergencyPhoneNumber")
+function IsEmergencyPhoneNumberSyncDefault(phoneNumber: String, options: EmergencyNumberOptions): bool;
+@gen_promise("isEmergencyPhoneNumber")
+function IsEmergencyPhoneNumberSyncOptional(phoneNumber: String, options: Optional<EmergencyNumberOptions>): bool;
+@gen_async("isEmergencyPhoneNumber")
+function IsEmergencyPhoneNumberSyncPhoneNumber(phoneNumber: String): bool;
+
+@gen_async("muteRinger")
+@gen_promise("muteRinger")
+function MuteRingerSync(): void;
+
+@gen_async("dialCall")
+function DialCallSyncDefault(phoneNumber: String, options: DialCallOptions): bool;
+@gen_promise("dialCall")
+function DialCallSyncOptional(phoneNumber: String, options: Optional<DialCallOptions>): bool;
+@gen_async("dialCall")
+function DialCallSyncPhoneNumber(phoneNumber: String): bool;
+
+@gen_async("sendCallUiEvent")
+@gen_promise("sendCallUiEvent")
+function SendCallUiEventSync(callId: i32, eventName: String): void;
+
+@gen_async("inputDialerSpecialCode")
+@gen_promise("inputDialerSpecialCode")
+function InputDialerSpecialCodeSync(inputCode: String): void;
+
+@gen_async("canSetCallTransferTime")
+@gen_promise("canSetCallTransferTime")
+function CanSetCallTransferTimeSync(slotId: i32): bool;
+
+@gen_async("getVoNRState")
+@gen_promise("getVoNRState")
+function GetVoNRStateSync(slotId: i32): VoNRState;
+
+@gen_async("removeMissedIncomingCallNotification")
+@gen_promise("removeMissedIncomingCallNotification")
+function RemoveMissedIncomingCallNotificationSync(): void;
+
+@gen_async("setVoNRState")
+@gen_promise("setVoNRState")
+function SetVoNRStateSync(slotId: i32, state: VoNRState): void;
+
+@gen_async("setDeviceDirection")
+@gen_promise("setDeviceDirection")
+function SetDeviceDirectionSync(callId: i32, deviceDirection: DeviceDirection): void;
+
+@gen_async("setDisplaySurface")
+@gen_promise("setDisplaySurface")
+function SetDisplaySurfaceSync(callId: i32, surfaceId: String): void;
+
+@gen_async("setPreviewSurface")
+@gen_promise("setPreviewSurface")
+function SetPreviewSurfaceSync(callId: i32, surfaceId: String): void;
+
+@gen_async("controlCamera")
+@gen_promise("controlCamera")
+function ControlCameraSync(callId: i32, cameraId: String): void;
+
+@gen_async("cancelCallUpgrade")
+@gen_promise("cancelCallUpgrade")
+function CancelCallUpgradeSync(callId: i32): void;
+
+@gen_async("kickOutFromConference")
+@gen_promise("kickOutFromConference")
+function KickOutFromConferenceSync(callId: i32): void;
+
+@gen_async("postDialProceed")
+@gen_promise("postDialProceed")
+function PostDialProceedSync(callId: i32, proceed: bool): void;
+
+@gen_async("answerCall")
+function AnswerCallSyncDefault(callId: i32): void;
+@gen_promise("answerCall")
+function AnswerCallSyncOptional(callId: Optional<i32>): void;
+@gen_async("answerCall")
+function AnswerCallSyncVoid(): void;
+@gen_promise("answerCall")
+function AnswerCallSync(videoState: VideoStateType, callId: i32): void;
+
+@gen_async("rejectCall")
+function RejectCallDefaultDefaultSync(callId: i32, options: RejectMessageOptions): void;
+@gen_promise("rejectCall")
+function RejectCallOptionalSync(callId: Optional<i32>,options: Optional<RejectMessageOptions>): void;
+@gen_async("rejectCall")
+function RejectCallWithCallIdSync(callId: i32): void;
+@gen_async("rejectCall")
+function RejectCallWithVoidSync(): void;
+@gen_async("rejectCall")
+function RejectCallWithRejectMessageSync(options: RejectMessageOptions): void;
+
+@gen_async("hangUpCall")
+function HangUpCallSync(callId: i32): void;
+@gen_promise("hangUpCall")
+function HangUpCallOptionalSync(callId: Optional<i32>): void;
+@gen_async("hangUpCall")
+function HangUpCallWithVoidSync(): void;
 
 @!sts_inject("""
 export function on(type: string, cb: (arg_0: Object) => void) {

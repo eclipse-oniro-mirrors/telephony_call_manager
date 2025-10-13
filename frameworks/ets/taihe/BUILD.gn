@@ -41,6 +41,7 @@ taihe_shared_library("telephony_call_taihe_native") {
   sources = get_target_outputs(":run_taihe")
   include_dirs = [
     "${call_manager_path}/frameworks/ets/taihe/include",
+    "${call_manager_path}/interfaces/innerkits",
   ]
   sources += [
     "src/ani_constructor.cpp",
@@ -52,13 +53,14 @@ taihe_shared_library("telephony_call_taihe_native") {
   ]
   deps = [
     ":run_taihe",
-    "//base/telephony/call_manager/frameworks/native:tel_call_manager_api"
+    "//base/telephony/call_manager:tel_call_manager",
+    "//base/telephony/call_manager/frameworks/native:tel_call_manager_api",
   ]
   external_deps = [
     "ability_base:base",
     "ability_base:want",
     "ability_runtime:ability_manager",
-    "ability_runtime:napi_common",
+    "ability_runtime:ani_common",
     "c_utils:utils",
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
@@ -68,6 +70,8 @@ taihe_shared_library("telephony_call_taihe_native") {
     "init:libbegetutil",
     "libuv:uv",
     "napi:ace_napi",
+    "runtime_core:ani_helpers",
+    "runtime_core:libarkruntime",
   ]
 
   sanitize = {
