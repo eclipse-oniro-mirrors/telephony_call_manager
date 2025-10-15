@@ -571,6 +571,8 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioProxy_002, TestSize.Level0)
     dcallDesc->deviceType_ = AudioStandard::DEVICE_TYPE_SPEAKER;
     descs.push_back(dcallDesc);
     EXPECT_TRUE(std::make_shared<AudioPreferDeviceChangeCallback>()->IsDistributedDeviceSelected(descs));
+    descs.clear();
+    EXPECT_FALSE(std::make_shared<AudioPreferDeviceChangeCallback>()->IsDistributedDeviceSelected(descs));
 }
 
 /**
