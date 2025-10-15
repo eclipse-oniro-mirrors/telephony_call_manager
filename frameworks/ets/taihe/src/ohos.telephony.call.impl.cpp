@@ -33,12 +33,22 @@
 #include <string_ex.h>
 #include "taihe_call_manager.h"
 #include "taihe_call_ability_callback.h"
+#include "napi_util.h"
 
 using namespace taihe;
 using namespace OHOS::Telephony;
 namespace {
-
 const int32_t DEFAULT_CALL_ID = 0;
+
+static void ConvertErrorForBusinessError(int32_t errorCode)
+{
+    if (errorCode == TELEPHONY_ERR_PERMISSION_ERR) {
+        set_business_error(JS_ERROR_TELEPHONY_PERMISSION_DENIED,
+            "BusinessError 201:Permission denied");
+    }
+    OHOS::Telephony::JsError error = NapiUtil::ConverErrorMessageForJs(errorCode);
+    set_business_error(error.errorCode, error.errorMessage);
+}
 
 static inline bool IsValidSlotId(int32_t slotId)
 {
@@ -63,7 +73,7 @@ void MakeCallSync(::taihe::string_view phoneNumber)
     CallManagerClientInitializer init;
     auto errCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->MakeCall(std::string(phoneNumber));
     if (errCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errCode, "makeCall return error");
+        ConvertErrorForBusinessError(errCode);
     }
     return;
 }
@@ -73,7 +83,7 @@ void MakeCallSync2(uintptr_t context, ::taihe::string_view phoneNumber)
     CallManagerClientInitializer init;
     auto errCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->MakeCall(std::string(phoneNumber));
     if (errCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errCode, "makeCall2 return error");
+        ConvertErrorForBusinessError(errCode);
     }
     return;
 }
@@ -95,7 +105,7 @@ void FormatPhoneNumberSync(
     auto errCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->FormatPhoneNumber(
         phoneNum, countryCode, formatNum);
     if (errCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errCode, "formatPhoneNumber return error");
+        ConvertErrorForBusinessError(errCode);
     }
     return;
 }
@@ -109,7 +119,7 @@ void FormatPhoneNumberSync2(::taihe::string_view phoneNumber)
     auto errCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->FormatPhoneNumber(
         phoneNum, countryCode, formatNum);
     if (errCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errCode, "FormatPhoneNumber2 return error");
+        ConvertErrorForBusinessError(errCode);
     }
     return;
 }
@@ -118,14 +128,14 @@ bool IsImsSwitchEnabledSync(int32_t slotId)
 {
     CallManagerClientInitializer init;
     if (!IsValidSlotId(slotId)) {
-        set_business_error(TELEPHONY_ERR_SLOTID_INVALID, "IsImsSwitchEnabledSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
         return false;
     }
 
     bool enabled = false;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->IsImsSwitchEnabled(slotId, enabled);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "IsImsSwitchEnabled return error");
+        ConvertErrorForBusinessError(errorCode);
     }
     return enabled;
 }
@@ -134,12 +144,12 @@ void DisableImsSwitchSync(int32_t slotId)
 {
     CallManagerClientInitializer init;
     if (!IsValidSlotId(slotId)) {
-        set_business_error(TELEPHONY_ERR_SLOTID_INVALID, "DisableImsSwitchSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
         return;
     }
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->DisableImsSwitch(slotId);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "DisableImsSwitch return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -147,12 +157,12 @@ void EnableImsSwitchSync(int32_t slotId)
 {
     CallManagerClientInitializer init;
     if (!IsValidSlotId(slotId)) {
-        set_business_error(TELEPHONY_ERR_SLOTID_INVALID, "EnableImsSwitchSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
         return;
     }
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->EnableImsSwitch(slotId);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "EnableImsSwitch return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -162,7 +172,7 @@ void UpdateImsCallModeSync(int32_t callId, ::ohos::telephony::call::ImsCallMode 
     ImsCallMode Mode = static_cast<ImsCallMode>(mode.get_key());
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->UpdateImsCallMode(callId, Mode);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "UpdateImsCallMode return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -176,7 +186,7 @@ void JoinConferenceSync(int32_t mainCallId, ::taihe::array_view<::taihe::string>
     int32_t errorCode =
         OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->JoinConference(mainCallId, callNumberList16);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "JoinConference return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -185,25 +195,25 @@ void SetAudioDeviceSync(::ohos::telephony::call::AudioDevice const & device)
     CallManagerClientInitializer init;
     AudioDevice audioDevice;
     if (device.address.has_value() && device.address->size() > kMaxAddressLen) {
-        set_business_error(TELEPHONY_ERR_ARGUMENT_INVALID, "address is not too long");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_ARGUMENT_INVALID);
         return;
     }
 
     const ::taihe::string &deviceAddress = device.address.value_or("");
     if (memcpy_s(audioDevice.address, kMaxAddressLen, deviceAddress.data(), deviceAddress.size()) != EOK) {
-        set_business_error(TELEPHONY_ERROR, "memcpy_s audioDevice.address failed");
+        ConvertErrorForBusinessError(TELEPHONY_ERROR);
         return;
     }
     const ::taihe::string &deviceNameTrans = device.deviceName.value_or("");
     if (memcpy_s(audioDevice.deviceName, kMaxDeviceNameLen, deviceNameTrans.data(), deviceNameTrans.size()) != EOK) {
-        set_business_error(TELEPHONY_ERROR, "memcpy_s audioDevice.deviceName failed");
+        ConvertErrorForBusinessError(TELEPHONY_ERROR);
         return;
     }
     int32_t value = device.deviceType.get_value();
     audioDevice.deviceType = static_cast<OHOS::Telephony::AudioDeviceType>(value);
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->SetAudioDevice(audioDevice);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "SetAudioDevice return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -212,7 +222,7 @@ void CancelMutedSync()
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->SetMuted(false);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "SetMuted return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -221,7 +231,7 @@ void SetMutedSync()
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->SetMuted(true);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "SetMuted return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -231,7 +241,7 @@ bool IsRingingSync()
     bool enabled = false;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->IsRinging(enabled);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "IsRingingSyncc return error");
+        ConvertErrorForBusinessError(errorCode);
     }
     return enabled;
 }
@@ -241,7 +251,7 @@ void SeparateConferenceSync(int32_t callId)
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->SeparateConference(callId);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "SeparateConference return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -251,7 +261,7 @@ bool IsNewCallAllowedSync()
     bool enabled = false;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->IsNewCallAllowed(enabled);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "IsNewCallAllowed return error");
+        ConvertErrorForBusinessError(errorCode);
     }
     return enabled;
 }
@@ -262,7 +272,7 @@ bool IsInEmergencyCallSync()
     bool enabled = false;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->IsInEmergencyCall(enabled);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "IsInEmergencyCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
     return enabled;
 }
@@ -272,7 +282,7 @@ void StopDTMFSync(int32_t callId)
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->StopDtmf(callId);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "StopDtmf return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -280,14 +290,14 @@ void StartDTMFSync(int32_t callId, ::taihe::string_view character)
 {
     CallManagerClientInitializer init;
     if (character.empty()) {
-        set_business_error(TELEPHONY_ERR_ARGUMENT_INVALID, "StartDTMFSync character is empty");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_ARGUMENT_INVALID);
         return;
     }
 
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->StartDtmf(
         callId, character.c_str()[0]);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "StartDtmf return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -298,7 +308,7 @@ void StartDTMFSync(int32_t callId, ::taihe::string_view character)
     int32_t errorCode =
         OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->GetCallIdListForConference(callId, messageArray);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "GetCallIdListForConference return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 
     taihe::vector<taihe::string> messageVector;
@@ -314,7 +324,7 @@ void StartDTMFSync(int32_t callId, ::taihe::string_view character)
     std::vector<std::u16string> listResult;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->GetSubCallIdList(callId, listResult);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "GetCallIdListForConference return error");
+        ConvertErrorForBusinessError(errorCode);
     }
     taihe::vector<taihe::string> resultVector;
     for (const auto &message : listResult) {
@@ -329,7 +339,7 @@ int32_t GetMainCallIdSync(int32_t callId)
     int32_t result = 0;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->GetMainCallId(callId, result);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "GetMainCallId return error");
+        ConvertErrorForBusinessError(errorCode);
     }
     return result;
 }
@@ -339,7 +349,7 @@ void CombineConferenceSync(int32_t callId)
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->CombineConference(callId);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "CombineConference return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -348,7 +358,7 @@ void SwitchCallSync(int32_t callId)
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->SwitchCall(callId);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "SwitchCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -357,7 +367,7 @@ void UnHoldCallSync(int32_t callId)
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->UnHoldCall(callId);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "UnHoldCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -366,7 +376,7 @@ void HoldCallSync(int32_t callId)
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->HoldCall(callId);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "HoldCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -379,7 +389,7 @@ void HoldCallSync(int32_t callId)
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->FormatPhoneNumberToE164(
         u16PhoneNumber, u16CountryCode, formatNumber);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "FormatPhoneNumberToE164 return error");
+        ConvertErrorForBusinessError(errorCode);
     }
     return OHOS::Str16ToStr8(formatNumber);
 }
@@ -391,7 +401,7 @@ bool IsEmergencyPhoneNumberSyncDefault(::taihe::string_view phoneNumber,
     bool enable = false;
     auto slotId = options.slotId.value_or(0);
     if (!IsValidSlotId(slotId)) {
-        set_business_error(TELEPHONY_ERR_SLOTID_INVALID, "IsEmergencyPhoneNumberDefaultSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
         return enable;
     }
 
@@ -400,7 +410,7 @@ bool IsEmergencyPhoneNumberSyncDefault(::taihe::string_view phoneNumber,
         OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->IsEmergencyPhoneNumber(
             u16strPhoneNumber, slotId, enable);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "IsEmergencyPhoneNumber return error");
+        ConvertErrorForBusinessError(errorCode);
     }
     return enable;
 }
@@ -416,7 +426,7 @@ bool IsEmergencyPhoneNumberSyncOptional(::taihe::string_view phoneNumber,
 
     bool enable = false;
     if (!IsValidSlotId(slotId)) {
-        set_business_error(TELEPHONY_ERR_SLOTID_INVALID, "IsEmergencyPhoneNumberOptionalSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
         return enable;
     }
 
@@ -424,7 +434,7 @@ bool IsEmergencyPhoneNumberSyncOptional(::taihe::string_view phoneNumber,
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->IsEmergencyPhoneNumber(
         u16strPhoneNumber, slotId, enable);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "IsEmergencyPhoneNumber return error");
+        ConvertErrorForBusinessError(errorCode);
     }
     return enable;
 }
@@ -437,7 +447,7 @@ bool IsEmergencyPhoneNumberSyncPhoneNumber(::taihe::string_view phoneNumber)
     int32_t errorCode =
         OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->IsEmergencyPhoneNumber(u16strPhoneNumber, 0, enable);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "IsEmergencyPhoneNumber return error");
+        ConvertErrorForBusinessError(errorCode);
     }
     return enable;
 }
@@ -447,7 +457,7 @@ void MuteRingerSync()
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->MuteRinger();
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "MuteRinger return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -456,7 +466,7 @@ bool DialCallSyncDefault(::taihe::string_view phoneNumber, ::ohos::telephony::ca
     CallManagerClientInitializer init;
     auto accountId = options.accountId.value_or(0);
     if (!IsValidSlotId(accountId)) {
-        set_business_error(TELEPHONY_ERR_SLOTID_INVALID, "accountId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
         return false;
     }
 
@@ -470,8 +480,7 @@ bool DialCallSyncDefault(::taihe::string_view phoneNumber, ::ohos::telephony::ca
         OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->GetVoIPCallState(state);
         if (state == (int32_t)CallStateToApp::CALL_STATE_OFFHOOK ||
             state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
-            set_business_error(CALL_ERR_CALL_COUNTS_EXCEED_LIMIT,
-                "GetVoIPCallState VoIP CALL is active, cannot dial now");
+            ConvertErrorForBusinessError(CALL_ERR_CALL_COUNTS_EXCEED_LIMIT);
             return false;
         }
     }
@@ -489,7 +498,7 @@ bool DialCallSyncDefault(::taihe::string_view phoneNumber, ::ohos::telephony::ca
         auto extraParamsRef = reinterpret_cast<ani_ref>(options.extraParams.value());
         OHOS::AAFwk::WantParams wantParams;
         if (!OHOS::AppExecFwk::UnwrapWantParams(env, extraParamsRef, wantParams)) {
-            set_business_error(TELEPHONY_ERR_ARGUMENT_INVALID, "UnwrapWantParams failed");
+            ConvertErrorForBusinessError(TELEPHONY_ERR_ARGUMENT_INVALID);
             return false;
         }
         dialInfo.PutStringValue("extraParams", OHOS::AAFwk::WantParamWrapper(wantParams).ToString());
@@ -498,7 +507,7 @@ bool DialCallSyncDefault(::taihe::string_view phoneNumber, ::ohos::telephony::ca
         OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->DialCall(
             OHOS::Str8ToStr16(phoneNumberString), dialInfo);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "DialCall return error");
+        ConvertErrorForBusinessError(errorCode);
         return false;
     }
     return true;
@@ -555,7 +564,7 @@ void SendCallUiEventSync(int32_t callId, ::taihe::string_view eventName)
     std::string name(eventName.c_str());
     auto errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->SendCallUiEvent(callId, name);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "SendCallUiEvent return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -565,7 +574,7 @@ void InputDialerSpecialCodeSync(::taihe::string_view inputCode)
     std::string specialCode(inputCode.c_str());
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->InputDialerSpecialCode(specialCode);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "InputDialerSpecialCode return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -573,7 +582,7 @@ bool CanSetCallTransferTimeSync(int32_t slotId)
 {
     CallManagerClientInitializer init;
     if (!IsValidSlotId(slotId)) {
-        set_business_error(TELEPHONY_ERR_SLOTID_INVALID, "CanSetCallTransferTimeSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
         return false;
     }
 
@@ -581,7 +590,7 @@ bool CanSetCallTransferTimeSync(int32_t slotId)
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->CanSetCallTransferTime(
         slotId, enabled);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "CanSetCallTransferTime return error");
+        ConvertErrorForBusinessError(errorCode);
     }
     return enabled;
 }
@@ -590,14 +599,14 @@ bool CanSetCallTransferTimeSync(int32_t slotId)
 {
     CallManagerClientInitializer init;
     if (!IsValidSlotId(slotId)) {
-        set_business_error(TELEPHONY_ERR_SLOTID_INVALID, "GetVoNRStateSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
         return ::ohos::telephony::call::VoNRState::key_t(0);
     }
 
     int32_t state;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->GetVoNRState(slotId, state);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "GetVoNRState return error");
+        ConvertErrorForBusinessError(errorCode);
         return ::ohos::telephony::call::VoNRState::key_t(0);
     }
     return ::ohos::telephony::call::VoNRState::key_t(state);
@@ -609,7 +618,7 @@ void RemoveMissedIncomingCallNotificationSync()
     int32_t errorCode =
         OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->RemoveMissedIncomingCallNotification();
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "RemoveMissedIncomingCallNotification return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -617,13 +626,13 @@ void SetVoNRStateSync(int32_t slotId, ::ohos::telephony::call::VoNRState state)
 {
     CallManagerClientInitializer init;
     if (!IsValidSlotId(slotId)) {
-        set_business_error(TELEPHONY_ERR_SLOTID_INVALID, "SetVoNRStateSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
         return;
     }
 
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->SetVoNRState(slotId, state);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "SetVoNRState return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -633,7 +642,7 @@ void SetDeviceDirectionSync(int32_t callId, ::ohos::telephony::call::DeviceDirec
     int32_t rotation = deviceDirection.get_value();
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->SetDeviceDirection(callId, rotation);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "SetDeviceDirection return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -644,7 +653,7 @@ void SetDisplaySurfaceSync(int32_t callId, ::taihe::string_view surfaceId)
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->SetDisplayWindow(
         callId, strSurfaceId);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "SetDisplayWindow return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -655,7 +664,7 @@ void SetPreviewSurfaceSync(int32_t callId, ::taihe::string_view surfaceId)
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->SetPreviewWindow(
         callId, strSurfaceId);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "SetPreviewWindow return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -666,7 +675,7 @@ void ControlCameraSync(int32_t callId, ::taihe::string_view cameraId)
         OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->ControlCamera(
             callId, OHOS::Str8ToStr16(std::string(cameraId)));
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "ControlCamera return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -675,7 +684,7 @@ void CancelCallUpgradeSync(int32_t callId)
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->CancelCallUpgrade(callId);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "CancelCallUpgrade return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -684,7 +693,7 @@ void KickOutFromConferenceSync(int32_t callId)
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->KickOutFromConference(callId);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "KickOutFromConference return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -693,7 +702,7 @@ void PostDialProceedSync(int32_t callId, bool proceed)
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->PostDialProceed(callId, proceed);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "PostDialProceed return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -702,7 +711,7 @@ void AnswerCallSyncDefault(int32_t callId)
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->AnswerCall(callId, 0);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "AnswerCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -712,7 +721,7 @@ void AnswerCallSyncOptional(::taihe::optional_view<int32_t> callId)
     int32_t callIdValue = callId.value_or(static_cast<int32_t>(DEFAULT_CALL_ID));
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->AnswerCall(callIdValue, 0);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "AnswerCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -721,7 +730,7 @@ void AnswerCallSyncVoid()
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->AnswerCall(0, 0);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "AnswerCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -731,7 +740,7 @@ void AnswerCallSync(::ohos::telephony::call::VideoStateType videoState, int32_t 
     int32_t videoStateValue = videoState.get_value();
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->AnswerCall(callId, videoStateValue);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "AnswerCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -741,7 +750,7 @@ void RejectCallDefaultDefaultSync(int32_t callId, ::ohos::telephony::call::Rejec
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->RejectCall(
         callId, false, OHOS::Str8ToStr16(std::string(options.messageContent)));
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "RejectCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -759,7 +768,7 @@ void RejectCallOptionalSync(
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->RejectCall(
         callIdValue, false, OHOS::Str8ToStr16(std::string(message)));
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "RejectCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -770,7 +779,7 @@ void RejectCallWithCallIdSync(int32_t callId)
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->RejectCall(
         callId, false, OHOS::Str8ToStr16(std::string(message)));
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "RejectCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -782,7 +791,7 @@ void RejectCallWithVoidSync()
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->RejectCall(
         callId, false, OHOS::Str8ToStr16(std::string(message)));
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "RejectCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -793,7 +802,7 @@ void RejectCallWithRejectMessageSync(::ohos::telephony::call::RejectMessageOptio
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->RejectCall(
         callId, false, OHOS::Str8ToStr16(std::string(options.messageContent)));
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "RejectCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -802,7 +811,7 @@ void HangUpCallSync(int32_t callId)
     CallManagerClientInitializer init;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->HangUpCall(callId);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "HangUpCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -812,7 +821,7 @@ void HangUpCallOptionalSync(::taihe::optional_view<int32_t> callId)
     int32_t callIdValue = callId.value_or(static_cast<int32_t>(DEFAULT_CALL_ID));
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->HangUpCall(callIdValue);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "HangUpCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
@@ -822,7 +831,7 @@ void HangUpCallWithVoidSync()
     int32_t callId = DEFAULT_CALL_ID;
     int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->HangUpCall(callId);
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
-        set_business_error(errorCode, "HangUpCall return error");
+        ConvertErrorForBusinessError(errorCode);
     }
 }
 
