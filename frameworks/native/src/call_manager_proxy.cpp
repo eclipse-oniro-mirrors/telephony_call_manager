@@ -1621,6 +1621,7 @@ void CallManagerProxy::OnRemoteDied(const wptr<IRemoteObject> &remote)
         serviceRemote->RemoveDeathRecipient(deathRecipient_);
         callManagerServicePtr_ = nullptr;
         initStatus_ = false;
+        registerStatus_ = false;
         TELEPHONY_LOGE("on remote died");
     }
 }
