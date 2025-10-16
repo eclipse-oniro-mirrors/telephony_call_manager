@@ -432,7 +432,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsConfig_0100, TestSize.Lev
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->GetImsConfig(SIM1_SLOTID, ITEM_VIDEO_QUALITY), RETURN_VALUE_IS_ZERO);
     }
@@ -451,7 +450,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsConfig_0200, TestSize.Lev
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(
@@ -475,7 +473,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsConfig_0300, TestSize.Lev
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
     ImsConfigItem item = static_cast<ImsConfigItem>(2);
 
-
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->GetImsConfig(SIM1_SLOTID, item), RETURN_VALUE_IS_ZERO);
     }
@@ -495,7 +492,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsConfig_0100, TestSize.Lev
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     std::u16string value = u"123";
     if (HasSimCard(SIM1_SLOTID)) {
@@ -519,7 +515,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsConfig_0200, TestSize.Lev
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     std::u16string value = u"123";
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsConfig(SIM1_SLOTID, ITEM_IMS_SWITCH_STATUS, value),
@@ -541,7 +536,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsConfig_0300, TestSize.Lev
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     std::u16string value = u"123";
     ImsConfigItem item = static_cast<ImsConfigItem>(2);
@@ -565,7 +559,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsFeatureValue_0100, TestSi
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(
             CallManagerGtest::clientPtr_->GetImsFeatureValue(SIM1_SLOTID, TYPE_VOICE_OVER_LTE), RETURN_VALUE_IS_ZERO);
@@ -587,7 +580,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsFeatureValue_0200, TestSi
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(
             CallManagerGtest::clientPtr_->GetImsFeatureValue(SIM1_SLOTID, TYPE_VIDEO_OVER_LTE), RETURN_VALUE_IS_ZERO);
@@ -608,7 +600,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsFeatureValue_0300, TestSi
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->GetImsFeatureValue(SIM1_SLOTID, TYPE_SS_OVER_UT),
@@ -632,7 +623,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsFeatureValue_0400, TestSi
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
     FeatureType type = static_cast<FeatureType>(3);
 
-
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->GetImsFeatureValue(SIM1_SLOTID, type), RETURN_VALUE_IS_ZERO);
     }
@@ -652,7 +642,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsFeatureValue_0100, TestSi
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     int32_t value = 1;
     if (HasSimCard(SIM1_SLOTID)) {
@@ -676,7 +665,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsFeatureValue_0200, TestSi
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     int32_t value = 1;
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsFeatureValue(SIM1_SLOTID, TYPE_VIDEO_OVER_LTE, value),
@@ -698,7 +686,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsFeatureValue_0300, TestSi
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     int32_t value = 1;
     if (HasSimCard(SIM1_SLOTID)) {
@@ -722,7 +709,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsFeatureValue_0400, TestSi
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     int32_t value = 1;
     FeatureType type = static_cast<FeatureType>(3);
     if (HasSimCard(SIM1_SLOTID)) {
@@ -745,7 +731,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UpdateImsCallMode_0100, TestSiz
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     int32_t callId = 1;
     EXPECT_EQ(CallManagerGtest::clientPtr_->UpdateImsCallMode(callId, CALL_MODE_AUDIO_ONLY), RETURN_VALUE_IS_ZERO);
 }
@@ -760,7 +745,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UpdateImsCallMode_0200, TestSiz
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     int32_t callId = 1;
     EXPECT_EQ(CallManagerGtest::clientPtr_->UpdateImsCallMode(callId, CALL_MODE_SEND_ONLY), RETURN_VALUE_IS_ZERO);
@@ -777,7 +761,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UpdateImsCallMode_0300, TestSiz
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     int32_t callId = 1;
     EXPECT_EQ(CallManagerGtest::clientPtr_->UpdateImsCallMode(callId, CALL_MODE_RECEIVE_ONLY), RETURN_VALUE_IS_ZERO);
 }
@@ -793,7 +776,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UpdateImsCallMode_0400, TestSiz
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     int32_t callId = 1;
     EXPECT_EQ(CallManagerGtest::clientPtr_->UpdateImsCallMode(callId, CALL_MODE_SEND_RECEIVE), RETURN_VALUE_IS_ZERO);
 }
@@ -808,7 +790,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UpdateImsCallMode_0500, TestSiz
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     int32_t callId = 1;
     EXPECT_EQ(CallManagerGtest::clientPtr_->UpdateImsCallMode(callId, CALL_MODE_VIDEO_PAUSED), RETURN_VALUE_IS_ZERO);
@@ -928,7 +909,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0400, Te
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     bool result;
     if (HasSimCard(SIM1_SLOTID)) {

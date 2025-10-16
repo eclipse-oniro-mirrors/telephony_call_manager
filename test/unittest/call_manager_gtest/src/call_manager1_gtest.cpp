@@ -32,7 +32,6 @@ using namespace OHOS::Bluetooth;
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
-constexpr int16_t SIM2_SLOTID = 1;
 constexpr int16_t RETURN_VALUE_IS_ZERO = 0;
 constexpr int16_t INVALID_NEGATIVE_ID = -100;
 constexpr int16_t INVALID_POSITIVE_ID = 100;
@@ -741,7 +740,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CombineConference_0400, Functio
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     std::string phoneNumber = "10086";
     InitDialInfo(
         0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
@@ -810,7 +808,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SeparateConference_0400, Functi
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     InitDialInfo(
         0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);

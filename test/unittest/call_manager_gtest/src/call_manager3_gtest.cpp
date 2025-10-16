@@ -652,7 +652,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0300, TestSi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0400, TestSize.Level0)
 {
-
     CallRestrictionInfo info;
     info.fac = CallRestrictionType::RESTRICTION_TYPE_ALL_OUTGOING;
     info.mode = CallRestrictionMode::RESTRICTION_MODE_ACTIVATION;

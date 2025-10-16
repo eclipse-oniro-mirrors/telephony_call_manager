@@ -348,7 +348,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallIdListForConference_0200
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0100, TestSize.Level0)
 {
-
     std::string number = "0-0-0";
     std::u16string phoneNumber = Str8ToStr16(number);
     if (HasSimCard(SIM1_SLOTID)) {
@@ -373,7 +372,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0100, Te
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0200, Function | MediumTest | Level2)
 {
-
     std::u16string phoneNumber = Str8ToStr16("112");
     if (HasSimCard(SIM2_SLOTID)) {
         bool enabled = false;
@@ -396,7 +394,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0200, Fu
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0300, Function | MediumTest | Level2)
 {
-
     std::u16string number = Str8ToStr16("911");
     if (HasSimCard(SIM1_SLOTID)) {
         bool enabled = false;
@@ -419,7 +416,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0300, Fu
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0400, Function | MediumTest | Level2)
 {
-
     std::string number = "119";
     std::u16string phoneNumber = Str8ToStr16(number);
     if (HasSimCard(SIM1_SLOTID)) {
@@ -443,7 +439,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0400, Fu
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0500, Function | MediumTest | Level2)
 {
-
     int32_t slotId = SIM1_SLOTID_NO_CARD;
     std::string number = "999";
     std::u16string phoneNumber = Str8ToStr16(number);
@@ -460,7 +455,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0500, Fu
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0600, Function | MediumTest | Level2)
 {
-
     int32_t slotId = SIM1_SLOTID_NO_CARD;
     std::string number = "";
     std::u16string phoneNumber = Str8ToStr16(number);
@@ -477,7 +471,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0600, Fu
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0700, Function | MediumTest | Level2)
 {
-
     int32_t slotId = SIM1_SLOTID_NO_CARD;
     std::string number = "@123";
     std::u16string phoneNumber = Str8ToStr16(number);
@@ -494,7 +487,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0700, Fu
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_1000, Function | MediumTest | Level2)
 {
-
     int32_t slotId = SIM1_SLOTID_NO_CARD;
     std::string number = "+1+1+9";
     std::u16string phoneNumber = Str8ToStr16(number);
@@ -517,7 +509,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallWaiting_0100, TestSize.L
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallWaiting(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
     }
@@ -533,8 +524,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallWaiting_0100, TestSize.L
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallWaiting_0200, TestSize.Level0)
 {
-
-
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallWaiting(SIM1_SLOTID), TELEPHONY_ERR_PERMISSION_ERR);
     }
@@ -573,7 +562,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_StartDtmf_0300, Function | Medi
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     char str = '1';
     EXPECT_EQ(bluetoothCallClient.StartDtmf(str), RETURN_VALUE_IS_ZERO);
 }
@@ -589,7 +577,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_StartDtmf_0400, Function | Medi
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-    
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
     }
@@ -674,8 +661,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_StopDtmf_0400, Function | Mediu
  * @tc.name     test post dial continue with proceed false
  * @tc.desc     Function test
  */
-HWTEST_F(
-    CallManagerGtest, Telephony_CallManager_PostDialProceed_0100, TestSize.Level1)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_PostDialProceed_0100, TestSize.Level1)
 {
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
@@ -697,7 +683,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_PostDialProceed_0300, TestSize.
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-    
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
     }
@@ -740,7 +725,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_PostDialProceed_0300, TestSize.
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0100, TestSize.Level0)
 {
-
     std::string number = "01085198749";
     std::string Code = "Kr";
     std::string formatBefore = "";
@@ -758,7 +742,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0100, TestSiz
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0200, TestSize.Level0)
 {
-
     std::string number = "010-8519-8748";
     std::string Code = "KR";
     std::string formatBefore = "";
@@ -776,7 +759,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0200, TestSiz
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0300, TestSize.Level0)
 {
-
     std::string number = "(03)38122112";
     std::string Code = "JP";
     std::string formatBefore = "";
@@ -794,7 +776,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0300, TestSiz
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0400, TestSize.Level0)
 {
-
     std::string number = "13888888888";
     std::string Code = "CN";
     std::string formatBefore = "";
@@ -812,7 +793,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0400, TestSiz
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0500, TestSize.Level0)
 {
-
     std::string number = "+81338122121";
     std::string Code = "jp";
     std::string formatBefore = "";
@@ -830,7 +810,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0500, TestSiz
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0600, TestSize.Level0)
 {
-
     std::string number = "666666999989";
     std::string Code = "CN";
     std::string formatBefore = "";
@@ -848,7 +827,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0600, TestSiz
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0700, TestSize.Level0)
 {
-
     std::string number = "13888888889";
     std::string Code = "abcdefg";
     std::string formatBefore = "";
