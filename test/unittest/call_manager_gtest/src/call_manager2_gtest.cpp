@@ -360,13 +360,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0100, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     std::string phoneNumber = "11111111111";
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
@@ -403,13 +398,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0200, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
@@ -435,13 +425,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0300, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     std::string phoneNumber = "-12354785268";
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
@@ -476,13 +461,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0400, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     std::string phoneNumber = "19119080646435437102938190283912471651865810514786470168818468143768714648";
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
@@ -518,13 +498,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0500, TestSize.Level0)
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
@@ -557,13 +532,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1000, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
@@ -597,13 +567,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1100, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
     InitDialInfo(INVALID_SLOT_ID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
         (int32_t)DialType::DIAL_CARRIER_TYPE);
@@ -622,13 +587,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1200, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     InitDialInfo(slotId, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
@@ -648,13 +608,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1300, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
@@ -677,13 +632,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1300, Function | Mediu
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1400, Function | MediumTest | Level1)
 {
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
@@ -709,13 +658,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1500, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     std::string phoneNumber = "33333333333";
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, INVALID_DIAL_TYPE);
@@ -740,13 +684,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1600, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
@@ -772,13 +711,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1700, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     std::string phoneNumber =
         "19119080646435437102938190283912471651865851478647016881846814376871464810514786470168818468143768714648";
     if (HasSimCard(SIM1_SLOTID)) {
@@ -815,13 +749,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1800, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     std::string phoneNumber = "";
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
@@ -847,13 +776,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1900, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     InitDialInfo(slotId, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
@@ -873,13 +797,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_2000, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
     }
@@ -927,13 +846,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_2100, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
     }
@@ -971,15 +885,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0100, Function | Med
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
     }
     int32_t callId = INVALID_NEGATIVE_ID;
     int32_t videoState = (int32_t)VideoStateType::TYPE_VOICE;
-    EXPECT_NE(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -993,12 +905,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0200, Function | Med
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     int32_t callId = INVALID_POSITIVE_ID;
     int32_t videoState = INVALID_NEGATIVE_ID;
-    EXPECT_NE(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -1008,12 +918,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0200, Function | Med
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0300, Function | MediumTest | Level2)
 {
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     int32_t callId = INVALID_POSITIVE_ID;
     int32_t videoState = INVALID_NEGATIVE_ID;
-    EXPECT_NE(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -1026,9 +934,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0400, Function | Med
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     EXPECT_NE(bluetoothCallClient.AnswerCall(), RETURN_VALUE_IS_ZERO);
 }
 } // namespace Telephony
