@@ -33,7 +33,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
 constexpr int16_t SIM2_SLOTID = 1;
-constexpr int16_t ;_VALUE_IS_ZERO = 0;
+constexpr int16_t RETURN_VALUE_IS_ZERO = 0;
 constexpr int16_t INVALID_NEGATIVE_ID = -100;
 constexpr int16_t INVALID_POSITIVE_ID = 100;
 constexpr int WAIT_TIME = 3;

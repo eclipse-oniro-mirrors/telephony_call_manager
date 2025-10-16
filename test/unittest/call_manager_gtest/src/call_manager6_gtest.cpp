@@ -764,7 +764,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0300, TestSize.Lev
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0400, TestSize.Level0)
 {
-
     int32_t state;
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoNRState(SIM1_SLOTID, state), TELEPHONY_ERR_PERMISSION_ERR);

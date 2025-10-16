@@ -918,7 +918,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0200, Function | Med
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0300, Function | MediumTest | Level2)
 {
-
     int32_t callId = INVALID_POSITIVE_ID;
     int32_t videoState = INVALID_NEGATIVE_ID;
     EXPECT_EQ(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);

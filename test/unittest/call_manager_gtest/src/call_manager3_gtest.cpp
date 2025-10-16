@@ -792,7 +792,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestrictionPassword_0500
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestrictionPassword_0600, TestSize.Level0)
 {
-
     const char oldPassword[kMaxNumberLen + 1] = "1111";
     const char newPassword[kMaxNumberLen + 1] = "2222";
     CallRestrictionType fac = CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS;

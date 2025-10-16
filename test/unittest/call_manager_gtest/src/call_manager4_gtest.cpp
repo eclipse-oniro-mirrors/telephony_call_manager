@@ -868,7 +868,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0700, TestSiz
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumberToE164_0100, Function | MediumTest | Level2)
 {
-
     std::string number = "01085198748";
     std::string Code = "Kr";
     std::string formatBefore = "";

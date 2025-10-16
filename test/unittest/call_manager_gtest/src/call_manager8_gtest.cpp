@@ -437,8 +437,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetMuted_0300, Function | Mediu
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
-    
     std::string phoneNumber = "00000000000";
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();

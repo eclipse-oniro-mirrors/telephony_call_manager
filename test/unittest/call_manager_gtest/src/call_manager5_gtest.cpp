@@ -907,8 +907,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0200, Te
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0300, TestSize.Level0)
 {
-
-
     bool result;
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(
