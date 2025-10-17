@@ -65,52 +65,47 @@ public:
     void ReleaseRenderer();
     int32_t SetMute();
     int32_t SetRingToneVolume(float volume);
-    bool isMutedRing_ = false;
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
     void RegisterObserver();
     void UnRegisterObserver();
 #endif
+    bool isMutedRing_ = false;
 
-#ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
 private:
+#ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
     void GetSettingsData();
     void OnComfortReminderDataChanged(int32_t result, std::shared_ptr<UserStatusData> userStatusData);
-    int32_t RegisterUserStatusDataCallbackFunc();
-    int32_t SubscribeFeature();
-    int32_t UnsubscribeFeature();
     void PrepareComfortReminder();
     void SetRingToneVibrationState();
     void DecreaseVolume();
     void IncreaseVolume();
     void ResetComfortReminder();
-#endif
-
-private:
-    ffrt::mutex mutex_;
-    std::unique_ptr<AudioPlayer> audioPlayer_{nullptr};
-    std::shared_ptr<Media::SystemSoundManager> SystemSoundManager_ = nullptr;
-    std::shared_ptr<Media::RingtonePlayer> RingtonePlayer_ = nullptr;
-    int32_t defaultVolume_ = 1;
-
-#ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
-    std::atomic<bool> isAdaptiveSwitchOn_ = true;
+    int32_t RegisterUserStatusDataCallbackFunc();
+    int32_t SubscribeFeature();
+    int32_t UnsubscribeFeature();
     bool isSwing_ = false;
     bool isQuiet_ = false;
     bool isSwingMsgRecv_ = false;
     bool isEnvMsgRecv_ = false;
+    bool isRingStopped_ = false;
     int32_t oriRingVolLevel_ = 0;
     float oriVolumeDb_ = 0.0f;
     ffrt::mutex comfortReminderMutex_;
     ffrt::condition_variable conditionVar_;
     ffrt::mutex ringStopMutex_;
     ffrt::condition_variable ringStopCv_;
-    bool isRingStopped_ = false;
     std::atomic<bool> isGentleHappend_{false};
     std::atomic<bool> isFadeupHappend_{false};
+    std::atomic<bool> isAdaptiveSwitchOn_{false};
     std::atomic<int32_t> curRingVolLevel_{0};
     sptr<RingtoneSettingStatusObserver> ringtoneSettingStatusObserver_ = nullptr;
     void* userHandle_ = nullptr;
 #endif
+    ffrt::mutex mutex_;
+    std::unique_ptr<AudioPlayer> audioPlayer_{nullptr};
+    std::shared_ptr<Media::SystemSoundManager> SystemSoundManager_ = nullptr;
+    std::shared_ptr<Media::RingtonePlayer> RingtonePlayer_ = nullptr;
+    int32_t defaultVolume_ = 1;
 };
 } // namespace Telephony
 } // namespace OHOS
