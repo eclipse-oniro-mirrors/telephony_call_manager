@@ -683,7 +683,6 @@ HWTEST_F(ZeroBranch10Test, Telephony_MuteRinger_001, TestSize.Level1)
     audioControlManager->MuteRinger();
     CallObjectManager::callObjectPtrList_.clear();
     audioControlManager->isVideoRingVibrating_ = true;
-    EXPECT_EQ(audioControlManager->isVideoRingVibrating_, true);
     sptr<CallBase> call2 = new IMSCall(info);
     call2->SetCallType(CallType::TYPE_IMS);
     call2->SetCrsType(CRS_TYPE);

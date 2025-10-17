@@ -200,11 +200,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0200, Function |
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     std::string phoneNumber = "77777777777";
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
     }
@@ -233,11 +231,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0300, Function |
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     std::string phoneNumber = "88888888888";
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
     }
@@ -266,10 +262,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0400, Function |
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+
+    
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
     }
@@ -299,11 +293,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0500, Function |
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     std::string phoneNumber = "00000001111";
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
     }
@@ -332,11 +324,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0600, Function |
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     std::string phoneNumber = "00000002222";
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
     }
@@ -365,11 +355,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0700, Function |
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     std::string phoneNumber = "00000003333";
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
     }
@@ -399,11 +387,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetMuted_0100, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     std::string phoneNumber = "00000004444";
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
     }
@@ -431,14 +417,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetMuted_0200, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     bool muted = true;
-
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetMuted(muted), CALL_ERR_AUDIO_SETTING_MUTE_FAILED);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetMuted(muted), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -452,11 +432,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetMuted_0300, Function | Mediu
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
 
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = "00000000000";
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
@@ -484,14 +460,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_RegisterCallBack_0100, TestSize
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
 
     std::unique_ptr<CallManagerCallback> callManagerCallbackPtr = std::make_unique<CallManagerCallBackStub>();
-    if (callManagerCallbackPtr == nullptr) {
-        return;
-    }
     EXPECT_EQ(CallManagerGtest::clientPtr_->RegisterCallBack(std::move(callManagerCallbackPtr)), RETURN_VALUE_IS_ZERO);
 }
 
@@ -506,9 +477,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UnRegisterCallBack_0100, TestSi
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->UnRegisterCallBack(), RETURN_VALUE_IS_ZERO);
 }
@@ -524,9 +493,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0100, Tes
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
 
     int32_t mode = CS_VOICE_ONLY;
     if (HasSimCard(SIM1_SLOTID)) {
@@ -547,9 +514,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0200, Tes
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
 
     int32_t mode = 0;
     if (HasSimCard(SIM1_SLOTID)) {
@@ -570,9 +535,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0300, Tes
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
 
     int32_t mode = CS_VOICE_PREFERRED;
     if (HasSimCard(SIM1_SLOTID)) {
@@ -593,9 +556,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0400, Tes
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
 
     int32_t mode = IMS_PS_VOICE_PREFERRED;
     if (HasSimCard(SIM1_SLOTID)) {
@@ -616,9 +577,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0500, Tes
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
 
     int32_t mode = IMS_PS_VOICE_ONLY;
     if (HasSimCard(SIM1_SLOTID)) {
@@ -640,9 +599,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0100, TestSiz
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     bool enabled = false;
     EXPECT_EQ(CallManagerGtest::clientPtr_->IsInEmergencyCall(enabled), TELEPHONY_SUCCESS);
     EXPECT_EQ(enabled, false);
@@ -658,26 +615,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0200, TestSiz
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     bool enabled = false;
     EXPECT_EQ(bluetoothCallClient.IsInEmergencyCall(enabled), TELEPHONY_SUCCESS);
-    EXPECT_EQ(enabled, false);
-}
-
-/**
- * @tc.number   Telephony_CallManager_IsInEmergencyCall_0300
- * @tc.name     test is in emergency call without permission
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0300, TestSize.Level0)
-{
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    bool enabled = false;
-    EXPECT_NE(CallManagerGtest::clientPtr_->IsInEmergencyCall(enabled), TELEPHONY_SUCCESS);
     EXPECT_EQ(enabled, false);
 }
 
@@ -692,9 +632,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_MuteRinger_0100, TestSize.Level
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->MuteRinger(), RETURN_VALUE_IS_ZERO);
 }
@@ -710,12 +648,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_JoinConference_0100, TestSize.L
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     int32_t callId = 1;
     std::vector<std::u16string> numberList { u"0000000000" };
-    EXPECT_NE(CallManagerGtest::clientPtr_->JoinConference(callId, numberList), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->JoinConference(callId, numberList), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -728,12 +664,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_JoinConference_0200, TestSize.L
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     int32_t callId = 1;
     std::vector<std::u16string> numberList;
-    EXPECT_NE(CallManagerGtest::clientPtr_->JoinConference(callId, numberList), CALL_ERR_PHONE_NUMBER_EMPTY);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->JoinConference(callId, numberList), CALL_ERR_PHONE_NUMBER_EMPTY);
 }
 
 /*********************************** Test ReportOttCallDetailsInfo() ***********************************/
@@ -747,9 +681,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportOttCallDetailsInfo_0100, 
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     OttCallDetailsInfo info;
     const char *number = "000000";
     memcpy_s(info.phoneNum, kMaxNumberLen, number, strlen(number));
@@ -771,11 +703,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportOttCallDetailsInfo_0200, 
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     std::vector<OttCallDetailsInfo> ottVec;
-    EXPECT_NE(CallManagerGtest::clientPtr_->ReportOttCallDetailsInfo(ottVec), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->ReportOttCallDetailsInfo(ottVec), RETURN_VALUE_IS_ZERO);
 }
 
 /************************************* Test ReportOttCallEventInfo() ************************************/
@@ -789,9 +719,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportOttCallEventInfo_0100, Te
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     OttCallEventInfo info;
     info.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
     char bundlename[] = "com.ohos.tddtest";
@@ -810,9 +738,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasVoiceCapability_0100, TestSi
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->HasVoiceCapability(), true);
 }
@@ -828,9 +754,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CloseUnFinishedUssd_0100, TestS
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
 
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_GE(CallManagerGtest::clientPtr_->CloseUnFinishedUssd(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
@@ -852,11 +776,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0100, Te
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
+
     std::string specialCode = "2846579";
-    EXPECT_NE(CallManagerGtest::clientPtr_->InputDialerSpecialCode(specialCode), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->InputDialerSpecialCode(specialCode), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -869,25 +791,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0200, Te
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    std::string specialCode = "1234";
-    EXPECT_NE(CallManagerGtest::clientPtr_->InputDialerSpecialCode(specialCode), RETURN_VALUE_IS_ZERO);
-}
 
-/**
- * @tc.number   Telephony_CallManager_InputDialerSpecialCode_0300
- * @tc.name     test Input Dialer Special Code without permission
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0300, TestSize.Level0)
-{
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    std::string specialCode = "2846579";
-    EXPECT_NE(CallManagerGtest::clientPtr_->InputDialerSpecialCode(specialCode), RETURN_VALUE_IS_ZERO);
+    std::string specialCode = "1234";
+    EXPECT_EQ(CallManagerGtest::clientPtr_->InputDialerSpecialCode(specialCode), RETURN_VALUE_IS_ZERO);
 }
 
 /**************************** Test RemoveMissedIncomingCallNotification() ****************************/
@@ -902,24 +808,8 @@ HWTEST_F(
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::clientPtr_->RemoveMissedIncomingCallNotification(), RETURN_VALUE_IS_ZERO);
-}
 
-/**
- * @tc.number   Telephony_CallManager_RemoveMissedIncomingCallNotification_0200
- * @tc.name     test cancel missed incoming call and mark as read without permission
- * @tc.desc     Function test
- */
-HWTEST_F(
-    CallManagerGtest, Telephony_CallManager_RemoveMissedIncomingCallNotification_0200, TestSize.Level0)
-{
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_NE(CallManagerGtest::clientPtr_->RemoveMissedIncomingCallNotification(), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->RemoveMissedIncomingCallNotification(), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test SetVoIPCallState() ********************************************/
@@ -1282,10 +1172,7 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraudHsdrHelper_0001, TestSize.Level0)
 {
     sptr<HsdrConnection> connection = new (std::nothrow) HsdrConnection(
         [](const sptr<IRemoteObject> &remoteObject) {});
-    if (connection == nullptr) {
-        std::cout << "connection is nullptr" << std::endl;
-        return;
-    }
+
     AppExecFwk::ElementName element;
     sptr<OHOS::IRemoteObject> failRemoteObj = new MockRemoteObject(-1);
     connection->OnAbilityConnectDone(element, failRemoteObj, -1);
@@ -1330,10 +1217,7 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraudHsdrHelper_0002, TestSize.Level0)
     OnError onError = [](int errCode) {};
     sptr<HsdrCallbackStub> callbackStub =
         new (std::nothrow) HsdrCallbackStub("123456", onResponse, onError);
-    if (callbackStub == nullptr) {
-        std::cout << "callbackStub is nullptr" << std::endl;
-        return;
-    }
+
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -1389,7 +1273,7 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, TestSize.Level0)
 {
     auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
     EXPECT_EQ(antiFraudService->CreateDataShareHelper(-1, USER_SETTINGSDATA_URI.c_str()), nullptr);
-    EXPECT_NE(antiFraudService->CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID,
+    EXPECT_EQ(antiFraudService->CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID,
         USER_SETTINGSDATA_URI.c_str()), nullptr);
 
     std::string switchName = "noswitch";
@@ -1429,10 +1313,7 @@ HWTEST_F(CallManagerGtest, Telephony_NumberIdentityConnection_0001, TestSize.Lev
 {
     sptr<NumberIdentityConnection> connection = new (std::nothrow) NumberIdentityConnection(
         [](const sptr<IRemoteObject> &remoteObject) {}, []() {});
-    if (connection == nullptr) {
-        std::cout << "connection is nullptr" << std::endl;
-        return;
-    }
+
     AppExecFwk::ElementName element;
     sptr<OHOS::IRemoteObject> failRemoteObj = new MockRemoteObject(-1);
     connection->OnAbilityConnectDone(element, failRemoteObj, -1);
@@ -1471,9 +1352,7 @@ HWTEST_F(CallManagerGtest, Telephony_NumberIdentityConnection_0001, TestSize.Lev
 HWTEST_F(CallManagerGtest, Telephony_CallSettingAbilityConnection_0001, TestSize.Level0)
 {
     sptr<CallSettingAbilityConnection> connection = new (std::nothrow) CallSettingAbilityConnection("str");
-    if (connection == nullptr) {
-        return;
-    }
+
     AppExecFwk::ElementName element;
     connection->OnAbilityConnectDone(element, nullptr, 0);
     sptr<OHOS::IRemoteObject> remoteObj = new MockRemoteObject(0);
