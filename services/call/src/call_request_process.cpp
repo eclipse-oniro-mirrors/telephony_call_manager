@@ -59,22 +59,8 @@ int32_t CallRequestProcess::DialRequest()
     }
     bool isEcc = false;
     DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(info.number, info.accountId, isEcc);
-    if (!isEcc && info.dialType == DialType::DIAL_CARRIER_TYPE &&
-        DelayedSingleton<CoreServiceConnection>::GetInstance()->IsFdnEnabled(info.accountId)) {
-        std::vector<std::u16string> fdnNumberList =
-            DelayedSingleton<CoreServiceConnection>::GetInstance()->GetFdnNumberList(info.accountId);
-        if (fdnNumberList.empty() || !IsFdnNumber(fdnNumberList, info.number)) {
-            CallEventInfo eventInfo;
-            (void)memset_s(eventInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
-            eventInfo.eventId = CallAbilityEventId::EVENT_INVALID_FDN_NUMBER;
-            (void)memcpy_s(eventInfo.phoneNum, kMaxNumberLen, info.number.c_str(), info.number.length());
-            DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
-            CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
-                static_cast<int32_t>(info.videoState),
-                static_cast<int32_t>(CallErrorCode::CALL_ERROR_INVALID_FDN_NUMBER), "invalid fdn number!");
-            DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_DUE_TO_FDN");
-            return CALL_ERR_DIAL_FAILED;
-        }
+    if (!isEcc && info.dialType == DialType::DIAL_CARRIER_TYPE) {
+        return CALL_ERR_DIAL_FAILED;
     }
     TELEPHONY_LOGI("dialType:%{public}d", info.dialType);
     return HandleDialRequest(info);
