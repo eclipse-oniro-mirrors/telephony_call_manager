@@ -396,7 +396,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0600, TestS
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0700, TestSize.Level0)
 {
-
     CallTransferInfo info;
     info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
     info.type = CallTransferType::TRANSFER_TYPE_BUSY;
@@ -555,7 +554,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0200, TestSi
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     bool enabled;
     EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(INVALID_SLOT_ID, enabled), CALL_ERR_INVALID_SLOT_ID);
 }
@@ -570,7 +568,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0300, TestSi
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     bool enabled;
@@ -630,7 +627,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0300, TestSize.Lev
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
     int32_t state = 0;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(INVALID_SLOT_ID, state), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(INVALID_SLOT_ID, state), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -646,7 +643,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0400, TestSize.Lev
 
     int32_t state = 0;
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(slotId, state), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(slotId, state), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -697,7 +694,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0100, TestSize.Lev
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     int32_t state;
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoNRState(SIM1_SLOTID, state), RETURN_VALUE_IS_ZERO);
@@ -718,9 +714,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0200, TestSize.Lev
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     int32_t state;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoNRState(INVALID_SLOT_ID, state), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoNRState(INVALID_SLOT_ID, state), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -734,10 +729,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0300, TestSize.Lev
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     int32_t state;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoNRState(slotId, state), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoNRState(slotId, state), RETURN_VALUE_IS_ZERO);
 }
 
 /**

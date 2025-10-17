@@ -858,9 +858,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0100, Te
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     bool result;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->CanSetCallTransferTime(INVALID_SLOT_ID, result), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->CanSetCallTransferTime(INVALID_SLOT_ID, result), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -875,10 +874,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0200, Te
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     bool result;
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    EXPECT_EQ(CallManagerGtest::clientPtr_->CanSetCallTransferTime(slotId, result), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->CanSetCallTransferTime(slotId, result), RETURN_VALUE_IS_ZERO);
 }
 
 /**

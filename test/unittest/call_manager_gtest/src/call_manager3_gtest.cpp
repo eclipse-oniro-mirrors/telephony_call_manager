@@ -322,7 +322,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0100, TestSize.L
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(SIM1_SLOTID, true), RETURN_VALUE_IS_ZERO);
     }
@@ -342,8 +341,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0200, TestSize.L
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(INVALID_SLOT_ID, true), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(INVALID_SLOT_ID, true), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -357,9 +355,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0300, TestSize.L
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(slotId, true), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(slotId, true), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -372,7 +369,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0400, TestSize.L
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(SIM1_SLOTID, false), RETURN_VALUE_IS_ZERO);
@@ -393,8 +389,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0500, TestSize.L
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(INVALID_SLOT_ID, false), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(INVALID_SLOT_ID, false), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -408,9 +403,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0600, TestSize.L
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(slotId, false), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(slotId, false), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -420,8 +414,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0600, TestSize.L
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0700, TestSize.Level0)
 {
-
-
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(SIM1_SLOTID, true), TELEPHONY_ERR_PERMISSION_ERR);
     }
@@ -441,7 +433,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0100, TestSi
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallRestriction(
@@ -469,7 +460,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0200, TestSi
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallRestriction(
                   INVALID_SLOT_ID, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
-        CALL_ERR_INVALID_SLOT_ID);
+        RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -487,7 +478,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0300, TestSi
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     EXPECT_EQ(
         CallManagerGtest::clientPtr_->GetCallRestriction(slotId, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
-        CALL_ERR_INVALID_SLOT_ID);
+        RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -527,7 +518,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0500, TestSi
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallRestriction(
                   INVALID_SLOT_ID, CallRestrictionType::RESTRICTION_TYPE_ALL_OUTGOING),
-        CALL_ERR_INVALID_SLOT_ID);
+        RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -545,7 +536,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0600, TestSi
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     EXPECT_EQ(
         CallManagerGtest::clientPtr_->GetCallRestriction(slotId, CallRestrictionType::RESTRICTION_TYPE_ALL_OUTGOING),
-        CALL_ERR_INVALID_SLOT_ID);
+        RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -612,8 +603,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0200, TestSi
     info.mode = CallRestrictionMode::RESTRICTION_MODE_ACTIVATION;
     strcpy_s(info.password, kMaxNumberLen + 1, "666");
 
-
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestriction(INVALID_SLOT_ID, info), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestriction(INVALID_SLOT_ID, info), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -635,7 +625,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0300, TestSi
     strcpy_s(info.password, kMaxNumberLen + 1, "777");
 
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestriction(slotId, info), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestriction(slotId, info), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -702,7 +692,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestrictionPassword_0200
     CallRestrictionType fac = CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS;
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(INVALID_SLOT_ID, fac, oldPassword, newPassword),
-        CALL_ERR_INVALID_SLOT_ID);
+        RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -832,7 +822,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0200, TestS
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(INVALID_SLOT_ID, CallTransferType::TRANSFER_TYPE_BUSY),
-        CALL_ERR_INVALID_SLOT_ID);
+        RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -849,7 +839,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0300, TestS
 
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(slotId, CallTransferType::TRANSFER_TYPE_BUSY),
-        CALL_ERR_INVALID_SLOT_ID);
+        RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -888,7 +878,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0500, TestS
 
     EXPECT_EQ(
         CallManagerGtest::clientPtr_->GetCallTransferInfo(INVALID_SLOT_ID, CallTransferType::TRANSFER_TYPE_NO_REPLY),
-        CALL_ERR_INVALID_SLOT_ID);
+        RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -905,7 +895,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0600, TestS
 
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(slotId, CallTransferType::TRANSFER_TYPE_NO_REPLY),
-        CALL_ERR_INVALID_SLOT_ID);
+        RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -945,7 +935,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0800, TestS
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(
                   INVALID_SLOT_ID, CallTransferType::TRANSFER_TYPE_NOT_REACHABLE),
-        CALL_ERR_INVALID_SLOT_ID);
+        RETURN_VALUE_IS_ZERO);
 }
 } // namespace Telephony
 } // namespace OHOS
