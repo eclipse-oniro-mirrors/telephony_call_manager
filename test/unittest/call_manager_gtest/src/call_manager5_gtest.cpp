@@ -954,7 +954,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0100, Function |
 
     audioDevice.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
 
-    memcpy_s(audioDevice.address, kMaxAddressLen, address.c_str(), address.length();
+    memcpy_s(audioDevice.address, kMaxAddressLen, address.c_str(), address.length());
     EXPECT_NE(clientPtr_->SetAudioDevice(audioDevice), RETURN_VALUE_IS_ZERO);
 }
 

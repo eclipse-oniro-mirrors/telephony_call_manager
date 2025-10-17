@@ -467,7 +467,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0200, TestSi
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallRestriction(
                   INVALID_SLOT_ID, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
         CALL_ERR_INVALID_SLOT_ID);
@@ -485,7 +484,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0300, TestSi
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     EXPECT_EQ(
         CallManagerGtest::clientPtr_->GetCallRestriction(slotId, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
@@ -502,7 +500,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0400, TestSi
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallRestriction(
@@ -528,7 +525,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0500, TestSi
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallRestriction(
                   INVALID_SLOT_ID, CallRestrictionType::RESTRICTION_TYPE_ALL_OUTGOING),
         CALL_ERR_INVALID_SLOT_ID);
@@ -546,7 +542,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0600, TestSi
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     EXPECT_EQ(
         CallManagerGtest::clientPtr_->GetCallRestriction(slotId, CallRestrictionType::RESTRICTION_TYPE_ALL_OUTGOING),
@@ -560,8 +555,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0600, TestSi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0700, TestSize.Level0)
 {
-
-
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallRestriction(
                       SIM1_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
@@ -817,7 +810,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0100, TestS
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(SIM1_SLOTID, CallTransferType::TRANSFER_TYPE_BUSY),
             RETURN_VALUE_IS_ZERO);
@@ -839,7 +831,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0200, TestS
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(INVALID_SLOT_ID, CallTransferType::TRANSFER_TYPE_BUSY),
         CALL_ERR_INVALID_SLOT_ID);
 }
@@ -856,7 +847,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0300, TestS
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(slotId, CallTransferType::TRANSFER_TYPE_BUSY),
         CALL_ERR_INVALID_SLOT_ID);
@@ -872,7 +862,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0400, TestS
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(
@@ -897,7 +886,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0500, TestS
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     EXPECT_EQ(
         CallManagerGtest::clientPtr_->GetCallTransferInfo(INVALID_SLOT_ID, CallTransferType::TRANSFER_TYPE_NO_REPLY),
         CALL_ERR_INVALID_SLOT_ID);
@@ -915,7 +903,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0600, TestS
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(slotId, CallTransferType::TRANSFER_TYPE_NO_REPLY),
         CALL_ERR_INVALID_SLOT_ID);
@@ -931,7 +918,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0700, TestS
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     if (HasSimCard(SIM1_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(
@@ -956,7 +942,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0800, TestS
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(
                   INVALID_SLOT_ID, CallTransferType::TRANSFER_TYPE_NOT_REACHABLE),
