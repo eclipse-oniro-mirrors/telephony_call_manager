@@ -49,9 +49,9 @@ enum class IncomingCallType {
 };
 
 enum class VoIPCallErrorCode {
-    REPORING_DISCONNECTED_VOIP_CALL_AGAIN = 300,
-    GET_CALLMANAGER_PROXY_VOIPCALLMANAGER_INTERFACEPTR_IS_NULL,
-}
+    REPORTING_DISCONNECTED_VOIP_CALL_AGAIN = 300,
+    GET_VOIPCALLMANAGER_INTERFACEPTR_IS_NULL,
+};
 class CallManagerHisysevent : public TelephonyHiSysEvent {
 public:
     static void WriteCallStateBehaviorEvent(const int32_t slotId, const int32_t state, const int32_t index);
