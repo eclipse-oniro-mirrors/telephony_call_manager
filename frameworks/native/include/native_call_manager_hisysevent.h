@@ -25,19 +25,19 @@ namespace Telephony {
 
 enum class VoIPCallErrorCodeEnum {
     TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL = 200,
-    SEND_INCOMINGCALL_FAILED,
+    SEND_INCOMINGCALL_CALL_FAILED,
     SEND_REPORTINCOMINGCALLERROR_CALL_FAILED,
     SEND_REPORTCALLSTATECHANGE_CALL_FAILED,
     SEND_REPORTOUTGOINGCALL_CALL_FAILED,
     SEND_REPORTVOIPINCOMINGCALL_CALL_FAILED,
     SEND_REPORTVOIPCALLEXTENSIONID_CALL_FAILED,
     SEND_ANSWER_CALL_FAILED,
-    SEND_HANUP_CALL_FAILED,
+    SEND_HANGUP_CALL_FAILED,
     SEND_REJECT_CALL_FAILED,
     SEND_SENDCALLUIEVENT_CALL_FAILED,
     SEND_REPORTCALLAUDIOEVENTCHANGE_CALL_FAILED,
-    SEND_SENDCALLUIEVENTFORWINDOW_FAILED,
-}
+    SEND_SENDCALLUIEVENTFORWINDOW_CALL_FAILED,
+};
 
 enum class Scenario {
     /**
@@ -53,7 +53,7 @@ public:
     static void WriteVoipCallFaultEvent(const std::string &voipCallId, const int32_t errCode);
 
 private:
-static void GetAppIndexByBundleName(AppExecFwk::BundleInfo &bundleInfo);
+    static void GetAppIndexByBundleName(OHOS::AppExecFwk::BundleInfo &bundleInfo);
 
 };
 } // namespace Telephony
