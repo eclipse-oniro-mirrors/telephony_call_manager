@@ -362,12 +362,13 @@ void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const int32_t &callId,
 
 void CallManagerHisysevent::WriteVoipCallFaultEvent(const std::string &voipCallId, int32_t uid, const int32_t errCode)
 {
-    ffrt::submit([voipCallId, errCode, uid]() {
+    ffrt::submit([voipCallId, uid, errCode]() {
+        std::string bundleName;
         int32_t appIndex = -1;
         GetAppIndexByBundleName(bundleName, uid, appIndex);
         HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_PERFORMANCE", EventType::FAULLT, CALL_ID_KEY, voipCallId,
             "BUNDLE_NAME", bundleName, "ERR_CODE", errCode, "APP_INDEX", appIndex,
-            "TIMESTAMP", static_cast<int64_t>(time(0)));
+            "TIME_STAMP", static_cast<int64_t>(time(0)));
     });
 }
 
