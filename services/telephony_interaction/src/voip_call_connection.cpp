@@ -97,7 +97,7 @@ int32_t VoipCallConnection::GetCallManagerProxy()
         for (auto call : allCallList) {
             if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
                 sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
-                CallManagerHisysevent::WriteVoipCallFaultEvent(voipCall.GetVoipCallIdd(), voipCall->GetVoipCall()
+                CallManagerHisysevent::WriteVoipCallFaultEvent(voipCall->GetVoipCallId(), voipCall->GetVoipUid()
                     static_cast<int32_t>(VoIPCallErrorCode::GET_VOIPCALLMANAGER_INTERFACEPTR_IS_NULL));
             }
         }
@@ -226,8 +226,8 @@ void VoipCallConnection::ClearVoipCall()
             if (voipCallCallbackPtr_ != nullptr) {
                 TELEPHONY_LOGI("Report disconnected voip call again!");
                 sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
-                CallManagerHisysevent::WriteVoipCallFaultEvent(voipCall.GetVoipCallIdd(), voipCall->GetVoipCall(),
-                    static_cast<int32_t>(VoIPCallErrorCode::REPORING_DISCONNECTED_VOIP_CALL_AGAIN));
+                CallManagerHisysevent::WriteVoipCallFaultEvent(voipCall->GetVoipCallId(), voipCall->GetVoipUid(),
+                    static_cast<int32_t>(VoIPCallErrorCode::REPORTING_DISCONNECTED_VOIP_CALL_AGAIN));
                 CallAttributeInfo info;
                 call->GetCallAttributeInfo(info);
                 CallReportInfo callReportInfo;
