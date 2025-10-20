@@ -67,7 +67,7 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportIncomingCall call failed! errCode:%{public}d", error);
         NativeCallManagerHisysevent::WriteVoipCallFaultEvent(extras.GetStringValue("callId"),
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_INCOMINGCALL_FAILED));
+            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_INCOMINGCALL_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = replyParcel.ReadInt32();
@@ -350,7 +350,7 @@ int32_t VoipCallManagerProxy::HangUp(const VoipCallEventInfo &events)
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function HangUp voip call failed! errCode:%{public}d", error);
         NativeCallManagerHisysevent::WriteVoipCallFaultEvent(events.voipCallId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_HANUP_CALL_FAILED));
+            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_HANGUP_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -545,7 +545,7 @@ int32_t VoipCallManagerProxy::SendCallUiEventForWindow(AppExecFwk::PacMap &extra
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function SendCallUiEventForWindow call failed! errCode:%{public}d", error);
         NativeCallManagerHisysevent::WriteVoipCallFaultEvent(extras.GetStringValue("callId"),
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_SENDCALLUIEVENTFORWINDOW_FAILED));
+            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_SENDCALLUIEVENTFORWINDOW_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
