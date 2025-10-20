@@ -48,6 +48,10 @@ enum class IncomingCallType {
     CS_VOICE_INCOMING,
 };
 
+enum class VoIPCallErrorCode {
+    REPORING_DISCONNECTED_VOIP_CALL_AGAIN = 300,
+    GET_CALLMANAGER_PROXY_VOIPCALLMANAGER_INTERFACEPTR_IS_NULL,
+}
 class CallManagerHisysevent : public TelephonyHiSysEvent {
 public:
     static void WriteCallStateBehaviorEvent(const int32_t slotId, const int32_t state, const int32_t index);
@@ -72,6 +76,8 @@ public:
     static void WriteVoipCallStatisticalEvent(const std::string &callId, const std::string &bundleName,
         const int32_t &uid, const std::string statisticalField);
     static void WriteVoipCallStatisticalEvent(const int32_t &callId, const std::string statisticalField);
+    static void WriteVoipCallFaultEvent(const std::string &voipCallId, int32_t uid, const int32_t errCode);
+
 public:
     template<typename... Types>
     static void HiWriteBehaviorEventPhoneUE(const std::string &eventName, Types... args)

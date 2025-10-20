@@ -930,6 +930,10 @@ HWTEST_F(CallStateTest, Telephony_VoipCallConnection_001, TestSize.Level0)
     sptr<ICallStatusCallback> callStatusCallback = nullptr;
     voipCallConnection->RegisterCallManagerCallBack(callStatusCallback);
     voipCallConnection->ClearVoipCall();
+    DialParaInfo dialInfo;
+    sptr<CallBase> call1 = new VoIPCall(dialInfo);
+    CallObjectManager::AddOneCallObject(call1);
+    voipCallConnection->ClearVoipCall();
     ASSERT_NE(voipCallConnection->UnRegisterCallManagerCallBack(), TELEPHONY_SUCCESS);
 }
 
