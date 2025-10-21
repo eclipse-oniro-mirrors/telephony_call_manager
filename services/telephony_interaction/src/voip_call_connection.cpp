@@ -23,7 +23,7 @@
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
 #include "voip_call_manager_proxy.h"
-
+#include "voip_call.h"
 namespace OHOS {
 namespace Telephony {
 VoipCallConnection::VoipCallConnection()
@@ -93,6 +93,14 @@ int32_t VoipCallConnection::GetCallManagerProxy()
     voipCallManagerInterfacePtr = iface_cast<IVoipCallManagerService>(iRemoteObjectPtr);
     if (!voipCallManagerInterfacePtr) {
         TELEPHONY_LOGI("Voipconnect GetCallManagerProxy voipCallManagerInterfacePtr is null");
+        std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
+        for (auto call : allCallList) {
+            if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
+                sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
+                CallManagerHisysevent::WriteVoipCallFaultEvent(voipCall->GetVoipCallId(), voipCall->GetVoipUid(),
+                    static_cast<int32_t>(VoIPCallErrorCode::GET_VOIPCALLMANAGER_INTERFACEPTR_IS_NULL));
+            }
+        }
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
@@ -217,6 +225,9 @@ void VoipCallConnection::ClearVoipCall()
             std::lock_guard<ffrt::mutex> lock(mutex_);
             if (voipCallCallbackPtr_ != nullptr) {
                 TELEPHONY_LOGI("Report disconnected voip call again!");
+                sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
+                CallManagerHisysevent::WriteVoipCallFaultEvent(voipCall->GetVoipCallId(), voipCall->GetVoipUid(),
+                    static_cast<int32_t>(VoIPCallErrorCode::REPORTING_DISCONNECTED_VOIP_CALL_AGAIN));
                 CallAttributeInfo info;
                 call->GetCallAttributeInfo(info);
                 CallReportInfo callReportInfo;

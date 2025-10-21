@@ -359,6 +359,19 @@ void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const int32_t &callId,
     WriteVoipCallStatisticalEvent(voipCall->GetVoipCallId(), voipCall->GetVoipBundleName(), voipCall->GetVoipUid(),
         statisticalField);
 }
+
+void CallManagerHisysevent::WriteVoipCallFaultEvent(const std::string &voipCallId, int32_t uid, const int32_t errCode)
+{
+    ffrt::submit([voipCallId, uid, errCode]() {
+        std::string bundleName;
+        int32_t appIndex = -1;
+        int64_t timestamp = static_cast<int64_t>(time(0));
+        GetAppIndexByBundleName(bundleName, uid, appIndex);
+        HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_PERFORMANCE", EventType::FAULT, CALL_ID_KEY, voipCallId,
+            "BUNDLE_NAME", bundleName, "ERR_CODE", errCode, "APP_INDEX", appIndex, "TIME_STAMP", timestamp);
+    });
+}
+
 void CallManagerHisysevent::GetAppIndexByBundleName(std::string bundleName, int32_t uid, int32_t &appIndex)
 {
     sptr<ISystemAbilityManager> systemAbilityManager =
