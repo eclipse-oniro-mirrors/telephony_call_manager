@@ -23,7 +23,7 @@
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
 #include "voip_call_manager_proxy.h"
-
+#include "voip_call.h"
 namespace OHOS {
 namespace Telephony {
 VoipCallConnection::VoipCallConnection()
@@ -97,7 +97,7 @@ int32_t VoipCallConnection::GetCallManagerProxy()
         for (auto call : allCallList) {
             if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
                 sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
-                CallManagerHisysevent::WriteVoipCallFaultEvent(voipCall->GetVoipCallId(), voipCall->GetVoipUid()
+                CallManagerHisysevent::WriteVoipCallFaultEvent(voipCall->GetVoipCallId(), voipCall->GetVoipUid(),
                     static_cast<int32_t>(VoIPCallErrorCode::GET_VOIPCALLMANAGER_INTERFACEPTR_IS_NULL));
             }
         }
