@@ -17,6 +17,7 @@
 #define NATIVE_CALL_MANAGER_HISYSEVENT_H
 
 #include <string>
+#include "bundle_mgr_interface.h"
 
 #include "telephony_hisysevent.h"
 
