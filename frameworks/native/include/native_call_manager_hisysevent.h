@@ -53,7 +53,6 @@ public:
     static void WriteVoipCallFaultEvent(const std::string &voipCallId, const int32_t errCode);
 private:
     static void GetAppIndexByBundleName(OHOS::AppExecFwk::BundleInfo &bundleInfo);
-
 };
 } // namespace Telephony
 } // namespace OHOS
