@@ -16,7 +16,6 @@
 #include "native_call_manager_hisysevent.h"
 
 #include "app_mgr_interface.h"
-#include "bundle_mgr_interface.h"
 #include "bundle_mgr_proxy.h"
 #include "iservice_registry.h"
 #include "telephony_log_wrapper.h"
