@@ -51,7 +51,6 @@ public:
         const int32_t scenario, const int32_t errCode, const std::string &errorMsg, const int32_t callType,
         const int32_t callState, const int32_t callDirection);
     static void WriteVoipCallFaultEvent(const std::string &voipCallId, const int32_t errCode);
-
 private:
     static void GetAppIndexByBundleName(OHOS::AppExecFwk::BundleInfo &bundleInfo);
 
