@@ -56,9 +56,10 @@ void NativeCallManagerHisysevent::WriteVoipCallFaultEvent(const std::string &voi
     BundleInfo bundleInfo;
     GetAppIndexByBundleName(bundleInfo);
     ffrt::submit([voipCallId, errCode, bundleInfo]() {
+        int64_t timestamp = static_cast<int64_t>(time(0));
         HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_PERFORMANCE", EventType::FAULT, CALL_ID_KEY, voipCallId,
             "BUNDLE_NAME", bundleInfo.name, "ERR_CODE", errCode, "APP_INDEX", bundleInfo.appIndex,
-            "TIME_STAMP", static_cast<int64_t>(time(0)));
+            "TIME_STAMP", timestamp);
     });
 }
 
