@@ -367,7 +367,7 @@ void CallManagerHisysevent::WriteVoipCallFaultEvent(const std::string &voipCallI
         int32_t appIndex = -1;
         int64_t timestamp = static_cast<int64_t>(time(0));
         GetAppIndexByBundleName(bundleName, uid, appIndex);
-        HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_PERFORMANCE", EventType::FAULLT, CALL_ID_KEY, voipCallId,
+        HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_PERFORMANCE", EventType::FAULT, CALL_ID_KEY, voipCallId,
             "BUNDLE_NAME", bundleName, "ERR_CODE", errCode, "APP_INDEX", appIndex, "TIME_STAMP", timestamp);
     });
 }
