@@ -162,6 +162,23 @@ struct VoipCallAttribute {
      */
     bool isVoiceAnswerSupported = true;
     /**
+     * Indicates whether the VoIP incoming call allows user to mute ringtone. Default value is false.
+     */
+    bool isUserMuteRingToneSupported = true;
+    /**
+     * Indicates whether the user is supported to use Bluetooth devices for answering or ending VoIP call. 
+     * Default value is true.
+     */
+    bool isAnswerAndEndCallByBtSupported = true;
+    /**
+     * Indicates whether the VoIP call loads UI ability after conference call answered. Default value is false.
+     */
+    bool isLoadUiAbilityAfterConferenceCallAnsweredSupported = true;
+    /**
+     * Indicates whether the VoIP call is allowed to initiate during cellular call. Default value is false.
+     */
+    bool isVoipInitiatedDuringCellularCallSupported = true;
+    /**
      * Indicates whether the app has the permission to use microphone. Default value is true.
      */
     bool hasMicPermission = true;
