@@ -137,6 +137,8 @@ public:
     void GetDialParaInfo(DialParaInfo &info);
     void GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap &extras);
     void ConnectCallUiService(bool shouldConnect);
+    void SetReduceRingToneVolume(bool reduceRingToneVolume);
+    bool GetReduceRingToneVolume();
     bool ShouldDisconnectService();
     int32_t RemoveMissedIncomingCallNotification();
     int32_t SetVoIPCallState(int32_t state);
@@ -229,6 +231,7 @@ private:
     ffrt::mutex mutex_;
     CallStateToApp VoIPCallState_ = CallStateToApp::CALL_STATE_IDLE;
     bool shouldDisconnect = true;
+    bool ReduceRingToneVolume_ = false;
     static bool alarmSeted;
     struct AnsweredCallQueue {
         bool hasCall = false;
@@ -251,6 +254,7 @@ private:
     int32_t wearStatus_ = WEAR_STATUS_INVALID;
     ffrt::mutex wearStatusMutex_;
     ffrt::mutex reminderMutex_;
+    ffrt::mutex ringToneMutex_;
     std::shared_ptr<IncomingFlashReminder> incomingFlashReminder_ {nullptr};
 };
 } // namespace Telephony

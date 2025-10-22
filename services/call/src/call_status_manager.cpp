@@ -1253,6 +1253,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     }
     if (CallObjectManager::GetCurrentCallNum() <= 0) {
         DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RestoreSuperPrivacyMode();
+        DelayedSingleton<CallControlManager>::GetInstance()->SetReduceRingToneVolume(false);
     }
 #ifdef NOT_SUPPORT_MULTICALL
     if (isTwoCallBtCallAndESIM || IsTwoCallESIMCall) {

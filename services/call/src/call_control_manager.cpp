@@ -2179,5 +2179,17 @@ bool CallControlManager::SetVirtualCall(bool isVirtual)
     TELEPHONY_LOGI("Virtualcall SetVirtualCall: %{public}d.", isVirtual);
     return DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(isVirtual);
 }
+
+void CallControlManager::SetReduceRingToneVolume(bool reduceRingToneVolume)
+{
+    std::lock_guard<ffrt::mutex> lock(ringToneMutex_);
+    ReduceRingToneVolume_ = reduceRingToneVolume;
+}
+ 
+bool CallControlManager::GetReduceRingToneVolume()
+{
+    std::lock_guard<ffrt::mutex> lock(ringToneMutex_);
+    return ReduceRingToneVolume_;
+}
 } // namespace Telephony
 } // namespace OHOS
