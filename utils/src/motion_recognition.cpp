@@ -142,9 +142,11 @@ void FlipMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
                 break;
             }
             MotionRecogntion::UnsubscribePickupSensor();
-            if (controlManager != nullptr) {
-                controlManager->StopFlashRemind();
+            if (controlManager == nullptr || controlManager->GetReduceRingToneVolume()) {
+                break;
             }
+            controlManager->SetReduceRingToneVolume(true);
+            controlManager->StopFlashRemind();
             ffrt::submit([=]() {
                 MotionRecogntion::ReduceRingToneVolume();
             });

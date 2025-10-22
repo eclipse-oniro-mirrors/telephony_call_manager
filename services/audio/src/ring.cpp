@@ -20,12 +20,11 @@
 #include <dlfcn.h>
 #include "audio_player.h"
 #include "call_base.h"
+#include "call_control_manager.h"
 #include "telephony_log_wrapper.h"
 #include "cpp/task_ext.h"
 namespace OHOS {
 namespace Telephony {
-static constexpr int32_t DEFAULT_SIM_SLOT_ID = 0;
-
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
 constexpr float START_INTENSITY = 1.0;
 constexpr float END_INTENSITY = 100.0;
@@ -148,6 +147,7 @@ int32_t Ring::Stop()
     }
     result = RingtonePlayer_->Stop();
     isMutedRing_ = false;
+    DelayedSingleton<CallControlManager>::GetInstance()->SetReduceRingToneVolume(false);
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
     std::unique_lock<ffrt::mutex> lockRing(ringStopMutex_);
     isRingStopped_ = true;
@@ -234,6 +234,11 @@ void RingtoneSettingStatusObserver::OnChange()
 
 void Ring::GetSettingsData()
 {
+    if (OHOS::system::GetBoolParameter(RINGADAPTIVE_MODE_STATE, false)) {
+        TELEPHONY_LOGI("ringtone vibrate adaptive is disabled");
+        isAdaptiveSwitchOn_ = false;
+        return;
+    }
     std::string ringtoneSettingStatus = "";
     auto settingHelper = SettingsDataShareHelper::GetInstance();
     if (settingHelper != nullptr) {
@@ -242,10 +247,6 @@ void Ring::GetSettingsData()
     }
     TELEPHONY_LOGI("ringtone vibrate adaptive: %{public}s", ringtoneSettingStatus.c_str());
     isAdaptiveSwitchOn_ = ringtoneSettingStatus == "true";
-    if (OHOS::system::GetBoolParameter(RINGADAPTIVE_MODE_STATE, false)) {
-        TELEPHONY_LOGI("ringtone vibrate adaptive is disabled");
-        isAdaptiveSwitchOn_ = false;
-    }
 }
 
 void Ring::OnComfortReminderDataChanged(int32_t result, std::shared_ptr<UserStatusData> userStatusData)
@@ -410,6 +411,11 @@ void Ring::PrepareComfortReminder()
     if (!isAdaptiveSwitchOn_ || RingtonePlayer_ == nullptr) {
         return;
     }
+    auto controlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    if (controlManager == nullptr || controlManager->GetReduceRingToneVolume()) {
+        return;
+    }
+    controlManager->SetReduceRingToneVolume(true);
     isRingStopped_ = false;
     auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
     oriRingVolLevel_ = audioProxy->GetVolume(AudioStandard::AudioVolumeType::STREAM_RING);
