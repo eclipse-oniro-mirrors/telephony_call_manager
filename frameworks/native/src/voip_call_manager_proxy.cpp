@@ -538,7 +538,8 @@ int32_t VoipCallManagerProxy::SendCallUiEventForWindow(AppExecFwk::PacMap &extra
     return replyParcel.ReadInt32();
 }
 
-bool VoipCallManagerProxy::WriteIncomingCallDataParcel(MessageParcel &dataParcel, AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile)
+bool VoipCallManagerProxy::WriteIncomingCallDataParcel(MessageParcel &dataParcel, AppExecFwk::PacMap &extras,
+    std::vector<uint8_t> &userProfile)
 {
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
@@ -554,8 +555,7 @@ bool VoipCallManagerProxy::WriteIncomingCallDataParcel(MessageParcel &dataParcel
     dataParcel.WriteBool(extras.GetBooleanValue("isConferenceCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isVoiceAnswerSupported"));
     dataParcel.WriteBool(extras.GetBooleanValue("isUserMuteRingToneSupported"));
-    dataParcel.WriteBool(extras.GetBooleanValue("isAnswerAndEndCallByBtSupported"));
-    dataParcel.WriteBool(extras.GetBooleanValue("isLoadUiAbilityAfterConferenceCallAnsweredSupported"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isCallControlByAudioDeviceSupported"));
     dataParcel.WriteBool(extras.GetBooleanValue("isVoipInitiatedDuringCellularCallSupported"));
     dataParcel.WriteInt64(extras.GetLongValue("startReportTime"));
 
