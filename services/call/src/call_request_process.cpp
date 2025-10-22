@@ -37,7 +37,8 @@ namespace OHOS {
 namespace Telephony {
 bool g_flagForDsda = false;
 constexpr int32_t INIT_INDEX = 0;
-
+constexpr const size_t MCC_LEN = 3;
+constexpr const char* CHN_MCC = "460";
 CallRequestProcess::CallRequestProcess() {}
 
 CallRequestProcess::~CallRequestProcess() {}

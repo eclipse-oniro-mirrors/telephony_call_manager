@@ -85,8 +85,6 @@ private:
     
 private:
     ffrt::mutex mutex_;
-    const size_t MCC_LEN = 3;
-    const std::string CHN_MCC = "460";
 };
 } // namespace Telephony
 } // namespace OHOS
