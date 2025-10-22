@@ -55,8 +55,7 @@ int32_t CallStatusCallbackProxy::UpdateCallReportInfo(const CallReportInfo &info
         dataParcel.WriteBool(info.voipCallInfo.isConferenceCall);
         dataParcel.WriteBool(info.voipCallInfo.isVoiceAnswerSupported);
         dataParcel.WriteBool(info.voipCallInfo.isUserMuteRingToneSupported);
-        dataParcel.WriteBool(info.voipCallInfo.isAnswerAndEndCallByBtSupported);
-        dataParcel.WriteBool(info.voipCallInfo.isLoadUiAbilityAfterConferenceCallAnsweredSupported);
+        dataParcel.WriteBool(info.voipCallInfo.isCallControlByAudioDeviceSupported);
         dataParcel.WriteBool(info.voipCallInfo.isVoipInitiatedDuringCellularCallSupported);
         dataParcel.WriteBool(info.voipCallInfo.hasMicPermission);
         dataParcel.WriteBool(info.voipCallInfo.isCapsuleSticky);
