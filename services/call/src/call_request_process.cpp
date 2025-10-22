@@ -85,11 +85,10 @@ bool CallRequestProcess::IsCnSimCard(int32_t slotId)
     std::u16string hplmn;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimOperatorNumeric(slotId, hplmn);
     std::string simOperator = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(hplmn);
-    TELEPHONY_LOGI("simOperator = %{public}s", simOperator.c_str());
-    if (simOperator.empty() || simOperator.length() < MCC_LEN) {
+    if (simOperator.size() < MCC_LEN) {
         return false;
     }
-    return simOperator.substr(0, MCC_LEN).compare(CHN_MCC) == 0;
+    return simOperator.compare(0, MCC_LEN, CHN_MCC) == 0;
 }
 
 int32_t CallRequestProcess::HandleDialRequest(DialParaInfo &info)
