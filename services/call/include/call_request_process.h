@@ -81,9 +81,12 @@ private:
     int32_t EccDialPolicy();
     int32_t BluetoothDialProcess(DialParaInfo &info);
     void GetDialingCall(sptr<CallBase> &call);
-
+    bool IsCnSimCard(int32_t slotId);
+    
 private:
     ffrt::mutex mutex_;
+    const size_t MCC_LEN = 3;
+    const std::string CHN_MCC = "460"
 };
 } // namespace Telephony
 } // namespace OHOS

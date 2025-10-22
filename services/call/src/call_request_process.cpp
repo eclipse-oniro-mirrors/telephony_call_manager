@@ -59,11 +59,37 @@ int32_t CallRequestProcess::DialRequest()
     }
     bool isEcc = false;
     DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(info.number, info.accountId, isEcc);
-    if (!isEcc && info.dialType == DialType::DIAL_CARRIER_TYPE) {
-        return CALL_ERR_DIAL_FAILED;
+    if (!isEcc && info.dialType == DialType::DIAL_CARRIER_TYPE && !IsCnSimCard(info.accountId) &&
+        DelayedSingleton<CoreServiceConnection>::GetInstance()->IsFdnEnabled(info.accountId)) {
+        std::vector<std::u16string> fdnNumberList =
+            DelayedSingleton<CoreServiceConnection>::GetInstance()->GetFdnNumberList(info.accountId);
+        if (fdnNumberList.empty() || !IsFdnNumber(fdnNumberList, info.number)) {
+            CallEventInfo eventInfo;
+            (void)memset_s(eventInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
+            eventInfo.eventId = CallAbilityEventId::EVENT_INVALID_FDN_NUMBER;
+            (void)memcpy_s(eventInfo.phoneNum, kMaxNumberLen, info.number.c_str(), info.number.length());
+            DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
+            CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
+                static_cast<int32_t>(info.videoState),
+                static_cast<int32_t>(CallErrorCode::CALL_ERROR_INVALID_FDN_NUMBER), "invalid fdn number!");
+            DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_DUE_TO_FDN");
+            return CALL_ERR_DIAL_FAILED;
+        }
     }
     TELEPHONY_LOGI("dialType:%{public}d", info.dialType);
     return HandleDialRequest(info);
+}
+
+bool CallPolicy::IsCnSimCard(int32_t slotId)
+{
+    std::u16string hplmn;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimOperatorNumeric(slotId, hplmn);
+    std::string simOperator = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(hplmn);
+    TELEPHONY_LOGI("simOperator = %{public}s", simOperator.c_str());
+    if (simOperator.empty() || simOperator.length() < MCC_LEN) {
+        return false;
+    }
+    return simOperator.substr(0, MCC_LEN).compare(CHN_MCC) == 0;
 }
 
 int32_t CallRequestProcess::HandleDialRequest(DialParaInfo &info)
