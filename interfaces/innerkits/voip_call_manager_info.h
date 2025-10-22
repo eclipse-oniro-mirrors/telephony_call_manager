@@ -166,14 +166,10 @@ struct VoipCallAttribute {
      */
     bool isUserMuteRingToneSupported = true;
     /**
-     * Indicates whether the user is supported to use Bluetooth devices for answering or ending VoIP call. 
+     * Indicates whether the user is supported to use audio devices for controling VoIP call.
      * Default value is true.
      */
-    bool isAnswerAndEndCallByBtSupported = true;
-    /**
-     * Indicates whether the VoIP call loads UI ability after conference call answered. Default value is false.
-     */
-    bool isLoadUiAbilityAfterConferenceCallAnsweredSupported = true;
+    bool isCallControlByAudioDeviceSupported = true;
     /**
      * Indicates whether the VoIP call is allowed to initiate during cellular call. Default value is false.
      */
