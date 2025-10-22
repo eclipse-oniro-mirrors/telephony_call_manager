@@ -80,7 +80,7 @@ int32_t CallRequestProcess::DialRequest()
     return HandleDialRequest(info);
 }
 
-bool CallPolicy::IsCnSimCard(int32_t slotId)
+bool CallRequestProcess::IsCnSimCard(int32_t slotId)
 {
     std::u16string hplmn;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimOperatorNumeric(slotId, hplmn);
