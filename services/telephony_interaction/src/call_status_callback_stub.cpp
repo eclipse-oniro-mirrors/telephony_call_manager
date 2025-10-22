@@ -211,8 +211,7 @@ void CallStatusCallbackStub::BuildCallReportInfo(MessageParcel &data, CallReport
         parcelPtr.voipCallInfo.isConferenceCall = data.ReadBool();
         parcelPtr.voipCallInfo.isVoiceAnswerSupported = data.ReadBool();
         parcelPtr.voipCallInfo.isUserMuteRingToneSupported = data.ReadBool();
-        parcelPtr.voipCallInfo.isAnswerAndEndCallByBtSupported = data.ReadBool();
-        parcelPtr.voipCallInfo.isLoadUiAbilityAfterConferenceCallAnsweredSupported = data.ReadBool();
+        parcelPtr.voipCallInfo.isCallControlByAudioDeviceSupported = data.ReadBool();
         parcelPtr.voipCallInfo.isVoipInitiatedDuringCellularCallSupported = data.ReadBool();
         parcelPtr.voipCallInfo.hasMicPermission = data.ReadBool();
         parcelPtr.voipCallInfo.isCapsuleSticky = data.ReadBool();
