@@ -81,7 +81,8 @@ private:
     int32_t EccDialPolicy();
     int32_t BluetoothDialProcess(DialParaInfo &info);
     void GetDialingCall(sptr<CallBase> &call);
-
+    bool IsCnSimCard(int32_t slotId);
+    
 private:
     ffrt::mutex mutex_;
 };

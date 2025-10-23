@@ -59,7 +59,7 @@ int32_t CallRequestProcess::DialRequest()
     }
     bool isEcc = false;
     DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(info.number, info.accountId, isEcc);
-    if (!isEcc && info.dialType == DialType::DIAL_CARRIER_TYPE &&
+    if (!isEcc && info.dialType == DialType::DIAL_CARRIER_TYPE && !IsCnSimCard(info.accountId) &&
         DelayedSingleton<CoreServiceConnection>::GetInstance()->IsFdnEnabled(info.accountId)) {
         std::vector<std::u16string> fdnNumberList =
             DelayedSingleton<CoreServiceConnection>::GetInstance()->GetFdnNumberList(info.accountId);
@@ -78,6 +78,17 @@ int32_t CallRequestProcess::DialRequest()
     }
     TELEPHONY_LOGI("dialType:%{public}d", info.dialType);
     return HandleDialRequest(info);
+}
+
+bool CallRequestProcess::IsCnSimCard(int32_t slotId)
+{
+    std::u16string hplmn;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimOperatorNumeric(slotId, hplmn);
+    std::string simOperator = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(hplmn);
+    if (simOperator.size() < MCC_LEN) {
+        return false;
+    }
+    return simOperator.compare(0, MCC_LEN, CHN_MCC) == 0;
 }
 
 int32_t CallRequestProcess::HandleDialRequest(DialParaInfo &info)
