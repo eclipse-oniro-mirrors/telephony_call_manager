@@ -555,8 +555,8 @@ bool VoipCallManagerProxy::WriteIncomingCallDataParcel(MessageParcel &dataParcel
     dataParcel.WriteBool(extras.GetBooleanValue("isConferenceCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isVoiceAnswerSupported"));
     dataParcel.WriteBool(extras.GetBooleanValue("isUserMuteRingToneSupported"));
-    dataParcel.WriteBool(extras.GetBooleanValue("isCallControlByAudioDeviceSupported"));
-    dataParcel.WriteBool(extras.GetBooleanValue("isVoipInitiatedDuringCellularCallSupported"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isCallControlByExternelAudioDeviceSupported"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isDialingAllowedDuringSystemCall"));
     dataParcel.WriteInt64(extras.GetLongValue("startReportTime"));
 
     if (!dataParcel.WriteUInt8Vector(userProfile)) {
