@@ -166,12 +166,12 @@ struct VoipCallAttribute {
      */
     bool isUserMuteRingToneSupported = false;
     /**
-     * Indicates whether the user is supported to use audio devices for controling VoIP call.
+     * Indicates whether the user is supported to use externel audio devices for operating VoIP call.
      * Default value is false.
      */
-    bool isCallControlByExternelAudioDeviceSupported = false;
+    bool isExternalAudioDeviceOperationsSupported = false;
     /**
-     * Indicates whether the VoIP call is allowed to initiate during cellular call. Default value is false.
+     * Indicates whether the VoIP call is allowed to dial during system call. Default value is false.
      */
     bool isDialingAllowedDuringSystemCall = false;
     /**
