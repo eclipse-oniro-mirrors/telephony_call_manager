@@ -164,16 +164,16 @@ struct VoipCallAttribute {
     /**
      * Indicates whether the VoIP incoming call allows user to mute ringtone. Default value is false.
      */
-    bool isUserMuteRingToneSupported = true;
+    bool isUserMuteRingToneSupported = false;
     /**
      * Indicates whether the user is supported to use audio devices for controling VoIP call.
-     * Default value is true.
+     * Default value is false.
      */
-    bool isCallControlByAudioDeviceSupported = true;
+    bool isCallControlByExternelAudioDeviceSupported = false;
     /**
      * Indicates whether the VoIP call is allowed to initiate during cellular call. Default value is false.
      */
-    bool isVoipInitiatedDuringCellularCallSupported = true;
+    bool isDialingAllowedDuringSystemCall = false;
     /**
      * Indicates whether the app has the permission to use microphone. Default value is true.
      */
