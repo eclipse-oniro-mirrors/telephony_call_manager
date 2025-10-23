@@ -379,7 +379,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_SatelliteCallControl_001, TestSize.Level0)
     satelliteCallControl->IsShowDialog();
     bool isShowDialog = true;
     satelliteCallControl->SetShowDialog(isShowDialog);
-    ASSERT_EQ(isShowDialog, true);
+    ASSERT_EQ(satelliteCallControl->isShowingDialog_, true);
 }
 
 /**

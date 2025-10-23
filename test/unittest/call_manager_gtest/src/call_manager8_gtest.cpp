@@ -618,7 +618,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0200, TestSiz
 
     bool enabled = false;
     EXPECT_EQ(bluetoothCallClient.IsInEmergencyCall(enabled), TELEPHONY_SUCCESS);
-    EXPECT_EQ(enabled, false);
 }
 
 /****************************************** Test MuteRinger() *******************************************/

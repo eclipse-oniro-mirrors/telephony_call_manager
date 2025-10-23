@@ -82,10 +82,7 @@ public:
 HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_001, TestSize.Level0)
 {
     auto engine = std::make_shared<MyLocationEngine>();
-    if (engine == nullptr) {
-        TELEPHONY_LOGI("engine is null. MyLocationEngine");
-        return;
-    }
+    ASSERT_FALSE(engine == nullptr);
     engine->mylocator = engine;
     engine = engine->GetInstance();
     engine->SetValue();
@@ -120,9 +117,7 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_002, TestSize.Level0)
     engine->SetValue();
     engine->RegisterLocationChange();
     engine->RegisterSwitchCallback();
-    if (engine->locatorCallback_ == nullptr) {
-        return;
-    }
+    ASSERT_FALSE(engine->switchCallback_ == nullptr);
     Parcel parcel;
     std::unique_ptr<Location::Location> location = Location::Location::UnmarshallingMakeUnique(parcel);
     engine->locatorCallback_->OnLocationReport(location);
@@ -167,9 +162,7 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_003, TestSize.Level0)
     engine->SetValue();
     engine->RegisterLocationChange();
     engine->RegisterSwitchCallback();
-    if (engine->switchCallback_ == nullptr) {
-        return;
-    }
+    ASSERT_FALSE(engine->switchCallback_ == nullptr);
     int state = 0;
     engine->switchCallback_->OnSwitchChange(state);
     uint32_t code = 0;
@@ -235,9 +228,7 @@ HWTEST_F(LocationEngineTest, Telephony_LocationSubscriber_001, TestSize.Level0)
     EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
     auto subscribe = std::make_shared<LocationSubscriber>(subscribeInfo);
     subscribe->subscriber_ = subscribe;
-    if (subscribe->subscriber_ == nullptr) {
-        return;
-    }
+    ASSERT_FALSE(subscribe->subscriber_ == nullptr);
     subscribe->Subscriber();
     EventFwk::CommonEventData eventData;
     AAFwk::Want want;

@@ -61,10 +61,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001,
     TelCallState priorState = TelCallState::CALL_STATUS_DIALING;
     TelCallState nextState = TelCallState::CALL_STATUS_INCOMING;
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
-    if (voicePtr == nullptr) {
-        TELEPHONY_LOGE("voicePtr is nullptr");
-        return;
-    }
+    ASSERT_FALSE(voicePtr == nullptr);
     voicePtr->mInstance_ = voicePtr;
     voicePtr->CallStateUpdated(callObjectPtr, priorState, nextState);
     voicePtr->CallStatusDialing(callId, accountId);
@@ -101,10 +98,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002,
     ContactInfo contactInfo;
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     sptr<IRemoteObject> remoteObject = sptr<VoiceAssistantConnectCallback>::MakeSptr(accountId);
-    if (voicePtr == nullptr) {
-        TELEPHONY_LOGE("voicePtr is nullptr");
-        return;
-    }
+    ASSERT_FALSE(voicePtr == nullptr);
     voicePtr->mInstance_ = voicePtr;
     voicePtr->SetIsControlSwitchOn(true);
     voicePtr->GetIsControlSwitchOn();
