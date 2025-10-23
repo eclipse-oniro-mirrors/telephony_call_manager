@@ -183,6 +183,10 @@ public:
     int32_t ReportCallAudioEventChange(std::string voipCallId, const CallAudioEvent &callAudioEvent) override;
 
 private:
+    bool WriteIncomingCallDataParcel(MessageParcel &dataParcel, AppExecFwk::PacMap &extras,
+        std::vector<uint8_t> &userProfile);
+
+private:
     static inline BrokerDelegator<VoipCallManagerProxy> delegator_;
 };
 

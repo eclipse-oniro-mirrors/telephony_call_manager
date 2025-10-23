@@ -36,22 +36,9 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
         chainId = OHOS::HiviewDFX::HiTraceChain::Begin("ReportIncomingCall", HiTraceFlag::HITRACE_FLAG_INCLUDE_ASYNC);
     }
     MessageParcel dataParcel;
-    if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
+    if (!WriteIncomingCallDataParcel(dataParcel, extras, userProfile)) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    dataParcel.WriteString(extras.GetStringValue("callId"));
-    dataParcel.WriteInt32(extras.GetIntValue("voipCallType"));
-    dataParcel.WriteString(extras.GetStringValue("userName"));
-    dataParcel.WriteString(extras.GetStringValue("abilityName"));
-    dataParcel.WriteInt32(extras.GetIntValue("voipCallState"));
-    dataParcel.WriteBool(extras.GetBooleanValue("showBannerForIncomingCall"));
-    dataParcel.WriteBool(extras.GetBooleanValue("isConferenceCall"));
-    dataParcel.WriteBool(extras.GetBooleanValue("isVoiceAnswerSupported"));
-    dataParcel.WriteInt64(extras.GetLongValue("startReportTime"));
-    if (!dataParcel.WriteUInt8Vector(userProfile)) {
-        TELEPHONY_LOGE("ReportIncomingCall userProfile write fail, size:%{public}u",
-            static_cast<uint32_t>(userProfile.size()));
     }
     auto remote = Remote();
     if (remote == nullptr) {
@@ -549,6 +536,35 @@ int32_t VoipCallManagerProxy::SendCallUiEventForWindow(AppExecFwk::PacMap &extra
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
+}
+
+bool VoipCallManagerProxy::WriteIncomingCallDataParcel(MessageParcel &dataParcel, AppExecFwk::PacMap &extras,
+    std::vector<uint8_t> &userProfile)
+{
+    if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return false;
+    }
+
+    dataParcel.WriteString(extras.GetStringValue("callId"));
+    dataParcel.WriteInt32(extras.GetIntValue("voipCallType"));
+    dataParcel.WriteString(extras.GetStringValue("userName"));
+    dataParcel.WriteString(extras.GetStringValue("abilityName"));
+    dataParcel.WriteInt32(extras.GetIntValue("voipCallState"));
+    dataParcel.WriteBool(extras.GetBooleanValue("showBannerForIncomingCall"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isConferenceCall"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isVoiceAnswerSupported"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isUserMuteRingToneSupported"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isExternalAudioDeviceOperationsSupported"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isDialingAllowedDuringSystemCall"));
+    dataParcel.WriteInt64(extras.GetLongValue("startReportTime"));
+
+    if (!dataParcel.WriteUInt8Vector(userProfile)) {
+        TELEPHONY_LOGE("ReportIncomingCall userProfile write fail, size:%{public}u",
+            static_cast<uint32_t>(userProfile.size()));
+    }
+
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS
