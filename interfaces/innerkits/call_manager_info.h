@@ -89,7 +89,7 @@ struct VoipCallReportInfo {
     bool isConferenceCall = false;
     bool isVoiceAnswerSupported = true;
     bool isUserMuteRingToneSupported = false;
-    bool isCallControlByExternelAudioDeviceSupported = false;
+    bool isExternalAudioDeviceOperationsSupported = false;
     bool isDialingAllowedDuringSystemCall = false;
     bool hasMicPermission = true;
     bool isCapsuleSticky = false;
