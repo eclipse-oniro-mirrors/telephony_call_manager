@@ -117,7 +117,7 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_002, TestSize.Level0)
     engine->SetValue();
     engine->RegisterLocationChange();
     engine->RegisterSwitchCallback();
-    ASSERT_FALSE(engine->switchCallback_ == nullptr);
+    ASSERT_FALSE(engine->locatorCallback_ == nullptr);
     Parcel parcel;
     std::unique_ptr<Location::Location> location = Location::Location::UnmarshallingMakeUnique(parcel);
     engine->locatorCallback_->OnLocationReport(location);
