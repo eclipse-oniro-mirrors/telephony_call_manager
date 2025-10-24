@@ -85,7 +85,7 @@ void Ring::Init()
         RingtonePlayer_.reset();
     }
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
-    if (OHOS::system::GetBoolParameter(RINGADAPTIVE_MODE_STATE, false)) {
+    if (!OHOS::system::GetBoolParameter(RINGADAPTIVE_MODE_STATE, false)) {
         TELEPHONY_LOGI("ringtone vibrate adaptive is disabled");
         return;
     }
@@ -234,7 +234,7 @@ void RingtoneSettingStatusObserver::OnChange()
 
 void Ring::GetSettingsData()
 {
-    if (OHOS::system::GetBoolParameter(RINGADAPTIVE_MODE_STATE, false)) {
+    if (!OHOS::system::GetBoolParameter(RINGADAPTIVE_MODE_STATE, false)) {
         TELEPHONY_LOGI("ringtone vibrate adaptive is disabled");
         isAdaptiveSwitchOn_ = false;
         return;
