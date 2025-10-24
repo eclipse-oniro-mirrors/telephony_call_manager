@@ -482,7 +482,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_001, TestSize.Level0)
     std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
     bool isBlock = false;
     NumberMarkInfo info;
-    int32_t blockReason = 0;
+    int32_t blockReason = 1;
     std::string detectDetails;
     spamCallAdapter->GetParseResult(isBlock, info, blockReason, detectDetails);
     EXPECT_EQ(blockReason, 0);

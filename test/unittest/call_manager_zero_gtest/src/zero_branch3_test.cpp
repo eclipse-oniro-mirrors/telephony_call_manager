@@ -352,7 +352,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_002, TestSize.Level1)
 HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_003, TestSize.Level0)
 {
     int32_t callId = 10020;
-    int32_t numActive = 1;
+    int32_t numActive = 0;
     int32_t callState = (int32_t)TelCallState::CALL_STATUS_IDLE;
     std::string number = "";
     CallAttributeInfo callAttributeInfo;

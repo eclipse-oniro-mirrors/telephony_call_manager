@@ -895,7 +895,7 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_003, TestSize.Level0)
     std::shared_ptr<CallManagerHisysevent> callManagerHisysevent = std::make_shared<CallManagerHisysevent>();
     callManagerHisysevent->WriteVoipCallStatisticalEvent(0, "statisticalField");
     DialParaInfo dialInfo;
-    int32_t appIndex = -1;
+    int32_t appIndex = 0;
     sptr<CallBase> call1 = new VoIPCall(dialInfo);
     CallObjectManager::AddOneCallObject(call1);
     sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call1.GetRefPtr());

@@ -697,15 +697,9 @@ HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_001, TestSize.Level0)
 HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_002, TestSize.Level0)
 {
     sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityMgr == nullptr) {
-        TELEPHONY_LOGE("Telephony_CallStatusCallbackProxy systemAbilityMgr is nullptr");
-        return;
-    }
+    ASSERT_FALSE(systemAbilityMgr == nullptr);
     sptr<IRemoteObject> remote = systemAbilityMgr->CheckSystemAbility(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("Telephony_CallStatusCallbackProxy remote is nullptr");
-        return;
-    }
+    ASSERT_FALSE(remote == nullptr);
     auto callStatusCallbackProxy = std::make_shared<CallStatusCallbackProxy>(remote);
 
     CallReportInfo callReportInfo;
@@ -738,15 +732,9 @@ HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_002, TestSize.Level0)
 HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_003, TestSize.Level0)
 {
     sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityMgr == nullptr) {
-        TELEPHONY_LOGE("Telephony_CallStatusCallbackProxy systemAbilityMgr is nullptr");
-        return;
-    }
+    ASSERT_FALSE(systemAbilityMgr == nullptr);
     sptr<IRemoteObject> remote = systemAbilityMgr->CheckSystemAbility(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("Telephony_CallStatusCallbackProxy remote is nullptr");
-        return;
-    }
+    ASSERT_FALSE(remote == nullptr);
     auto callStatusCallbackProxy = std::make_shared<CallStatusCallbackProxy>(remote);
 
     int32_t result = 0;

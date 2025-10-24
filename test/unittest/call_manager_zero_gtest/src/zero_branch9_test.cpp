@@ -128,9 +128,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_002, TestSize.Level1)
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     AudioDevice device;
     device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PAD;
-    if (memset_s(device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK) {
-        return;
-    }
+    ASSERT_FALSE(memset_s(device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK);
     audioControl->SetAudioDevice(device);
     device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
     audioControl->SetAudioDevice(device);

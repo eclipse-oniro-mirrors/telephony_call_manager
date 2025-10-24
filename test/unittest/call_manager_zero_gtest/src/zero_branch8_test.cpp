@@ -166,9 +166,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallStatusCallbackStub_002, TestSize.Level0)
 HWTEST_F(ZeroBranch7Test, Telephony_FoldStatusManager_001, TestSize.Level1)
 {
     auto foldStatusManagerPtr = DelayedSingleton<FoldStatusManager>::GetInstance();
-    if (foldStatusManagerPtr == nullptr) {
-        return;
-    }
+    ASSERT_FALSE(foldStatusManagerPtr == nullptr);
     foldStatusManagerPtr->RegisterFoldableListener();
     foldStatusManagerPtr->UnregisterFoldableListener();
     FoldStatusManager::IsSmallFoldDevice();
@@ -181,9 +179,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_FoldStatusManager_001, TestSize.Level1)
 HWTEST_F(ZeroBranch7Test, Telephony_BluetoothCallConnection_001, TestSize.Level0)
 {
     auto blueToothConnectionPtr = DelayedSingleton<BluetoothCallConnection>::GetInstance();
-    if (blueToothConnectionPtr == nullptr) {
-        return;
-    }
+    ASSERT_FALSE(blueToothConnectionPtr == nullptr);
     DialParaInfo info;
     blueToothConnectionPtr->Dial(info);
     blueToothConnectionPtr->SetMacAddress("");
