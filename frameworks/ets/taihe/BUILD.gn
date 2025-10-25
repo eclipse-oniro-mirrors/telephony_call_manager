@@ -50,6 +50,8 @@ taihe_shared_library("telephony_call_taihe_native") {
     "src/taihe_call_manager_callback.cpp",
     "src/taihe_call_manager.cpp",
     "src/util.cpp",
+    "src/taihe_ani_callback_common.cpp",
+    "src/taihe_ani_call_update_async_result.cpp",
   ]
   deps = [
     ":run_taihe",
@@ -72,6 +74,11 @@ taihe_shared_library("telephony_call_taihe_native") {
     "napi:ace_napi",
     "runtime_core:ani_helpers",
     "runtime_core:libarkruntime",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerEtsApi\"",
+    "LOG_DOMAIN = 0xD001F10",
   ]
 
   sanitize = {

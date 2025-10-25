@@ -197,5 +197,144 @@ int32_t TaiheCallAbilityCallback::UpdateCameraCapabilities(const CameraCapabilit
     return TELEPHONY_ERR_FAIL;
 }
 
+int32_t TaiheCallAbilityCallback::UpdateAsyncResultsInfo(const CallResultReportId reportId,
+    AppExecFwk::PacMap &resultInfo)
+{
+    std::lock_guard<std::mutex> lock(callbackMutex_);
+    int32_t result = TELEPHONY_ERR_FAIL;
+    TELEPHONY_LOGI("UpdateAsyncResultsInfo reportId = %{public}d", reportId);
+    switch (reportId) {
+        case CallResultReportId::GET_CALL_WAITING_REPORT_ID: {
+            result = ReportGetCallWaitingStatus(resultInfo);
+            break;
+        }
+        case CallResultReportId::SET_CALL_WAITING_REPORT_ID: {
+            result = ReportSetCallWaiting(resultInfo);
+            break;
+        }
+        case CallResultReportId::GET_CALL_RESTRICTION_REPORT_ID: {
+            result = ReportGetCallRestrictionStatus(resultInfo);
+            break;
+        }
+        case CallResultReportId::SET_CALL_RESTRICTION_REPORT_ID: {
+            result = ReportSetCallRestriction(resultInfo);
+            break;
+        }
+        case CallResultReportId::SET_CALL_RESTRICTION_PWD_REPORT_ID: {
+            result = ReportSetCallRestrictionPassword(resultInfo);
+            break;
+        }
+        case CallResultReportId::GET_CALL_TRANSFER_REPORT_ID: {
+            result = ReportGetCallTransferInfo(resultInfo);
+            break;
+        }
+        case CallResultReportId::SET_CALL_TRANSFER_REPORT_ID: {
+            result = ReportSetCallTransfer(resultInfo);
+            break;
+        }
+        case CallResultReportId::CLOSE_UNFINISHED_USSD_REPORT_ID: {
+            result = ReportCloseUnfinishedUssd(resultInfo);
+            break;
+        }
+        default:
+            TELEPHONY_LOGI("UpdateAsyncResultsInfo reportId %{public}d is unsupport", reportId);;
+    }
+    return result;
+}
+
+int32_t TaiheCallAbilityCallback::ReportGetCallWaitingStatus(AppExecFwk::PacMap &resultInfo)
+{
+    int32_t result = resultInfo.GetIntValue("result");
+    int32_t status = resultInfo.GetIntValue("status");
+    auto waitingStatus = ::ohos::telephony::call::CallWaitingStatus::from_value(status);
+    if (getCallWaitingStatusCallback_) {
+        getCallWaitingStatusCallback_(result, waitingStatus);
+    }
+
+    return result;
+}
+
+int32_t TaiheCallAbilityCallback::ReportSetCallWaiting(AppExecFwk::PacMap &resultInfo)
+{
+    int32_t result = resultInfo.GetIntValue("result");
+    if (setCallWatingStatusCallback_) {
+        setCallWatingStatusCallback_(result);
+    }
+
+    return result;
+}
+
+int32_t TaiheCallAbilityCallback::ReportGetCallRestrictionStatus(AppExecFwk::PacMap &resultInfo)
+{
+    int32_t result = resultInfo.GetIntValue("result");
+    int32_t status = resultInfo.GetIntValue("status");
+    auto restrictionStatus = ::ohos::telephony::call::RestrictionStatus::from_value(status);
+    if (getCallRestrictionStatusCallback_) {
+        getCallRestrictionStatusCallback_(result, restrictionStatus);
+    }
+
+    return result;
+}
+
+int32_t TaiheCallAbilityCallback::ReportSetCallRestriction(AppExecFwk::PacMap &resultInfo)
+{
+    int32_t result = resultInfo.GetIntValue("result");
+    if (setCallRestrictionStatusCallback_) {
+        setCallRestrictionStatusCallback_(result);
+    }
+
+    return result;
+}
+
+int32_t TaiheCallAbilityCallback::ReportSetCallRestrictionPassword(AppExecFwk::PacMap &resultInfo)
+{
+    int32_t result = resultInfo.GetIntValue("result");
+    if (setCallRestrictionPasswordCallback_) {
+        setCallRestrictionPasswordCallback_(result);
+    }
+
+    return result;
+}
+
+int32_t TaiheCallAbilityCallback::ReportGetCallTransferInfo(AppExecFwk::PacMap &resultInfo)
+{
+    int32_t result = resultInfo.GetIntValue("result");
+    int32_t status = resultInfo.GetIntValue("status");
+    std::string teleNumber = resultInfo.GetStringValue("teleNumber");
+    int32_t startHour = resultInfo.GetIntValue("startHour");
+    int32_t endHour = resultInfo.GetIntValue("endHour");
+    int32_t startMinute = resultInfo.GetIntValue("startMinute");
+    int32_t endMinute = resultInfo.GetIntValue("endMinute");
+    ohos::telephony::call::TransferStatus transferStatus = ohos::telephony::call::TransferStatus::from_value(status);
+    ohos::telephony::call::CallTransferResult transferResult = {
+        transferStatus, teleNumber, startHour, endHour, startMinute, endMinute
+    };
+
+    if (getCallTransferInfoCallback_) {
+        getCallTransferInfoCallback_(result, transferResult);
+    }
+
+    return result;
+}
+
+int32_t TaiheCallAbilityCallback::ReportSetCallTransfer(AppExecFwk::PacMap &resultInfo)
+{
+    int32_t result = resultInfo.GetIntValue("result");
+    if (setCallTransferCallback_) {
+        setCallTransferCallback_(result);
+    }
+
+    return result;
+}
+
+int32_t TaiheCallAbilityCallback::ReportCloseUnfinishedUssd(AppExecFwk::PacMap &resultInfo)
+{
+    int32_t result = resultInfo.GetIntValue("result");
+    if (closeUnfinishedUssdCallback_) {
+        closeUnfinishedUssdCallback_(result);
+    }
+
+    return result;
+}
 } // namespace Telephony
 } // namespace OHOS
