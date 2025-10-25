@@ -631,6 +631,39 @@ function HangUpCallOptionalSync(callId: Optional<i32>): void;
 @gen_async("hangUpCall")
 function HangUpCallWithVoidSync(): void;
 
+@rename("getCallWaitingStatus")
+function GetCallWaitingStatusAsync(slotId: i32, opq: @sts_type("AsyncCallback<CallWaitingStatus>") Opaque): void;
+@rename("getCallWaitingStatus")
+function GetCallWaitingStatusPromise(slotId: i32): @sts_type("Promise<CallWaitingStatus>") Opaque;
+@rename("setCallWaiting")
+function SetCallWaitingAsync(slotId: i32, activate: bool, opq: @sts_type("AsyncCallback<void>") Opaque): void;
+@rename("setCallWaiting")
+function SetCallWaitingPromise(slotId: i32, activate: bool): @sts_type("Promise<void>") Opaque;
+@rename("getCallRestrictionStatus")
+function GetCallRestrictionStatusAsync(slotId: i32, type: CallRestrictionType, opq: @sts_type("AsyncCallback<RestrictionStatus>") Opaque): void;
+@rename("getCallRestrictionStatus")
+function GetCallRestrictionStatusPromise(slotId: i32, type: CallRestrictionType): @sts_type("Promise<RestrictionStatus>") Opaque;
+@rename("setCallRestriction")
+function SetCallRestrictionAsync(slotId: i32, info: CallRestrictionInfo, opq: @sts_type("AsyncCallback<void>") Opaque): void;
+@rename("setCallRestriction")
+function SetCallRestrictionPromise(slotId: i32, info: CallRestrictionInfo): @sts_type("Promise<void>") Opaque;
+@rename("setCallRestrictionPassword")
+function SetCallRestrictionPasswordAsync(slotId: i32, oldPassword: String, newPassword: String, opq: @sts_type("AsyncCallback<void>") Opaque): void;
+@rename("setCallRestrictionPassword")
+function SetCallRestrictionPasswordPromise(slotId: i32, oldPassword: String, newPassword: String): @sts_type("Promise<void>") Opaque;
+@rename("getCallTransferInfo")
+function GetCallTransferInfoAsync(slotId: i32, type: CallTransferType, opq: @sts_type("AsyncCallback<CallTransferResult>") Opaque): void;
+@rename("getCallTransferInfo")
+function GetCallTransferInfoPromise(slotId: i32, type: CallTransferType): @sts_type("Promise<CallTransferResult>") Opaque;
+@rename("setCallTransfer")
+function SetCallTransferAsync(slotId: i32, info: CallTransferInfo, opq: @sts_type("AsyncCallback<void>") Opaque): void;
+@rename("setCallTransfer")
+function SetCallTransferPromise(slotId: i32, info: CallTransferInfo): @sts_type("Promise<void>") Opaque;
+@rename("closeUnfinishedUssd")
+function CloseUnfinishedUssdAsync(slotId: i32, opq: @sts_type("AsyncCallback<void>") Opaque): void;
+@rename("closeUnfinishedUssd")
+function CloseUnfinishedUssdPromise(slotId: i32): @sts_type("Promise<void>") Opaque;
+
 @!sts_inject("""
 export function on(type: string, cb: (arg_0: Object) => void) {
     switch(type) {

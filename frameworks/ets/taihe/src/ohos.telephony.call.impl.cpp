@@ -34,6 +34,8 @@
 #include "taihe_call_manager.h"
 #include "taihe_call_ability_callback.h"
 #include "napi_util.h"
+#include "taihe_ani_callback_common.h"
+#include "taihe_ani_call_update_async_result.h"
 
 using namespace taihe;
 using namespace OHOS::Telephony;
@@ -45,9 +47,10 @@ static void ConvertErrorForBusinessError(int32_t errorCode)
     if (errorCode == TELEPHONY_ERR_PERMISSION_ERR) {
         set_business_error(JS_ERROR_TELEPHONY_PERMISSION_DENIED,
             "BusinessError 201:Permission denied");
+    } else {
+        OHOS::Telephony::JsError error = NapiUtil::ConverErrorMessageForJs(errorCode);
+        set_business_error(error.errorCode, error.errorMessage);
     }
-    OHOS::Telephony::JsError error = NapiUtil::ConverErrorMessageForJs(errorCode);
-    set_business_error(error.errorCode, error.errorMessage);
 }
 
 static inline bool IsValidSlotId(int32_t slotId)
@@ -835,6 +838,447 @@ void HangUpCallWithVoidSync()
     }
 }
 
+static void GetCallWaitingStatusCallback(int32_t slotId, uintptr_t opq, ani_object& promise)
+{
+    CallManagerClientInitializer init;
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("GetCallWaitingStatusSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
+        return;
+    }
+
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
+    if (nullptr == cb) {
+        TELEPHONY_LOGE("AniCallbackInfo is null");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
+        return;
+    }
+    if (!cb->init(opq)) {
+        TELEPHONY_LOGE("AniCallbackInfo init fail");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_UNINIT);
+        return;
+    }
+    promise = cb->promise_;
+    auto callback = [cb](int32_t errorCode, ::ohos::telephony::call::CallWaitingStatus status) {
+        cb->AttachThread();
+        AniCallUpdateAsyncResult::GetInstance().UpdateGetCallWaitingStatus(cb, errorCode, status);
+        cb->DetachThread();
+    };
+    TaiheCallAbilityCallback::GetInstance().getCallWaitingStatusCallback_ = callback;
+
+    int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->GetCallWaiting(slotId);
+    if (errorCode != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("GetCallWaiting return error");
+        ConvertErrorForBusinessError(errorCode);
+    }
+}
+
+void GetCallWaitingStatusAsync(int32_t slotId, uintptr_t opq)
+{
+    ani_object promise;
+    GetCallWaitingStatusCallback(slotId, opq, promise);
+    return;
+}
+
+uintptr_t GetCallWaitingStatusPromise(int32_t slotId)
+{
+    ani_object promise;
+    GetCallWaitingStatusCallback(slotId, 0, promise);
+    return reinterpret_cast<uintptr_t>(promise);
+}
+
+static void SetCallWaitingCallback(int32_t slotId, bool activate, uintptr_t opq, ani_object& promise)
+{
+    CallManagerClientInitializer init;
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("SetCallWaitingSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
+        return;
+    }
+
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
+    if (nullptr == cb) {
+        TELEPHONY_LOGE("AniCallbackInfo is null");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
+        return;
+    }
+    if (!cb->init(opq)) {
+        TELEPHONY_LOGE("AniCallbackInfo init fail");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_UNINIT);
+        return;
+    }
+    promise = cb->promise_;
+    auto callback = [cb](int32_t errorCode) {
+        cb->AttachThread();
+        AniCallUpdateAsyncResult::GetInstance().UpdateUndefinedCallState(cb, errorCode);
+        cb->DetachThread();
+    };
+    TaiheCallAbilityCallback::GetInstance().setCallWatingStatusCallback_ = callback;
+
+    int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->SetCallWaiting(slotId, activate);
+    if (errorCode != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("SetCallWaiting return error");
+        ConvertErrorForBusinessError(errorCode);
+    }
+}
+
+void SetCallWaitingAsync(int32_t slotId, bool activate, uintptr_t opq)
+{
+    ani_object promise;
+    SetCallWaitingCallback(slotId, activate, opq, promise);
+    return;
+}
+
+uintptr_t SetCallWaitingPromise(int32_t slotId, bool activate)
+{
+    ani_object promise;
+    SetCallWaitingCallback(slotId, activate, 0, promise);
+    return reinterpret_cast<uintptr_t>(promise);
+}
+
+static void GetCallRestrictionStatusCallback(int32_t slotId, ::ohos::telephony::call::CallRestrictionType type,
+    uintptr_t opq, ani_object& promise)
+{
+    CallManagerClientInitializer init;
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("GetCallRestrictionStatusSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
+        return;
+    }
+
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
+    if (nullptr == cb) {
+        TELEPHONY_LOGE("AniCallbackInfo is null");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
+        return;
+    }
+    if (!cb->init(opq)) {
+        TELEPHONY_LOGE("AniCallbackInfo init fail");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_UNINIT);
+        return;
+    }
+    promise = cb->promise_;
+    auto callback = [cb](int32_t errorCode, ::ohos::telephony::call::RestrictionStatus status) {
+        cb->AttachThread();
+        AniCallUpdateAsyncResult::GetInstance().UpdateGetCallRestrictionStatus(cb, errorCode, status);
+        cb->DetachThread();
+    };
+    TaiheCallAbilityCallback::GetInstance().getCallRestrictionStatusCallback_ = callback;
+
+    auto callRestrictionType = static_cast<CallRestrictionType>(type.get_value());
+    int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->GetCallRestriction(
+        slotId, callRestrictionType);
+    if (errorCode != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("GetCallRestriction return error");
+        ConvertErrorForBusinessError(errorCode);
+    }
+
+    return;
+}
+
+void GetCallRestrictionStatusAsync(int32_t slotId, ::ohos::telephony::call::CallRestrictionType type, uintptr_t opq)
+{
+    ani_object promise;
+    GetCallRestrictionStatusCallback(slotId, type, opq, promise);
+    return;
+}
+
+uintptr_t GetCallRestrictionStatusPromise(int32_t slotId, ::ohos::telephony::call::CallRestrictionType type)
+{
+    ani_object promise;
+    GetCallRestrictionStatusCallback(slotId, type, 0, promise);
+    return reinterpret_cast<uintptr_t>(promise);
+}
+
+static void SetCallRestrictionCallback(int32_t slotId, ::ohos::telephony::call::CallRestrictionInfo const & info,
+    uintptr_t opq, ani_object& promise)
+{
+    CallManagerClientInitializer init;
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("SetCallRestrictionSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
+        return;
+    }
+
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
+    if (nullptr == cb) {
+        TELEPHONY_LOGE("AniCallbackInfo is null");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
+        return;
+    }
+    if (!cb->init(opq)) {
+        TELEPHONY_LOGE("AniCallbackInfo init fail");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_UNINIT);
+        return;
+    }
+    promise = cb->promise_;
+    auto callback = [cb](int32_t errorCode) {
+        cb->AttachThread();
+        AniCallUpdateAsyncResult::GetInstance().UpdateUndefinedCallState(cb, errorCode);
+        cb->DetachThread();
+    };
+    TaiheCallAbilityCallback::GetInstance().setCallRestrictionStatusCallback_ = callback;
+
+    CallRestrictionInfo infores;
+    infores.mode = static_cast<OHOS::Telephony::CallRestrictionMode>(info.mode.get_value());
+    std::copy(info.password.begin(), info.password.end(), infores.password);
+    infores.fac = static_cast<OHOS::Telephony::CallRestrictionType>(info.type.get_value());
+    int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->SetCallRestriction(slotId, infores);
+    if (errorCode != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("SetCallRestriction return error");
+        ConvertErrorForBusinessError(errorCode);
+    }
+}
+
+void SetCallRestrictionAsync(int32_t slotId, ::ohos::telephony::call::CallRestrictionInfo const & info, uintptr_t opq)
+{
+    ani_object promise;
+    SetCallRestrictionCallback(slotId, info, opq, promise);
+    return;
+}
+
+uintptr_t SetCallRestrictionPromise(int32_t slotId, ::ohos::telephony::call::CallRestrictionInfo const & info)
+{
+    ani_object promise;
+    SetCallRestrictionCallback(slotId, info, 0, promise);
+    return reinterpret_cast<uintptr_t>(promise);
+}
+
+static void SetCallRestrictionPasswordCallback(int32_t slotId, ::taihe::string_view oldPassword,
+    ::taihe::string_view newPassword, uintptr_t opq, ani_object& promise)
+{
+    CallManagerClientInitializer init;
+    if (oldPassword.size() > kMaxNumberLen || newPassword.size() > kMaxNumberLen) {
+        TELEPHONY_LOGE("SetCallRestrictionPasswordSync password too long");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_ARGUMENT_INVALID);
+        return;
+    }
+
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("SetCallRestrictionPasswordSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
+        return;
+    }
+
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
+    if (nullptr == cb) {
+        TELEPHONY_LOGE("AniCallbackInfo is null");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
+        return;
+    }
+    if (!cb->init(opq)) {
+        TELEPHONY_LOGE("AniCallbackInfo init fail");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_UNINIT);
+        return;
+    }
+    promise = cb->promise_;
+    auto callback = [cb](int32_t errorCode) {
+        cb->AttachThread();
+        AniCallUpdateAsyncResult::GetInstance().UpdateUndefinedCallState(cb, errorCode);
+        cb->DetachThread();
+    };
+    TaiheCallAbilityCallback::GetInstance().setCallRestrictionPasswordCallback_ = callback;
+
+    int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->SetCallRestrictionPassword(slotId,
+        CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS, oldPassword.c_str(), newPassword.c_str());
+    if (errorCode != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("SetCallRestrictionPassword return error");
+        ConvertErrorForBusinessError(errorCode);
+    }
+}
+
+void SetCallRestrictionPasswordAsync(int32_t slotId, ::taihe::string_view oldPassword,
+    ::taihe::string_view newPassword, uintptr_t opq)
+{
+    ani_object promise;
+    SetCallRestrictionPasswordCallback(slotId, oldPassword, newPassword, opq, promise);
+    return;
+}
+
+uintptr_t SetCallRestrictionPasswordPromise(int32_t slotId, ::taihe::string_view oldPassword,
+    ::taihe::string_view newPassword)
+{
+    ani_object promise;
+    SetCallRestrictionPasswordCallback(slotId, oldPassword, newPassword, 0, promise);
+    return reinterpret_cast<uintptr_t>(promise);
+}
+
+static void GetCallTransferInfoCallback(int32_t slotId, ::ohos::telephony::call::CallTransferType type,
+    uintptr_t opq, ani_object& promise)
+{
+    CallManagerClientInitializer init;
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("GetCallTransferInfoSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
+        return;
+    }
+
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
+    if (nullptr == cb) {
+        TELEPHONY_LOGE("AniCallbackInfo is null");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
+        return;
+    }
+    if (!cb->init(opq)) {
+        TELEPHONY_LOGE("AniCallbackInfo init fail");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_UNINIT);
+        return;
+    }
+    promise = cb->promise_;
+    auto callback = [cb](int32_t errorCode, ::ohos::telephony::call::CallTransferResult info) {
+        cb->AttachThread();
+        AniCallUpdateAsyncResult::GetInstance().UpdateGetCallTransferInfo(cb, errorCode, info);
+        cb->DetachThread();
+    };
+    TaiheCallAbilityCallback::GetInstance().getCallTransferInfoCallback_ = callback;
+
+    CallTransferType callTranferType = static_cast<CallTransferType>(type.get_value());
+    int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->GetCallTransferInfo(
+        slotId, callTranferType);
+    if (errorCode != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("GetCallTransferInfo return error");
+        ConvertErrorForBusinessError(errorCode);
+    }
+
+    return;
+}
+
+void GetCallTransferInfoAsync(int32_t slotId, ::ohos::telephony::call::CallTransferType type, uintptr_t opq)
+{
+    ani_object promise;
+    GetCallTransferInfoCallback(slotId, type, opq, promise);
+    return;
+}
+
+uintptr_t GetCallTransferInfoPromise(int32_t slotId, ::ohos::telephony::call::CallTransferType type)
+{
+    ani_object promise;
+    GetCallTransferInfoCallback(slotId, type, 0, promise);
+    return reinterpret_cast<uintptr_t>(promise);
+}
+
+static void SetCallTransferCallback(int32_t slotId, ::ohos::telephony::call::CallTransferInfo const & info,
+    uintptr_t opq, ani_object& promise)
+{
+    CallManagerClientInitializer init;
+
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("SetCallTransferSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
+        return;
+    }
+
+    CallTransferInfo information;
+    information.endHour = info.endHour.value_or(0);
+    information.startHour = info.startHour.value_or(0);
+    information.startMinute = info.startMinute.value_or(0);
+    information.endMinute = info.endMinute.value_or(0);
+    information.settingType = static_cast<OHOS::Telephony::CallTransferSettingType>(info.settingType.get_value());
+    information.type = static_cast<OHOS::Telephony::CallTransferType>(info.type.get_value());
+    if (memcpy_s(information.transferNum, kMaxNumberLen, info.transferNum.data(), info.transferNum.size()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s information.transferNum failed");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_ARGUMENT_INVALID);
+        return;
+    }
+
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
+    if (nullptr == cb) {
+        TELEPHONY_LOGE("AniCallbackInfo is null");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
+        return;
+    }
+    if (!cb->init(opq)) {
+        TELEPHONY_LOGE("AniCallbackInfo init fail");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_UNINIT);
+        return;
+    }
+    promise = cb->promise_;
+    auto callback = [cb](int32_t errorCode) {
+        cb->AttachThread();
+        AniCallUpdateAsyncResult::GetInstance().UpdateUndefinedCallState(cb, errorCode);
+        cb->DetachThread();
+    };
+    TaiheCallAbilityCallback::GetInstance().setCallTransferCallback_ = callback;
+
+    int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->SetCallTransferInfo(
+        slotId, information);
+    if (errorCode != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("SetCallTransferInfo return error");
+        ConvertErrorForBusinessError(errorCode);
+    }
+}
+
+void SetCallTransferAsync(int32_t slotId, ::ohos::telephony::call::CallTransferInfo const & info, uintptr_t opq)
+{
+    ani_object promise;
+    SetCallTransferCallback(slotId, info, opq, promise);
+    return;
+}
+
+uintptr_t SetCallTransferPromise(int32_t slotId, ::ohos::telephony::call::CallTransferInfo const & info)
+{
+    ani_object promise;
+    SetCallTransferCallback(slotId, info, 0, promise);
+    return reinterpret_cast<uintptr_t>(promise);
+}
+
+static void CloseUnfinishedUssdCallback(int32_t slotId, uintptr_t opq, ani_object& promise)
+{
+    CallManagerClientInitializer init;
+    if (!IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("CloseUnfinishedUssdSync slotId is invalid");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_SLOTID_INVALID);
+        return;
+    }
+
+    TaiheCallManager::GetInstance().RegisterCallBack();
+    std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
+    if (nullptr == cb) {
+        TELEPHONY_LOGE("AniCallbackInfo is null");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
+        return;
+    }
+    if (!cb->init(opq)) {
+        TELEPHONY_LOGE("AniCallbackInfo init fail");
+        ConvertErrorForBusinessError(TELEPHONY_ERR_UNINIT);
+        return;
+    }
+    promise = cb->promise_;
+    auto callback = [cb](int32_t errorCode) {
+        cb->AttachThread();
+        AniCallUpdateAsyncResult::GetInstance().UpdateUndefinedCallState(cb, errorCode);
+        cb->DetachThread();
+    };
+    TaiheCallAbilityCallback::GetInstance().closeUnfinishedUssdCallback_ = callback;
+
+    int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->CloseUnFinishedUssd(slotId);
+    if (errorCode != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("CloseUnFinishedUssd return error");
+        ConvertErrorForBusinessError(errorCode);
+    }
+}
+
+void CloseUnfinishedUssdAsync(int32_t slotId, uintptr_t opq)
+{
+    ani_object promise;
+    CloseUnfinishedUssdCallback(slotId, opq, promise);
+    return;
+}
+
+uintptr_t CloseUnfinishedUssdPromise(int32_t slotId)
+{
+    ani_object promise;
+    CloseUnfinishedUssdCallback(slotId, 0, promise);
+    return reinterpret_cast<uintptr_t>(promise);
+}
+
 void onCallDetailsChange(
     ::taihe::callback_view<void(::ohos::telephony::call::CallAttributeOptions const& data)> callback)
 {
@@ -1075,6 +1519,24 @@ TH_EXPORT_CPP_API_RejectCallWithRejectMessageSync(RejectCallWithRejectMessageSyn
 TH_EXPORT_CPP_API_HangUpCallSync(HangUpCallSync);
 TH_EXPORT_CPP_API_HangUpCallOptionalSync(HangUpCallOptionalSync);
 TH_EXPORT_CPP_API_HangUpCallWithVoidSync(HangUpCallWithVoidSync);
+
+TH_EXPORT_CPP_API_GetCallWaitingStatusAsync(GetCallWaitingStatusAsync);
+TH_EXPORT_CPP_API_GetCallWaitingStatusPromise(GetCallWaitingStatusPromise);
+TH_EXPORT_CPP_API_SetCallWaitingAsync(SetCallWaitingAsync);
+TH_EXPORT_CPP_API_SetCallWaitingPromise(SetCallWaitingPromise);
+TH_EXPORT_CPP_API_GetCallRestrictionStatusAsync(GetCallRestrictionStatusAsync);
+TH_EXPORT_CPP_API_GetCallRestrictionStatusPromise(GetCallRestrictionStatusPromise);
+TH_EXPORT_CPP_API_SetCallRestrictionAsync(SetCallRestrictionAsync);
+TH_EXPORT_CPP_API_SetCallRestrictionPromise(SetCallRestrictionPromise);
+TH_EXPORT_CPP_API_SetCallRestrictionPasswordAsync(SetCallRestrictionPasswordAsync);
+TH_EXPORT_CPP_API_SetCallRestrictionPasswordPromise(SetCallRestrictionPasswordPromise);
+TH_EXPORT_CPP_API_GetCallTransferInfoAsync(GetCallTransferInfoAsync);
+TH_EXPORT_CPP_API_GetCallTransferInfoPromise(GetCallTransferInfoPromise);
+TH_EXPORT_CPP_API_SetCallTransferAsync(SetCallTransferAsync);
+TH_EXPORT_CPP_API_SetCallTransferPromise(SetCallTransferPromise);
+TH_EXPORT_CPP_API_CloseUnfinishedUssdAsync(CloseUnfinishedUssdAsync);
+TH_EXPORT_CPP_API_CloseUnfinishedUssdPromise(CloseUnfinishedUssdPromise);
+
 TH_EXPORT_CPP_API_onCallDetailsChange(onCallDetailsChange);
 TH_EXPORT_CPP_API_offCallDetailsChange(offCallDetailsChange);
 TH_EXPORT_CPP_API_onCallEventChange(onCallEventChange);
