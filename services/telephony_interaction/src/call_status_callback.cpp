@@ -52,8 +52,7 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
         detailInfo.voipCallInfo.isConferenceCall = info.voipCallInfo.isConferenceCall;
         detailInfo.voipCallInfo.isVoiceAnswerSupported = info.voipCallInfo.isVoiceAnswerSupported;
         detailInfo.voipCallInfo.isUserMuteRingToneAllowed = info.voipCallInfo.isUserMuteRingToneAllowed;
-        detailInfo.voipCallInfo.isRemoteDeviceControlAllowed =
-            info.voipCallInfo.isRemoteDeviceControlAllowed;
+        detailInfo.voipCallInfo.isRemoteDeviceControlAllowed = info.voipCallInfo.isRemoteDeviceControlAllowed;
         detailInfo.voipCallInfo.isDialingAllowedDuringCarrierCall =
             info.voipCallInfo.isDialingAllowedDuringCarrierCall;
         detailInfo.voipCallInfo.hasMicPermission = info.voipCallInfo.hasMicPermission;
