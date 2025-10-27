@@ -79,7 +79,7 @@ int32_t CallStatusCallbackProxy::UpdateCallsReportInfo(const CallsReportInfo &in
     MessageOption option;
     int32_t error = TELEPHONY_ERR_FAIL;
 
-    error = PackUpdateCallsReportInfo(INFO, dataParcel);
+    error = PackUpdateCallsReportInfo(info, dataParcel);
     if (error != TELEPHONY_SUCCESS) {
         return error;
     }
