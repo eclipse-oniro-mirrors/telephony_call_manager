@@ -86,7 +86,7 @@ enum class VoipCallState {
     /**
      * Indicates whether the VOIP incoming call allows user to mute ringtone.
      */
-    VOIP_CALL_EVENT_MUTE_RINGTONE = 4,
+    VOIP_CALL_EVENT_MUTE_RINGTONE,
 };
 
 /**
