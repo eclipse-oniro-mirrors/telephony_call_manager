@@ -35,6 +35,9 @@ VoIPCall::VoIPCall(DialParaInfo &info) : CarrierCall(info)
     showBannerForIncomingCall_ = info.voipCallInfo.showBannerForIncomingCall;
     isConferenceCall_ = info.voipCallInfo.isConferenceCall;
     isVoiceAnswerSupported_ = info.voipCallInfo.isVoiceAnswerSupported;
+    isUserMuteRingToneAllowed_ = info.voipCallInfo.isUserMuteRingToneAllowed;
+    isRemoteDeviceControlAllowed_ = info.voipCallInfo.isRemoteDeviceControlAllowed;
+    isDialingAllowedDuringCarrierCall_ = info.voipCallInfo.isDialingAllowedDuringCarrierCall;
     hasMicPermission_ = info.voipCallInfo.hasMicPermission;
     isCapsuleSticky_ = info.voipCallInfo.isCapsuleSticky;
     uid_ = info.voipCallInfo.uid;
@@ -166,6 +169,9 @@ void VoIPCall::GetCallAttributeInfo(CallAttributeInfo &info)
     info.voipCallInfo.showBannerForIncomingCall = showBannerForIncomingCall_;
     info.voipCallInfo.isConferenceCall = isConferenceCall_;
     info.voipCallInfo.isVoiceAnswerSupported = isVoiceAnswerSupported_;
+    info.voipCallInfo.isUserMuteRingToneAllowed = isUserMuteRingToneAllowed_;
+    info.voipCallInfo.isRemoteDeviceControlAllowed = isRemoteDeviceControlAllowed_;
+    info.voipCallInfo.isDialingAllowedDuringCarrierCall = isDialingAllowedDuringCarrierCall_;
     info.voipCallInfo.hasMicPermission = hasMicPermission_;
     info.voipCallInfo.isCapsuleSticky = isCapsuleSticky_;
     info.voipCallInfo.uid = uid_;

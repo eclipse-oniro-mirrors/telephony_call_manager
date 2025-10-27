@@ -317,6 +317,9 @@ public:
     int32_t UpdateVoipEventInfo(const VoipCallEventInfo &info) override;
 
 private:
+    int32_t PackUpdateCallsReportInfo(const CallsReportInfo &info, MessageParcel &dataParcel);
+
+private:
     static inline BrokerDelegator<CallStatusCallbackProxy> delegator_;
 };
 } // namespace Telephony

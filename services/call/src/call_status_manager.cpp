@@ -1958,21 +1958,7 @@ void CallStatusManager::PackParaInfo(
         DelayedSingleton<CallControlManager>::GetInstance()->GetDialParaInfo(paraInfo, extras);
     }
     TELEPHONY_LOGI("is ecc: %{public}d", paraInfo.isEcc);
-    if (info.callType == CallType::TYPE_VOIP) {
-        paraInfo.voipCallInfo.voipCallId = info.voipCallInfo.voipCallId;
-        paraInfo.voipCallInfo.userName = info.voipCallInfo.userName;
-        (paraInfo.voipCallInfo.userProfile).assign(
-            (info.voipCallInfo.userProfile).begin(), (info.voipCallInfo.userProfile).end());
-        paraInfo.voipCallInfo.abilityName = info.voipCallInfo.abilityName;
-        paraInfo.voipCallInfo.extensionId = info.voipCallInfo.extensionId;
-        paraInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
-        paraInfo.voipCallInfo.showBannerForIncomingCall = info.voipCallInfo.showBannerForIncomingCall;
-        paraInfo.voipCallInfo.isConferenceCall = info.voipCallInfo.isConferenceCall;
-        paraInfo.voipCallInfo.isVoiceAnswerSupported = info.voipCallInfo.isVoiceAnswerSupported;
-        paraInfo.voipCallInfo.hasMicPermission = info.voipCallInfo.hasMicPermission;
-        paraInfo.voipCallInfo.isCapsuleSticky = info.voipCallInfo.isCapsuleSticky;
-        paraInfo.voipCallInfo.uid = info.voipCallInfo.uid;
-    }
+
     paraInfo.number = info.phoneNum;
     paraInfo.callId = GetNewCallId();
     paraInfo.index = info.index;
@@ -2539,6 +2525,28 @@ void CallStatusManager::UpdateDevProvisioned()
         } else if (deviceProvisioned == "1") {
             deviceProvisioned_ = DEVICE_PROVISION_VALID;
         }
+    }
+}
+
+void CallStatusManager::PackVoipCallInfo(DialParaInfo &paraInfo, const CallDetailInfo &info)
+{
+    if (info.callType == CallType::TYPE_VOIP) {
+        paraInfo.voipCallInfo.voipCallId = info.voipCallInfo.voipCallId;
+        paraInfo.voipCallInfo.userName = info.voipCallInfo.userName;
+        (paraInfo.voipCallInfo.userProfile).assign(
+            (info.voipCallInfo.userProfile).begin(), (info.voipCallInfo.userProfile).end());
+        paraInfo.voipCallInfo.abilityName = info.voipCallInfo.abilityName;
+        paraInfo.voipCallInfo.extensionId = info.voipCallInfo.extensionId;
+        paraInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
+        paraInfo.voipCallInfo.showBannerForIncomingCall = info.voipCallInfo.showBannerForIncomingCall;
+        paraInfo.voipCallInfo.isConferenceCall = info.voipCallInfo.isConferenceCall;
+        paraInfo.voipCallInfo.isVoiceAnswerSupported = info.voipCallInfo.isVoiceAnswerSupported;
+        paraInfo.voipCallInfo.isUserMuteRingToneAllowed = info.voipCallInfo.isUserMuteRingToneAllowed;
+        paraInfo.voipCallInfo.isRemoteDeviceControlAllowed = info.voipCallInfo.isRemoteDeviceControlAllowed;
+        paraInfo.voipCallInfo.isDialingAllowedDuringCarrierCall = info.voipCallInfo.isDialingAllowedDuringCarrierCall;
+        paraInfo.voipCallInfo.hasMicPermission = info.voipCallInfo.hasMicPermission;
+        paraInfo.voipCallInfo.isCapsuleSticky = info.voipCallInfo.isCapsuleSticky;
+        paraInfo.voipCallInfo.uid = info.voipCallInfo.uid;
     }
 }
 } // namespace Telephony

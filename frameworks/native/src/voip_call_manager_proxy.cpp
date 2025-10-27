@@ -36,8 +36,7 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
         chainId = OHOS::HiviewDFX::HiTraceChain::Begin("ReportIncomingCall", HiTraceFlag::HITRACE_FLAG_INCLUDE_ASYNC);
     }
     MessageParcel dataParcel;
-    if (!WriteIncomingCallDataParcel(dataParcel, extras, userProfile)) {
-        TELEPHONY_LOGE("write descriptor fail");
+    if (!WriteDataParcel(dataParcel, extras, userProfile)) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     auto remote = Remote();
@@ -142,6 +141,9 @@ int32_t VoipCallManagerProxy::ReportOutgoingCall(
     dataParcel.WriteBool(extras.GetBooleanValue("showBannerForIncomingCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isConferenceCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isVoiceAnswerSupported"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isUserMuteRingToneAllowed"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isRemoteDeviceControlAllowed"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isDialingAllowedDuringCarrierCall"));
     if (!dataParcel.WriteUInt8Vector(userProfile)) {
         TELEPHONY_LOGE("ReportOutgoingCall userProfile write fail, size:%{public}u",
             static_cast<uint32_t>(userProfile.size()));
@@ -510,7 +512,7 @@ int32_t VoipCallManagerProxy::SendCallUiEventForWindow(AppExecFwk::PacMap &extra
     return replyParcel.ReadInt32();
 }
 
-bool VoipCallManagerProxy::WriteIncomingCallDataParcel(MessageParcel &dataParcel, AppExecFwk::PacMap &extras,
+bool VoipCallManagerProxy::WriteDataParcel(MessageParcel &dataParcel, AppExecFwk::PacMap &extras,
     std::vector<uint8_t> &userProfile)
 {
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
@@ -526,9 +528,9 @@ bool VoipCallManagerProxy::WriteIncomingCallDataParcel(MessageParcel &dataParcel
     dataParcel.WriteBool(extras.GetBooleanValue("showBannerForIncomingCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isConferenceCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isVoiceAnswerSupported"));
-    dataParcel.WriteBool(extras.GetBooleanValue("isUserMuteRingToneSupported"));
-    dataParcel.WriteBool(extras.GetBooleanValue("isExternalAudioDeviceOperationsSupported"));
-    dataParcel.WriteBool(extras.GetBooleanValue("isDialingAllowedDuringSystemCall"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isUserMuteRingToneAllowed"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isRemoteDeviceControlAllowed"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isDialingAllowedDuringCarrierCall"));
     dataParcel.WriteInt64(extras.GetLongValue("startReportTime"));
 
     if (!dataParcel.WriteUInt8Vector(userProfile)) {
