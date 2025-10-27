@@ -23,7 +23,6 @@
 namespace OHOS {
 namespace Telephony {
 
-
 enum class Scenario {
     /**
      * Indicates that the sendrequest request is sent through the remote
