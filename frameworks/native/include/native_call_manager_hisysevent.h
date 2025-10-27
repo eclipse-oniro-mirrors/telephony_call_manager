@@ -17,28 +17,11 @@
 #define NATIVE_CALL_MANAGER_HISYSEVENT_H
 
 #include <string>
-#include "bundle_mgr_interface.h"
 
 #include "telephony_hisysevent.h"
 
 namespace OHOS {
 namespace Telephony {
-
-enum class VoIPCallErrorCodeEnum {
-    TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL = 200,
-    SEND_INCOMINGCALL_CALL_FAILED,
-    SEND_REPORTINCOMINGCALLERROR_CALL_FAILED,
-    SEND_REPORTCALLSTATECHANGE_CALL_FAILED,
-    SEND_REPORTOUTGOINGCALL_CALL_FAILED,
-    SEND_REPORTVOIPINCOMINGCALL_CALL_FAILED,
-    SEND_REPORTVOIPCALLEXTENSIONID_CALL_FAILED,
-    SEND_ANSWER_CALL_FAILED,
-    SEND_HANGUP_CALL_FAILED,
-    SEND_REJECT_CALL_FAILED,
-    SEND_SENDCALLUIEVENT_CALL_FAILED,
-    SEND_REPORTCALLAUDIOEVENTCHANGE_CALL_FAILED,
-    SEND_SENDCALLUIEVENTFORWINDOW_CALL_FAILED,
-};
 
 enum class Scenario {
     /**
@@ -51,9 +34,6 @@ public:
     static void WriteVoipCallEvent(const std::string &callId, const std::string &bundleName,
         const int32_t scenario, const int32_t errCode, const std::string &errorMsg, const int32_t callType,
         const int32_t callState, const int32_t callDirection);
-    static void WriteVoipCallFaultEvent(const std::string &voipCallId, const int32_t errCode);
-private:
-    static void GetAppIndexByBundleName(OHOS::AppExecFwk::BundleInfo &bundleInfo);
 };
 } // namespace Telephony
 } // namespace OHOS
