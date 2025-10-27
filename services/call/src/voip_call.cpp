@@ -23,6 +23,8 @@
 
 namespace OHOS {
 namespace Telephony {
+const int32_t AUDIO_EVENT_MUTED_RINGTONE = 4;
+const int32_t AUDIO_EVENT_MUTE = 1;
 VoIPCall::VoIPCall(DialParaInfo &info) : CarrierCall(info)
 {
     callId_ = info.callId;
@@ -146,7 +148,18 @@ int32_t VoIPCall::SetMute(int32_t mute, int32_t slotId)
     GetCallAttributeInfo(info);
     std::string voipCallId = info.voipCallInfo.voipBundleName + ":" + std::to_string(info.voipCallInfo.uid) + ":" +
         info.voipCallInfo.voipCallId;
-    CallAudioEvent callAudioEvent = mute == 1 ? CallAudioEvent::AUDIO_EVENT_MUTED : CallAudioEvent::AUDIO_EVENT_UNMUTED;
+    CallAudioEvent callAudioEvent;
+    switch (mute) {
+        case AUDIO_EVENT_MUTED_RINGTONE:
+            callAudioEvent = CallAudioEvent::AUDIO_EVENT_MUTED_RINGTONE;
+            break;
+        case AUDIO_EVENT_MUTE:
+            callAudioEvent = CallAudioEvent::AUDIO_EVENT_MUTED;
+            break;
+        default:
+            callAudioEvent = CallAudioEvent::AUDIO_EVENT_UNMUTED;
+            break;
+    }
     TELEPHONY_LOGI("VoIPCall::setMute voipCallId: %{public}s, callAudioEvent: %{public}d", voipCallId.c_str(),
         callAudioEvent);
     DelayedSingleton<VoipCallConnection>::GetInstance()->SendCallUiEvent(voipCallId, callAudioEvent);
@@ -258,6 +271,11 @@ std::string VoIPCall::GetVoipCallId()
 std::string VoIPCall::GetVoipBundleName()
 {
     return voipBundleName_;
+}
+
+bool VoIPCall::GetUserMuteRingToneAllowed()
+{
+    return false;
 }
 
 int32_t VoIPCall::GetVoipUid()
