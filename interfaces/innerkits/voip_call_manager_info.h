@@ -41,6 +41,10 @@ enum class CallAudioEvent {
      * Indicates the event of speaker off.
      */
     AUDIO_EVENT_SPEAKER_OFF = 3,
+    /**
+     * Indicates whether the VOIP incoming call allows user to mute ringtone.
+     */
+    AUDIO_EVENT_MUTED_RINGTONE = 4,
 };
 
 /**
@@ -79,6 +83,10 @@ enum class VoipCallState {
      * Indicates the call is disconnecting.
      */
     VOIP_CALL_STATE_DISCONNECTING,
+    /**
+     * Indicates whether the VOIP incoming call allows user to mute ringtone.
+     */
+    VOIP_CALL_EVENT_MUTE_RINGTONE = 4,
 };
 
 /**
