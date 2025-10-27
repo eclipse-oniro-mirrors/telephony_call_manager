@@ -881,7 +881,6 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_002, TestSize.Level0)
     std::shared_ptr<NativeCallManagerHisysevent> nativeCallManagerHisysevent =
         std::make_shared<NativeCallManagerHisysevent>();
     nativeCallManagerHisysevent->WriteVoipCallEvent("001", "test", 0, 111, "testMsg", 1, 1, 1);
-    nativeCallManagerHisysevent->WriteVoipCallFaultEvent("001", 111);
 }
 
 
