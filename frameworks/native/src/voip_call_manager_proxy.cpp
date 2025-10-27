@@ -56,8 +56,8 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportIncomingCall Remote is null");
-        NativeCallManagerHisysevent::WriteVoipCallEvent(extras.GetStringValue("callId"), "",	
-            static_cast<int32_t>(Scenario::VOIP_PROXY_IPC_CONNECTTING), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL,	
+        NativeCallManagerHisysevent::WriteVoipCallEvent(extras.GetStringValue("callId"), "",
+            static_cast<int32_t>(Scenario::VOIP_PROXY_IPC_CONNECTTING), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL,
             "remote is nullptr!", extras.GetIntValue("voipCallType"),
             static_cast<int32_t>(VoipCallState::VOIP_CALL_STATE_INCOMING),
             static_cast<int32_t>(CallDirection::CALL_DIRECTION_IN));
@@ -69,8 +69,8 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
         remote->SendRequest(static_cast<int32_t>(INTERFACE_REPORT_INCOMING_CALL), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportIncomingCall call failed! errCode:%{public}d", error);
-        NativeCallManagerHisysevent::WriteVoipCallEvent(extras.GetStringValue("callId"), "",	
-            static_cast<int32_t>(Scenario::VOIP_PROXY_IPC_CONNECTTING), error,	
+        NativeCallManagerHisysevent::WriteVoipCallEvent(extras.GetStringValue("callId"), "",
+            static_cast<int32_t>(Scenario::VOIP_PROXY_IPC_CONNECTTING), error,
             "IncomingCall call failed!", extras.GetIntValue("voipCallType"),
             static_cast<int32_t>(VoipCallState::VOIP_CALL_STATE_INCOMING),
             static_cast<int32_t>(CallDirection::CALL_DIRECTION_IN));
@@ -239,8 +239,8 @@ int32_t VoipCallManagerProxy::ReportVoipIncomingCall(
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportVoipIncomingCall Remote is null");
-        NativeCallManagerHisysevent::WriteVoipCallEvent(callId, bundleName,	
-            static_cast<int32_t>(Scenario::VOIP_PROXY_IPC_CONNECTTING), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL,	
+        NativeCallManagerHisysevent::WriteVoipCallEvent(callId, bundleName,
+            static_cast<int32_t>(Scenario::VOIP_PROXY_IPC_CONNECTTING), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL,
             "voip remote is nullptr!", static_cast<int32_t>(VoipCallType::VOIP_CALL_VOICE),
             static_cast<int32_t>(VoipCallState::VOIP_CALL_STATE_INCOMING),
             static_cast<int32_t>(CallDirection::CALL_DIRECTION_IN));
@@ -252,8 +252,8 @@ int32_t VoipCallManagerProxy::ReportVoipIncomingCall(
         remote->SendRequest(static_cast<int32_t>(INTERFACE_REPORT_VOIP_INCOMING_CALL), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportVoipIncomingCall call failed! errCode:%{public}d", error);
-        NativeCallManagerHisysevent::WriteVoipCallEvent(callId, bundleName,	
-            static_cast<int32_t>(Scenario::VOIP_PROXY_IPC_CONNECTTING), error,	
+        NativeCallManagerHisysevent::WriteVoipCallEvent(callId, bundleName,
+            static_cast<int32_t>(Scenario::VOIP_PROXY_IPC_CONNECTTING), error,
             "voipIncomingCall call failed!", static_cast<int32_t>(VoipCallType::VOIP_CALL_VOICE),
             static_cast<int32_t>(VoipCallState::VOIP_CALL_STATE_INCOMING),
             static_cast<int32_t>(CallDirection::CALL_DIRECTION_IN));
