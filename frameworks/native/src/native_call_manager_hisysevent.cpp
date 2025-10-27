@@ -15,7 +15,6 @@
 
 #include "native_call_manager_hisysevent.h"
 
-
 namespace OHOS {
 namespace Telephony {
 // EVENT
