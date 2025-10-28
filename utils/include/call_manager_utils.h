@@ -32,6 +32,7 @@ public:
 
 private:
     static bool IsForcedReportVoiceCall(const CallAttributeInfo &info);
+    static void WriteVoipCallInfo(const CallAttributeInfo &info, MessageParcel &messageParcel);
 };
 } // namespace Telephony
 } // namespace OHOS

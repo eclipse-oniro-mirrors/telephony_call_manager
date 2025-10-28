@@ -88,9 +88,9 @@ struct VoipCallReportInfo {
     bool showBannerForIncomingCall = true;
     bool isConferenceCall = false;
     bool isVoiceAnswerSupported = true;
-    bool isUserMuteRingToneSupported = false;
-    bool isExternalAudioDeviceOperationsSupported = false;
-    bool isDialingAllowedDuringSystemCall = false;
+    bool isUserMuteRingToneAllowed = false;
+    bool isRemoteDeviceControlAllowed = false;
+    bool isDialingAllowedDuringCarrierCall = false;
     bool hasMicPermission = true;
     bool isCapsuleSticky = false;
     int32_t uid = 0;
@@ -661,6 +661,9 @@ struct CallDetailInfo {
         voipCallInfo.showBannerForIncomingCall = temp.voipCallInfo.showBannerForIncomingCall;
         voipCallInfo.isConferenceCall = temp.voipCallInfo.isConferenceCall;
         voipCallInfo.isVoiceAnswerSupported = temp.voipCallInfo.isVoiceAnswerSupported;
+        voipCallInfo.isUserMuteRingToneAllowed = temp.voipCallInfo.isUserMuteRingToneAllowed;
+        voipCallInfo.isRemoteDeviceControlAllowed = temp.voipCallInfo.isRemoteDeviceControlAllowed;
+        voipCallInfo.isDialingAllowedDuringCarrierCall = temp.voipCallInfo.isDialingAllowedDuringCarrierCall;
         voipCallInfo.hasMicPermission = temp.voipCallInfo.hasMicPermission;
         voipCallInfo.isCapsuleSticky = temp.voipCallInfo.isCapsuleSticky;
         voipCallInfo.uid = temp.voipCallInfo.uid;

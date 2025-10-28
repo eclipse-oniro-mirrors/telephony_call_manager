@@ -80,6 +80,9 @@ CallAttributeInfo NativeCallManagerUtils::ReadCallAttributeInfo(MessageParcel &m
         info.voipCallInfo.showBannerForIncomingCall = messageParcel.ReadBool();
         info.voipCallInfo.isConferenceCall = messageParcel.ReadBool();
         info.voipCallInfo.isVoiceAnswerSupported = messageParcel.ReadBool();
+        info.voipCallInfo.isUserMuteRingToneAllowed = messageParcel.ReadBool();
+        info.voipCallInfo.isRemoteDeviceControlAllowed = messageParcel.ReadBool();
+        info.voipCallInfo.isDialingAllowedDuringCarrierCall = messageParcel.ReadBool();
         info.voipCallInfo.hasMicPermission = messageParcel.ReadBool();
         info.voipCallInfo.isCapsuleSticky = messageParcel.ReadBool();
         info.voipCallInfo.uid = messageParcel.ReadInt32();

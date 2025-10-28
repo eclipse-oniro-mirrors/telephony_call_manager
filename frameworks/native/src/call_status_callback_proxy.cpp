@@ -54,9 +54,9 @@ int32_t CallStatusCallbackProxy::UpdateCallReportInfo(const CallReportInfo &info
         dataParcel.WriteBool(info.voipCallInfo.showBannerForIncomingCall);
         dataParcel.WriteBool(info.voipCallInfo.isConferenceCall);
         dataParcel.WriteBool(info.voipCallInfo.isVoiceAnswerSupported);
-        dataParcel.WriteBool(info.voipCallInfo.isUserMuteRingToneSupported);
-        dataParcel.WriteBool(info.voipCallInfo.isExternalAudioDeviceOperationsSupported);
-        dataParcel.WriteBool(info.voipCallInfo.isDialingAllowedDuringSystemCall);
+        dataParcel.WriteBool(info.voipCallInfo.isUserMuteRingToneAllowed);
+        dataParcel.WriteBool(info.voipCallInfo.isRemoteDeviceControlAllowed);
+        dataParcel.WriteBool(info.voipCallInfo.isDialingAllowedDuringCarrierCall);
         dataParcel.WriteBool(info.voipCallInfo.hasMicPermission);
         dataParcel.WriteBool(info.voipCallInfo.isCapsuleSticky);
         dataParcel.WriteInt32(info.voipCallInfo.uid);
@@ -78,42 +78,12 @@ int32_t CallStatusCallbackProxy::UpdateCallsReportInfo(const CallsReportInfo &in
     MessageParcel replyParcel;
     MessageOption option;
     int32_t error = TELEPHONY_ERR_FAIL;
-    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+
+    error = PackUpdateCallsReportInfo(info, dataParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        return error;
     }
-    dataParcel.WriteInt32(info.callVec.size());
-    for (auto &it : info.callVec) {
-        dataParcel.WriteInt32(it.index);
-        dataParcel.WriteCString(it.accountNum);
-        dataParcel.WriteInt32(it.accountId);
-        dataParcel.WriteInt32(static_cast<int32_t>(it.callType));
-        dataParcel.WriteInt32(static_cast<int32_t>(it.callMode));
-        dataParcel.WriteInt32(static_cast<int32_t>(it.state));
-        dataParcel.WriteInt32(it.voiceDomain);
-        dataParcel.WriteInt32(it.mpty);
-        dataParcel.WriteInt32(it.crsType);
-        dataParcel.WriteInt32(it.originalCallType);
-        if (it.callType == CallType::TYPE_VOIP) {
-            dataParcel.WriteString(it.voipCallInfo.voipCallId);
-            dataParcel.WriteString(it.voipCallInfo.userName);
-            dataParcel.WriteString(it.voipCallInfo.abilityName);
-            dataParcel.WriteString(it.voipCallInfo.extensionId);
-            dataParcel.WriteString(it.voipCallInfo.voipBundleName);
-            dataParcel.WriteBool(it.voipCallInfo.showBannerForIncomingCall);
-            dataParcel.WriteBool(it.voipCallInfo.isConferenceCall);
-            dataParcel.WriteBool(it.voipCallInfo.isVoiceAnswerSupported);
-            dataParcel.WriteBool(it.voipCallInfo.hasMicPermission);
-            dataParcel.WriteBool(it.voipCallInfo.isCapsuleSticky);
-            dataParcel.WriteInt32(it.voipCallInfo.uid);
-            dataParcel.WriteUInt8Vector(it.voipCallInfo.userProfile);
-        }
-        dataParcel.WriteString(it.name);
-        dataParcel.WriteInt32(it.namePresentation);
-        dataParcel.WriteInt32(it.newCallUseBox);
-        dataParcel.WriteInt32(static_cast<int32_t>(it.reason));
-        dataParcel.WriteString(it.message);
-    }
-    dataParcel.WriteInt32(info.slotId);
+
     if (Remote() == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -857,6 +827,47 @@ int32_t CallStatusCallbackProxy::HandleCameraCapabilitiesChanged(const CameraCap
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
+}
+
+int32_t CallStatusCallbackProxy::PackUpdateCallsReportInfo(const CallsReportInfo &info, MessageParcel &dataParcel)
+{
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(info.callVec.size());
+    for (auto &it : info.callVec) {
+        dataParcel.WriteInt32(it.index);
+        dataParcel.WriteCString(it.accountNum);
+        dataParcel.WriteInt32(it.accountId);
+        dataParcel.WriteInt32(static_cast<int32_t>(it.callType));
+        dataParcel.WriteInt32(static_cast<int32_t>(it.callMode));
+        dataParcel.WriteInt32(static_cast<int32_t>(it.state));
+        dataParcel.WriteInt32(it.voiceDomain);
+        dataParcel.WriteInt32(it.mpty);
+        dataParcel.WriteInt32(it.crsType);
+        dataParcel.WriteInt32(it.originalCallType);
+        if (it.callType == CallType::TYPE_VOIP) {
+            dataParcel.WriteString(it.voipCallInfo.voipCallId);
+            dataParcel.WriteString(it.voipCallInfo.userName);
+            dataParcel.WriteString(it.voipCallInfo.abilityName);
+            dataParcel.WriteString(it.voipCallInfo.extensionId);
+            dataParcel.WriteString(it.voipCallInfo.voipBundleName);
+            dataParcel.WriteBool(it.voipCallInfo.showBannerForIncomingCall);
+            dataParcel.WriteBool(it.voipCallInfo.isConferenceCall);
+            dataParcel.WriteBool(it.voipCallInfo.isVoiceAnswerSupported);
+            dataParcel.WriteBool(it.voipCallInfo.hasMicPermission);
+            dataParcel.WriteBool(it.voipCallInfo.isCapsuleSticky);
+            dataParcel.WriteInt32(it.voipCallInfo.uid);
+            dataParcel.WriteUInt8Vector(it.voipCallInfo.userProfile);
+        }
+        dataParcel.WriteString(it.name);
+        dataParcel.WriteInt32(it.namePresentation);
+        dataParcel.WriteInt32(it.newCallUseBox);
+        dataParcel.WriteInt32(static_cast<int32_t>(it.reason));
+        dataParcel.WriteString(it.message);
+    }
+    dataParcel.WriteInt32(info.slotId);
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

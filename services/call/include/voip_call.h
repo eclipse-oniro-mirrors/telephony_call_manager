@@ -68,6 +68,9 @@ private:
     bool showBannerForIncomingCall_ = true;
     bool isConferenceCall_ = false;
     bool isVoiceAnswerSupported_ = true;
+    bool isUserMuteRingToneAllowed_ = false;
+    bool isRemoteDeviceControlAllowed_ = false;
+    bool isDialingAllowedDuringCarrierCall_ = false;
     bool hasMicPermission_ = true;
     bool isCapsuleSticky_ = false;
     int32_t uid_ = 0;

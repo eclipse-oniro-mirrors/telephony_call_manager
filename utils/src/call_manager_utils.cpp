@@ -68,20 +68,7 @@ void CallManagerUtils::WriteCallAttributeInfo(const CallAttributeInfo &info, Mes
     messageParcel.WriteCString(info.numberMarkInfo.markDetails);
     messageParcel.WriteCString(info.contactName);
     messageParcel.WriteString(info.extraParamsString);
-    if (info.callType == CallType::TYPE_VOIP) {
-        messageParcel.WriteString(info.voipCallInfo.voipCallId);
-        messageParcel.WriteString(info.voipCallInfo.userName);
-        messageParcel.WriteString(info.voipCallInfo.abilityName);
-        messageParcel.WriteString(info.voipCallInfo.extensionId);
-        messageParcel.WriteString(info.voipCallInfo.voipBundleName);
-        messageParcel.WriteBool(info.voipCallInfo.showBannerForIncomingCall);
-        messageParcel.WriteBool(info.voipCallInfo.isConferenceCall);
-        messageParcel.WriteBool(info.voipCallInfo.isVoiceAnswerSupported);
-        messageParcel.WriteBool(info.voipCallInfo.hasMicPermission);
-        messageParcel.WriteBool(info.voipCallInfo.isCapsuleSticky);
-        messageParcel.WriteInt32(info.voipCallInfo.uid);
-        messageParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
-    }
+    WriteVoipCallInfo(info, messageParcel);
     messageParcel.WriteInt32(info.phoneOrWatch);
 }
 
@@ -102,6 +89,27 @@ bool CallManagerUtils::IsBundleInstalled(const std::string &bundleName, int32_t 
         return false;
     }
     return isInstalled;
+}
+
+void CallManagerUtils::WriteVoipCallInfo(const CallAttributeInfo &info, MessageParcel &messageParcel)
+{
+    if (info.callType == CallType::TYPE_VOIP) {
+    messageParcel.WriteString(info.voipCallInfo.voipCallId);
+    messageParcel.WriteString(info.voipCallInfo.userName);
+    messageParcel.WriteString(info.voipCallInfo.abilityName);
+    messageParcel.WriteString(info.voipCallInfo.extensionId);
+    messageParcel.WriteString(info.voipCallInfo.voipBundleName);
+    messageParcel.WriteBool(info.voipCallInfo.showBannerForIncomingCall);
+    messageParcel.WriteBool(info.voipCallInfo.isConferenceCall);
+    messageParcel.WriteBool(info.voipCallInfo.isVoiceAnswerSupported);
+    messageParcel.WriteBool(info.voipCallInfo.isUserMuteRingToneAllowed);
+    messageParcel.WriteBool(info.voipCallInfo.isRemoteDeviceControlAllowed);
+    messageParcel.WriteBool(info.voipCallInfo.isDialingAllowedDuringCarrierCall);
+    messageParcel.WriteBool(info.voipCallInfo.hasMicPermission);
+    messageParcel.WriteBool(info.voipCallInfo.isCapsuleSticky);
+    messageParcel.WriteInt32(info.voipCallInfo.uid);
+    messageParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
