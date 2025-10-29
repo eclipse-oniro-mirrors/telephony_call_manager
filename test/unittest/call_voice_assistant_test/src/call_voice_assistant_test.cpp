@@ -64,6 +64,8 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001,
     ASSERT_FALSE(voicePtr == nullptr);
     voicePtr->mInstance_ = voicePtr;
     voicePtr->CallStateUpdated(callObjectPtr, priorState, nextState);
+    callObjectPtr->SetCallType(CallType::TYPE_VOIP);
+    voicePtr->CallStateUpdated(callObjectPtr, priorState, nextState);
     voicePtr->CallStatusDialing(callId, accountId);
     voicePtr->CallStatusIncoming(callId, accountId);
     voicePtr->CallStatusActive(callId, accountId);

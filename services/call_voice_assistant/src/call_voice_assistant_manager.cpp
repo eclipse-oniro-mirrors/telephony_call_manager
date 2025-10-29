@@ -505,6 +505,9 @@ void CallVoiceAssistantManager::CallStateUpdated(
             TELEPHONY_LOGE("callobject is nullptr");
             return;
         }
+        if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
+            return;
+        }
         TelCallState callState = callObjectPtr->GetTelCallState();
         if (callState != TelCallState::CALL_STATUS_ACTIVE && callState != TelCallState::CALL_STATUS_DIALING &&
             callState != TelCallState::CALL_STATUS_INCOMING && callState != TelCallState::CALL_STATUS_DISCONNECTED) {
