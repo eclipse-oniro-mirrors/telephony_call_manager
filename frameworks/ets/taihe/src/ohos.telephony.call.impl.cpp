@@ -553,7 +553,7 @@ bool DialCallSyncPhoneNumber(::taihe::string_view phoneNumber)
 {
     CallManagerClientInitializer init;
     int32_t callState = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->GetCallState();
-    return static_cast<::ohos::telephony::call::CallState:from_value(callState);
+    return ::ohos::telephony::call::CallState:from_value(callState);
 }
 
 bool HasCallSync()
