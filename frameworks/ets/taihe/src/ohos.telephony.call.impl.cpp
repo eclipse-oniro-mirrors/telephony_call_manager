@@ -117,7 +117,11 @@ void FormatPhoneNumberSync2(::taihe::string_view phoneNumber)
 {
     CallManagerClientInitializer init;
     std::u16string phoneNum = OHOS::Str8ToStr16(std::string(phoneNumber));
-    std::u16string countryCode = OHOS::Str8ToStr16("cn");
+    std::string Code = std::string(options.countryCode.value_or("cn"));
+    if (code.size() < 1) {
+        code = "cn";
+    }
+    std::u16string countryCode = OHOS::Str8ToStr16(code);
     std::u16string formatNum = OHOS::Str8ToStr16("");
     auto errCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->FormatPhoneNumber(
         phoneNum, countryCode, formatNum);
@@ -548,9 +552,9 @@ bool DialCallSyncPhoneNumber(::taihe::string_view phoneNumber)
 ::ohos::telephony::call::CallState GetCallStateSync()
 {
     CallManagerClientInitializer init;
-    int32_t callState = static_cast<int32_t>(CallStateToApp::CALL_STATE_UNKNOWN);
+    int32_t callState;
     callState = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->GetCallState();
-    return static_cast<::ohos::telephony::call::CallState::key_t>(callState);
+    return static_cast<::ohos::telephony::call::CallState:from_value(callState);
 }
 
 bool HasCallSync()
