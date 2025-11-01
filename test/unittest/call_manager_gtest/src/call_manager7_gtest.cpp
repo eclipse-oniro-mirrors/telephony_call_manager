@@ -327,7 +327,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, TestSize.Level1)
     ASSERT_NE(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
-    callManagerService->writeVoipCallFaultEvent('callId', 123);
+    callManagerService->WriteVoipCallFaultEvent("callId", 123);
     ASSERT_NE(callManagerService->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_SUCCESS);
 }
 
