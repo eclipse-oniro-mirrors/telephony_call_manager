@@ -21,7 +21,7 @@
 #include "telephony_log_wrapper.h"
 #include "native_call_manager_hisysevent.h"
 #include "hitrace/tracechain.h"
-
+#include "call_manager_proxy.h"
 namespace OHOS {
 namespace Telephony {
 VoipCallManagerProxy::VoipCallManagerProxy(const sptr<IRemoteObject> &impl)
