@@ -269,7 +269,7 @@ int32_t VoipCallConnection::WriteVoipCallFaultEvent(std::string voipCallId, int3
         if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
             sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
             if (voipCall->GetVoipCallId() == voipCallId) {
-            CallManagerHisysevent::WriteVoipCallFaultEvent(voipCallId, voipCall->GetVoipUid(), faultId);
+                CallManagerHisysevent::WriteVoipCallFaultEvent(voipCallId, voipCall->GetVoipUid(), faultId);
             }
         }
     }
