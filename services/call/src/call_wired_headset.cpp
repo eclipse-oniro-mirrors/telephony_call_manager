@@ -65,8 +65,8 @@ bool CallWiredHeadSet::Init()
     subscribeIdForMediaPauseDown_ = RegistKeyEvent(MEDIA_PLAY_PAUSE_KEY, true, pressedDownCallBack);
     subscribeIdForMediaPausedUp_ = RegistKeyEvent(MEDIA_PLAY_PAUSE_KEY, false, pressedUpCallBack);
 
-    TELEPHONY_LOGI("pressUp = %{public}d, pressDown = %{public}d, pauseUp = %{public}d, pauseDown = %{public}d",
-        subscribeIdForPressedUp_, subscribeIdForPressedUp_, subscribeIdForMediaPauseDown_,
+    TELEPHONY_LOGI("pressDown = %{public}d, pressUp = %{public}d, pauseDown = %{public}d, pauseUp = %{public}d",
+        subscribeIdForPressedDown_, subscribeIdForPressedUp_, subscribeIdForMediaPauseDown_,
         subscribeIdForMediaPausedUp_);
     return true;
 }
