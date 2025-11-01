@@ -43,7 +43,7 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportIncomingCall Remote is null");
         WriteVoipCallFaultEvent(extras.GetStringValue("callId"),
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_INCOMINGCALL_CALL_FAILED));
+            static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     MessageOption option;
@@ -53,7 +53,7 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportIncomingCall call failed! errCode:%{public}d", error);
         WriteVoipCallFaultEvent(extras.GetStringValue("callId"),
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
+            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_INCOMINGCALL_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = replyParcel.ReadInt32();
@@ -111,7 +111,7 @@ int32_t VoipCallManagerProxy::ReportCallStateChange(
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportCallStateChange Remote is null");
-        NativeCallManagerHisysevent::WriteVoipCallFaultEvent(callId,
+        WriteVoipCallFaultEvent(callId,
             static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -121,7 +121,7 @@ int32_t VoipCallManagerProxy::ReportCallStateChange(
         remote->SendRequest(static_cast<int32_t>(INTERFACE_REPORT_CALL_STATE_CHANGE), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportCallStateChange call failed! errCode:%{public}d", error);
-        NativeCallManagerHisysevent::WriteVoipCallFaultEvent(callId,
+        WriteVoipCallFaultEvent(callId,
             static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_REPORTCALLSTATECHANGE_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -570,6 +570,11 @@ bool VoipCallManagerProxy::WriteDataParcel(MessageParcel &dataParcel, AppExecFwk
     }
 
     return true;
+}
+
+void VoipCallManagerProxy::WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId)
+{
+    DelayedSingleton<CallManagerProxy>::GetInstance()->WriteVoipCallFaultEvent(voipCallId, faultId);
 }
 } // namespace Telephony
 } // namespace OHOS
