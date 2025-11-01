@@ -1767,7 +1767,7 @@ int32_t CallManagerProxy::WriteVoipCallFaultEvent(std::string voipCallId, int32_
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t errCode = callManagerServicePtr_->WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId);
+    int32_t errCode = callManagerServicePtr_->WriteVoipCallFaultEvent(voipCallId, faultId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("WriteVoipCallFaultEvent failed, errcode:%{public}d", errCode);
         return errCode;
