@@ -595,6 +595,13 @@ HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTes
     int32_t systemAbilityId = 1;
     voipCallConnection->Init(systemAbilityId);
     voipCallConnection->SendCallUiEventForWindow(extras);
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    inof.CallType = CallType::TYPE_VOIP;
+    sptr<CallBase> voipCall = CallStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    CallObjectManager::AddOneCallObject(ringingCall);
+    voipCallConnection->WriteVoipCallFaultEvent(voipCall->GetVoipCallId(), 200);
     voipCallConnection->ClearVoipCall();
 }
 

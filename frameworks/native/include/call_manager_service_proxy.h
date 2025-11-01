@@ -777,7 +777,7 @@ public:
      */
     int32_t SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
         bool isIncomingTrustlist, const std::vector<std::string> &incomingList) override;
-        
+    int32_t WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId) override;
 private:
     int32_t SendRequest(CallManagerInterfaceCode code);
     int32_t SendRequest(CallManagerInterfaceCode code, MessageParcel &dataParcel, MessageParcel &replyParcel);

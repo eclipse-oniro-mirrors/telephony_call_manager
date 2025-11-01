@@ -110,6 +110,8 @@ void CallManagerServiceStub::InitCallUtilsRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnObserverOnCallDetailsChange(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_POLICY_INFO)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetCallPolicyInfo(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_WRITE_VOIP_CALL_FAULT_EVENT)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnWriteVoipCallFaultEvent(data, reply); };
 }
 
 void CallManagerServiceStub::InitCallConferenceRequest()
@@ -1500,6 +1502,20 @@ int32_t CallManagerServiceStub::OnSetCallPolicyInfo(MessageParcel &data, Message
     result = SetCallPolicyInfo(isDialingTrustlist, dialingList, isIncomingTrustlist, incomingList);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("SetCallPolicyInfo fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnWriteVoipCallFaultEvent(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    std::string voipCallId = data.ReadString();
+    data.ReadStringVector(&dialingList);
+    int32_t faultId = data.ReadInt32();
+    result = writeVoipCallFaultEvent(voipCallId, faultId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnWriteVoipCallFaultEvent fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;

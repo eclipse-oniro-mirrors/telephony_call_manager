@@ -121,6 +121,7 @@ public:
     virtual int32_t SendUssdResponse(int32_t slotId, const std::string &content) = 0;
     virtual int32_t SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
         bool isIncomingTrustlist, const std::vector<std::string> &incomingList) = 0;
+    virtual int32_t WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallManagerService");

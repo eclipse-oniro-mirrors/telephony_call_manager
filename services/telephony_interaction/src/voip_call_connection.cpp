@@ -138,8 +138,7 @@ int32_t VoipCallConnection::HangUpCall(const VoipCallEventInfo &events)
         TELEPHONY_LOGI("Voipconnect HangUpCall voipCallManagerInterfacePtr_ is null");
         return TELEPHONY_ERROR;
     }
-    CallManagerHisysevent::WriteVoipCallStatisticalEvent(events.voipCallId, events.bundleName,
-        events.uid, "HungupByCallmanager");
+    CallManagerHisysevent::WriteVoipCallStatisticalEvent(events.voipCallId, events.uid, "HungupByCallmanager");
     return voipCallManagerInterfacePtr_->HangUp(events);
 }
 
@@ -261,6 +260,20 @@ int32_t VoipCallConnection::SendCallUiEventForWindow(AppExecFwk::PacMap &extras)
         return TELEPHONY_ERROR;
     }
     return voipCallManagerInterfacePtr_->SendCallUiEventForWindow(extras);
+}
+
+int32_t VoipCallConnection::WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId)
+{
+    std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
+    for (auto call : allCallList) {
+        if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
+            sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
+            if (voipCall->GetVoipCallId() == voipCallId) {
+            CallManagerHisysevent::WriteVoipCallFaultEvent(voipCallId, voipCall->GetVoipUid(), faultId);
+            }
+        }
+    }
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

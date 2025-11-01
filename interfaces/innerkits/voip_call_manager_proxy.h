@@ -184,6 +184,7 @@ public:
 
 private:
     bool WriteDataParcel(MessageParcel &dataParcel, AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile);
+    void WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId);
 
 private:
     static inline BrokerDelegator<VoipCallManagerProxy> delegator_;
