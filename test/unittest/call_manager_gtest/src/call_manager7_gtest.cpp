@@ -831,6 +831,30 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_009, TestSize.Level0
 }
 
 /**
+ * @tc.number   Telephony_CallManagerServiceStub_010
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_010, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel reply;
+    MessageParcel data12;
+    data12.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    std::vector<std::string> dialingList;
+    std::vector<std::string> incomingList;
+    data12.WriteInt32(0);
+    data12.WriteStringVector(dialingList);
+    data12.WriteInt32(0);
+    data12.WriteStringVector(incomingList);
+    MessageParcel data13;
+    std::string bundleName("abc");
+    data13.WriteString(bundleName);
+    data13.WriteInt32(0);
+    callManagerService->OnWriteVoipCallFaultEvent(data13, reply);
+    ASSERT_EQ(callManagerService->OnSetCallPolicyInfo(data12, reply), TELEPHONY_SUCCESS);
+}
+/**
  * @tc.number   Telephony_VoipCall_001
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
