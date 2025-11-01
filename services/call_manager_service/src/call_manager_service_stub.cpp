@@ -1511,9 +1511,8 @@ int32_t CallManagerServiceStub::OnWriteVoipCallFaultEvent(MessageParcel &data, M
 {
     int32_t result = TELEPHONY_ERR_FAIL;
     std::string voipCallId = data.ReadString();
-    data.ReadStringVector(&dialingList);
     int32_t faultId = data.ReadInt32();
-    result = writeVoipCallFaultEvent(voipCallId, faultId);
+    result = WriteVoipCallFaultEvent(voipCallId, faultId);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("OnWriteVoipCallFaultEvent fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
