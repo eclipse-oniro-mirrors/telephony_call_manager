@@ -770,7 +770,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_008, TestSize.Level0
     data12.WriteStringVector(incomingList);
     MessageParcel data13;
     std::string bundleName("abc");
-    data12.WriteString(bundleName);
+    data13.WriteString(bundleName);
     data13.WriteInt32(0);
     callManagerService->OnWriteVoipCallFaultEvent(data13, reply);
     ASSERT_EQ(callManagerService->OnSetCallPolicyInfo(data12, reply), TELEPHONY_SUCCESS);
