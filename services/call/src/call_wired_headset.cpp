@@ -55,15 +55,15 @@ bool CallWiredHeadSet::Init()
 
     auto pressedUpCallBack = [this](const std::shared_ptr<OHOS::MMI::KeyEvent> event) {
         this->DealKeyPressedUp(event);
-    }
+    };
     auto pressedDownCallBack = [this](const std::shared_ptr<OHOS::MMI::KeyEvent> event) {
         this->DealKeyPressedDown(event);
-    }
+    };
 
     subscribeIdForPressedDown_ = RegistKeyEvent(HEADSETHOOK_KEY, true, pressedDownCallBack);
     subscribeIdForPressedUp_ = RegistKeyEvent(HEADSETHOOK_KEY, false, pressedUpCallBack);
-    subscribeIdForMediaPauseDown_ = RegistKeyEvent(HEADSETHOOK_KEY, true, pressedDownCallBack);
-    subscribeIdForMediaPausedUp_ = RegistKeyEvent(HEADSETHOOK_KEY, false, pressedUpCallBack);
+    subscribeIdForMediaPauseDown_ = RegistKeyEvent(MEDIA_PLAY_PAUSE_KEY, true, pressedDownCallBack);
+    subscribeIdForMediaPausedUp_ = RegistKeyEvent(MEDIA_PLAY_PAUSE_KEY, false, pressedUpCallBack);
 
     TELEPHONY_LOGI("pressUp = %{public}d, pressDown = %{public}d, pauseUp = %{public}d, pauseDown = %{public}d",
         subscribeIdForPressedUp_, subscribeIdForPressedUp_, subscribeIdForMediaPauseDown_,
@@ -91,7 +91,7 @@ std::shared_ptr<MMI::KeyOption> CallWiredHeadSet::InitOption(
     return keyOption;
 }
 
-int32_t CallWiredHeadSet::RegistKeyEvent(int32_t keyCode, bool isFinalKeyDown， const WiredHeadSetCallback &callback)
+int32_t CallWiredHeadSet::RegistKeyEvent(int32_t keyCode, bool isFinalKeyDown, const WiredHeadSetCallback &callback)
 {
     std::set<int32_t> preKeys;
     std::shared_ptr<MMI::KeyOption> keyOption = InitOption(preKeys, keyCode, isFinalKeyDown, 0);
