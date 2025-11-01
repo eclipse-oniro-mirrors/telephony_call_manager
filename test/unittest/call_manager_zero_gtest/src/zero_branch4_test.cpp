@@ -900,7 +900,8 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_003, TestSize.Level0)
     sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call1.GetRefPtr());
     callManagerHisysevent->WriteVoipCallStatisticalEvent("123", 100, "statisticalField");
     callManagerHisysevent->WriteVoipCallStatisticalEvent(call1->GetCallID(), "statisticalField");
-    callManagerHisysevent->GetAppIndexByBundleName(voipCall->GetVoipBundleName(), voipCall->GetVoipUid(), appIndex);
+    std::string bundleName = voipCall->GetVoipBundleName();
+    callManagerHisysevent->GetAppIndexByBundleName(bundleName, voipCall->GetVoipUid(), appIndex);
     callManagerHisysevent->WriteVoipCallFaultEvent("123", 123, 233);
     EXPECT_EQ(appIndex, -1);
 }
