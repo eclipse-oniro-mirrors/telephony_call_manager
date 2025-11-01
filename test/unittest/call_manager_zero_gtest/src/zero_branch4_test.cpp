@@ -902,6 +902,7 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_003, TestSize.Level0)
     callManagerHisysevent->WriteVoipCallStatisticalEvent(call1->GetCallID(), "statisticalField");
     callManagerHisysevent->GetAppIndexByBundleName(voipCall->GetVoipBundleName(), voipCall->GetVoipUid(), appIndex);
     callManagerHisysevent->WriteVoipCallFaultEvent("123", 123, 233);
+    callManagerHisysevent->WriteVoipCallFaultEvent("123", 123, 233);
     EXPECT_EQ(appIndex, -1);
 }
 /**

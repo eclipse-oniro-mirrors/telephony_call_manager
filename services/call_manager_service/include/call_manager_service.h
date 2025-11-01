@@ -825,6 +825,7 @@ public:
      */
     int32_t SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
         bool isIncomingTrustlist, const std::vector<std::string> &incomingList) override;
+    int32_t WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId) override;
 private:
     std::string GetBundleInfo();
     int32_t dealCeliaCallEvent(int32_t callId);

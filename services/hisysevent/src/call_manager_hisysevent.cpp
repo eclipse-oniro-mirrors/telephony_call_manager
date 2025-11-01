@@ -338,10 +338,11 @@ void CallManagerHisysevent::JudgingAnswerTimeOut(const int32_t slotId, const int
     }
 }
 
-void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const std::string &voipCallId, const std::string &bundleName,
-    const int32_t &uid, const std::string statisticalField)
+void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const std::string &voipCallId, const int32_t &uid,
+    const std::string statisticalField)
 {
-    ffrt::submit([voipCallId, bundleName, uid, statisticalField]() {
+    ffrt::submit([voipCallId, uid, statisticalField]() {
+        std::string bundleName;
         int32_t appIndex = -1;
         GetAppIndexByBundleName(bundleName, uid, appIndex);
         HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_STATISTICS", EventType::STATISTIC, CALL_ID_KEY, voipCallId,
@@ -356,8 +357,7 @@ void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const int32_t &callId,
     }
 
     sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
-    WriteVoipCallStatisticalEvent(voipCall->GetVoipCallId(), voipCall->GetVoipBundleName(), voipCall->GetVoipUid(),
-        statisticalField);
+    WriteVoipCallStatisticalEvent(voipCall->GetVoipCallId(), voipCall->GetVoipUid(), statisticalField);
 }
 
 void CallManagerHisysevent::WriteVoipCallFaultEvent(const std::string &voipCallId, int32_t uid, const int32_t errCode)
@@ -372,7 +372,7 @@ void CallManagerHisysevent::WriteVoipCallFaultEvent(const std::string &voipCallI
     });
 }
 
-void CallManagerHisysevent::GetAppIndexByBundleName(std::string bundleName, int32_t uid, int32_t &appIndex)
+void CallManagerHisysevent::GetAppIndexByBundleName(std::string &bundleName, int32_t uid, int32_t &appIndex)
 {
     sptr<ISystemAbilityManager> systemAbilityManager =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
