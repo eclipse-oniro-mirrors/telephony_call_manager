@@ -598,9 +598,9 @@ HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTes
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     CallDetailInfo info;
     info.state = TelCallState::CALL_STATUS_ACTIVE;
-    inof.CallType = CallType::TYPE_VOIP;
-    sptr<CallBase> voipCall = CallStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
-    CallObjectManager::AddOneCallObject(ringingCall);
+    info.callType = CallType::TYPE_VOIP;
+    sptr<CallBase> voipCall = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    CallObjectManager::AddOneCallObject(voipCall);
     voipCallConnection->WriteVoipCallFaultEvent(voipCall->GetVoipCallId(), 200);
     voipCallConnection->ClearVoipCall();
 }
