@@ -1860,9 +1860,10 @@ int32_t CallManagerService::SetCallPolicyInfo(bool isDialingTrustlist, const std
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
 }
+
 int32_t CallManagerService::WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId)
 {
-    return DelayedSingleton<CellularCallConnection>::GetInstance()->WriteVoipCallFaultEvent(voipCallId, faultId);
+    return DelayedSingleton<VoipCallConnection>::GetInstance()->WriteVoipCallFaultEvent(voipCallId, faultId);
 }
 } // namespace Telephony
 } // namespace OHOS
