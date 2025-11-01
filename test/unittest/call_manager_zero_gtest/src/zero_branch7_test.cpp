@@ -599,8 +599,9 @@ HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTes
     CallDetailInfo info;
     info.state = TelCallState::CALL_STATUS_ACTIVE;
     info.callType = CallType::TYPE_VOIP;
-    sptr<CallBase> voipCall = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
-    CallObjectManager::AddOneCallObject(voipCall);
+    sptr<CallBase> call = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
+    CallObjectManager::AddOneCallObject(call);
     voipCallConnection->WriteVoipCallFaultEvent(voipCall->GetVoipCallId(), 200);
     voipCallConnection->ClearVoipCall();
 }
