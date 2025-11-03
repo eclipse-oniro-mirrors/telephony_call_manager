@@ -83,6 +83,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBroadcastSubscriber_001, TestSize.Level0
     subscriber.HighTempLevelChangedBroadcast(eventData);
     subscriber.ConnectCallUiSuperPrivacyModeBroadcast(eventData);
     subscriber.UpdateBluetoothDeviceName(eventData);
+    subscriber.UpdateNearlinkDeviceName(eventData);
     subscriber.ConnectCallUiUserSwitchedBroadcast(eventData);
     ASSERT_NE(sizeof(eventData), 0);
 }
@@ -405,6 +406,32 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBroadcastSubscriber_004, Function | Medi
     EXPECT_EQ(DelayedSingleton<BluetoothCallConnection>::GetInstance()->hfpPhoneNumber_, phoneNumber);
     EXPECT_EQ(DelayedSingleton<BluetoothCallConnection>::GetInstance()->hfpContactName_, contact);
     CallObjectManager::DeleteOneCallObject(alertingCall);
+}
+
+/**
+ * @tc.number   Telephony_CallBroadCastSubscriber_005
+ * @tc.name     test OnReceiveEvent ex
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallBroadCastSubscriber_005, Function | MediumTest | Level1)
+{
+    g_receiveUnknownEvent = false;
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
+    subscriberPtr->memberFuncMap_[CallBroadcastSubscriber::UNKNOWN_BROADCAST_EVENT] =
+        [](const EventFwk::CommonEventData &data) { UnknownBroadcastStub(data); };
+    EventFwk::CommonEventData data;
+    OHOS::EventFwk::Want want;
+    want.SetAction("usual.event.nearlink.remotedevice.NAME_UPDATE");
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    want.SetAction("unknown.event");
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    subscriberPtr->memberFuncMap_.clear();
+    subscriberPtr->OnReceiveEvent(data);
+    EXPECT_TRUE(g_receiveUnknownEvent);
 }
 
 /**

@@ -79,6 +79,14 @@ public:
      */
     void UpdateBluetoothDeviceName(const std::string &macAddress, const std::string &deviceName);
 
+    /**
+     * @brief Update nearlink device name
+     *
+     * @param macAddress[in], mac address
+     * @param deviceName[in], device name
+     */
+    void UpdateNearlinkDeviceName(const std::string &macAddress, const std::string &deviceName);
+
     AudioDeviceType GetCurrentAudioDevice();
 
 private:
@@ -101,6 +109,7 @@ private:
     void UpdateBtDevice(std::string &address, std::string &deviceName);
     void UpdateNearlinkDevice(std::string &address, std::string &deviceName);
     void UpdateBtHearingAidDevice(std::string &address, std::string &deviceName);
+    bool UpdateDeviceName(const std::string &macAddress, const std::string &deviceName, AudioDeviceType deviceType);
     ffrt::mutex mutex_;
     ffrt::mutex infoMutex_;
     AudioDeviceType audioDeviceType_;

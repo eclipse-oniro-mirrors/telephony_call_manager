@@ -49,6 +49,8 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { ConnectCallUiSuperPrivacyModeBroadcast(data); };
     memberFuncMap_[BLUETOOTH_REMOTEDEVICE_NAME_UPDATE] =
         [this](const EventFwk::CommonEventData &data) { UpdateBluetoothDeviceName(data); };
+    memberFuncMap_[NEARLINK_REMOTEDEVICE_NAME_UPDATE] =
+        [this](const EventFwk::CommonEventData &data) { UpdateNearlinkDeviceName(data); };
     memberFuncMap_[USER_SWITCHED] =
         [this](const EventFwk::CommonEventData &data) { ConnectCallUiUserSwitchedBroadcast(data); };
     memberFuncMap_[SHUTDOWN] =
@@ -81,6 +83,8 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
         code = HSDR_EVENT;
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_REMOTEDEVICE_NAME_UPDATE) {
         code = BLUETOOTH_REMOTEDEVICE_NAME_UPDATE;
+    } else if (action == "usual.event.nearlink.remotedevice.NAME_UPDATE") {
+        code = NEARLINK_REMOTEDEVICE_NAME_UPDATE;
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         code = USER_SWITCHED;
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SHUTDOWN) {
@@ -167,6 +171,13 @@ void CallBroadcastSubscriber::UpdateBluetoothDeviceName(const EventFwk::CommonEv
     std::string macAddress = data.GetWant().GetStringParam("deviceAddr");
     std::string deviceName = data.GetWant().GetStringParam("remoteName");
     DelayedSingleton<AudioDeviceManager>::GetInstance()->UpdateBluetoothDeviceName(macAddress, deviceName);
+}
+
+void CallBroadcastSubscriber::UpdateNearlinkDeviceName(const EventFwk::CommonEventData &data)
+{
+    std::string macAddress = data.GetWant().GetStringParam("deviceAddr");
+    std::string deviceName = data.GetWant().GetStringParam("remoteName");
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->UpdateNearlinkDeviceName(macAddress, deviceName);
 }
 
 void CallBroadcastSubscriber::ConnectCallUiUserSwitchedBroadcast(const EventFwk::CommonEventData &data)
