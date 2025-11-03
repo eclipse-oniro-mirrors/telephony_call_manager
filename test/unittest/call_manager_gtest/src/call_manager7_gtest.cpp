@@ -327,6 +327,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, TestSize.Level1)
     ASSERT_NE(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
+    callManagerService->WriteVoipCallFaultEvent("callId", 123);
     ASSERT_NE(callManagerService->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_SUCCESS);
 }
 
@@ -759,15 +760,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_008, TestSize.Level0
     data11.WriteRawData((const void *)&imsCallMode, length);
     data11.RewindRead(0);
     ASSERT_EQ(callManagerService->OnUpdateCallMediaMode(data11, reply), TELEPHONY_SUCCESS);
-    MessageParcel data12;
-    data12.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
-    std::vector<std::string> dialingList;
-    std::vector<std::string> incomingList;
-    data12.WriteInt32(0);
-    data12.WriteStringVector(dialingList);
-    data12.WriteInt32(0);
-    data12.WriteStringVector(incomingList);
-    ASSERT_EQ(callManagerService->OnSetCallPolicyInfo(data12, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -824,6 +816,30 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_009, TestSize.Level0
     ASSERT_NE(callManagerService->OnSendUssdResponse(data16, reply), TELEPHONY_SUCCESS);
 }
 
+/**
+ * @tc.number   Telephony_CallManagerServiceStub_010
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_010, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel reply;
+    MessageParcel data12;
+    data12.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    std::vector<std::string> dialingList;
+    std::vector<std::string> incomingList;
+    data12.WriteInt32(0);
+    data12.WriteStringVector(dialingList);
+    data12.WriteInt32(0);
+    data12.WriteStringVector(incomingList);
+    MessageParcel data13;
+    std::string bundleName("abc");
+    data13.WriteString(bundleName);
+    data13.WriteInt32(0);
+    callManagerService->OnWriteVoipCallFaultEvent(data13, reply);
+    ASSERT_EQ(callManagerService->OnSetCallPolicyInfo(data12, reply), TELEPHONY_SUCCESS);
+}
 /**
  * @tc.number   Telephony_VoipCall_001
  * @tc.name     test error nullptr branch with permission

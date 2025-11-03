@@ -128,6 +128,7 @@ private:
     int32_t OnRegisterBluetoothCallManagerCallbackPtr(MessageParcel &data, MessageParcel &reply);
     int32_t OnSendUssdResponse(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetCallPolicyInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnWriteVoipCallFaultEvent(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
     std::map<uint32_t, std::string> collieCodeStringMap_ = {
         { uint32_t(CallManagerInterfaceCode::INTERFACE_REGISTER_CALLBACK), "INTERFACE_REGISTER_CALLBACK" },

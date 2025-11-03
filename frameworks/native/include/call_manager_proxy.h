@@ -127,7 +127,7 @@ public:
     int32_t SendUssdResponse(int32_t slotId, std::string &content);
     int32_t SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
         bool isIncomingTrustlist, const std::vector<std::string> &incomingList);
-        
+    int32_t WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId);
 private:
     int32_t ConnectService();
     void DisconnectService();

@@ -1459,5 +1459,23 @@ int32_t CallManagerServiceProxy::SetCallPolicyInfo(bool isDialingTrustlist, cons
     }
     return replyParcel.ReadInt32();
 }
+
+int32_t CallManagerServiceProxy::WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteString(voipCallId);
+    dataParcel.WriteInt32(faultId);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_WRITE_VOIP_CALL_FAULT_EVENT, dataParcel, replyParcel);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("function WriteVoipCallFaultEvent failed! errCode:%{public}d", error);
+        return error;
+    }
+    return replyParcel.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS
