@@ -74,7 +74,7 @@ int32_t VoipCallManagerProxy::ReportIncomingCallError(AppExecFwk::PacMap &extras
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     std::string callId = extras.GetStringValue("callId");
-    dataParcel.WriteString(extras.GetStringValue("callId"));
+    dataParcel.WriteString(callId);
     dataParcel.WriteInt32(extras.GetIntValue("reportVoipCallFailedCause"));
     dataParcel.WriteInt64(extras.GetLongValue("startReportTime"));
     auto remote = Remote();
