@@ -23,6 +23,8 @@
 
 namespace OHOS {
 namespace Telephony {
+using WiredHeadSetCallback = std::function<void(const std::shared_ptr<OHOS::MMI::KeyEvent>)>;
+
 class CallWiredHeadSet : public std::enable_shared_from_this<CallWiredHeadSet> {
     DECLARE_DELAYED_SINGLETON(CallWiredHeadSet)
 public:
@@ -31,15 +33,12 @@ public:
 
     std::shared_ptr<MMI::KeyOption> InitOption(
         const std::set<int32_t> &preKeys, int32_t finalKey, bool isFinalKeyDown, int32_t duration);
-    bool RegistKeyMutePressedUp();
-    void UnregistKeyMutePressedUp();
-    bool RegistKeyMutePressedDown();
-    void UnregistKeyMutePressedDown();
-
-    void DealKeyMutePressedUp(const std::shared_ptr<OHOS::MMI::KeyEvent>);
-    void DealKeyMutePressedDown(const std::shared_ptr<OHOS::MMI::KeyEvent>);
-    void DealKeyMuteShortPressed();
-    void DealKeyMuteLongPressed();
+    int32_t RegistKeyEvent(int32_t keyCode, bool isFinalKeyDown, const WiredHeadSetCallback &callback);
+    void UnRegistKeyEvent(int32_t &subscribeId);
+    void DealKeyPressedUp(const std::shared_ptr<OHOS::MMI::KeyEvent>);
+    void DealKeyPressedDown(const std::shared_ptr<OHOS::MMI::KeyEvent>);
+    void DealKeyShortPressed();
+    void DealKeyLongPressed();
 
 private:
     time_t GetCurrentTimeMS();
@@ -48,6 +47,8 @@ private:
     time_t downFirstTime_;
     int32_t subscribeIdForPressedUp_;
     int32_t subscribeIdForPressedDown_;
+    int32_t subscribeIdForMediaPausedUp_;
+    int32_t subscribeIdForMediaPauseDown_;
 };
 } // namespace Telephony
 } // namespace OHOS

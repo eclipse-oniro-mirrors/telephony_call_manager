@@ -39,6 +39,8 @@ CallWiredHeadSet::CallWiredHeadSet()
     downFirstTime_ = 0;
     subscribeIdForPressedUp_ = INVALID_VALUE;
     subscribeIdForPressedDown_ = INVALID_VALUE;
+    subscribeIdForMediaPausedUp_ = INVALID_VALUE;
+    subscribeIdForMediaPauseDown_ = INVALID_VALUE;
 }
 
 CallWiredHeadSet::~CallWiredHeadSet()
@@ -48,23 +50,33 @@ CallWiredHeadSet::~CallWiredHeadSet()
 
 bool CallWiredHeadSet::Init()
 {
-    bool pressedUp = RegistKeyMutePressedUp();
-    bool pressedDown = RegistKeyMutePressedDown();
-    if (pressedUp && pressedDown) {
-        TELEPHONY_LOGI("CallWiredHeadSet Registed KeyMute Pressed callback succeed");
-        return true;
-    } else {
-        TELEPHONY_LOGE("CallWiredHeadSet Registed KeyMute Pressed callback failed,"
-            "pressedUp is %{public}s, pressedDown is %{public}s",
-            pressedUp ? "true" : "false", pressedDown ? "true" : "false");
-        return false;
-    }
+    const int32_t HEADSETHOOK_KEY = MMI::KeyEvent::KEYCODE_HEADSETHOOK;
+    const int32_t MEDIA_PLAY_PAUSE_KEY = MMI::KeyEvent::KEYCODE_MEDIA_PLAY_PAUSE;
+
+    auto pressedUpCallBack = [this](const std::shared_ptr<OHOS::MMI::KeyEvent> event) {
+        this->DealKeyPressedUp(event);
+    };
+    auto pressedDownCallBack = [this](const std::shared_ptr<OHOS::MMI::KeyEvent> event) {
+        this->DealKeyPressedDown(event);
+    };
+
+    subscribeIdForPressedDown_ = RegistKeyEvent(HEADSETHOOK_KEY, true, pressedDownCallBack);
+    subscribeIdForPressedUp_ = RegistKeyEvent(HEADSETHOOK_KEY, false, pressedUpCallBack);
+    subscribeIdForMediaPauseDown_ = RegistKeyEvent(MEDIA_PLAY_PAUSE_KEY, true, pressedDownCallBack);
+    subscribeIdForMediaPausedUp_ = RegistKeyEvent(MEDIA_PLAY_PAUSE_KEY, false, pressedUpCallBack);
+
+    TELEPHONY_LOGI("pressDown = %{public}d, pressUp = %{public}d, pauseDown = %{public}d, pauseUp = %{public}d",
+        subscribeIdForPressedDown_, subscribeIdForPressedUp_, subscribeIdForMediaPauseDown_,
+        subscribeIdForMediaPausedUp_);
+    return true;
 }
 
 void CallWiredHeadSet::DeInit()
 {
-    UnregistKeyMutePressedUp();
-    UnregistKeyMutePressedDown();
+    UnRegistKeyEvent(subscribeIdForPressedDown_);
+    UnRegistKeyEvent(subscribeIdForPressedUp_);
+    UnRegistKeyEvent(subscribeIdForMediaPauseDown_);
+    UnRegistKeyEvent(subscribeIdForMediaPausedUp_);
     TELEPHONY_LOGI("CallWiredHeadSet UnRegisted KeyMute Pressed callback succeed");
 }
 
@@ -79,65 +91,43 @@ std::shared_ptr<MMI::KeyOption> CallWiredHeadSet::InitOption(
     return keyOption;
 }
 
-bool CallWiredHeadSet::RegistKeyMutePressedUp()
+int32_t CallWiredHeadSet::RegistKeyEvent(int32_t keyCode, bool isFinalKeyDown, const WiredHeadSetCallback &callback)
 {
-    WiredHeadSetCallback pressedFunc = [this](const std::shared_ptr<OHOS::MMI::KeyEvent> event) {
-        this->DealKeyMutePressedUp(event);
-    };
-
     std::set<int32_t> preKeys;
-    std::shared_ptr<MMI::KeyOption> keyOption = InitOption(preKeys, MMI::KeyEvent::KEYCODE_HEADSETHOOK, false, 0);
-    keyOption->SetPriority(MMI::SubscribePriority::PRIORITY_100);
-    subscribeIdForPressedUp_ = MMI::InputManager::GetInstance()->SubscribeKeyEvent(keyOption, pressedFunc);
-    TELEPHONY_LOGI("subscribeIdForPressedUp_: %{public}d", subscribeIdForPressedUp_);
-    return subscribeIdForPressedUp_ < 0 ? false : true;
-}
-
-bool CallWiredHeadSet::RegistKeyMutePressedDown()
-{
-    WiredHeadSetCallback pressedFunc = [this](const std::shared_ptr<OHOS::MMI::KeyEvent> event) {
-        this->DealKeyMutePressedDown(event);
-    };
-
-    std::set<int32_t> preKeys;
-    std::shared_ptr<MMI::KeyOption> keyOption = InitOption(preKeys, MMI::KeyEvent::KEYCODE_HEADSETHOOK, true, 0);
-    keyOption->SetPriority(MMI::SubscribePriority::PRIORITY_100);
-    subscribeIdForPressedDown_ = MMI::InputManager::GetInstance()->SubscribeKeyEvent(keyOption, pressedFunc);
-    TELEPHONY_LOGI("subscribeIdForPressedDown_: %{public}d", subscribeIdForPressedDown_);
-    return subscribeIdForPressedDown_ < 0 ? false : true;
-}
-
-void CallWiredHeadSet::UnregistKeyMutePressedUp()
-{
-    if (subscribeIdForPressedUp_ > 0) {
-        MMI::InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeIdForPressedUp_);
+    std::shared_ptr<MMI::KeyOption> keyOption = InitOption(preKeys, keyCode, isFinalKeyDown, 0);
+    if (keyCode == MMI::KeyEvent::KEYCODE_HEADSETHOOK) {
+        keyOption->SetPriority(MMI::SubscribePriority::PRIORITY_100);
     }
+    int32_t subscribeId = MMI::InputManager::GetInstance()->SubscribeKeyEvent(keyOption, callback);
+    TELEPHONY_LOGI("keyCode: %{public}d, subscribeId: %{public}d", keyCode, subscribeId);
+    return subscribeId;
 }
 
-void CallWiredHeadSet::UnregistKeyMutePressedDown()
+void CallWiredHeadSet::UnRegistKeyEvent(int32_t &subscribeId)
 {
-    if (subscribeIdForPressedDown_ > 0) {
-        MMI::InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeIdForPressedDown_);
+    if (subscribeId > 0) {
+        MMI::InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+        subscribeId = INVALID_VALUE;
     }
 }
 
 // wired headset mute key pressed callback method
-void CallWiredHeadSet::DealKeyMutePressedUp(std::shared_ptr<MMI::KeyEvent> event)
+void CallWiredHeadSet::DealKeyPressedUp(std::shared_ptr<MMI::KeyEvent> event)
 {
     TELEPHONY_LOGI("received KeyMute Pressed Up event");
     if (DelayedSingleton<AudioDeviceManager>::GetInstance()->IsWiredHeadsetConnected() == true) {
         time_t currentTime = GetCurrentTimeMS();
         if ((currentTime - downFirstTime_) < FINAL_KEY_DOWN_DURATION_TWO) {
-            DealKeyMuteShortPressed();
+            DealKeyShortPressed();
         } else if (!isProcessed_) {
-            DealKeyMuteLongPressed();
+            DealKeyLongPressed();
         }
     }
     downFirstTime_ = 0;
     isProcessed_ = false;
 }
 
-void CallWiredHeadSet::DealKeyMutePressedDown(std::shared_ptr<MMI::KeyEvent> event)
+void CallWiredHeadSet::DealKeyPressedDown(std::shared_ptr<MMI::KeyEvent> event)
 {
     TELEPHONY_LOGI("received KeyMute Pressed Down event");
     if (isProcessed_) {
@@ -150,35 +140,35 @@ void CallWiredHeadSet::DealKeyMutePressedDown(std::shared_ptr<MMI::KeyEvent> eve
             return;
         }
         if (!isProcessed_ && (currentTime - downFirstTime_ >= FINAL_KEY_DOWN_DURATION_TWO)) {
-            DealKeyMuteLongPressed();
+            DealKeyLongPressed();
             isProcessed_ = true;
         }
     }
 }
 
 // wired headset mute key short pressed callback method
-void CallWiredHeadSet::DealKeyMuteShortPressed()
+void CallWiredHeadSet::DealKeyShortPressed()
 {
     sptr<CallBase> ringingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (ringingCall == nullptr) {
         sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
         sptr<CallBase> activeCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
         if (activeCall != nullptr && holdCall != nullptr) {
-            TELEPHONY_LOGI("DealKeyMuteShortPressed UnHoldCall callid(%{public}d)", holdCall->GetCallID());
+            TELEPHONY_LOGI("DealKeyShortPressed UnHoldCall callid(%{public}d)", holdCall->GetCallID());
             DelayedSingleton<CallControlManager>::GetInstance()->UnHoldCall(holdCall->GetCallID());
             return;
         }
         sptr<CallBase> call = CallObjectManager::GetAudioLiveCall();
         if (call != nullptr) {
             bool isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
-            TELEPHONY_LOGI("DealKeyMuteShortPressed SetMuted isMuted((%{public}d))", (!isMuted));
+            TELEPHONY_LOGI("DealKeyShortPressed SetMuted isMuted((%{public}d))", (!isMuted));
             DelayedSingleton<CallControlManager>::GetInstance()->SetMuted(!isMuted);
         }
     } else {
-        TELEPHONY_LOGI("DealKeyMuteShortPressed AnswerCall callid(%{public}d)", ringingCall->GetCallID());
+        TELEPHONY_LOGI("DealKeyShortPressed AnswerCall callid(%{public}d)", ringingCall->GetCallID());
         VideoStateType videoState = ringingCall->GetVideoStateType();
         if (videoState != VideoStateType::TYPE_VOICE && videoState != VideoStateType::TYPE_VIDEO) {
-            TELEPHONY_LOGI("DealKeyMuteShortPressed get original call type");
+            TELEPHONY_LOGI("DealKeyShortPressed get original call type");
             videoState = static_cast<VideoStateType>(ringingCall->GetOriginalCallType());
         }
         DelayedSingleton<CallControlManager>::GetInstance()->AnswerCall(
@@ -187,11 +177,11 @@ void CallWiredHeadSet::DealKeyMuteShortPressed()
 }
 
 // wired headset mute key long pressed callback method
-void CallWiredHeadSet::DealKeyMuteLongPressed()
+void CallWiredHeadSet::DealKeyLongPressed()
 {
     sptr<CallBase> ringingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (ringingCall != nullptr) {
-        TELEPHONY_LOGI("DealKeyMuteLongPressed RejectCall callid(%{public}d)", ringingCall->GetCallID());
+        TELEPHONY_LOGI("DealKeyLongPressed RejectCall callid(%{public}d)", ringingCall->GetCallID());
         ringingCall->RejectCall();
     } else {
         sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall();
@@ -199,10 +189,10 @@ void CallWiredHeadSet::DealKeyMuteLongPressed()
             TelConferenceState confState = foregroundCall->GetTelConferenceState();
             if (confState != TelConferenceState::TEL_CONFERENCE_IDLE) {
                 int32_t conferenceId = DelayedSingleton<ImsConference>::GetInstance()->GetMainCall();
-                TELEPHONY_LOGI("DealKeyMuteLongPressed HangUpCall conferenceId(%{public}d)", conferenceId);
+                TELEPHONY_LOGI("DealKeyLongPressed HangUpCall conferenceId(%{public}d)", conferenceId);
                 DelayedSingleton<CallControlManager>::GetInstance()->HangUpCall(conferenceId);
             } else {
-                TELEPHONY_LOGI("DealKeyMuteLongPressed HangUpCall callid(%{public}d)", foregroundCall->GetCallID());
+                TELEPHONY_LOGI("DealKeyLongPressed HangUpCall callid(%{public}d)", foregroundCall->GetCallID());
                 foregroundCall->HangUpCall();
             }
         }
