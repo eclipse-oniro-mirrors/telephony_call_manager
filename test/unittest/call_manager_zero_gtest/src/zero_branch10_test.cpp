@@ -487,6 +487,33 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioDeviceManager_002, TestSize.Level0)
 }
 
 /**
+ * @tc.number   Telephony_AudioDeviceManager_003
+ * @tc.name     test AudioDeviceManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch10Test, Telephony_AudioDeviceManager_003, TestSize.Level0)
+{
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    AudioDevice deviceNearlink = {
+        .deviceType = AudioDeviceType::DEVICE_NEARLINK,
+        .deviceName = "name",
+        .address = "addr"
+    };
+    audioDeviceManager->info_.audioDeviceList.clear();
+    audioDeviceManager->info_.audioDeviceList.push_back(deviceNearlink);
+    audioDeviceManager->UpdateNearlinkDeviceName("addr", "nameReplace");
+    EXPECT_EQ(audioDeviceManager->info_.audioDeviceList.size(), 1);
+
+    std::string deviceLongName = "SuperLongDeviceName_";
+    for (int i = 0; i <= kMaxDeviceNameLen; ++i) {
+        deviceLongName += 'x';
+    }
+    audioDeviceManager->UpdateNearlinkDeviceName("addr", deviceLongName);
+    EXPECT_EQ(audioDeviceManager->info_.audioDeviceList.size(), 1);
+    EXPECT_NE(std::string(audioDeviceManager->info_.audioDeviceList.front().deviceName), deviceLongName);
+}
+
+/**
  * @tc.number   Telephony_AudioProxy_001
  * @tc.name     test AudioProxy
  * @tc.desc     Function test

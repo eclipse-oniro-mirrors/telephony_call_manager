@@ -119,29 +119,44 @@ void AudioDeviceManager::UpdateEarpieceDevice()
 
 void AudioDeviceManager::UpdateBluetoothDeviceName(const std::string &macAddress, const std::string &deviceName)
 {
+    if (!UpdateDeviceName(macAddress, deviceName, AudioDeviceType::DEVICE_BLUETOOTH_SCO)) {
+        if (!UpdateDeviceName(macAddress, deviceName, AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID)) {
+            TELEPHONY_LOGE("Failed to update Bluetooth device name for both types");
+        }
+    }
+}
+
+void AudioDeviceManager::UpdateNearlinkDeviceName(const std::string &macAddress, const std::string &deviceName)
+{
+    if (!UpdateDeviceName(macAddress, deviceName, AudioDeviceType::DEVICE_NEARLINK)) {
+        TELEPHONY_LOGE("Failed to update Nearlink device name");
+    }
+}
+
+bool AudioDeviceManager::UpdateDeviceName(const std::string &macAddress, const std::string &deviceName,
+    AudioDeviceType deviceType)
+{
     std::lock_guard<ffrt::mutex> lock(infoMutex_);
-    std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
-    while (it != info_.audioDeviceList.end()) {
-        if (it->address == macAddress && (it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
-            it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID)) {
+    for (auto &device : info_.audioDeviceList) {
+        if (device.address == macAddress && (device.deviceType == deviceType)) {
             if (deviceName.length() > kMaxDeviceNameLen) {
                 TELEPHONY_LOGE("deviceName is too long");
-                return;
+                return false;
             }
-            if (memset_s(it->deviceName, sizeof(it->deviceName), 0, sizeof(it->deviceName)) != EOK) {
+            if (memset_s(device.deviceName, sizeof(device.deviceName), 0, sizeof(device.deviceName)) != EOK) {
                 TELEPHONY_LOGE("memset_s fail");
-                return;
+                return false;
             }
-            if (memcpy_s(it->deviceName, kMaxDeviceNameLen, deviceName.c_str(), deviceName.length()) != EOK) {
+            if (memcpy_s(device.deviceName, kMaxDeviceNameLen, deviceName.c_str(), deviceName.length()) != EOK) {
                 TELEPHONY_LOGE("memcpy_s deviceName fail");
-                return;
+                return false;
             }
-            TELEPHONY_LOGI("UpdateBluetoothDeviceName");
+            TELEPHONY_LOGI("UpdateDeviceName for type %d", static_cast<int>(deviceType));
             ReportAudioDeviceInfo();
-            return;
+            return true;
         }
-        ++it;
     }
+    return false;
 }
 
 void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType,
