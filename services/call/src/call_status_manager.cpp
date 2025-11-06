@@ -1706,13 +1706,19 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     }
     callPtr->SetOriginalCallType(info.originalCallType);
     TELEPHONY_LOGD("originalCallType:%{public}d", info.originalCallType);
+    HandleNewCallConfig(callPtr, info);
+    return callPtr;
+}
+
+void CallStatusManager::HandleNewCallConfig(sptr<CallBase> callPtr, const CallDetailInfo &info)
+{
     AAFwk::WantParams params = callPtr->GetExtraParams();
     if (info.callType == CallType::TYPE_VOIP) {
         OHOS::HiviewDFX::HiTraceId chainId = OHOS::HiviewDFX::HiTraceChain::GetId();
         params.SetParam("traceChainId", AAFwk::String::Box(std::to_string(chainId.GetChainId())));
         params.SetParam("traceFlags", AAFwk::String::Box(std::to_string(chainId.GetFlags())));
         callPtr->SetExtraParams(params);
-        return callPtr;
+        return;
     }
     SimLabel simLabel;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimLabel(info.accountId, simLabel);
@@ -1741,7 +1747,6 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     }
     time_t createTime = std::max(time(nullptr), static_cast<time_t>(0));
     callPtr->SetCallCreateTime(createTime);
-    return callPtr;
 }
 
 sptr<CallBase> CallStatusManager::CreateNewCallByCallType(
