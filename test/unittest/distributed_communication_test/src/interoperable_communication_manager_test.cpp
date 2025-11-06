@@ -58,7 +58,7 @@ HWTEST_F(InteroperableCommunicationManagerTest,
     ASSERT_NO_THROW(dcManager->CallStateUpdated(call2, pState, nState1));
     ASSERT_NO_THROW(dcManager->SetMuted(true));
     ASSERT_NO_THROW(dcManager->MuteRinger());
-    dcManager->OnDeviceOnline(deviceInfo);
+    ASSERT_NO_THROW(dcManager->OnDeviceOnline(deviceInfo));
     ASSERT_NO_THROW(dcManager->CallStateUpdated(call1, pState, nState1));
     ASSERT_NO_THROW(dcManager->CallStateUpdated(call2, pState, nState1));
     ASSERT_NO_THROW(dcManager->CallStateUpdated(call2, pState, nState2));
