@@ -502,6 +502,8 @@ struct CallRecordInfo {
     int32_t newCallUseBox = 0;
     /**
      * Identifies the sim card type;
+     * - 0: PSIM
+     * - 1: ESIM
      */
     int32_t simType = 0;
     /**
