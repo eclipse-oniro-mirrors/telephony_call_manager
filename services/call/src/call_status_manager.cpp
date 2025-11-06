@@ -1706,11 +1706,11 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     }
     callPtr->SetOriginalCallType(info.originalCallType);
     TELEPHONY_LOGD("originalCallType:%{public}d", info.originalCallType);
-    HandleNewCallConfig(callPtr, info);
+    SetCallParams(callPtr, info);
     return callPtr;
 }
 
-void CallStatusManager::HandleNewCallConfig(sptr<CallBase> callPtr, const CallDetailInfo &info)
+void CallStatusManager::SetCallParams(sptr<CallBase> callPtr, const CallDetailInfo &info)
 {
     AAFwk::WantParams params = callPtr->GetExtraParams();
     if (info.callType == CallType::TYPE_VOIP) {
@@ -1721,10 +1721,13 @@ void CallStatusManager::HandleNewCallConfig(sptr<CallBase> callPtr, const CallDe
         return;
     }
     SimLabel simLabel;
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimLabel(info.accountId, simLabel);
-    params.SetParam("simType", AAFwk::Integer::Box(static_cast<int32_t>(simLabel.simType)));
-    params.SetParam("simIndex", AAFwk::Integer::Box(simLabel.index));
-    callPtr->SetExtraParams(params);
+    if (DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimLabel(info.accountId, simLabel) ==
+        TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGI("GetSimLabel success, simType is %{public}d", static_cast<int32_t>(simLabel.simType));
+        params.SetParam("simType", AAFwk::Integer::Box(static_cast<int32_t>(simLabel.simType)));
+        params.SetParam("simIndex", AAFwk::Integer::Box(simLabel.index));
+        callPtr->SetExtraParams(params);
+    }
     if (info.state == TelCallState::CALL_STATUS_INCOMING || info.state == TelCallState::CALL_STATUS_WAITING ||
         (info.state == TelCallState::CALL_STATUS_DIALING && (info.index == 0 || IsDcCallConneceted()))) {
         TELEPHONY_LOGI("NumberLocationUpdate start");

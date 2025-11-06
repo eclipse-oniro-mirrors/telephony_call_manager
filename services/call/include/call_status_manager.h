@@ -98,7 +98,7 @@ private:
     void AutoAnswerForVideoCall(int32_t activeCallNum);
     void AutoUnHoldForDsda(bool canSwitchCallState, TelCallState priorState, int32_t activeCallNum, int32_t slotId);
     sptr<CallBase> CreateNewCall(const CallDetailInfo &info, CallDirection dir);
-    void HandleNewCallConfig(sptr<CallBase> callPtr, const CallDetailInfo &info);
+    void SetCallParams(sptr<CallBase> callPtr, const CallDetailInfo &info);
     sptr<CallBase> CreateNewCallByCallType(
         DialParaInfo &paraInfo, const CallDetailInfo &info, CallDirection dir, AppExecFwk::PacMap &extras);
     sptr<CallBase> CreateNewCallByCallTypeEx(
