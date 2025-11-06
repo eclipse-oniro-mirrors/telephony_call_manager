@@ -1710,7 +1710,7 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     return callPtr;
 }
 
-void CallStatusManager::SetCallParams(const sptr<CallBase> callPtr, const CallDetailInfo &info)
+void CallStatusManager::SetCallParams(const sptr<CallBase> &callPtr, const CallDetailInfo &info)
 {
     AAFwk::WantParams params = callPtr->GetExtraParams();
     if (info.callType == CallType::TYPE_VOIP) {
