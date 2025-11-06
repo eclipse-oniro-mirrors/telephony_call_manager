@@ -1706,14 +1706,19 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     }
     callPtr->SetOriginalCallType(info.originalCallType);
     TELEPHONY_LOGD("originalCallType:%{public}d", info.originalCallType);
+    AAFwk::WantParams params = callPtr->GetExtraParams();
     if (info.callType == CallType::TYPE_VOIP) {
         OHOS::HiviewDFX::HiTraceId chainId = OHOS::HiviewDFX::HiTraceChain::GetId();
-        AAFwk::WantParams params = callPtr->GetExtraParams();
         params.SetParam("traceChainId", AAFwk::String::Box(std::to_string(chainId.GetChainId())));
         params.SetParam("traceFlags", AAFwk::String::Box(std::to_string(chainId.GetFlags())));
         callPtr->SetExtraParams(params);
         return callPtr;
     }
+    SimLabel simLabel;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimLabel(info.accountId, simLabel);
+    params.SetParam("simType", AAFwk::Integer::Box(static_cast<int32_t>(simlLabel.simType)));
+    params.SetParam("simIndex", AAFwk::Integer::Box(simlLabel.simIndex));
+    callPtr->SetExtraParams(params);
     if (info.state == TelCallState::CALL_STATUS_INCOMING || info.state == TelCallState::CALL_STATUS_WAITING ||
         (info.state == TelCallState::CALL_STATUS_DIALING && (info.index == 0 || IsDcCallConneceted()))) {
         TELEPHONY_LOGI("NumberLocationUpdate start");

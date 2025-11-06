@@ -380,6 +380,14 @@ struct CallAttributeInfo {
      * - 1: Yes
      */
     int32_t newCallUseBox = 0;
+    /**
+     * Identifies the sim card type.
+     */
+    int32_t simType = 0;
+    /**
+     * Identifies the sim card index.
+     */
+    int32_t simIndex = 0;
 };
 
 /**
@@ -490,6 +498,14 @@ struct CallRecordInfo {
      * - 1: Yes
      */
     int32_t newCallUseBox = 0;
+    /**
+     * Identifies the sim card type.
+     */
+    int32_t simType = 0;
+    /**
+     * Identifies the sim card index.
+     */
+    int32_t simIndex = 0;
 
     CallRecordInfo() {}
 
@@ -536,6 +552,8 @@ struct CallRecordInfo {
         namePresentation = temp.namePresentation;
         name = temp.name;
         newCallUseBox = temp.newCallUseBox;
+        simType = temp.simType;
+        simIndex = temp.simIndex;
         return *this;
     }
 };

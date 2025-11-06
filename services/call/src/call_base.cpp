@@ -185,6 +185,8 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.namePresentation = object.GetIntParam("namePresentation", 0);
         info.antiFraudState = object.GetIntParam("antiFraudState", 0);
         info.phoneOrWatch = phoneOrWatch_;
+        info.simType = object.GetIntParam("simType", 0);
+        info.simIndex = object.GetIntParam("simIndex", 0);
         if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
             TELEPHONY_LOGE("memset_s numberLocation fail");
             return;
