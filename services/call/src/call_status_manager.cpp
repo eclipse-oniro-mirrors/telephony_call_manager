@@ -1716,8 +1716,8 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     }
     SimLabel simLabel;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimLabel(info.accountId, simLabel);
-    params.SetParam("simType", AAFwk::Integer::Box(static_cast<int32_t>(simlLabel.simType)));
-    params.SetParam("simIndex", AAFwk::Integer::Box(simlLabel.simIndex));
+    params.SetParam("simType", AAFwk::Integer::Box(static_cast<int32_t>(simLabel.simType)));
+    params.SetParam("simIndex", AAFwk::Integer::Box(simLabel.index));
     callPtr->SetExtraParams(params);
     if (info.state == TelCallState::CALL_STATUS_INCOMING || info.state == TelCallState::CALL_STATUS_WAITING ||
         (info.state == TelCallState::CALL_STATUS_DIALING && (info.index == 0 || IsDcCallConneceted()))) {

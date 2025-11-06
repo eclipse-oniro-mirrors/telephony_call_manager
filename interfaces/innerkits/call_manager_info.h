@@ -381,11 +381,11 @@ struct CallAttributeInfo {
      */
     int32_t newCallUseBox = 0;
     /**
-     * Identifies the sim card type.
+     * Identifies the sim card type;
      */
     int32_t simType = 0;
     /**
-     * Identifies the sim card index.
+     * Identifies the sim card index;
      */
     int32_t simIndex = 0;
 };
@@ -499,11 +499,11 @@ struct CallRecordInfo {
      */
     int32_t newCallUseBox = 0;
     /**
-     * Identifies the sim card type.
+     * Identifies the sim card type;
      */
     int32_t simType = 0;
     /**
-     * Identifies the sim card index.
+     * Identifies the sim card index;
      */
     int32_t simIndex = 0;
 
