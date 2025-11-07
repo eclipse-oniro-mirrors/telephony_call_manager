@@ -37,15 +37,20 @@ VoipCallConnection::~VoipCallConnection()
 
 void VoipCallConnection::Init(int32_t systemAbilityId)
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (connectCallManagerState_) {
         TELEPHONY_LOGE("Init, connectState is true");
         return;
     }
     systemAbilityId_ = systemAbilityId;
     TELEPHONY_LOGI("systemAbilityId_ = %{public}d", systemAbilityId);
-    if (GetCallManagerProxy() == TELEPHONY_SUCCESS) {
-        connectCallManagerState_ = true;
+    std::unique_lock<ffrt::mutex> lock(mutex_);
+    if (GetCallManagerProxy() != TELEPHONY_SUCCESS) {
+        return;
+    }
+    lock.unlock();
+    connectCallManagerState_ = true;
+    if (statusChangeListener_ != nullptr) {
+        return;
     }
     statusChangeListener_ = new (std::nothrow) SystemAbilityListener();
     if (statusChangeListener_ == nullptr) {
@@ -59,6 +64,7 @@ void VoipCallConnection::Init(int32_t systemAbilityId)
     }
     int32_t ret = managerPtr->SubscribeSystemAbility(systemAbilityId_, statusChangeListener_);
     if (ret != TELEPHONY_SUCCESS) {
+        statusChangeListener_ = nullptr;
         TELEPHONY_LOGE("Init, failed to subscribe sa:%{public}d", systemAbilityId_);
         return;
     }
