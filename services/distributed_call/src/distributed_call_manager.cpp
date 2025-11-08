@@ -342,7 +342,6 @@ bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
             return false;
         }
         isSwitching_ = true;
-        ReportDistributedDeviceInfo(device);
         ret = dcallProxy_->SwitchDevice(devId, DCALL_SWITCH_DEVICE_TYPE_SINK);
         isSwitching_ = false;
     }
@@ -351,6 +350,7 @@ bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
         SetConnectedDCallDevice(device);
         DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
         TELEPHONY_LOGI("switch dcall device on succeed.");
+        ReportDistributedDeviceInfo(device);
         return true;
     }
     TELEPHONY_LOGI("switch dcall device on failed, ret: %{public}d.", ret);

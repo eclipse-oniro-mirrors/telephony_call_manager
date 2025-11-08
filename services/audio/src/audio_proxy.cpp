@@ -501,7 +501,7 @@ bool AudioPreferDeviceChangeCallback::IsDistributedDeviceSelected(
         if (LOCAL_DEVICE != networkId && (*iter)->deviceType_ == AudioStandard::DEVICE_TYPE_SPEAKER) {
             TELEPHONY_LOGI("distributed device networkId.");
             if (!DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn() &&
-                CallObjectManager::HasCellularCallExist()) {
+                CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_ACTIVE, false) > 0) {
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
             }
             return true;

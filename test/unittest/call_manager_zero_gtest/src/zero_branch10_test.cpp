@@ -40,6 +40,7 @@
 #include "screenlock_manager.h"
 #endif
 #include "call_state_report_proxy.h"
+#include "distributed_call_manager.h"
 
 namespace OHOS::Telephony {
 using namespace testing::ext;
@@ -597,7 +598,11 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioProxy_002, TestSize.Level0)
     dcallDesc->networkId_ = "RemoteId";
     dcallDesc->deviceType_ = AudioStandard::DEVICE_TYPE_SPEAKER;
     descs.push_back(dcallDesc);
+    auto dcallManager = DelayedSingleton<DistributedCallManager>::GetInstance();
+    bool temp = dcallManager->dCallDeviceSwitchedOn_.load(); // backup
+    dcallManager->dCallDeviceSwitchedOn_.store(false);
     EXPECT_TRUE(std::make_shared<AudioPreferDeviceChangeCallback>()->IsDistributedDeviceSelected(descs));
+    dcallManager->dCallDeviceSwitchedOn_.store(temp); // recovery
     descs.clear();
     EXPECT_FALSE(std::make_shared<AudioPreferDeviceChangeCallback>()->IsDistributedDeviceSelected(descs));
 }
