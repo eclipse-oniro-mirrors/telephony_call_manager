@@ -27,7 +27,7 @@ namespace Telephony {
             return nullptr;
         }
         auto lenth = origin.length() + 1;
-        if (len > 10000) {  //10000 is max string length
+        if (lenth > 10000) {  //10000 is max string length
             return nullptr;
         }
         char* res = static_cast<char*>(malloc(sizeof(char) * lenth));
