@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
-    inline char* MallocCString(const std::string& origin)
+    char* MallocCString(const std::string& origin)
     {
         if (origin.empty()) {
             return nullptr;
