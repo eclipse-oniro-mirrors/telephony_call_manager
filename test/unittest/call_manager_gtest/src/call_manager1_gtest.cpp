@@ -879,7 +879,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_EndCall_0100, Function | Medium
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-    int32_t callId = INVALID_NEGATIVE_ID;
     EXPECT_FALSE(CallManagerGtest::clientPtr_->EndCall());
 }
 
