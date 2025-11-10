@@ -833,7 +833,7 @@ public:
      * @brief endCall for callManager
      * @return Returns reue on success, others on failure.
      */
-     bool EndCall();
+    bool EndCall() override;
 private:
     std::string GetBundleInfo();
     int32_t dealCeliaCallEvent(int32_t callId);

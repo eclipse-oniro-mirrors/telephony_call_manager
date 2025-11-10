@@ -24,6 +24,8 @@
 #include "bluetooth_hfp_ag.h"
 #include "call_manager_connect.h"
 #include "call_manager_service.h"
+#include "call_object_manager.h"
+#include "ims_call.h"
 #include "surface_utils.h"
 #include "telephony_types.h"
 #include "voip_call.h"
@@ -896,25 +898,25 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_EndCall_0200, Function | Medium
     call->SetCallId(1);
     call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
     CallObjectManager::AddOneCallObject(call);
-    EEXPECT_FALSE(CallManagerGtest::clientPtr_->EndCall());
+    EXPECT_FALSE(CallManagerGtest::clientPtr_->EndCall());
     CallObjectManager::DeleteOneCallObject(call);
 
     call->SetCallId(2);
     call->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
     CallObjectManager::AddOneCallObject(call);
-    EEXPECT_FALSE(CallManagerGtest::clientPtr_->EndCall());
+    EXPECT_FALSE(CallManagerGtest::clientPtr_->EndCall());
     CallObjectManager::DeleteOneCallObject(call);
 
     call->SetCallId(3);
     call->SetTelCallState(TelCallState::CALL_STATUS_ALERTING);
     CallObjectManager::AddOneCallObject(call);
-    EEXPECT_FALSE(CallManagerGtest::clientPtr_->EndCall());
+    EXPECT_FALSE(CallManagerGtest::clientPtr_->EndCall());
     CallObjectManager::DeleteOneCallObject(call);
 
     call->SetCallId(4);
     call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
     CallObjectManager::AddOneCallObject(call);
-    EEXPECT_FALSE(CallManagerGtest::clientPtr_->EndCall());
+    EXPECT_FALSE(CallManagerGtest::clientPtr_->EndCall());
     CallObjectManager::DeleteOneCallObject(call);
 }
 } // namespace Telephony

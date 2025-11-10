@@ -714,7 +714,7 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_001, TestSize.Level0)
     ASSERT_NE(callManagerClient->HangUpCall(0), TELEPHONY_SUCCESS);
     ASSERT_GE(callManagerClient->GetCallState(), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerClient->RemoveMissedIncomingCallNotification(), TELEPHONY_SUCCESS);
-    ASSERT_FALSE(callManagerClient->EndCall);
+    ASSERT_FALSE(callManagerClient->EndCall());
 }
 
 /**

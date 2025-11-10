@@ -697,7 +697,7 @@ public:
      *
      * @return Returns true on success, others on failure.
      */
-    bool EndCall;
+    bool EndCall();
 };
 } // namespace Telephony
 } // namespace OHOS
