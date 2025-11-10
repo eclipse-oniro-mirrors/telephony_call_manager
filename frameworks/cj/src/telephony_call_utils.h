@@ -21,15 +21,12 @@
 
 namespace OHOS {
 namespace Telephony {
-    char* MallocCString(const std::string& origin)
+    inline char* MallocCString(const std::string& origin)
     {
-        if (origin.empty()) {
+        if (origin.empty() || origin.length() +1 > 10000) { //10000 is max string length
             return nullptr;
         }
         auto lenth = origin.length() + 1;
-        if (lenth > 10000) {  //10000 is max string length
-            return nullptr;
-        }
         char* res = static_cast<char*>(malloc(sizeof(char) * lenth));
         if (res == nullptr) {
             return nullptr;
