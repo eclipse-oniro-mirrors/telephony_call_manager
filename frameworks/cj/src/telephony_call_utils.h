@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Telephony {
     inline char* MallocCString(const std::string& origin)
     {
-        if (origin.empty()) {
+        if (origin.empty() || origin.length() + 1 > 10000) { //10000 is max string length
             return nullptr;
         }
         auto lenth = origin.length() + 1;
