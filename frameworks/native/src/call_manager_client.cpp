@@ -838,5 +838,15 @@ int32_t CallManagerClient::SetCallPolicyInfo(bool isDialingTrustlist, const std:
     TELEPHONY_LOGE("init first please!");
     return TELEPHONY_ERR_UNINIT;
 }
+
+bool CallManagerClient::EndCall()
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->EndCall();
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return false;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

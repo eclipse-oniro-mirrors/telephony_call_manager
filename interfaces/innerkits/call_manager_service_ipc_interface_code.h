@@ -101,6 +101,7 @@ enum CallManagerInterfaceCode {
     INTERFACE_SEND_USSD_RESPONSE,
     INTERFACE_SET_CALL_POLICY_INFO,
     INTERFACE_WRITE_VOIP_CALL_FAULT_EVENT,
+    INTERFACE_END_CALL,
 };
 } // end extern
 } // namespace Telephony

@@ -707,12 +707,14 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_001, TestSize.Level0)
     callManagerClient->IsNewCallAllowed(result);
     callManagerClient->IsInEmergencyCall(result);
     callManagerClient->ObserverOnCallDetailsChange();
+    callManagerClient->EndCall();
     ASSERT_NE(callManagerClient->DialCall(value, extras), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerClient->AnswerCall(0, 0), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerClient->RejectCall(0, false, value), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerClient->HangUpCall(0), TELEPHONY_SUCCESS);
     ASSERT_GE(callManagerClient->GetCallState(), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerClient->RemoveMissedIncomingCallNotification(), TELEPHONY_SUCCESS);
+    ASSERT_FALSE(callManagerClient->EndCall);
 }
 
 /**

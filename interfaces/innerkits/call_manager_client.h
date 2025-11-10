@@ -691,6 +691,13 @@ public:
      */
     int32_t SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
         bool isIncomingTrustlist, const std::vector<std::string> &incomingList);
+
+    /**
+     * @brief endCall for callManager
+     *
+     * @return Returns true on success, others on failure.
+     */
+    bool EndCall;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -170,6 +170,8 @@ public:
     void RegisterObserver();
     void UnRegisterObserver();
     void HandleVideoRingPlayFail();
+    bool EndCall();
+
 private:
     void CallStateObserve();
     int32_t NumberLegalityCheck(std::string &number);
