@@ -293,6 +293,8 @@ void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecor
     data.name = info.name;
     data.namePresentation = info.namePresentation;
     data.newCallUseBox = info.newCallUseBox;
+    data.simType = info.simType;
+    data.simIndex = info.simIndex;
 }
 
 void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsigned int size)
