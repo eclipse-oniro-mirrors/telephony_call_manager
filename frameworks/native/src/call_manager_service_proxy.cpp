@@ -1477,5 +1477,21 @@ int32_t CallManagerServiceProxy::WriteVoipCallFaultEvent(std::string voipCallId,
     }
     return replyParcel.ReadInt32();
 }
+
+bool CallManagerServiceProxy::EndCall()
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return false;
+    }
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_END_CALL, dataParcel, replyParcel);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("Function EndCall! errCode:%{public}d", error);
+        return false;
+    }
+    return replyParcel.ReadBool();
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -1865,5 +1865,15 @@ int32_t CallManagerService::WriteVoipCallFaultEvent(std::string voipCallId, int3
 {
     return DelayedSingleton<VoipCallConnection>::GetInstance()->WriteVoipCallFaultEvent(voipCallId, faultId);
 }
+
+bool CallManagerService::EndCall()
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->EndCall();
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return false;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

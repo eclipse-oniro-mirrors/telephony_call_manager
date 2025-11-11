@@ -85,6 +85,8 @@ void CallManagerServiceStub::InitCallBasicRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnInputDialerSpecialCode(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SEND_CALLUI_EVENT)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSendCallUiEvent(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_END_CALL)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnEndCall(data, reply); };
 }
 
 void CallManagerServiceStub::InitCallUtilsRequest()
@@ -1515,6 +1517,18 @@ int32_t CallManagerServiceStub::OnWriteVoipCallFaultEvent(MessageParcel &data, M
     result = WriteVoipCallFaultEvent(voipCallId, faultId);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("OnWriteVoipCallFaultEvent fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+
+int32_t CallManagerServiceStub::OnEndCall(MessageParcel &data, MessageParcel &reply)
+{
+    bool result = EndCall();
+    TELEPHONY_LOGD("result:%{public}d", result);
+    if (!reply.WriteBool(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;

@@ -128,6 +128,8 @@ public:
     int32_t SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
         bool isIncomingTrustlist, const std::vector<std::string> &incomingList);
     int32_t WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId);
+    bool EndCall();
+
 private:
     int32_t ConnectService();
     void DisconnectService();

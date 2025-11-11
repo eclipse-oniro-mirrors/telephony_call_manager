@@ -2192,5 +2192,35 @@ bool CallControlManager::GetReduceRingToneVolume()
     std::lock_guard<ffrt::mutex> lock(ringToneMutex_);
     return ReduceRingToneVolume_;
 }
+
+bool CallControlManager::EndCall()
+{
+    std::vector<CallRunningState> callRunningStateVec;
+    callRunningStateVec.push_back(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    callRunningStateVec.push_back(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    callRunningStateVec.push_back(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    callRunningStateVec.push_back(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
+    callRunningStateVec.push_back(CallRunningState::CALL_RUNNING_STATE_HOLD);
+
+    int32_t callId = INVALID_CALLID;
+    int32_t ret = TELEPHONY_SUCCESS;
+    for (auto &state : callRunningStateVec) {
+        sptr<CallBase> call = GetOneCallObject(state);
+        if (call != nullptr) {
+            callId = call->GetCallID();
+            if (callId == INVALID_CALLID || callId >= VOIP_CALL_MINIMUM ||
+                call->GetCallType() == CallType::TYPE_VOIP) {
+                continue;
+            }
+            if (state == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+                ret = RejectCall(callId, false, Str8ToStr16(""));
+            } else {
+                ret = HangUpCall(callId);
+            }
+            break;
+        }
+    }
+    return ret == TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS
