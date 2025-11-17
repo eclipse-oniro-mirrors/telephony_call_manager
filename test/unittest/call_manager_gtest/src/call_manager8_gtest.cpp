@@ -977,6 +977,29 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_SetVoIPCallInfo_0400
     ASSERT_EQ(callManagerService->OnGetVoIPCallInfo(data, reply), TELEPHONY_SUCCESS);
 }
 
+/**
+ * @tc.number   Telephony_CallControlManager_SetVoIPCallInfo_0500
+ * @tc.name     test SetVoIPCallInfo_HandleVoipAlerting
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallControlManager_SetVoIPCallInfo_0500, TestSize.Level0)
+{
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    int32_t callId = 12345;
+    callControlManager->HandleVoipAlerting(callId, "12345678901");
+
+    CallObjectManager::ClearVoipList();
+    CallAttributeInfo callAttrInfo;
+    callAttrInfo.callId = callId;
+    callAttrInfo.callState = TelCallState::CALL_STATUS_DIALING;
+    CallObjectManager::AddOneVoipCallObject(callAttrInfo);
+    EXPECT_EQ(CallObjectManager::IsVoipCallExist(), true);
+
+    callControlManager->HandleVoipAlerting(callId, "12345678901");
+
+    CallObjectManager::ClearVoipList();
+}
+
 /*********************************** Test Dump() ***************************************/
 /**
  * @tc.number   Telephony_CallManager_TestDump_0100
