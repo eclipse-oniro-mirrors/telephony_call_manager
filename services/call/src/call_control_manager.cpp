@@ -1448,8 +1448,7 @@ int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::
     int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING, false);
     switch (state) {
         case (int32_t)TelCallState::CALL_STATUS_DIALING: {
-            bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(false);
-            TELEPHONY_LOGI("SetVirtualCall res: %{public}d.", res);
+            HandleVoipDialing(callId, phoneNumber);
             break;
         }
         case (int32_t)TelCallState::CALL_STATUS_IDLE: {
@@ -1497,7 +1496,7 @@ void CallControlManager::HandleVoipConnected(int32_t &numActive, int32_t callId)
     UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_ACTIVE);
 }
 
-void CallControlManager::HandleVoipIncoming(int32_t &numActive, int32_t callId, const std::string phoneNumber)
+void CallControlManager::HandleVoipIncoming(int32_t &numActive, int32_t callId, const std::string &phoneNumber)
 {
     CallAttributeInfo info;
     size_t copiedChars = phoneNumber.copy(info.accountNumber, sizeof(info.accountNumber) - 1);
@@ -1522,7 +1521,7 @@ void CallControlManager::HandleVoipIncoming(int32_t &numActive, int32_t callId, 
 }
 
 int32_t CallControlManager::HandleVoipDisconnected(int32_t &numActive, int32_t numHeld, int32_t callId,
-    int32_t state, const std::string phoneNumber)
+    int32_t state, const std::string &phoneNumber)
 {
     CallAttributeInfo info;
     size_t copiedChars = phoneNumber.copy(info.accountNumber, sizeof(info.accountNumber) - 1);
@@ -1550,20 +1549,42 @@ int32_t CallControlManager::HandleVoipDisconnected(int32_t &numActive, int32_t n
         SendBtCallState(numActive, numHeld, (int32_t)TelCallState::CALL_STATUS_IDLE, "");
 }
 
-
-void CallControlManager::HandleVoipAlerting(int32_t callId, const std::string phoneNumber)
+void CallControlManager::HandleVoipDialing(int32_t callId, const std::string &phoneNumber)
 {
     CallAttributeInfo info;
     size_t copiedChars = phoneNumber.copy(info.accountNumber, sizeof(info.accountNumber) - 1);
     info.accountNumber[copiedChars] = '\0';
     info.callType = CallType::TYPE_VOIP;
     info.callId = callId;
-    info.callState = TelCallState::CALL_STATUS_ALERTING;
+    info.callState = TelCallState::CALL_STATUS_DIALING;
     info.callDirection = CallDirection::CALL_DIRECTION_OUT;
     AddOneVoipCallObject(info);
-    NotifyVoipCallStateUpdated(info, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_DIALING);
+    NotifyVoipCallStateUpdated(info, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_DIALING);
     bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(false);
     TELEPHONY_LOGI("SetVirtualCall res = %{public}d.", res);
+}
+
+void CallControlManager::HandleVoipAlerting(int32_t callId, const std::string &phoneNumber)
+{
+    int32_t dialingCallId;
+    if (IsVoipCallExist(TelCallState::CALL_STATUS_DIALING, dialingCallId) && (callId == dialingCallId)) {
+        NotifyVoipCallStateUpdated(GetVoipCallInfo(),
+            TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ALERTING);
+        UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_ALERTING);
+        TELEPHONY_LOGI("Update VoIP to alerting.");
+    } else {
+        CallAttributeInfo info;
+        size_t copiedChars = phoneNumber.copy(info.accountNumber, sizeof(info.accountNumber) - 1);
+        info.accountNumber[copiedChars] = '\0';
+        info.callType = CallType::TYPE_VOIP;
+        info.callId = callId;
+        info.callState = TelCallState::CALL_STATUS_ALERTING;
+        info.callDirection = CallDirection::CALL_DIRECTION_OUT;
+        AddOneVoipCallObject(info);
+        NotifyVoipCallStateUpdated(info, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_DIALING);
+        bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(false);
+        TELEPHONY_LOGI("SetVirtualCall res = %{public}d.", res);
+    }
 }
 
 int32_t CallControlManager::GetMeetimeCallState()
