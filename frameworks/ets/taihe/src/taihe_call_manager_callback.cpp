@@ -164,9 +164,13 @@ int32_t TaiheCallManagerCallback::OnMeeTimeDetailsChange(const CallAttributeInfo
 int32_t TaiheCallManagerCallback::OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo)
 {
     TELEPHONY_LOGI("OnReportAsyncResults reportId:%{public}d", reportId);
-    // 这里可以根据具体需求处理异步结果
-    // 目前暂时返回成功，后续可以根据业务需求进行扩展
-    return TELEPHONY_SUCCESS;
+    int32_t ret = TaiheCallAbilityCallback::GetInstance().UpdateAsyncResultsInfo(reportId, resultInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("OnReportAsyncResults failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("OnReportAsyncResults success!");
+    }
+    return ret;
 }
 
 int32_t TaiheCallManagerCallback::OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info)

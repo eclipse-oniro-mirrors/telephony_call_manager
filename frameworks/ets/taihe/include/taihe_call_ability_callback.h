@@ -22,6 +22,7 @@
 
 #include "ohos.telephony.call.proj.hpp"
 #include "ohos.telephony.call.impl.hpp"
+#include "pac_map.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -64,8 +65,21 @@ public:
     // 相机能力变化回调
     int32_t UpdateCameraCapabilities(const CameraCapabilities &capabilities);
 
+    // set/get状态回调
+    int32_t UpdateAsyncResultsInfo(const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo);
+
+    std::function<void(int32_t errorCode, ::ohos::telephony::call::CallWaitingStatus)> getCallWaitingStatusCallback_;
+    std::function<void(int32_t errorCode)> setCallWatingStatusCallback_;
+    std::function<void(int32_t errorCode,
+        ::ohos::telephony::call::RestrictionStatus)> getCallRestrictionStatusCallback_;
+    std::function<void(int32_t errorCode)> setCallRestrictionStatusCallback_;
+    std::function<void(int32_t errorCode)> setCallRestrictionPasswordCallback_;
+    std::function<void(int32_t errorCode, ::ohos::telephony::call::CallTransferResult)> getCallTransferInfoCallback_;
+    std::function<void(int32_t errorCode)> setCallTransferCallback_;
+    std::function<void(int32_t errorCode)> closeUnfinishedUssdCallback_;
+
     ::taihe::optional<taihe::callback<void(::ohos::telephony::call::CallAttributeOptions const&)>> callStateCallback_;
-    ::taihe::optional<taihe::callback<void(::ohos::telephony::call::CallEventOptions const&)>> callEventCallback_;;
+    ::taihe::optional<taihe::callback<void(::ohos::telephony::call::CallEventOptions const&)>> callEventCallback_;
     ::taihe::optional<taihe::callback<void(
         ::ohos::telephony::call::DisconnectedDetails const&)>> disconnectedCauseCallback_;
     ::taihe::optional<taihe::callback<void(::ohos::telephony::call::MmiCodeResults const&)>> mmiCodeResultCallback_;
@@ -81,6 +95,15 @@ public:
         ::ohos::telephony::call::CameraCapabilities const&)>> cameraCapabilitiesCallback_;
 
 private:
+    int32_t ReportGetCallWaitingStatus(AppExecFwk::PacMap &resultInfo);
+    int32_t ReportSetCallWaiting(AppExecFwk::PacMap &resultInfo);
+    int32_t ReportGetCallRestrictionStatus(AppExecFwk::PacMap &resultInfo);
+    int32_t ReportSetCallRestriction(AppExecFwk::PacMap &resultInfo);
+    int32_t ReportSetCallRestrictionPassword(AppExecFwk::PacMap &resultInfo);
+    int32_t ReportGetCallTransferInfo(AppExecFwk::PacMap &resultInfo);
+    int32_t ReportSetCallTransfer(AppExecFwk::PacMap &resultInfo);
+    int32_t ReportCloseUnfinishedUssd(AppExecFwk::PacMap &resultInfo);
+
     TaiheCallAbilityCallback() = default;
     ~TaiheCallAbilityCallback() = default;
 
