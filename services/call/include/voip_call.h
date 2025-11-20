@@ -69,7 +69,6 @@ private:
     bool isConferenceCall_ = false;
     bool isVoiceAnswerSupported_ = true;
     bool isUserMuteRingToneAllowed_ = false;
-    bool isRemoteDeviceControlAllowed_ = false;
     bool isDialingAllowedDuringCarrierCall_ = false;
     bool hasMicPermission_ = true;
     bool isCapsuleSticky_ = false;

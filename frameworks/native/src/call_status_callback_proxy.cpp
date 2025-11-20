@@ -55,7 +55,6 @@ int32_t CallStatusCallbackProxy::UpdateCallReportInfo(const CallReportInfo &info
         dataParcel.WriteBool(info.voipCallInfo.isConferenceCall);
         dataParcel.WriteBool(info.voipCallInfo.isVoiceAnswerSupported);
         dataParcel.WriteBool(info.voipCallInfo.isUserMuteRingToneAllowed);
-        dataParcel.WriteBool(info.voipCallInfo.isRemoteDeviceControlAllowed);
         dataParcel.WriteBool(info.voipCallInfo.isDialingAllowedDuringCarrierCall);
         dataParcel.WriteBool(info.voipCallInfo.hasMicPermission);
         dataParcel.WriteBool(info.voipCallInfo.isCapsuleSticky);
@@ -855,6 +854,8 @@ int32_t CallStatusCallbackProxy::PackUpdateCallsReportInfo(const CallsReportInfo
             dataParcel.WriteBool(it.voipCallInfo.showBannerForIncomingCall);
             dataParcel.WriteBool(it.voipCallInfo.isConferenceCall);
             dataParcel.WriteBool(it.voipCallInfo.isVoiceAnswerSupported);
+            dataParcel.WriteBool(it.voipCallInfo.isUserMuteRingToneAllowed);
+            dataParcel.WriteBool(it.voipCallInfo.isDialingAllowedDuringCarrierCall);
             dataParcel.WriteBool(it.voipCallInfo.hasMicPermission);
             dataParcel.WriteBool(it.voipCallInfo.isCapsuleSticky);
             dataParcel.WriteInt32(it.voipCallInfo.uid);

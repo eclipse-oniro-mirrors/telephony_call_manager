@@ -339,6 +339,7 @@ int32_t CallStatusManager::HandleVoipCallReportInfo(const CallDetailInfo &info)
             TELEPHONY_LOGE("Invalid call state!");
             break;
     }
+    DelayedSingleton<BluetoothCallService>::GetInstance()->GetCallState();
     return ret;
 }
 
@@ -631,6 +632,8 @@ int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("CreateVoipCall failed!");
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
+    
+    call->SetNonVirtualCall(!DelayedSingleton<AudioDeviceManager>::GetInstance()->GetVirtualCall());
     AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
@@ -664,6 +667,7 @@ int32_t CallStatusManager::OutgoingVoipCallHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("CreateVoipCall failed!");
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
+    call->SetNonVirtualCall(!DelayedSingleton<AudioDeviceManager>::GetInstance()->GetVirtualCall());
     AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
@@ -697,6 +701,8 @@ int32_t CallStatusManager::DisconnectingVoipCallHandle(const CallDetailInfo &inf
     if (call == nullptr) {
         return TELEPHONY_ERROR;
     }
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(true);
+    call->SetNonVirtualCall(false);
     return UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
 }
 
@@ -1203,6 +1209,8 @@ int32_t CallStatusManager::DisconnectedVoipCallHandle(const CallDetailInfo &info
         return ret;
     }
     DeleteOneCallObject(call->GetCallID());
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(true);
+    call->SetNonVirtualCall(false);
     TELEPHONY_LOGI("handle disconnected voip call state success");
     return ret;
 }
@@ -2556,7 +2564,6 @@ void CallStatusManager::PackVoipCallInfo(DialParaInfo &paraInfo, const CallDetai
         paraInfo.voipCallInfo.isConferenceCall = info.voipCallInfo.isConferenceCall;
         paraInfo.voipCallInfo.isVoiceAnswerSupported = info.voipCallInfo.isVoiceAnswerSupported;
         paraInfo.voipCallInfo.isUserMuteRingToneAllowed = info.voipCallInfo.isUserMuteRingToneAllowed;
-        paraInfo.voipCallInfo.isRemoteDeviceControlAllowed = info.voipCallInfo.isRemoteDeviceControlAllowed;
         paraInfo.voipCallInfo.isDialingAllowedDuringCarrierCall = info.voipCallInfo.isDialingAllowedDuringCarrierCall;
         paraInfo.voipCallInfo.hasMicPermission = info.voipCallInfo.hasMicPermission;
         paraInfo.voipCallInfo.isCapsuleSticky = info.voipCallInfo.isCapsuleSticky;

@@ -146,7 +146,6 @@ int32_t VoipCallManagerProxy::ReportOutgoingCall(
     dataParcel.WriteBool(extras.GetBooleanValue("isConferenceCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isVoiceAnswerSupported"));
     dataParcel.WriteBool(extras.GetBooleanValue("isUserMuteRingToneAllowed"));
-    dataParcel.WriteBool(extras.GetBooleanValue("isRemoteDeviceControlAllowed"));
     dataParcel.WriteBool(extras.GetBooleanValue("isDialingAllowedDuringCarrierCall"));
     if (!dataParcel.WriteUInt8Vector(userProfile)) {
         TELEPHONY_LOGE("ReportOutgoingCall userProfile write fail, size:%{public}u",
@@ -560,7 +559,6 @@ bool VoipCallManagerProxy::WriteDataParcel(MessageParcel &dataParcel, AppExecFwk
     dataParcel.WriteBool(extras.GetBooleanValue("isConferenceCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isVoiceAnswerSupported"));
     dataParcel.WriteBool(extras.GetBooleanValue("isUserMuteRingToneAllowed"));
-    dataParcel.WriteBool(extras.GetBooleanValue("isRemoteDeviceControlAllowed"));
     dataParcel.WriteBool(extras.GetBooleanValue("isDialingAllowedDuringCarrierCall"));
     dataParcel.WriteInt64(extras.GetLongValue("startReportTime"));
 

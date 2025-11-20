@@ -152,10 +152,10 @@ int32_t BluetoothCallService::GetCallState()
     int32_t numHeld = 0;
     int32_t callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
     std::string number = "";
-    std::vector<int32_t> carrierCallInfo = getCarrierCallInfoNum(callState, number);
-    if (!carrierCallInfo.empty()) {
-        numActive = carrierCallInfo[0];
-        numHeld = carrierCallInfo[1];
+    std::vector<int32_t> callInfo = getCallInfoNum(callState, number);
+    if (!callInfo.empty()) {
+        numActive = callInfo[0];
+        numHeld = callInfo[1];
     }
     if (IsVoipCallExist() && numActive == 0) {
         GetVoipCallState(numActive, callState, number);
@@ -164,47 +164,47 @@ int32_t BluetoothCallService::GetCallState()
         SendBtCallState(numActive, numHeld, callState, number);
 }
 
-std::vector<int32_t> BluetoothCallService::getCarrierCallInfoNum(int32_t &callState, std::string &number)
+std::vector<int32_t> BluetoothCallService::getCallInfoNum(int32_t &callState, std::string &number)
 {
-    int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE, false);
-    int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING, false);
-    int32_t numDial = GetCallNum(TelCallState::CALL_STATUS_DIALING, false);
-    int32_t numAlert = GetCallNum(TelCallState::CALL_STATUS_ALERTING, false);
-    int32_t numIncoming = GetCallNum(TelCallState::CALL_STATUS_INCOMING, false);
-    int32_t numWait = GetCallNum(TelCallState::CALL_STATUS_WAITING, false);
-    int32_t numDisconnected = GetCallNum(TelCallState::CALL_STATUS_DISCONNECTED, false);
-    int32_t numDisconnecting = GetCallNum(TelCallState::CALL_STATUS_DISCONNECTING, false);
+    int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE, true);
+    int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING, true);
+    int32_t numDial = GetCallNum(TelCallState::CALL_STATUS_DIALING, true);
+    int32_t numAlert = GetCallNum(TelCallState::CALL_STATUS_ALERTING, true);
+    int32_t numIncoming = GetCallNum(TelCallState::CALL_STATUS_INCOMING, true);
+    int32_t numWait = GetCallNum(TelCallState::CALL_STATUS_WAITING, true);
+    int32_t numDisconnected = GetCallNum(TelCallState::CALL_STATUS_DISCONNECTED, true);
+    int32_t numDisconnecting = GetCallNum(TelCallState::CALL_STATUS_DISCONNECTING, true);
     if (numHeld > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
-        number = GetCallNumber(TelCallState::CALL_STATUS_HOLDING, false);
+        number = GetCallNumber(TelCallState::CALL_STATUS_HOLDING, true);
     }
     if (numActive > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
-        number = GetCallNumber(TelCallState::CALL_STATUS_ACTIVE, false);
+        number = GetCallNumber(TelCallState::CALL_STATUS_ACTIVE, true);
     }
     if (numDial > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_DIALING);
-        number = GetCallNumber(TelCallState::CALL_STATUS_DIALING, false);
+        number = GetCallNumber(TelCallState::CALL_STATUS_DIALING, true);
     }
     if (numAlert > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_ALERTING);
-        number = GetCallNumber(TelCallState::CALL_STATUS_ALERTING, false);
+        number = GetCallNumber(TelCallState::CALL_STATUS_ALERTING, true);
     }
     if (numIncoming > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_INCOMING);
-        number = GetCallNumber(TelCallState::CALL_STATUS_INCOMING, false);
+        number = GetCallNumber(TelCallState::CALL_STATUS_INCOMING, true);
     }
     if (numWait > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_INCOMING);
-        number = GetCallNumber(TelCallState::CALL_STATUS_WAITING, false);
+        number = GetCallNumber(TelCallState::CALL_STATUS_WAITING, true);
     }
     if (numDisconnected > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
-        number = GetCallNumber(TelCallState::CALL_STATUS_DISCONNECTED, false);
+        number = GetCallNumber(TelCallState::CALL_STATUS_DISCONNECTED, true);
     }
     if (numDisconnecting > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_DISCONNECTED);
-        number = GetCallNumber(TelCallState::CALL_STATUS_DISCONNECTING, false);
+        number = GetCallNumber(TelCallState::CALL_STATUS_DISCONNECTING, true);
     }
     return {numActive, numHeld};
 }
@@ -405,9 +405,9 @@ std::vector<CallAttributeInfo> BluetoothCallService::GetCurrentCallList(int32_t 
         return vec;
     }
     if (slotId < 0) {
-        return GetAllCallInfoList(false);
+        return GetAllCallInfoList(true);
     }
-    return GetCallInfoList(slotId, false);
+    return GetCallInfoList(slotId, (true));
 }
 
 int32_t BluetoothCallService::AddAudioDeviceList(const std::string &address, int32_t deviceType,

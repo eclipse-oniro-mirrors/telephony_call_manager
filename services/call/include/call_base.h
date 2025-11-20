@@ -156,6 +156,8 @@ public:
     int32_t GetNewCallUseBox();
     int32_t GetBtCallSlotId();
     void SetBtCallSlotId(int32_t slotId);
+    bool isNonVirtualCall();
+    Void SetNonVirtualCall(bool isNonVirtualCall);
 
 protected:
     int32_t callId_;
@@ -213,6 +215,7 @@ private:
     bool isAnsweredByPhone_{false};
     int32_t newCallUseBox_ = 0;
     int32_t btCallSlotId_{BT_CALL_INVALID_SLOT};
+    bool isNonVirtualCall_{false};
 };
 } // namespace Telephony
 } // namespace OHOS
