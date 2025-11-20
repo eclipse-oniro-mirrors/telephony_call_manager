@@ -51,7 +51,7 @@ int32_t CsConference::JoinToConference(int32_t callId)
     state_ = CONFERENCE_STATE_ACTIVE;
     oldState_ = state_;
     beginTime_ = time(nullptr);
-    TELEPHONY_LOGI("JoinToCsConference success, callId:%{public}d" callId);
+    TELEPHONY_LOGI("JoinToCsConference success, callId:%{public}d", callId);
     return TELEPHONY_SUCCESS;
 }
 
