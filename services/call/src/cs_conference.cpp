@@ -44,13 +44,14 @@ int32_t CsConference::JoinToConference(int32_t callId)
     std::lock_guard<ffrt::mutex> lock(conferenceMutex_);
     if (state_ != CONFERENCE_STATE_CREATING && state_ != CONFERENCE_STATE_ACTIVE &&
         state_ != CONFERENCE_STATE_LEAVING && state_ != CONFERENCE_STATE_HOLDING) {
-        TELEPHONY_LOGE("the current conference status does not allow CombineConference");
+        TELEPHONY_LOGE("the current CsConference status does not allow CombineConference");
         return CALL_ERR_ILLEGAL_CALL_OPERATION;
     }
     subCallIdSet_.insert(callId);
     state_ = CONFERENCE_STATE_ACTIVE;
     oldState_ = state_;
     beginTime_ = time(nullptr);
+    TELEPHONY_LOGI("JoinToCsConference success, callId:%{public}d", callId);
     return TELEPHONY_SUCCESS;
 }
 
@@ -83,7 +84,7 @@ int32_t CsConference::HoldConference(int32_t callId)
         return TELEPHONY_SUCCESS;
     }
     if (subCallIdSet_.find(callId) == subCallIdSet_.end()) {
-        TELEPHONY_LOGE("separate conference failed, callId %{public}d not in conference", callId);
+        TELEPHONY_LOGE("separate CsConference failed, callId %{public}d not in conference", callId);
         return CALL_ERR_CONFERENCE_SEPERATE_FAILED;
     }
     if (subCallIdSet_.empty()) {
@@ -102,7 +103,7 @@ int32_t CsConference::CanCombineConference()
 {
     std::lock_guard<ffrt::mutex> lock(conferenceMutex_);
     if (subCallIdSet_.size() >= maxSubCallLimits_) {
-        TELEPHONY_LOGE("there is %{public}zu calls in the conference yet!", subCallIdSet_.size());
+        TELEPHONY_LOGE("there is %{public}zu calls in the CsConference yet!", subCallIdSet_.size());
         return CALL_ERR_CONFERENCE_CALL_EXCEED_LIMIT;
     }
     return TELEPHONY_SUCCESS;
@@ -112,7 +113,7 @@ int32_t CsConference::CanSeparateConference()
 {
     std::lock_guard<ffrt::mutex> lock(conferenceMutex_);
     if (subCallIdSet_.empty()) {
-        TELEPHONY_LOGE("no call is currently in the conference!");
+        TELEPHONY_LOGE("no call is currently in the CsConference!");
         return CALL_ERR_CONFERENCE_NOT_EXISTS;
     }
     if (state_ != CONFERENCE_STATE_ACTIVE) {
@@ -126,7 +127,7 @@ int32_t CsConference::CanKickOutFromConference()
 {
     std::lock_guard<ffrt::mutex> lock(conferenceMutex_);
     if (subCallIdSet_.empty()) {
-        TELEPHONY_LOGE("no call is currently in the conference!");
+        TELEPHONY_LOGE("no call is currently in the CsConference!");
         return CALL_ERR_CONFERENCE_NOT_EXISTS;
     }
     return TELEPHONY_SUCCESS;

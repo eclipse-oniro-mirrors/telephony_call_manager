@@ -1067,6 +1067,7 @@ void CallStatusManager::SetConferenceCall(std::vector<sptr<CallBase>> conference
     for (auto conferenceCall : conferenceCallList) {
         TELEPHONY_LOGI("SetConferenceCall callid : %{public}d; State : %{public}d",
             conferenceCall->GetCallID(), conferenceCall->GetTelConferenceState());
+        conferenceCall->SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_IDLE);
         if (conferenceCall->GetTelConferenceState() != TelConferenceState::TEL_CONFERENCE_ACTIVE) {
             conferenceCall->LaunchConference();
             UpdateCallState(conferenceCall, conferenceCall->GetTelCallState());

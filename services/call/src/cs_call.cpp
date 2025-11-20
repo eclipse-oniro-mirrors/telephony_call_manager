@@ -130,6 +130,7 @@ int32_t CSCall::CanKickOutFromConference()
 
 int32_t CSCall::LaunchConference()
 {
+    DelayedSingleton<CsConference>::GetInstance()->SetConferenceState(ConferenceState::CONFERENCE_STATE_IDLE);
     int32_t ret = DelayedSingleton<CsConference>::GetInstance()->JoinToConference(GetCallID());
     if (ret == TELEPHONY_SUCCESS) {
         SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_ACTIVE);
