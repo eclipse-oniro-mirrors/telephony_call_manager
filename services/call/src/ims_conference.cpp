@@ -50,7 +50,7 @@ int32_t ImsConference::JoinToConference(int32_t callId)
     state_ = CONFERENCE_STATE_ACTIVE;
     oldState_ = state_;
     beginTime_ = time(nullptr);
-    TELEPHONY_LOGI("JoinToConference success, callId:%{public}d", callId);
+    TELEPHONY_LOGI("JoinToImsConference success, callId:%{public}d", callId);
     return TELEPHONY_SUCCESS;
 }
 

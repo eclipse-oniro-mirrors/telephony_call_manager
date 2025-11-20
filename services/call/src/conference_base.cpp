@@ -61,6 +61,7 @@ ConferenceState ConferenceBase::GetConferenceState()
 
 void ConferenceBase::SetConferenceState(ConferenceState state)
 {
+    TELEPHONY_LOGE("SetConferenceState state is:%{public}d", static_cast<int32_t>(state));
     std::lock_guard<ffrt::mutex> lock(conferenceMutex_);
     state_ = state;
 }
