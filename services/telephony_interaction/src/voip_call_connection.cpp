@@ -45,6 +45,7 @@ void VoipCallConnection::Init(int32_t systemAbilityId)
     TELEPHONY_LOGI("systemAbilityId_ = %{public}d", systemAbilityId);
     std::unique_lock<ffrt::mutex> lock(mutex_);
     if (GetCallManagerProxy() != TELEPHONY_SUCCESS) {
+        lock.unlock();
         return;
     }
     lock.unlock();
@@ -52,7 +53,7 @@ void VoipCallConnection::Init(int32_t systemAbilityId)
     if (statusChangeListener_ != nullptr) {
         return;
     }
-    statusChangeListener_ = new (std::nothrow) SystemAbilityListener();
+    statusChangeListener_ = sptr<SystemAbilityListener>::MakeSptr();
     if (statusChangeListener_ == nullptr) {
         TELEPHONY_LOGE("Init, failed to create statusChangeListener.");
         return;
