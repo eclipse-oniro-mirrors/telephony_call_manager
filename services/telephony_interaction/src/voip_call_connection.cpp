@@ -53,7 +53,7 @@ void VoipCallConnection::Init(int32_t systemAbilityId)
     if (statusChangeListener_ != nullptr) {
         return;
     }
-    statusChangeListener_ = sptr<systemAbilityListener>::MakeSptr();
+    statusChangeListener_ = sptr<SystemAbilityListener>::MakeSptr();
     if (statusChangeListener_ == nullptr) {
         TELEPHONY_LOGE("Init, failed to create statusChangeListener.");
         return;
