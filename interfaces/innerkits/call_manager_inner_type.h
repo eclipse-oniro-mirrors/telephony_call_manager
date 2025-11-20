@@ -19,6 +19,7 @@
 #include "call_manager_base.h"
 #include "call_manager_disconnected_details.h"
 #include "call_manager_info.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -788,7 +789,7 @@ struct OttCallEventInfo {
     OttCallEventInfo &operator=(const OttCallEventInfo &temp)
     {
         ottCallEventId = temp.ottCallEventId;
-        std::copy(std::begin(temp.bundleName), std::end(temp.bundleName), std::begin(bundleName));
+        strncpy_s(bundleName, kMaxBundleNameLen + 1, temp.bundleName, kMaxBundleNameLen);
         return *this;
     }
 };
