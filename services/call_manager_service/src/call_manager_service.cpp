@@ -1497,9 +1497,6 @@ int32_t CallManagerService::InputDialerSpecialCode(const std::string &specialCod
     commonEventData.SetWant(want);
     commonEventData.SetData(specialCode);
     EventFwk::CommonEventPublishInfo publishInfo;
-    std::vector<std::string> callPermissions;
-    callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
-    publishInfo.SetSubscriberPermissions(callPermissions);
     if (!EventFwk::CommonEventManager::PublishCommonEvent(commonEventData, publishInfo, nullptr)) {
         TELEPHONY_LOGE("PublishCommonEvent fail");
         return TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL;
