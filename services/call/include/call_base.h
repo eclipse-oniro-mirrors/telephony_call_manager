@@ -157,7 +157,7 @@ public:
     int32_t GetBtCallSlotId();
     void SetBtCallSlotId(int32_t slotId);
     bool isNonVirtualCall();
-    Void SetNonVirtualCall(bool isNonVirtualCall);
+    void SetNonVirtualCall(bool isNonVirtualCall);
 
 protected:
     int32_t callId_;
