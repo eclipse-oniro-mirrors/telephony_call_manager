@@ -222,6 +222,7 @@ void SpamCallAdapter::ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::s
     TELEPHONY_LOGI("DetectSpamCall markType: %{public}d", info.markType);
     if (!isBlock && (info.markType == MarkType::MARK_TYPE_CRANK || info.markType == MarkType::MARK_TYPE_FRAUD ||
         info.markType == MarkType::MARK_TYPE_PROMOTE_SALES || info.markType == MarkType::MARK_TYPE_HOUSE_AGENT)) {
+        std::lock_guard<ffrt::mutex> lock(mutex_);
         if (connection_ != nullptr) {
             connection_->RequireCallReminder();
         }
