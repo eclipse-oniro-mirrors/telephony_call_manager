@@ -701,7 +701,10 @@ int32_t CallStatusManager::DisconnectingVoipCallHandle(const CallDetailInfo &inf
     if (call == nullptr) {
         return TELEPHONY_ERROR;
     }
-    DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(true);
+    if (GetVoipCallNum(true) == 1) {
+        bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(true);
+        TELEPHONY_LOGE("SetVirtualCall res:%{public}d", res);
+    }
     call->SetNonVirtualCall(false);
     return UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
 }
@@ -1209,7 +1212,10 @@ int32_t CallStatusManager::DisconnectedVoipCallHandle(const CallDetailInfo &info
         return ret;
     }
     DeleteOneCallObject(call->GetCallID());
-    DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(true);
+    if (GetVoipCallNum(true) == 1) {
+        bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(true);
+        TELEPHONY_LOGE("SetVirtualCall res:%{public}d", res);
+    }
     call->SetNonVirtualCall(false);
     TELEPHONY_LOGI("handle disconnected voip call state success");
     return ret;
