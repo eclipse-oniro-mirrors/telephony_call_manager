@@ -172,7 +172,7 @@ public:
     int32_t ResetBtHearingAidDeviceList() override;
 
 private:
-    std::vector<int32_t> getCarrierCallInfoNum(int32_t &callState, std::string &number);
+    std::vector<int32_t> getCallInfoNum(int32_t &callState, std::string &number);
     void sendEventToVoip(CallAbilityEventId eventId);
 private:
     void GetVoipCallState(int32_t &numActive, int32_t &callState, std::string &number);

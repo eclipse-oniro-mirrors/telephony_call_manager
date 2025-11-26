@@ -54,7 +54,7 @@ public:
     static int32_t IsNewCallAllowedCreate(bool &enabled);
     static int32_t GetCurrentCallNum();
     static int32_t GetCarrierCallList(std::list<int32_t> &list);
-    static int32_t GetVoipCallNum();
+    static int32_t GetVoipCallNum(bool isOnlyIncludeNonVirtualVoIP = false);
     static int32_t GetVoipCallList(std::list<int32_t> &list);
     static bool HasRingingMaximum();
     static bool HasDialingMaximum();
@@ -63,7 +63,7 @@ public:
     static bool IsCallExist(int32_t callId);
     static bool IsCallExist(std::string &phoneNumber);
     static bool HasCallExist();
-    static bool HasActivedCallExist(int32_t &callId, bool isIncludeCallServiceKitCall);
+    static bool HasActivedCallExist(int32_t &callId, bool isIncludeVoipCall);
     static int32_t HasRingingCall(bool &hasRingingCall);
     static int32_t HasHoldCall(bool &hasHoldCall);
     static TelCallState GetCallState(int32_t callId);

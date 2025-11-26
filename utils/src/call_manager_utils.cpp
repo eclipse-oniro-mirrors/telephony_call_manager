@@ -103,7 +103,6 @@ void CallManagerUtils::WriteVoipCallInfo(const CallAttributeInfo &info, MessageP
     messageParcel.WriteBool(info.voipCallInfo.isConferenceCall);
     messageParcel.WriteBool(info.voipCallInfo.isVoiceAnswerSupported);
     messageParcel.WriteBool(info.voipCallInfo.isUserMuteRingToneAllowed);
-    messageParcel.WriteBool(info.voipCallInfo.isRemoteDeviceControlAllowed);
     messageParcel.WriteBool(info.voipCallInfo.isDialingAllowedDuringCarrierCall);
     messageParcel.WriteBool(info.voipCallInfo.hasMicPermission);
     messageParcel.WriteBool(info.voipCallInfo.isCapsuleSticky);

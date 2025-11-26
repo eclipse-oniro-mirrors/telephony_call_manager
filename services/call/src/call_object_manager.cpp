@@ -387,13 +387,14 @@ int32_t CallObjectManager::GetCarrierCallList(std::list<int32_t> &list)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallObjectManager::GetVoipCallNum()
+int32_t CallObjectManager::GetVoipCallNum(bool isOnlyIncludeNonVirtualVoIP)
 {
     int32_t count = 0;
     std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
-        if ((*it)->GetCallType() == CallType::TYPE_VOIP) {
+        if ((*it)->GetCallType() == CallType::TYPE_VOIP &&
+            (isOnlyIncludeNonVirtualVoIP? (*it)->isNonVirtualCall() : true)) {
             count++;
         }
     }
@@ -811,13 +812,13 @@ bool CallObjectManager::IsConferenceCallExist(TelConferenceState state, int32_t 
     return false;
 }
 
-bool CallObjectManager::HasActivedCallExist(int32_t &callId, bool isIncludeCallServiceKitCall)
+bool CallObjectManager::HasActivedCallExist(int32_t &callId, bool isIncludeVoipCall)
 {
     std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE &&
-            (isIncludeCallServiceKitCall || (*it)->GetCallType() != CallType::TYPE_VOIP)) {
+            ((isIncludeVoipCall && (*it)->isNonVirtualCall()) || (*it)->GetCallType() != CallType::TYPE_VOIP)) {
             callId = (*it)->GetCallID();
             return true;
         }
@@ -838,11 +839,11 @@ int32_t CallObjectManager::GetCallNum(TelCallState callState, bool isIncludeVoip
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == callState) {
-            if (!isIncludeVoipCall && (*it)->GetCallType() == CallType::TYPE_VOIP) {
+            if ((*it)->GetCallType() == CallType::TYPE_VOIP &&
+                (isIncludeVoipCall ? !(*it)->isNonVirtualCall() : true)) {
                 continue;
-            } else {
-                ++num;
             }
+            ++num;
         }
     }
     TELEPHONY_LOGI("callState:%{public}d, num:%{public}d", callState, num);
@@ -856,12 +857,11 @@ std::string CallObjectManager::GetCallNumber(TelCallState callState, bool isIncl
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == callState) {
-            if (!isIncludeVoipCall && (*it)->GetCallType() == CallType::TYPE_VOIP) {
+            if ((*it)->GetCallType() == CallType::TYPE_VOIP &&
+                (isIncludeVoipCall ? !(*it)->isNonVirtualCall() : true)) {
                 continue;
-            } else {
-                number = (*it)->GetAccountNumber();
-                break;
             }
+            number = (*it)->GetAccountNumber();
         }
     }
     return number;
@@ -875,10 +875,14 @@ std::vector<CallAttributeInfo> CallObjectManager::GetCallInfoList(int32_t slotId
     std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallType() == CallType::TYPE_VOIP &&
+            (isIncludeVoipCall ? !(*it)->isNonVirtualCall() : true)) {
+            continue;
+        }
+
         (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
         (*it)->GetCallAttributeInfo(info);
-        if (info.accountId == slotId && info.callType != CallType::TYPE_OTT &&
-            (isIncludeVoipCall || info.callType != CallType::TYPE_VOIP)) {
+        if (info.accountId == slotId && info.callType != CallType::TYPE_OTT) {
             callVec.emplace_back(info);
         }
     }
@@ -1042,10 +1046,13 @@ std::vector<CallAttributeInfo> CallObjectManager::GetAllCallInfoList(bool isIncl
             TELEPHONY_LOGE("call is nullptr");
             continue;
         }
-        (*it)->GetCallAttributeInfo(info);
-        if (isIncludeVoipCall || info.callType != CallType::TYPE_VOIP) {
-            callVec.emplace_back(info);
+
+        if ((*it)->GetCallType() == CallType::TYPE_VOIP &&
+            (isIncludeVoipCall ? !(*it)->isNonVirtualCall() : true)) {
+                continue;
         }
+        (*it)->GetCallAttributeInfo(info);
+        callVec.emplace_back(info);
     }
     std::vector<CallAttributeInfo> voipCallVec = GetVoipCallInfoList();
     for (CallAttributeInfo voipCall : voipCallVec) {

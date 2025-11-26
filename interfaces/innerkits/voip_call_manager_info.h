@@ -174,10 +174,6 @@ struct VoipCallAttribute {
      */
     bool isUserMuteRingToneAllowed = false;
     /**
-     * Indicates whether the VoIP call is allowed to be controlled by remote devices.Default value is false.
-     */
-    bool isRemoteDeviceControlAllowed = false;
-    /**
      * Indicates whether the VoIP call is allowed to dial during carrier call. Default value is false.
      */
     bool isDialingAllowedDuringCarrierCall = false;

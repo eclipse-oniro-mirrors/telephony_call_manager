@@ -560,8 +560,16 @@ void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
 
 bool AudioDeviceManager::SetVirtualCall(bool isVirtual)
 {
-    TELEPHONY_LOGI("Virtualcall SetVirtualCall: %{public}d.", isVirtual);
-    return AudioStandard::AudioSystemManager::GetInstance()->SetVirtualCall(isVirtual);
+    bool res = AudioStandard::AudioSystemManager::GetInstance()->SetVirtualCall(isVirtual);
+    TELEPHONY_LOGI("Virtualcall SetVirtualCall: %{public}d, res: %{public}d.", isVirtual, res);
+    return res;
+}
+
+bool AudioDeviceManager::GetVirtualCall()
+{
+    bool res = AudioStandard::AudioSystemManager::GetInstance()->GetVirtualCall();
+    TELEPHONY_LOGI("Virtualcall GetVirtualCall res: %{public}d.", res);
+    return res;
 }
 
 void AudioDeviceManager::SetCurrentAudioDevice(const AudioDevice &device)

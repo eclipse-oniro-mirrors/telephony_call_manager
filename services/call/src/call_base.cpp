@@ -778,5 +778,17 @@ void CallBase::SetBtCallSlotId(int32_t slotId)
     std::lock_guard<ffrt::mutex> lock(mutex_);
     btCallSlotId_ = slotId;
 }
+
+bool CallBase::isNonVirtualCall()
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    return isNonVirtualCall_;
+}
+
+void CallBase::SetNonVirtualCall(bool isNonVirtualCall)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    isNonVirtualCall_ = isNonVirtualCall;
+}
 } // namespace Telephony
 } // namespace OHOS
