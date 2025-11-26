@@ -818,7 +818,7 @@ bool CallObjectManager::HasActivedCallExist(int32_t &callId, bool isIncludeVoipC
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE &&
-            (isIncludeVoipCall && (*it)->isNonVirtualCall() || (*it)->GetCallType() != CallType::TYPE_VOIP)) {
+            ((isIncludeVoipCall && (*it)->isNonVirtualCall()) || (*it)->GetCallType() != CallType::TYPE_VOIP)) {
             callId = (*it)->GetCallID();
             return true;
         }
