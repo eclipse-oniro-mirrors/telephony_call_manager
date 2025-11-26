@@ -1875,5 +1875,15 @@ bool CallManagerService::EndCall()
         return false;
     }
 }
+
+bool CallManagerService::HasDistributedCommunicationCapability()
+{
+#ifdef SUPPORT_DSOFTBUS
+    if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsConnected()) {
+        return true;
+    }
+#endif
+    return false;
+}
 } // namespace Telephony
 } // namespace OHOS

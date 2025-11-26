@@ -281,6 +281,18 @@ HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_010, TestSize.Level0)
 }
 
 /**
+ * @tc.number   Telephony_CallManagerService_011
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_011, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    EXPECT_FALSE(callManagerService->HasDistributedCommunicationCapability());
+}
+
+/**
  * @tc.number   Telephony_SatelliteCall_001
  * @tc.name     test branch
  * @tc.desc     Function test

@@ -834,6 +834,14 @@ public:
      * @return Returns reue on success, others on failure.
      */
     bool EndCall() override;
+
+    /**
+     * HasDistributedCommunicationCapability
+     *
+     * @brief If has distributed communication capability
+     * @return Returns true on has distributed communication capability, others on don't has.
+     */
+    bool HasDistributedCommunicationCapability() override;
 private:
     std::string GetBundleInfo();
     int32_t dealCeliaCallEvent(int32_t callId);

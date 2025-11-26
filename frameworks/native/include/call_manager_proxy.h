@@ -129,6 +129,7 @@ public:
         bool isIncomingTrustlist, const std::vector<std::string> &incomingList);
     int32_t WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId);
     bool EndCall();
+    bool HasDistributedCommunicationCapability();
 
 private:
     int32_t ConnectService();

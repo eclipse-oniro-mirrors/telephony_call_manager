@@ -762,10 +762,14 @@ bool CallManagerClient::HasVoiceCapability()
     char retValue[VOICECALL_CAP_VAL_LEN + 1] = {"true"};
     int retLen = GetParameter(KEY_VOICECALL_CAP.c_str(), "true", retValue, VOICECALL_CAP_VAL_LEN);
     TELEPHONY_LOGD("HasVoiceCapability retValue %{public}s, retLen %{public}d", retValue, retLen);
-    if (strcmp(retValue, "false") == 0) {
-        return false;
+    if (strcmp(retValue, "true") == 0) {
+        return true;
     }
-    return true;
+
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->HasDistributedCommunicationCapability();
+    }
+    return false;
 }
 
 int32_t CallManagerClient::ReportAudioDeviceInfo()

@@ -1788,5 +1788,19 @@ bool CallManagerProxy::EndCall()
     }
     return callManagerServicePtr_->EndCall();
 }
+
+bool CallManagerProxy::HasDistributedCommunicationCapability()
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return false;
+    }
+    std::shared_lock<ffrt::shared_mutex> lock(clientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return false;
+    }
+    return callManagerServicePtr_->HasDistributedCommunicationCapability();
+}
 } // namespace Telephony
 } // namespace OHOS

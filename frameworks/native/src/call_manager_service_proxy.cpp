@@ -1493,5 +1493,21 @@ bool CallManagerServiceProxy::EndCall()
     }
     return replyParcel.ReadBool();
 }
+
+bool CallManagerServiceProxy::HasDistributedCommunicationCapability()
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return false;
+    }
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_HAS_DISTRIBUTED_COMMUNICATION_CAPABILITY, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Function HasDistributedCommunicationCapability! errCode:%{public}d", error);
+        return false;
+    }
+    return replyParcel.ReadBool();
+}
 } // namespace Telephony
 } // namespace OHOS

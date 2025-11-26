@@ -114,6 +114,9 @@ void CallManagerServiceStub::InitCallUtilsRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetCallPolicyInfo(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_WRITE_VOIP_CALL_FAULT_EVENT)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnWriteVoipCallFaultEvent(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_HAS_DISTRIBUTED_COMMUNICATION_CAPABILITY)] =
+        [this](
+            MessageParcel &data, MessageParcel &reply) { return OnHasDistributedCommunicationCapability(data, reply); };
 }
 
 void CallManagerServiceStub::InitCallConferenceRequest()
@@ -1527,6 +1530,16 @@ int32_t CallManagerServiceStub::OnEndCall(MessageParcel &data, MessageParcel &re
 {
     bool result = EndCall();
     TELEPHONY_LOGD("result:%{public}d", result);
+    if (!reply.WriteBool(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnHasDistributedCommunicationCapability(MessageParcel &data, MessageParcel &reply)
+{
+    bool result = HasDistributedCommunicationCapability();
     if (!reply.WriteBool(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
