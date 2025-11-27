@@ -33,6 +33,7 @@ public:
     int32_t CanCombineConference() override;
     int32_t CanSeparateConference() override;
     int32_t CanKickOutFromConference() override;
+    void UpdateConferenceId(int32_t callId);
 
 private:
     uint32_t maxSubCallLimits_;

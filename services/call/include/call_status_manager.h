@@ -104,6 +104,7 @@ private:
     sptr<CallBase> CreateNewCallByCallTypeEx(
         DialParaInfo &paraInfo, const CallDetailInfo &info, CallDirection dir, AppExecFwk::PacMap &extras);
     sptr<CallBase> RefreshCallIfNecessary(const sptr<CallBase> &call, const CallDetailInfo &info);
+    sptr<CallBase> RefreshCall(const sptr<CallBase> &call, const CallDetailInfo &info);
     void SetOriginalCallTypeForActiveState(sptr<CallBase> &call);
     void SetOriginalCallTypeForDisconnectState(sptr<CallBase> &call);
     void PackParaInfo(
