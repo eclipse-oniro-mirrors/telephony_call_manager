@@ -183,5 +183,10 @@ int32_t CSCall::IsSupportConferenceable()
 #endif
     return CarrierCall::IsSupportConferenceable();
 }
+
+int32_t CSCall::UpdateConferenceId(int32_t callId)
+{
+    DelayedSingleton<CsConference>::GetInstance()->UpdateConferenceId(callId);
+}
 } // namespace Telephony
 } // namespace OHOS

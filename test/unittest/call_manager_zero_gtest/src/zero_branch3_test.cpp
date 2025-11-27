@@ -245,6 +245,9 @@ HWTEST_F(ZeroBranch4Test, Telephony_Cs_Conference_001, TestSize.Level0)
     csConference.subCallIdSet_.clear();
     ASSERT_EQ(csConference.CanSeparateConference(), CALL_ERR_CONFERENCE_NOT_EXISTS);
     ASSERT_EQ(csConference.CanKickOutFromConference(), CALL_ERR_CONFERENCE_NOT_EXISTS);
+    CsConference csConference1;
+    csConference1.subCallIdSet_.insert(1);
+    csConference1.UpdateConferenceId(1);
 }
 
 /**
@@ -1734,6 +1737,9 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_011, TestSize.Level0)
     info.callType = CallType::TYPE_ERR_CALL;
     EXPECT_NE(callStatusManager->RefreshCallIfNecessary(call, info), nullptr);
     info.callType = CallType::TYPE_CS;
+    call->SetCallType(CallType::TYPE_IMS);
+    info.mpty = 1;
+    callStatusManager->RefreshCallIfNecessary(call, info);
     NumberMarkInfo numberMarkInfo;
     numberMarkInfo.markType = MarkType::MARK_TYPE_NONE;
     call->SetNumberLocation("default");

@@ -1585,13 +1585,18 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
         TELEPHONY_LOGI("RefreshCallIfNecessary not need Refresh");
         return call;
     }
+    retrun RefreshCall(call, info);
+}
+
+sptr<CallBase> CallStatusManager::RefreshCall(const sptr<CallBase> &call, const CallDetailInfo &info)
+{
     TelCallState priorState = call->GetTelCallState();
     CallAttributeInfo attrInfo;
     (void)memset_s(&attrInfo, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
     call->GetCallAttributeBaseInfo(attrInfo);
     sptr<CallBase> newCall = CreateNewCall(info, attrInfo.callDirection);
     if (newCall == nullptr) {
-        TELEPHONY_LOGE("RefreshCallIfNecessary createCallFail");
+        TELEPHONY_LOGE("RefreshCall createCallFail");
         return call;
     }
     AddOneCallObject(newCall);
@@ -1609,6 +1614,10 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
     newCall->SetAnswerType(attrInfo.answerType);
     newCall->SetMicPhoneState(call->IsMuted());
     DeleteOneCallObject(call->GetCallID());
+    if (call->GetCallType == CallType::TYPE_IMS && info.callType == CallType::TYPE_CS && info.mpty == 1) {
+        sptr<CSCall> csCall = reinterpret_cast<CSCall *>(newCall.GetRefPtr());
+        csCall->UpdateConferenceId(call->GetCallId());
+    }
     newCall->SetCallId(call->GetCallID());
     newCall->SetTelCallState(priorState);
     if (call->GetNumberLocation() != "default") {

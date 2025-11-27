@@ -49,6 +49,7 @@ public:
     int32_t GetSubCallIdList(std::vector<std::u16string> &callIdList) override;
     int32_t GetCallIdListForConference(std::vector<std::u16string> &callIdList) override;
     int32_t IsSupportConferenceable() override;
+    void UpdateConferenceId(int32_t callId);
 };
 } // namespace Telephony
 } // namespace OHOS
