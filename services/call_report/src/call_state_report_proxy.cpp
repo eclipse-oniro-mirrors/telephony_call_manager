@@ -45,8 +45,8 @@ void CallStateReportProxy::CallStateUpdated(
     }
     if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
         auto callRunningState = callObjectPtr->GetCallRunningState();
-        if (callRunningState != CallRunningState::CALL_RUNNING_STATE_RINGING ||
-            (!CallObjectManager::IsVoipCallExist() && !DelayedSingleton<CallControlManager>::GetInstance()->HasCall())) {
+        if (callRunningState != CallRunningState::CALL_RUNNING_STATE_RINGING || (!CallObjectManager::IsVoipCallExist()
+            && !DelayedSingleton<CallControlManager>::GetInstance()->HasCall())) {
             auto voipCall = static_cast<VoIPCall *>(callObjectPtr.GetRefPtr());
             SendVoipCallStateChanged(voipCall->GetVoipUid(), nextState);
         }
