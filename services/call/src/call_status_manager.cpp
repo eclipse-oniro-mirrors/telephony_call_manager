@@ -1585,7 +1585,7 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
         TELEPHONY_LOGI("RefreshCallIfNecessary not need Refresh");
         return call;
     }
-    retrun RefreshCall(call, info);
+    return RefreshCall(call, info);
 }
 
 sptr<CallBase> CallStatusManager::RefreshCall(const sptr<CallBase> &call, const CallDetailInfo &info)
