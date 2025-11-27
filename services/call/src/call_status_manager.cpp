@@ -1614,7 +1614,7 @@ sptr<CallBase> CallStatusManager::RefreshCall(const sptr<CallBase> &call, const 
     newCall->SetAnswerType(attrInfo.answerType);
     newCall->SetMicPhoneState(call->IsMuted());
     DeleteOneCallObject(call->GetCallID());
-    if (call->GetCallType() == CallType::TYPE_IMS && newCall->GetCallType == CallType::TYPE_CS && info.mpty == 1) {
+    if (call->GetCallType() == CallType::TYPE_IMS && newCall->GetCallType() == CallType::TYPE_CS && info.mpty == 1) {
         sptr<CSCall> csCall = reinterpret_cast<CSCall *>(newCall.GetRefPtr());
         csCall->UpdateConferenceId(call->GetCallID());
     }
