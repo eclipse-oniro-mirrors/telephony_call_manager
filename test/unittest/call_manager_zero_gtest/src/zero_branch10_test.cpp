@@ -752,5 +752,7 @@ HWTEST_F(ZeroBranch10Test, CallStateReportProxy_CallStateUpdated_001, TestSize.L
     CallObjectManager::voipCallObjectList_[1] = voipInfo;
     callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_ANSWERED;
     callStateProxy->CallStateUpdated(call1, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
+    call1->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    callStateProxy->CallStateUpdated(call1, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_DISCONNECTED);
 }
 }
