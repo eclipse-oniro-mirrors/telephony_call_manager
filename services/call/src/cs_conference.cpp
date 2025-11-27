@@ -137,7 +137,7 @@ int32_t CsConference::UpdateConferenceId(int32_t callId)
 {
     TELEPHONY_LOGI("UpdateConferenceId callId:%{public}d, mainCallId_:%{public}d", callId, mainCallId_);
     std::lock_guard<ffrt::mutex> lock(conferenceMutex_);
-    if (subCallIdset_.find(callId) == subCallIdSet_.end()) {
+    if (subCallIdSet_.find(callId) == subCallIdSet_.end()) {
         subCallIdSet_.insert(callId);
     }
     if (mainCallId_ == ERR_ID) {
