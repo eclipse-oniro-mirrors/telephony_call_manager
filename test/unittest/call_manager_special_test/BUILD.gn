@@ -70,9 +70,7 @@ ohos_unittest("tel_call_manager_special1_test") {
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "data_share:datashare_consumer",
-    "device_manager:devicemanagersdk",
     "distributed_notification_service:ans_innerkits",
-    "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "googletest:gmock_main",
@@ -94,6 +92,13 @@ ohos_unittest("tel_call_manager_special1_test") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (call_manager_feature_support_dsoftbus) {
+    external_deps += [
+      "device_manager:devicemanagersdk",
+      "dsoftbus:softbus_client",
+    ]
+  }
 
   deps = [ "${call_manager_path}/frameworks/native:tel_call_manager_api" ]
 
@@ -209,9 +214,7 @@ ohos_unittest("tel_call_manager_special2_test") {
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "data_share:datashare_consumer",
-    "device_manager:devicemanagersdk",
     "distributed_notification_service:ans_innerkits",
-    "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "googletest:gmock_main",
@@ -233,6 +236,13 @@ ohos_unittest("tel_call_manager_special2_test") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (call_manager_feature_support_dsoftbus) {
+    external_deps += [
+      "device_manager:devicemanagersdk",
+      "dsoftbus:softbus_client",
+    ]
+  }  
 
   deps = [ "${call_manager_path}/frameworks/native:tel_call_manager_api" ]
 
@@ -349,9 +359,7 @@ ohos_unittest("tel_call_manager_special3_test") {
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "data_share:datashare_consumer",
-    "device_manager:devicemanagersdk",
     "distributed_notification_service:ans_innerkits",
-    "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "googletest:gmock_main",
@@ -373,6 +381,13 @@ ohos_unittest("tel_call_manager_special3_test") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (call_manager_feature_support_dsoftbus) {
+    external_deps += [
+      "device_manager:devicemanagersdk",
+      "dsoftbus:softbus_client",
+    ]
+  }
 
   deps = [ "${call_manager_path}/frameworks/native:tel_call_manager_api" ]
 
