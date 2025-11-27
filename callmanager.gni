@@ -19,6 +19,7 @@ declare_args() {
 
 call_manager_path = "//base/telephony/call_manager"
 call_manager_defines = []
+call_manager_external_deps = []
 
 call_manager_sources = [
   "${call_manager_path}/services/antifraud/src/anonymize_adapter.cpp",
@@ -193,6 +194,11 @@ if (call_manager_feature_support_dsoftbus) {
     "${call_manager_path}/services/distributed_call/include/distributed_communication",
     "${call_manager_path}/services/interoperable_call/include",
   ]
+
+  call_manager_external_deps += [
+    "device_manager:devicemanagersdk",
+    "dsoftbus:softbus_client",
+  ]
  
   if (target_platform == "watch") {
     call_manager_defines += [ "SUPPORT_MUTE_BY_DATABASE" ]
@@ -200,7 +206,7 @@ if (call_manager_feature_support_dsoftbus) {
   }
 }
 
-call_manager_external_deps = [
+call_manager_external_deps += [
   "ability_base:base",
   "ability_base:want",
   "ability_base:zuri",
@@ -223,9 +229,7 @@ call_manager_external_deps = [
   "core_service:libtel_common",
   "core_service:tel_core_service_api",
   "data_share:datashare_consumer",
-  "device_manager:devicemanagersdk",
   "distributed_notification_service:ans_innerkits",
-  "dsoftbus:softbus_client",
   "eventhandler:libeventhandler",
   "ffrt:libffrt",
   "graphic_surface:surface",
