@@ -133,7 +133,7 @@ int32_t CsConference::CanKickOutFromConference()
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CsConference::UpdateConferenceId(int32_t callId)
+void CsConference::UpdateConferenceId(int32_t callId)
 {
     TELEPHONY_LOGI("UpdateConferenceId callId:%{public}d, mainCallId_:%{public}d", callId, mainCallId_);
     std::lock_guard<ffrt::mutex> lock(conferenceMutex_);
