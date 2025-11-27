@@ -184,7 +184,7 @@ int32_t CSCall::IsSupportConferenceable()
     return CarrierCall::IsSupportConferenceable();
 }
 
-int32_t CSCall::UpdateConferenceId(int32_t callId)
+void CSCall::UpdateConferenceId(int32_t callId)
 {
     DelayedSingleton<CsConference>::GetInstance()->UpdateConferenceId(callId);
 }
