@@ -71,10 +71,10 @@ public:
     int32_t StartVibrator();
     int32_t StopVibrator();
     bool SetMicrophoneMute(bool mute);
-    bool SetEarpieceDevActive();
-    bool SetSpeakerDevActive(bool isActive);
+    bool SetEarpieceDevActive(bool isSetAudioDeviceByUser = false);
+    bool SetSpeakerDevActive(bool isActive, bool isSetAudioDeviceByUser = false);
     bool SetBluetoothDevActive();
-    bool SetWiredHeadsetDevActive();
+    bool SetWiredHeadsetDevActive(bool isSetAudioDeviceByUser = false);
     AudioStandard::AudioRingerMode GetRingerMode() const;
     int32_t GetVolume(AudioStandard::AudioVolumeType audioVolumeType);
     int32_t SetVolume(AudioStandard::AudioVolumeType audioVolumeType, int32_t volume);
@@ -96,7 +96,7 @@ public:
     int32_t SetAudioMicStateChangeCallback();
     int32_t UnsetAudioMicStateChangeCallback();
     float GetSystemRingVolumeInDb(int32_t volumeLevel);
-    bool SetDeviceActive(AudioStandard::DeviceType deviceType, bool flag);
+    bool SetDeviceActive(AudioStandard::DeviceType deviceType, bool flag, bool isSetAudioDeviceByUser = false);
 
 private:
     void PreventInterruption(VibrationType type);

@@ -47,7 +47,7 @@ public:
     static void SetDeviceAvailable(AudioDeviceType deviceType, bool available);
     static bool SetVirtualCall(bool isVirtual);
     static bool GetVirtualCall();
-    bool SwitchDevice(AudioDeviceType device);
+    bool SwitchDevice(AudioDeviceType device, bool isSetAudioDeviceByUser = false);
     void AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType, const std::string &deviceName);
     void RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType);
     void ResetBtAudioDevicesList();
@@ -91,13 +91,12 @@ public:
     AudioDeviceType GetCurrentAudioDevice();
 
 private:
-    bool SwitchDevice(AudioEvent event);
     bool EnableBtSco();
     bool EnableNearlink();
     bool EnableBtHearingAid();
-    bool EnableWiredHeadset();
-    bool EnableSpeaker();
-    bool EnableEarpiece();
+    bool EnableWiredHeadset(bool isSetAudioDeviceByUser);
+    bool EnableSpeaker(bool isSetAudioDeviceByUser);
+    bool EnableEarpiece(bool isSetAudioDeviceByUser);
     bool DisableAll();
     bool IsBtScoDevEnable();
     bool IsDCallDevEnable();
@@ -127,8 +126,6 @@ private:
     static bool isBtScoConnected_;
     static bool isDCallDevConnected_;
     bool isAudioActivated_;
-    using AudioDeviceManagerFunc = std::function<bool()>;
-    std::map<uint32_t, AudioDeviceManagerFunc> memberFuncMap_;
     AudioDeviceInfo info_;
 };
 } // namespace Telephony

@@ -96,12 +96,12 @@ bool AudioProxy::SetBluetoothDevActive()
     return SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO, true);
 }
 
-bool AudioProxy::SetSpeakerDevActive(bool isActive)
+bool AudioProxy::SetSpeakerDevActive(bool isActive, bool isSetAudioDeviceByUser)
 {
-    return SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, isActive);
+    return SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, isActive, isSetAudioDeviceByUser);
 }
 
-bool AudioProxy::SetWiredHeadsetDevActive()
+bool AudioProxy::SetWiredHeadsetDevActive(bool isSetAudioDeviceByUser)
 {
     if (!isWiredHeadsetConnected_) {
         TELEPHONY_LOGE("SetWiredHeadsetDevActive wiredheadset is not connected");
@@ -112,10 +112,10 @@ bool AudioProxy::SetWiredHeadsetDevActive()
         TELEPHONY_LOGI("wired headset device is already active");
         return true;
     }
-    return SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_USB_HEADSET, true);
+    return SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_USB_HEADSET, true, isSetAudioDeviceByUser);
 }
 
-bool AudioProxy::SetEarpieceDevActive()
+bool AudioProxy::SetEarpieceDevActive(bool isSetAudioDeviceByUser)
 {
     if (isWiredHeadsetConnected_) {
         TELEPHONY_LOGE("SetEarpieceDevActive wiredheadset is connected, no need set earpiece dev active");
@@ -126,7 +126,7 @@ bool AudioProxy::SetEarpieceDevActive()
         TELEPHONY_LOGI("earpiece device is already active");
         return true;
     }
-    return SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_EARPIECE, true);
+    return SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_EARPIECE, true, isSetAudioDeviceByUser);
 }
 
 #ifdef SUPPORT_VIBRATOR
@@ -579,14 +579,14 @@ float AudioProxy::GetSystemRingVolumeInDb(int32_t volumeLevel)
         volumeLevel, AudioStandard::DEVICE_TYPE_SPEAKER);
 }
 
-bool AudioProxy::SetDeviceActive(AudioStandard::DeviceType deviceType, bool flag)
+bool AudioProxy::SetDeviceActive(AudioStandard::DeviceType deviceType, bool flag, bool isSetAudioDeviceByUser)
 {
     sptr<CallBase> call = CallObjectManager::GetAudioLiveCall();
     if (call == nullptr) {
         TELEPHONY_LOGE("SetDeviceActive failed, call is nullptr");
         return false;
     }
-    if (call->GetCallType() == CallType::TYPE_VOIP) {
+    if (isSetAudioDeviceByUser && call->GetCallType() == CallType::TYPE_VOIP) {
         sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
         if (AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
             deviceType, flag, voipCall->GetVoipUid()) != ERR_NONE) {

@@ -628,10 +628,10 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
         default:
             break;
     }
-    return SwitchAudioDevice(audioDeviceType);
+    return SwitchAudioDevice(audioDeviceType, isByUser);
 }
 
-int32_t AudioControlManager::SwitchAudioDevice(AudioDeviceType audioDeviceType)
+int32_t AudioControlManager::SwitchAudioDevice(AudioDeviceType audioDeviceType, bool isSetAudioDeviceByUser)
 {
     if (audioDeviceType != AudioDeviceType::DEVICE_UNKNOWN) {
 #ifdef SUPPORT_DSOFTBUS
@@ -642,7 +642,8 @@ int32_t AudioControlManager::SwitchAudioDevice(AudioDeviceType audioDeviceType)
         if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
             DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOffDCallDeviceSync();
         }
-        if (DelayedSingleton<AudioDeviceManager>::GetInstance()->SwitchDevice(audioDeviceType)) {
+        if (DelayedSingleton<AudioDeviceManager>::GetInstance()->SwitchDevice(
+            audioDeviceType, isSetAudioDeviceByUser)) {
             return TELEPHONY_SUCCESS;
         }
     }

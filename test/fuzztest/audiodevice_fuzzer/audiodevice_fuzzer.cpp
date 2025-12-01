@@ -94,12 +94,11 @@ void AudioDeviceManagerFunc(const uint8_t *data, size_t size)
     audioDeviceManager->Init();
     audioDeviceManager->InitAudioDevice();
     audioDeviceManager->ProcessEvent(event);
-    audioDeviceManager->SwitchDevice(event);
     audioDeviceManager->SwitchDevice(deviceType);
     audioDeviceManager->EnableBtSco();
-    audioDeviceManager->EnableWiredHeadset();
-    audioDeviceManager->EnableSpeaker();
-    audioDeviceManager->EnableEarpiece();
+    audioDeviceManager->EnableWiredHeadset(false);
+    audioDeviceManager->EnableSpeaker(false);
+    audioDeviceManager->EnableEarpiece(false);
     audioDeviceManager->DisableAll();
     audioDeviceManager->IsBtScoDevEnable();
     audioDeviceManager->IsSpeakerDevEnable();
