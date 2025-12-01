@@ -787,6 +787,14 @@ public:
      */
     bool EndCall() override;
 
+    /**
+     * HasDistributedCommunicationCapability
+     *
+     * @brief If has distributed communication capability
+     * @return Returns true on has distributed communication capability, others on don't has.
+     */
+    bool HasDistributedCommunicationCapability() override;
+
 private:
     int32_t SendRequest(CallManagerInterfaceCode code);
     int32_t SendRequest(CallManagerInterfaceCode code, MessageParcel &dataParcel, MessageParcel &replyParcel);

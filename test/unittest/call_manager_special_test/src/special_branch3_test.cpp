@@ -103,6 +103,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_001, TestSize.Lev
     CallTransferInfo transferInfo;
     EXPECT_EQ(proxy.SetCallTransferInfo(0, transferInfo), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.CanSetCallTransferTime(0, enabled), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_FALSE(proxy.HasDistributedCommunicationCapability());
 }
 
 /**
@@ -216,6 +217,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerProxy_001, TestSize.Level1)
     EXPECT_EQ(callManagerProxyPtr->InputDialerSpecialCode(id), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(callManagerProxyPtr->RemoveMissedIncomingCallNotification(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(callManagerProxyPtr->ReportAudioDeviceInfo(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_FALSE(callManagerProxyPtr->HasDistributedCommunicationCapability());
 }
 
 /**

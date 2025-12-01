@@ -123,6 +123,7 @@ public:
         bool isIncomingTrustlist, const std::vector<std::string> &incomingList) = 0;
     virtual int32_t WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId) = 0;
     virtual bool EndCall() = 0;
+    virtual bool HasDistributedCommunicationCapability() = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallManagerService");
