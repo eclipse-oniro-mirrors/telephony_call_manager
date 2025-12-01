@@ -122,7 +122,7 @@ private:
     void SendMuteRingEvent();
     bool IsRingingVibrateModeOn();
     bool IsVoIPCallActived();
-    int32_t SwitchAudioDevice(AudioDeviceType audioDeviceType);
+    int32_t SwitchAudioDevice(AudioDeviceType audioDeviceType, bool isSetAudioDeviceByUser);
     bool IsBtCallDisconnected();
     void AdjustVolumesForCrs();
     void SaveVoiceVolume(int32_t volume);

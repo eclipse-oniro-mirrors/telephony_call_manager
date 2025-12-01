@@ -326,12 +326,15 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_002, TestSize.Level0)
     EXPECT_TRUE(CallObjectManager::GetAudioLiveCall() != nullptr);
     audioProxy->SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO, true);
     call0->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
+    CallObjectManager::callObjectPtrList_.clear();
     sptr<CallBase> call1 = new VoIPCall(info);
     call1->SetCallId(1);
     call1->SetCallType(CallType::TYPE_VOIP);
     call1->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    CallObjectManager::callObjectPtrList_.emplace_back(call1);
     EXPECT_FALSE(CallObjectManager::GetAudioLiveCall() != nullptr);
-    audioProxy->SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, true);
+    audioProxy->SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, true, true);
+    audioProxy->SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, true, false);
 }
 
 /**
@@ -394,7 +397,7 @@ HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_002, TestSize.Level0)
     audioDeviceManager->SwitchDevice(AudioDeviceType::DEVICE_DISTRIBUTED_PAD);
     audioDeviceManager->isWiredHeadsetConnected_ = true;
     audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_WIRED_HEADSET, true);
-    audioDeviceManager->EnableWiredHeadset();
+    audioDeviceManager->EnableWiredHeadset(false);
     audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_DISTRIBUTED_PAD, true);
     audioDeviceManager->IsBtScoDevEnable();
     audioDeviceManager->IsDCallDevEnable();

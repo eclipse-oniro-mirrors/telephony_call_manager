@@ -54,16 +54,10 @@ AudioDeviceManager::AudioDeviceManager()
 {}
 
 AudioDeviceManager::~AudioDeviceManager()
-{
-    memberFuncMap_.clear();
-}
+{}
 
 void AudioDeviceManager::Init()
 {
-    memberFuncMap_[AudioEvent::ENABLE_DEVICE_EARPIECE] = [this]() { return EnableEarpiece(); };
-    memberFuncMap_[AudioEvent::ENABLE_DEVICE_SPEAKER] = [this]() { return EnableSpeaker(); };
-    memberFuncMap_[AudioEvent::ENABLE_DEVICE_WIRED_HEADSET] = [this]() { return EnableWiredHeadset(); };
-    memberFuncMap_[AudioEvent::ENABLE_DEVICE_BLUETOOTH] = [this]() { return EnableBtSco(); };
     currentAudioDevice_ = std::make_unique<InactiveDeviceState>();
     if (currentAudioDevice_ == nullptr) {
         TELEPHONY_LOGE("current audio device nullptr");
@@ -411,29 +405,19 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
     return result;
 }
 
-bool AudioDeviceManager::SwitchDevice(AudioEvent event)
-{
-    auto itFunc = memberFuncMap_.find(event);
-    if (itFunc != memberFuncMap_.end() && itFunc->second != nullptr) {
-        auto memberFunc = itFunc->second;
-        return memberFunc();
-    }
-    return false;
-}
-
-bool AudioDeviceManager::SwitchDevice(AudioDeviceType device)
+bool AudioDeviceManager::SwitchDevice(AudioDeviceType device, bool isSetAudioDeviceByUser)
 {
     bool result = false;
     std::lock_guard<ffrt::mutex> lock(mutex_);
     switch (device) {
         case AudioDeviceType::DEVICE_EARPIECE:
-            result = EnableEarpiece();
+            result = EnableEarpiece(isSetAudioDeviceByUser);
             break;
         case AudioDeviceType::DEVICE_SPEAKER:
-            result = EnableSpeaker();
+            result = EnableSpeaker(isSetAudioDeviceByUser);
             break;
         case AudioDeviceType::DEVICE_WIRED_HEADSET:
-            result = EnableWiredHeadset();
+            result = EnableWiredHeadset(isSetAudioDeviceByUser);
             break;
         case AudioDeviceType::DEVICE_BLUETOOTH_SCO:
             result = EnableBtSco();
@@ -454,9 +438,10 @@ bool AudioDeviceManager::SwitchDevice(AudioDeviceType device)
     return result;
 }
 
-bool AudioDeviceManager::EnableSpeaker()
+bool AudioDeviceManager::EnableSpeaker(bool isSetAudioDeviceByUser)
 {
-    if (isSpeakerAvailable_ && DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(true)) {
+    if (isSpeakerAvailable_ && DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(
+        true, isSetAudioDeviceByUser)) {
         TELEPHONY_LOGI("speaker enabled , current audio device : speaker");
         SetCurrentAudioDevice(AudioDeviceType::DEVICE_SPEAKER);
         return true;
@@ -465,9 +450,10 @@ bool AudioDeviceManager::EnableSpeaker()
     return false;
 }
 
-bool AudioDeviceManager::EnableEarpiece()
+bool AudioDeviceManager::EnableEarpiece(bool isSetAudioDeviceByUser)
 {
-    if (isEarpieceAvailable_ && DelayedSingleton<AudioProxy>::GetInstance()->SetEarpieceDevActive()) {
+    if (isEarpieceAvailable_ && DelayedSingleton<AudioProxy>::GetInstance()->SetEarpieceDevActive(
+        isSetAudioDeviceByUser)) {
         TELEPHONY_LOGI("earpiece enabled , current audio device : earpiece");
         SetCurrentAudioDevice(AudioDeviceType::DEVICE_EARPIECE);
         return true;
@@ -476,9 +462,10 @@ bool AudioDeviceManager::EnableEarpiece()
     return false;
 }
 
-bool AudioDeviceManager::EnableWiredHeadset()
+bool AudioDeviceManager::EnableWiredHeadset(bool isSetAudioDeviceByUser)
 {
-    if (isWiredHeadsetConnected_ && DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetDevActive()) {
+    if (isWiredHeadsetConnected_ && DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetDevActive(
+        isSetAudioDeviceByUser)) {
         TELEPHONY_LOGI("wired headset enabled , current audio device : wired headset");
         SetCurrentAudioDevice(AudioDeviceType::DEVICE_WIRED_HEADSET);
         return true;
