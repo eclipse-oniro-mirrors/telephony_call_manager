@@ -361,7 +361,6 @@ HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_001, TestSize.Level0)
     audioDeviceManager->UpdateNearlinkDevice(address, deviceName);
     audioDeviceManager->UpdateBtHearingAidDevice(address, deviceName);
     audioDeviceManager->ProcessEvent(AudioEvent::WIRED_HEADSET_DISCONNECTED);
-    audioDeviceManager->SwitchDevice(AUDIO_DEACTIVATED);
     audioDeviceManager->EnableBtSco();
     audioDeviceManager->GetCurrentAudioDevice();
     audioDeviceManager->IsEarpieceDevEnable();
