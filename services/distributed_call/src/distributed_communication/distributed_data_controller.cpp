@@ -149,7 +149,7 @@ std::string DistributedDataController::CreateMuteMsg(DistributedMsgType msgType,
         char *jsonData = cJSON_PrintUnformatted(muteMsg);
         if (jsonData != nullptr) {
             data = jsonData;
-            free(jsonData);
+            cJSON_free(jsonData);
             jsonData = nullptr;
         }
     } while (false);
@@ -173,7 +173,7 @@ std::string DistributedDataController::CreateMuteRingerMsg(DistributedMsgType ms
         char *jsonData = cJSON_PrintUnformatted(muteRingerMsg);
         if (jsonData != nullptr) {
             data = jsonData;
-            free(jsonData);
+            cJSON_free(jsonData);
             jsonData = nullptr;
         }
     } while (false);

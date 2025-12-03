@@ -196,7 +196,7 @@ std::string DistributedDataSourceController::CreateDataRspMsg(DistributedMsgType
         char *jsonData = cJSON_PrintUnformatted(rspMsg);
         if (jsonData != nullptr) {
             data = jsonData;
-            free(jsonData);
+            cJSON_free(jsonData);
             jsonData = nullptr;
         }
     } while (false);
@@ -274,7 +274,7 @@ std::string DistributedDataSourceController::CreateCurrentDataRspMsg(const std::
         char *jsonData = cJSON_PrintUnformatted(currentRspMsg);
         if (jsonData != nullptr) {
             data = jsonData;
-            free(jsonData);
+            cJSON_free(jsonData);
             jsonData = nullptr;
         }
     } while (false);
