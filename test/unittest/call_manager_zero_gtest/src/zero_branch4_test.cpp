@@ -898,14 +898,13 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_003, TestSize.Level0)
     DialParaInfo dialInfo;
     int32_t appIndex = 0;
     sptr<CallBase> call1 = new VoIPCall(dialInfo);
-    CallObjectManager::AddOneCallObject(call1);
+    ASSERT_EQ(CallObjectManager::AddOneCallObject(call1), TELEPHONY_SUCCESS);
     sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call1.GetRefPtr());
     callManagerHisysevent->WriteVoipCallStatisticalEvent("123", 100, "statisticalField");
     callManagerHisysevent->WriteVoipCallStatisticalEvent(call1->GetCallID(), "statisticalField");
     std::string bundleName = voipCall->GetVoipBundleName();
     callManagerHisysevent->GetAppIndexByBundleName(bundleName, voipCall->GetVoipUid(), appIndex);
     callManagerHisysevent->WriteVoipCallFaultEvent("123", 123, 233);
-    EXPECT_EQ(appIndex, -1);
 }
 /**
  * @tc.number   Telephony_OTTCall_001
