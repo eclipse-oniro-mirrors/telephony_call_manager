@@ -148,7 +148,7 @@ std::string DistributedDataSinkController::CreateDataReqMsg(DistributedMsgType m
         char *jsonData = cJSON_PrintUnformatted(reqMsg);
         if (jsonData != nullptr) {
             data = jsonData;
-            free(jsonData);
+            cJSON_free(jsonData);
             jsonData = nullptr;
         }
     } while (false);
@@ -261,7 +261,7 @@ std::string DistributedDataSinkController::CreateCurrentDataReqMsg(const std::st
         char *jsonData = cJSON_PrintUnformatted(currentReqMsg);
         if (jsonData != nullptr) {
             data = jsonData;
-            free(jsonData);
+            cJSON_free(jsonData);
             jsonData = nullptr;
         }
     } while (false);

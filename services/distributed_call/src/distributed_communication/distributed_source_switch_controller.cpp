@@ -150,7 +150,7 @@ std::string DistributedSourceSwitchController::GetDevAddress(const std::string &
         char *jsonData = cJSON_PrintUnformatted(root);
         if (jsonData != nullptr) {
             address = jsonData;
-            free(jsonData);
+            cJSON_free(jsonData);
             jsonData = nullptr;
         }
     } while (false);
