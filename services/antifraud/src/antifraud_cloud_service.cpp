@@ -373,7 +373,7 @@ std::string AntiFraudCloudService::GenerateRequestJson(const std::map<std::strin
     }
     std::string requestJson(str);
     cJSON_Delete(root);
-    free(str);
+    cJSON_free(str);
     return requestJson;
 }
 
