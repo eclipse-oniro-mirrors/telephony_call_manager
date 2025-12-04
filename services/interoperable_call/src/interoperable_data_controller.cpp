@@ -111,7 +111,7 @@ std::string InteroperableDataController::CreateMuteMsg(InteroperableMsgType msgT
     char *jsonData = cJSON_PrintUnformatted(muteMsg);
     if (jsonData != nullptr) {
         data = jsonData;
-        free(jsonData);
+        cJSON_free(jsonData);
         jsonData = nullptr;
     }
     cJSON_Delete(muteMsg);
@@ -131,7 +131,7 @@ std::string InteroperableDataController::CreateMuteRingerMsg(InteroperableMsgTyp
     char *jsonData = cJSON_PrintUnformatted(muteRingerMsg);
     if (jsonData != nullptr) {
         data = jsonData;
-        free(jsonData);
+        cJSON_free(jsonData);
         jsonData = nullptr;
     }
     cJSON_Delete(muteRingerMsg);
@@ -191,7 +191,7 @@ std::string InteroperableDataController::CreateRequisitesDataMsg(InteroperableMs
     char *jsonData = cJSON_PrintUnformatted(slotIdMsg);
     if (jsonData != nullptr) {
         data = jsonData;
-        free(jsonData);
+        cJSON_free(jsonData);
         jsonData = nullptr;
     }
     cJSON_Delete(slotIdMsg);
@@ -268,7 +268,7 @@ std::string InteroperableDataController::CreateQueryRequisitesDataMsg(Interopera
     char *jsonData = cJSON_PrintUnformatted(querySlotMsg);
     if (jsonData != nullptr) {
         data = jsonData;
-        free(jsonData);
+        cJSON_free(jsonData);
         jsonData = nullptr;
     }
     cJSON_Delete(querySlotMsg);
