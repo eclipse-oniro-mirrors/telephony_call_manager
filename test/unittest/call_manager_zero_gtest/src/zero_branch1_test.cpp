@@ -222,7 +222,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_001, Function | MediumTes
     callRequestProcess->DisconnectOtherCallForVideoCall(1);
     mDialParaInfo.number = "*#21#";
     callRequestProcess->CarrierDialProcess(mDialParaInfo);
-    ASSERT_FALSE(callRequestProcess->IsDsdsMode5());
+    ASSERT_FALSE(callRequestProcess->IsDsdsMode3());
 }
 
 /**
