@@ -44,7 +44,7 @@ void VoipCallConnection::Init(int32_t systemAbilityId)
     }
     systemAbilityId_ = systemAbilityId;
     TELEPHONY_LOGI("systemAbilityId_ = %{public}d", systemAbilityId);
-    if (GetCallManagerProxy() != TELEPHONY_SUCCESS) {
+    if (GetCallManagerProxy() == TELEPHONY_SUCCESS) {
         connectCallManagerState_ = true;
     }
     if (statusChangeListener_ != nullptr) {
