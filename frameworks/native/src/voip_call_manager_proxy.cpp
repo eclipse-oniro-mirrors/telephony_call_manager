@@ -574,5 +574,29 @@ void VoipCallManagerProxy::WriteVoipCallFaultEvent(std::string voipCallId, int32
 {
     DelayedSingleton<CallManagerProxy>::GetInstance()->WriteVoipCallFaultEvent(voipCallId, faultId);
 }
+
+int32_t VoipCallManagerProxy::NotifyVoIPAudioStreamStart(int32_t uid)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(uid);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("NotifyVoIPAudioStreamStart Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    MessageOption option;
+    MessageParcel replyParcel;
+    int32_t error =
+        remote->SendRequest(static_cast<int32_t>(INTERFACE_NOTIFY_VOIP_START), dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function NotifyVoIPAudioStreamStart call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS

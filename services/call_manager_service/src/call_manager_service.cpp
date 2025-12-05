@@ -71,6 +71,7 @@ static constexpr const char *VIDEO_STATE = "videoState";
 static constexpr int32_t CLEAR_VOICE_MAIL_COUNT = 0;
 static constexpr int32_t IS_CELIA_CALL = 1;
 static constexpr int32_t EDM_UID = 3057;
+static constexpr int32_t AUDIO_UID = 1041;
 
 const bool g_registerResult =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<CallManagerService>::GetInstance().get());
@@ -1884,6 +1885,15 @@ bool CallManagerService::HasDistributedCommunicationCapability()
     }
 #endif
     return false;
+}
+
+int32_t CallManagerService::NotifyVoIPAudioStreamStart(int32_t uid)
+{
+    if (IPCSkeleton::GetCallingUid() != AUDIO_UID) {
+        TELEPHONY_LOGE("notify is not from Audio");
+        return TELEPHONY_ERR_FAIL;
+    }
+    return DelayedSingleton<VoipCallConnection>::GetInstance()->NotifyVoIPAudioStreamStart(uid);
 }
 } // namespace Telephony
 } // namespace OHOS

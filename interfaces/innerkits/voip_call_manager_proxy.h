@@ -182,6 +182,14 @@ public:
      */
     int32_t ReportCallAudioEventChange(std::string voipCallId, const CallAudioEvent &callAudioEvent) override;
 
+    /**
+     * @brief Notify voip audio stream start
+     *
+     * @param uid[in], uid
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t NotifyVoIPAudioStreamStart(int32_t uid) override;
+
 private:
     bool WriteDataParcel(MessageParcel &dataParcel, AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile);
     void WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId);

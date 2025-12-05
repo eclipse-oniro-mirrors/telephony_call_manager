@@ -87,6 +87,8 @@ void CallManagerServiceStub::InitCallBasicRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSendCallUiEvent(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_END_CALL)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnEndCall(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_NOTIFY_VOIP_AUDIO_STREAM_START)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnNotifyVoIPAudioStreamStart(data, reply); };
 }
 
 void CallManagerServiceStub::InitCallUtilsRequest()
@@ -1545,6 +1547,17 @@ int32_t CallManagerServiceStub::OnHasDistributedCommunicationCapability(MessageP
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnNotifyVoIPAudioStreamStart(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t uid = data.ReadInt32();
+    int32_t result = NotifyVoIPAudioStreamStart(uid);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -278,6 +278,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, TestSize.Level1)
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
     ASSERT_NE(callManagerService->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_SUCCESS);
+    int32_t uid = 0;
+    ASSERT_NE(callManagerService->NotifyVoIPAudioStreamStart(uid), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -839,6 +841,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_010, TestSize.Level0
     data13.WriteInt32(0);
     callManagerService->OnWriteVoipCallFaultEvent(data13, reply);
     ASSERT_EQ(callManagerService->OnSetCallPolicyInfo(data12, reply), TELEPHONY_SUCCESS);
+
+    MessageParcel data14;
+    data14.WriteInt32(20020211);
+    ASSERT_EQ(callManagerService->OnNotifyVoIPAudioStreamStart(data14, reply), TELEPHONY_SUCCESS);
 }
 /**
  * @tc.number   Telephony_VoipCall_001

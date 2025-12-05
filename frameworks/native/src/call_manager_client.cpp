@@ -852,5 +852,15 @@ bool CallManagerClient::EndCall()
         return false;
     }
 }
+
+int32_t CallManagerClient::NotifyVoIPAudioStreamStart(int32_t uid)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->NotifyVoIPAudioStreamStart(uid);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
