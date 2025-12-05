@@ -708,6 +708,7 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_001, TestSize.Level0)
     callManagerClient->IsInEmergencyCall(result);
     callManagerClient->ObserverOnCallDetailsChange();
     callManagerClient->EndCall();
+    callManagerClient->NotifyVoIPAudioStreamStart(20020211);
     ASSERT_NE(callManagerClient->DialCall(value, extras), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerClient->AnswerCall(0, 0), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerClient->RejectCall(0, false, value), TELEPHONY_SUCCESS);

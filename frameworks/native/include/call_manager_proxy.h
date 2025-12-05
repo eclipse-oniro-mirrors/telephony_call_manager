@@ -130,6 +130,7 @@ public:
     int32_t WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId);
     bool EndCall();
     bool HasDistributedCommunicationCapability();
+    int32_t NotifyVoIPAudioStreamStart(int32_t uid);
 
 private:
     int32_t ConnectService();

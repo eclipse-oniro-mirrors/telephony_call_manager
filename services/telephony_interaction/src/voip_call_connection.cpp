@@ -282,5 +282,16 @@ int32_t VoipCallConnection::WriteVoipCallFaultEvent(std::string voipCallId, int3
     }
     return TELEPHONY_SUCCESS;
 }
+
+int32_t VoipCallConnection::NotifyVoIPAudioStreamStart(int32_t uid)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    GetCallManagerProxy();
+    if (voipCallManagerInterfacePtr_ == nullptr) {
+        TELEPHONY_LOGE("voipCallManagerInterfacePtr_ is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    return voipCallManagerInterfacePtr_->NotifyVoIPAudioStreamStart(uid);
+}
 } // namespace Telephony
 } // namespace OHOS

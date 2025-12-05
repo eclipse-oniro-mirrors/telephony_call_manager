@@ -795,6 +795,14 @@ public:
      */
     bool HasDistributedCommunicationCapability() override;
 
+    /**
+     * NotifyVoIPAudioStreamStart
+     *
+     * @brief Notify voip audio stream start
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t NotifyVoIPAudioStreamStart(int32_t uid) override;
+
 private:
     int32_t SendRequest(CallManagerInterfaceCode code);
     int32_t SendRequest(CallManagerInterfaceCode code, MessageParcel &dataParcel, MessageParcel &replyParcel);

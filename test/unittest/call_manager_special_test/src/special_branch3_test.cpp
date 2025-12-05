@@ -187,6 +187,8 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_003, TestSize.Lev
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
     EXPECT_EQ(proxy.SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    int32_t uid = 20020211;
+    EXPECT_EQ(proxy.NotifyVoIPAudioStreamStart(uid), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
 /**
@@ -240,6 +242,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_VoipCallManagerProxy_001, TestSize.Level1
     EXPECT_EQ(proxy.SendCallUiEvent("", CallAudioEvent::AUDIO_EVENT_MUTED), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.ReportCallAudioEventChange("", CallAudioEvent::AUDIO_EVENT_MUTED),
         TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.NotifyVoIPAudioStreamStart(20020211), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 /**
  * @tc.number   Telephony_CallStatusCallbackProxy_001

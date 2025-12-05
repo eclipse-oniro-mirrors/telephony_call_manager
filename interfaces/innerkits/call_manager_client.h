@@ -698,6 +698,14 @@ public:
      * @return Returns true on success, others on failure.
      */
     bool EndCall();
+
+    /**
+     * @brief notify voip audio stream start
+     *
+     * @param uid[in], uid
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t NotifyVoIPAudioStreamStart(int32_t uid);
 };
 } // namespace Telephony
 } // namespace OHOS

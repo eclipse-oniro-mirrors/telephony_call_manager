@@ -1509,5 +1509,22 @@ bool CallManagerServiceProxy::HasDistributedCommunicationCapability()
     }
     return replyParcel.ReadBool();
 }
+
+int32_t CallManagerServiceProxy::NotifyVoIPAudioStreamStart(int32_t uid)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(uid);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_NOTIFY_VOIP_AUDIO_STREAM_START, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function NotifyVoIPAudioStreamStart call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS

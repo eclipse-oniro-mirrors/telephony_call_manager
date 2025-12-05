@@ -842,6 +842,16 @@ public:
      * @return Returns true on has distributed communication capability, others on don't has.
      */
     bool HasDistributedCommunicationCapability() override;
+
+    /**
+     * NotifyVoIPAudioStreamStart
+     *
+     * @brief Notify voip audio stream start
+     * @param uid[in], uid
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t NotifyVoIPAudioStreamStart(int32_t uid) override;
+
 private:
     std::string GetBundleInfo();
     int32_t dealCeliaCallEvent(int32_t callId);
