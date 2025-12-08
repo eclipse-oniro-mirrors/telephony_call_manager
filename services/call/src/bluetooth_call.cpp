@@ -46,7 +46,7 @@ int32_t BluetoothCall::DialingProcess()
     return TELEPHONY_SUCCESS;
 }
 
-int32_t BluetoothCall::AnswerCall(int32_t videoState)
+int32_t BluetoothCall::AnswerCall(int32_t videoState, bool isRTT)
 {
     TELEPHONY_LOGI("BluetoothCall AnswerCall");
     Bluetooth::HandsFreeUnit *profile = Bluetooth::HandsFreeUnit::GetProfile();

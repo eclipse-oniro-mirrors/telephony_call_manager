@@ -286,15 +286,15 @@ public:
      */
     int SetCallPreferenceMode(int32_t slotId, int32_t mode);
 
+#ifdef SUPPORT_RTT_CALL
     /**
      * StartRtt
      *
      * @brief Enable and send RTT information
      * @param callInfo[in], Call information.
-     * @param msg[in], RTT information
      * @return Returns 0 on success, others on failure.
      */
-    int StartRtt(const CellularCallInfo &callInfo, std::u16string &msg);
+    int StartRtt(const CellularCallInfo &callInfo);
 
     /**
      * StopRtt
@@ -304,6 +304,15 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int StopRtt(const CellularCallInfo &callInfo);
+
+    /**
+     * @brief rtt upgrade or downgrade
+     * @param callInfo[in], Call information.
+     * @param mode[in], rtt modify mode.
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UpdateImsRttCallMode(const CellularCallInfo &callInfo, ImsRTTCallMode mode);
+#endif
 
     /**
      * RegisterCallBack
@@ -580,6 +589,17 @@ public:
      * @return Returns true on phone number is mmi code, else return false.
      */
     bool IsMmiCode(int32_t slotId, std::string &number);
+
+#ifdef SUPPORT_RTT_CALL
+    /**
+     * @brief RTT Call Switch Settings
+     *
+     * @param slotId[in], The slot id
+     * @param isEnable[out], The result of enable or not
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetRttCapability(int32_t slotId, bool isEnable);
+#endif
 
 private:
     int32_t ConnectService();

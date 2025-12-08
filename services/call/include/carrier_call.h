@@ -28,7 +28,7 @@ public:
     CarrierCall(DialParaInfo &info, AppExecFwk::PacMap &extras);
     ~CarrierCall();
     int32_t CarrierDialingProcess();
-    int32_t CarrierAnswerCall(int32_t videoState);
+    int32_t CarrierAnswerCall(int32_t videoState, bool isRTT = false);
     int32_t CarrierRejectCall();
     int32_t CarrierHangUpCall();
     int32_t CarrierHoldCall();

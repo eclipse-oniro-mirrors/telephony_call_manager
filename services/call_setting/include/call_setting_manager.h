@@ -50,6 +50,9 @@ public:
     int32_t SetVoNRState(int32_t slotId, int32_t state);
     int32_t GetVoNRState(int32_t slotId, int32_t &state);
     int32_t CloseUnFinishedUssd(int32_t slotId);
+#ifdef SUPPORT_RTT_CALL
+    int32_t SetRttCapability(int32_t slotId, bool isEnable);
+#endif
 
 private:
     int32_t CallWaitingPolicy(int32_t slotId);

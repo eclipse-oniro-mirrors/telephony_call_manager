@@ -176,5 +176,44 @@ int32_t NapiCallManagerCallback::OnUpdateCameraCapabilities(const CameraCapabili
     }
     return ret;
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t NapiCallManagerCallback::OnReportRttCallEvtChanged(const RttEvent &info)
+{
+    int32_t ret =
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->ReportRttCallEventInfo(info);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("OnReportRttCallEvtChanged failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("OnReportRttCallEvtChanged success!");
+    }
+    
+    return ret;
+}
+
+int32_t NapiCallManagerCallback::OnReportRttCallError(const RttError &info)
+{
+    int32_t ret =
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->ReportRttCallErrorInfo(info);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("OnReportRttCallError failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("OnReportRttCallError success!");
+    }
+    return ret;
+}
+
+int32_t NapiCallManagerCallback::OnReportRttCallMessage(AppExecFwk::PacMap &msgResult)
+{
+    int32_t ret =
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->ReportRttCallMessageInfo(msgResult);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("OnReportRttCallError failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("OnReportRttCallError success!");
+    }
+    return ret;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

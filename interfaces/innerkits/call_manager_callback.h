@@ -112,6 +112,11 @@ public:
     virtual int32_t OnPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail) = 0;
     virtual int32_t OnCallDataUsageChange(const int64_t dataUsage) = 0;
     virtual int32_t OnUpdateCameraCapabilities(const CameraCapabilities &cameraCapabilities) = 0;
+#ifdef SUPPORT_RTT_CALL
+    virtual int32_t OnReportRttCallEvtChanged(const RttEvent &info) { return 0; }
+    virtual int32_t OnReportRttCallError(const RttError &info) { return 0; }
+    virtual int32_t OnReportRttCallMessage(AppExecFwk::PacMap &msgResult) { return 0; }
+#endif
 
     /**
      * @brief report phone state change

@@ -306,6 +306,23 @@ public:
     {
         return value_;
     }
+
+#ifdef SUPPORT_RTT_CALL
+    int32_t OnReportRttCallEvtChanged(const RttEvent &info)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportRttCallError(const RttError &info)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportRttCallMessage(AppExecFwk::PacMap &msgResult)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+#endif
 private:
     int32_t value_;
 };
@@ -332,6 +349,19 @@ HWTEST_F(ZeroBranch10Test, Telephony_NearlinkCallReport_001, TestSize.Level1)
     DelayedSingleton<CallAbilityReportProxy>::GetInstance()->callbackPtrList_.emplace_back(nullptr);
     EXPECT_NE(DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportPhoneStateChange(0, 0, 0, ""), 0);
     client.UnInit();
+
+#ifdef SUPPORT_RTT_CALL
+    RttEvent info;
+    int32_t errorCode = -100;
+    AppExecFwk::PacMap msgResult;
+    RttError errorInfo;
+    msgResult.PutIntValue("info_one", 1);
+    sptr<CallAbilityCallback> callback3 = new (std::nothrow) CallAbilityCallback();
+    ASSERT_NE(callback3, nullptr);
+    EXPECT_NE(callback3->OnReportRttCallEvtChanged(info), errorCode);
+    EXPECT_NE(callback3->OnReportRttCallError(errorInfo), errorCode);
+    EXPECT_NE(callback3->OnReportRttCallMessage(msgResult), errorCode);
+#endif
 }
 
 /**

@@ -50,7 +50,7 @@ public:
     int32_t ObserverOnCallDetailsChange();
     int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras);
     int32_t MakeCall(std::string number);
-    int32_t AnswerCall(int32_t callId, int32_t videoState);
+    int32_t AnswerCall(int32_t callId, int32_t videoState, bool isRTT = false);
     int32_t RejectCall(int32_t callId, bool isSendSms, std::u16string content);
     int32_t HangUpCall(int32_t callId);
     int32_t GetCallState();
@@ -105,8 +105,11 @@ public:
     int32_t IsImsSwitchEnabled(int32_t slotId, bool &enabled);
     int32_t SetVoNRState(int32_t slotId, int32_t state);
     int32_t GetVoNRState(int32_t slotId, int32_t &state);
-    int32_t StartRtt(int32_t callId, std::u16string &msg);
+#ifdef SUPPORT_RTT_CALL
+    int32_t StartRtt(int32_t callId);
     int32_t StopRtt(int32_t callId);
+    int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode);
+#endif
     int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList);
     int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec);
     int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo);
@@ -131,6 +134,10 @@ public:
     bool EndCall();
     bool HasDistributedCommunicationCapability();
     int32_t NotifyVoIPAudioStreamStart(int32_t uid);
+#ifdef SUPPORT_RTT_CALL
+    int32_t SendRttMessage(int32_t callId, const std::string &rttMessage);
+    int32_t SetRttCapability(int32_t slotId, bool isEnable);
+#endif
 
 private:
     int32_t ConnectService();

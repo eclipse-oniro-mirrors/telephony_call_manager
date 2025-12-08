@@ -107,8 +107,11 @@ private:
     int32_t OnIsVoLteEnabled(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetVoNRState(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetVoNRState(MessageParcel &data, MessageParcel &reply);
+#ifdef SUPPORT_RTT_CALL
     int32_t OnStartRtt(MessageParcel &data, MessageParcel &reply);
     int32_t OnStopRtt(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateImsRttCallMode(MessageParcel &data, MessageParcel &reply);
+#endif
     int32_t OnReportOttCallDetailsInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnReportOttCallEventInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnCloseUnFinishedUssd(MessageParcel &data, MessageParcel &reply);
@@ -132,6 +135,10 @@ private:
     int32_t OnEndCall(MessageParcel &data, MessageParcel &reply);
     int32_t OnHasDistributedCommunicationCapability(MessageParcel &data, MessageParcel &reply);
     int32_t OnNotifyVoIPAudioStreamStart(MessageParcel &data, MessageParcel &reply);
+#ifdef SUPPORT_RTT_CALL
+    int32_t OnSendRttMessage(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetRttCapability(MessageParcel &data, MessageParcel &reply);
+#endif
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
     std::map<uint32_t, std::string> collieCodeStringMap_ = {
         { uint32_t(CallManagerInterfaceCode::INTERFACE_REGISTER_CALLBACK), "INTERFACE_REGISTER_CALLBACK" },

@@ -351,6 +351,23 @@ public:
         return TELEPHONY_SUCCESS;
     }
 
+#ifdef SUPPORT_RTT_CALL
+    int32_t OnReportRttCallEvtChanged(const RttEvent &info)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportRttCallError(const RttError &info)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportRttCallMessage(AppExecFwk::PacMap &msgResult)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+#endif
+
 private:
     using CallAbilityCallbackFunc = int32_t (CallAbilityCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateCallStateInfoRequest(MessageParcel &data, MessageParcel &reply);
@@ -438,6 +455,23 @@ public:
     {
         return TELEPHONY_SUCCESS;
     }
+
+#ifdef SUPPORT_RTT_CALL
+    int32_t OnReportRttCallEvtChanged(const RttEvent &info)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportRttCallError(const RttError &info)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportRttCallMessage(AppExecFwk::PacMap &msgResult)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+#endif
 };
 
 class CallManagerConnect {

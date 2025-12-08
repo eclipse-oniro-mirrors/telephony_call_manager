@@ -228,10 +228,11 @@ HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_001, TestSize.Leve
     cellularCallConnection->GetVideoCallWaiting(0, result);
     cellularCallConnection->SetCallPreferenceMode(0, 0);
 
-    std::u16string msg;
-    cellularCallConnection->StartRtt(callInfo, msg);
+#ifdef SUPPORT_RTT_CALL
+    cellularCallConnection->StartRtt(callInfo);
     int ret = cellularCallConnection->StopRtt(callInfo);
     EXPECT_NE(ret, 0);
+#endif
 }
 
 /**

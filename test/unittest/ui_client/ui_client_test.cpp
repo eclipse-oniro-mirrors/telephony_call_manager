@@ -1332,6 +1332,7 @@ void GetVoNRState()
     std::cout << "return value:" << ret << std::endl;
 }
 
+#ifdef SUPPORT_RTT_CALL
 void StartRtt()
 {
     int32_t callId = DEFAULT_CALL_ID;
@@ -1349,7 +1350,7 @@ void StartRtt()
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    int32_t ret = g_clientPtr->StartRtt(callId, msg);
+    int32_t ret = g_clientPtr->StartRtt(callId);
     std::cout << "return value:" << ret << std::endl;
 }
 
@@ -1366,6 +1367,7 @@ void StopRtt()
     int32_t ret = g_clientPtr->StopRtt(callId);
     std::cout << "return value:" << ret << std::endl;
 }
+#endif
 
 void InputDialerSpecialCode()
 {
@@ -1471,8 +1473,10 @@ void InitCallBasicPower()
         &OHOS::Telephony::GetCallState;
     g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SWAP_CALL)] =
         &OHOS::Telephony::SwitchCall;
+#ifdef SUPPORT_RTT_CALL
     g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_START_RTT)] = &OHOS::Telephony::StartRtt;
     g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_STOP_RTT)] = &OHOS::Telephony::StopRtt;
+#endif
     g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_INPUT_DIALER_SPECIAL_CODE)] =
         &OHOS::Telephony::InputDialerSpecialCode;
 }

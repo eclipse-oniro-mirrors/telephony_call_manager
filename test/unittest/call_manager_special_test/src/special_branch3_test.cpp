@@ -117,8 +117,10 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_002, TestSize.Lev
     CallManagerServiceProxy proxy(impl);
     EXPECT_EQ(proxy.SetCallPreferenceMode(0, 0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     std::u16string msg = u"";
-    EXPECT_EQ(proxy.StartRtt(0, msg), TELEPHONY_ERR_ARGUMENT_INVALID);
+#ifdef SUPPORT_RTT_CALL
+    EXPECT_EQ(proxy.StartRtt(0), TELEPHONY_ERR_ARGUMENT_INVALID);
     EXPECT_EQ(proxy.StopRtt(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+#endif
     EXPECT_EQ(proxy.CombineConference(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.SeparateConference(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.KickOutFromConference(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -189,6 +191,16 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_003, TestSize.Lev
     EXPECT_EQ(proxy.SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     int32_t uid = 20020211;
     EXPECT_EQ(proxy.NotifyVoIPAudioStreamStart(uid), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+#ifdef SUPPORT_RTT_CALL
+    callId = -1;
+    int32_t slotId = -1;
+    bool isEnable = false;
+    std::string message = "message";
+    ImsRTTCallMode mode = ImsRTTCallMode::LOCAL_REQUEST_UPGRADE;
+    EXPECT_NE(proxy.UpdateImsRttCallMode(callId, mode), TELEPHONY_SUCCESS);
+    EXPECT_NE(proxy.SendRttMessage(callId, message), TELEPHONY_SUCCESS);
+    EXPECT_NE(proxy.SetRttCapability(slotId, isEnable), TELEPHONY_SUCCESS);
+#endif
 }
 
 /**
@@ -220,6 +232,17 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerProxy_001, TestSize.Level1)
     EXPECT_EQ(callManagerProxyPtr->RemoveMissedIncomingCallNotification(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(callManagerProxyPtr->ReportAudioDeviceInfo(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_FALSE(callManagerProxyPtr->HasDistributedCommunicationCapability());
+
+#ifdef SUPPORT_RTT_CALL
+    int32_t callId = -1;
+    int32_t slotId = -1;
+    bool isEnable = false;
+    std::string message = "message";
+    ImsRTTCallMode mode = ImsRTTCallMode::LOCAL_REQUEST_UPGRADE;
+    EXPECT_NE(callManagerProxyPtr->UpdateImsRttCallMode(callId, mode), TELEPHONY_SUCCESS);
+    EXPECT_NE(callManagerProxyPtr->SendRttMessage(callId, message), TELEPHONY_SUCCESS);
+    EXPECT_NE(callManagerProxyPtr->SetRttCapability(slotId, isEnable), TELEPHONY_SUCCESS);
+#endif
 }
 
 /**
@@ -271,6 +294,14 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallStatusCallbackProxy_001, TestSize.Lev
     CameraCapabilitiesReportInfo cameraInfo;
     EXPECT_EQ(callStatusCallbackProxy->HandleCameraCapabilitiesChanged(cameraInfo),
         TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+
+#ifdef SUPPORT_RTT_CALL
+    int32_t ret = -100;
+    RttEventInfo rttEventInfo;
+    RttErrorInfo rttErrorInfo;
+    EXPECT_NE(callStatusCallbackProxy->HandleRttEvtChanged(rttEventInfo), ret);
+    EXPECT_NE(callStatusCallbackProxy->HandleRttErrReport(rttErrorInfo), ret);
+#endif
 }
 
 /**
@@ -295,10 +326,21 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_001, TestSize.Level1)
     EXPECT_NE(cellularCallProxy->KickOutFromConference(callInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->HangUpAllConnection(), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->StopDtmf(callInfo), TELEPHONY_SUCCESS);
-    EXPECT_NE(cellularCallProxy->StopRtt(slotId), TELEPHONY_SUCCESS);
+#ifdef SUPPORT_RTT_CALL
+    EXPECT_NE(cellularCallProxy->StopRtt(slotId, callInfo.callId), TELEPHONY_SUCCESS);
+#endif
     EXPECT_NE(cellularCallProxy->GetDomainPreferenceMode(slotId), TELEPHONY_SUCCESS);
     std::string value = "";
     EXPECT_NE(cellularCallProxy->SetImsConfig(slotId, ImsConfigItem::ITEM_VIDEO_QUALITY, value), TELEPHONY_SUCCESS);
+
+#ifdef SUPPORT_RTT_CALL
+    slotId = -1;
+    int32_t callId = -1;
+    bool isEnable = false;
+    ImsRTTCallMode mode = ImsRTTCallMode::LOCAL_REQUEST_DOWNGRADE;
+    EXPECT_NE(cellularCallProxy->UpdateImsRttCallMode(slotId, callId, mode), TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->SetRttCapability(slotId, isEnable), TELEPHONY_SUCCESS);
+#endif
 }
 
 /**
@@ -321,7 +363,6 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_002, TestSize.Level1)
     int32_t index = 1;
     std::string cameraId = "";
     std::string surfaceId = "123";
-    std::string msg = "";
     sptr<Surface> surface;
     std::string path = "";
     std::vector<EmergencyCall> eccVec;
@@ -335,7 +376,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_002, TestSize.Level1)
     EXPECT_NE(Proxy->StartDtmf(cDtmfCode, callInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->PostDialProceed(callInfo, 0), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->SendDtmf(cDtmfCode, callInfo), TELEPHONY_SUCCESS);
-    EXPECT_NE(Proxy->StartRtt(slotId, msg), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->StartRtt(slotId, callInfo.callId), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->SetCallTransferInfo(slotId, ctInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->CanSetCallTransferTime(slotId, result), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->GetVideoCallWaiting(slotId, enabled), TELEPHONY_SUCCESS);

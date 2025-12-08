@@ -47,6 +47,10 @@ struct CellularCallInfo {
      */
     int32_t videoState = 0;
     int32_t index = 0;
+    /**
+     * Indicates the call is RTT.
+     */    
+    bool isRTT = false;
 };
 
 /**
@@ -224,6 +228,14 @@ struct CallReportInfo {
      * - 1: Yes
      */
     int32_t newCallUseBox = 0;
+    /**
+     * Whether to use the RTT call.
+     */
+    RttCallState rttState = RttCallState::RTT_STATE_NO;
+    /**
+     * RTT Call Channel Id
+     */
+    int32_t rttChannelId = -1;
 };
 
 /**
@@ -389,6 +401,11 @@ struct CallAttributeInfo {
      * Identifies the sim card index;
      */
     int32_t simIndex = 0;
+
+    /**
+     * Whether to use the RTT call.
+     */
+    RttCallState rttState = RttCallState::RTT_STATE_NO;
 };
 
 /**
@@ -651,6 +668,14 @@ struct CallDetailInfo {
      * - 1: Yes
      */
     int32_t newCallUseBox = 0;
+    /**
+     * RTT call state
+     */
+    RttCallState rttState = RttCallState::RTT_STATE_NO;
+    /**
+     * RTT Call Channel Id
+     */
+    int32_t rttChannelId = -1;
 
     CallDetailInfo() {}
 
@@ -694,6 +719,8 @@ struct CallDetailInfo {
         antiFraudState = temp.antiFraudState;
         message = temp.message;
         newCallUseBox = temp.newCallUseBox;
+        rttState = temp.rttState;
+        rttChannelId = temp.rttChannelId;
         return *this;
     }
 };

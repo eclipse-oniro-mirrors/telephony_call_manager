@@ -178,5 +178,22 @@ int32_t CallManagerCallbackTest::OnUpdateCameraCapabilities(const CameraCapabili
               << "height:" << cameraCapabilities.height << std::endl;
     return RETURN_SUCCESS;
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t CallManagerCallbackTest::OnReportRttCallEvtChanged(const RttEvent &info)
+{
+    return RETURN_SUCCESS;
+}
+
+int32_t CallManagerCallbackTest::OnReportRttCallError(const RttError &info)
+{
+    return RETURN_SUCCESS;
+}
+
+int32_t CallManagerCallbackTest::OnReportRttCallMessage(AppExecFwk::PacMap &msgResult)
+{
+    return RETURN_SUCCESS;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

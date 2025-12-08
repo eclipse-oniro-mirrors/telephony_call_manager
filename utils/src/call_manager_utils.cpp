@@ -70,6 +70,7 @@ void CallManagerUtils::WriteCallAttributeInfo(const CallAttributeInfo &info, Mes
     messageParcel.WriteString(info.extraParamsString);
     WriteVoipCallInfo(info, messageParcel);
     messageParcel.WriteInt32(info.phoneOrWatch);
+    messageParcel.WriteInt32(static_cast<int32_t>(info.rttState));
 }
 
 bool CallManagerUtils::IsBundleInstalled(const std::string &bundleName, int32_t userId)

@@ -335,6 +335,11 @@ HWTEST_F(SpecialBranch1Test, Telephony_CallRequestProcess_001, TestSize.Level1)
     std::shared_ptr<CallRequestProcess> callRequestProcess = std::make_shared<CallRequestProcess>();
     ASSERT_TRUE(callRequestProcess != nullptr);
     DialParaInfo info;
+#ifdef SUPPORT_RTT_CALL
+    int32_t callId = -1;
+    ImsRTTCallMode mode = ImsRTTCallMode::LOCAL_REQUEST_DOWNGRADE;
+    callRequestProcess->UpdateImsRttCallModeRequest(callId, mode);
+#endif
     info.dialType = static_cast<DialType>(-1);
     int32_t ret = callRequestProcess->HandleDialRequest(info);
     EXPECT_NE(ret, 0);

@@ -49,6 +49,10 @@ enum class CellularCallInterfaceCode {
     POST_DIAL_PROCEED,
     START_RTT,
     STOP_RTT,
+#ifdef SUPPORT_RTT_CALL
+    UPDATE_RTT_CALL_MODE,
+    RTT_CAPABILITY_SETTING,
+#endif
 
     /****************** supplement ******************/
     SET_CALL_TRANSFER = 200,

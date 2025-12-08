@@ -47,8 +47,9 @@ public:
     int32_t HangUpPolicy(int32_t callId);
     int32_t SwitchCallPolicy(int32_t callId);
     static int32_t VideoCallPolicy(int32_t callId);
-    static int32_t StartRttPolicy(int32_t callId);
-    static int32_t StopRttPolicy(int32_t callId);
+#ifdef SUPPORT_RTT_CALL
+    int32_t RttCallModifyPolicy(int32_t callId);
+#endif
     int32_t IsValidSlotId(int32_t slotId);
     int32_t EnableVoLtePolicy(int32_t slotId);
     int32_t DisableVoLtePolicy(int32_t slotId);
@@ -78,6 +79,9 @@ public:
         bool isIncomingTrustlist, const std::vector<std::string> &incomingList);
     bool IsDialingEnable(const std::string &phoneNum);
     bool IsIncomingEnable(const std::string &phoneNum);
+#ifdef SUPPORT_RTT_CALL
+    int32_t SetRttCapabilityPolicy(int32_t slotId, bool isEnbale);
+#endif
 
 private:
     bool IsCtSimCardSwitchToChnOrMc(int32_t slotId);

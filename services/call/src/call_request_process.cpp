@@ -113,7 +113,7 @@ int32_t CallRequestProcess::HandleDialRequest(DialParaInfo &info)
     return ret;
 }
 
-void CallRequestProcess::AnswerRequest(int32_t callId, int32_t videoState)
+void CallRequestProcess::AnswerRequest(int32_t callId, int32_t videoState, bool isRTT)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
@@ -130,10 +130,11 @@ void CallRequestProcess::AnswerRequest(int32_t callId, int32_t videoState)
         DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallAnswered(call);
         return;
     }
-    AnswerRequestForDsda(call, callId, videoState);
+    AnswerRequestForDsda(call, callId, videoState, isRTT);
 }
 
-void CallRequestProcess::AnswerRequestForDsda(sptr<CallBase> call, int32_t callId, int32_t videoState)
+void CallRequestProcess::AnswerRequestForDsda(
+    sptr<CallBase> call, int32_t callId, int32_t videoState, bool isRTT)
 {
     int32_t slotId = call->GetSlotId();
     int32_t callCrsType = 2;
@@ -164,7 +165,7 @@ void CallRequestProcess::AnswerRequestForDsda(sptr<CallBase> call, int32_t callI
         call->SetAutoAnswerState(true);
         HoldOrDisconnectedCall(callId, slotId, videoState);
     } else {
-        int32_t ret = call->AnswerCall(videoState);
+        int32_t ret = call->AnswerCall(videoState, isRTT);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("AnswerCall failed!");
             return;
@@ -725,7 +726,8 @@ void CallRequestProcess::KickOutFromConferenceRequest(int32_t callId)
     }
 }
 
-void CallRequestProcess::StartRttRequest(int32_t callId, std::u16string &msg)
+#ifdef SUPPORT_RTT_CALL
+void CallRequestProcess::StartRttRequest(int32_t callId)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
@@ -735,10 +737,10 @@ void CallRequestProcess::StartRttRequest(int32_t callId, std::u16string &msg)
     if (call->GetCallType() != CallType::TYPE_IMS) {
         TELEPHONY_LOGE("Unsupported Network type, callId:%{public}d", callId);
         return;
-    } else {
-        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
-        imsCall->StartRtt(msg);
     }
+    
+    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+    imsCall->StartRtt(callId);
 }
 
 void CallRequestProcess::StopRttRequest(int32_t callId)
@@ -751,11 +753,28 @@ void CallRequestProcess::StopRttRequest(int32_t callId)
     if (call->GetCallType() != CallType::TYPE_IMS) {
         TELEPHONY_LOGE("Unsupported Network type, callId:%{public}d", callId);
         return;
-    } else {
-        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
-        imsCall->StopRtt();
     }
+    
+    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+    imsCall->StopRtt(callId);
 }
+
+void CallRequestProcess::UpdateImsRttCallModeRequest(int32_t callId, ImsRTTCallMode mode)
+{
+    sptr<CallBase> call = GetOneCallObject(callId);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
+        return;
+    }
+    if (call->GetCallType() != CallType::TYPE_IMS) {
+        TELEPHONY_LOGE("Unsupported Network type, callId:%{public}d", callId);
+        return;
+    }
+    
+    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+    imsCall->UpdateImsRttCallMode(mode);
+}
+#endif
 
 void CallRequestProcess::JoinConference(int32_t callId, std::vector<std::string> &numberList)
 {
@@ -988,6 +1007,7 @@ int32_t CallRequestProcess::PackCellularCallInfo(DialParaInfo &info, CellularCal
     callInfo.videoState = static_cast<int32_t>(info.videoState);
     callInfo.index = info.index;
     callInfo.slotId = info.accountId;
+    callInfo.isRTT = info.isRTT;
     if (memset_s(callInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
         TELEPHONY_LOGW("memset_s failed!");
         return TELEPHONY_ERR_MEMSET_FAIL;

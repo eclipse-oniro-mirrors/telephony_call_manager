@@ -863,12 +863,64 @@ int32_t CallStatusCallbackProxy::PackUpdateCallsReportInfo(const CallsReportInfo
         }
         dataParcel.WriteString(it.name);
         dataParcel.WriteInt32(it.namePresentation);
-        dataParcel.WriteInt32(it.newCallUseBox);
         dataParcel.WriteInt32(static_cast<int32_t>(it.reason));
         dataParcel.WriteString(it.message);
+        dataParcel.WriteInt32(it.newCallUseBox);
+        dataParcel.WriteInt32(static_cast<int32_t>(it.rttState));
+        dataParcel.WriteInt32(it.rttChannelId);
     }
     dataParcel.WriteInt32(info.slotId);
     return TELEPHONY_SUCCESS;
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t CallStatusCallbackProxy::HandleRttEvtChanged(const RttEventInfo &rttEventInfo)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    
+    dataParcel.WriteInt32(rttEventInfo.callId);
+    dataParcel.WriteInt32(rttEventInfo.eventType);
+    dataParcel.WriteInt32(rttEventInfo.reason);
+
+    if (Remote() == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    error = Remote()->SendRequest(static_cast<int32_t>(UPDATE_RTT_EVENT_STATUS), dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallStatusCallbackProxy::HandleRttErrReport(const RttErrorInfo &rttErrorInfo)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    
+    dataParcel.WriteInt32(rttErrorInfo.callId);
+    dataParcel.WriteInt32(rttErrorInfo.causeCode);
+    dataParcel.WriteInt32(rttErrorInfo.operationType);
+    dataParcel.WriteString(rttErrorInfo.reasonText);
+    if (Remote() == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    error = Remote()->SendRequest(static_cast<int32_t>(UPDATE_RTT_ERR_INFO), dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

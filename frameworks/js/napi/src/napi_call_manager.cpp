@@ -173,9 +173,13 @@ napi_value NapiCallManager::DeclareCallMultimediaInterface(napi_env env, napi_va
 napi_value NapiCallManager::DeclareCallImsInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_WRITABLE_FUNCTION("startRTT", StartRTT),
-        DECLARE_NAPI_WRITABLE_FUNCTION("stopRTT", StopRTT),
         DECLARE_NAPI_WRITABLE_FUNCTION("joinConference", JoinConference),
+#ifdef SUPPORT_RTT_CALL
+        DECLARE_NAPI_WRITABLE_FUNCTION("startRtt", StartRtt),
+        DECLARE_NAPI_WRITABLE_FUNCTION("stopRtt", StopRtt),
+        DECLARE_NAPI_WRITABLE_FUNCTION("sendRttMessage", SendRttMessage),
+        DECLARE_NAPI_WRITABLE_FUNCTION("setRttCapability", SetRttCapability),
+#endif
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -1069,7 +1073,7 @@ napi_value NapiCallManager::DialCall(napi_env env, napi_callback_info info)
 
 napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, TWO_VALUE_LIMIT);
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
     if (!MatchOneOptionalNumberParameter(env, argv, argc)) {
         TELEPHONY_LOGE("MatchOneOptionalNumberParameter failed.");
         NapiUtil::ThrowParameterError(env);
@@ -1100,6 +1104,16 @@ napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
         } else {
             napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &answerAsyncContext->videoState);
             napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &answerAsyncContext->callId);
+        }
+    } else if (argc == THREE_VALUE_MAXIMUM_LIMIT) {
+        if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_THIRD], napi_function)) {
+            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &answerAsyncContext->callId);
+            napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &answerAsyncContext->videoState);
+            napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(answerAsyncContext->callbackRef));
+        } else {
+            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &answerAsyncContext->videoState);
+            napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &answerAsyncContext->callId);
+            napi_get_value_bool(env, argv[ARRAY_INDEX_THIRD], &answerAsyncContext->isRTT);
         }
     }
 
@@ -1463,6 +1477,9 @@ bool NapiCallManager::MatchOneOptionalNumberParameter(
         case TWO_VALUE_LIMIT:
             return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number }) ||
                    NapiUtil::MatchParameters(env, parameters, { napi_number, napi_function });
+        case THREE_VALUE_MAXIMUM_LIMIT:
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number, napi_function }) ||
+                   NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number, napi_boolean });
         default:
             return false;
     }
@@ -2374,6 +2391,14 @@ void NapiCallManager::RegisterNapiCallFuncCallback(std::string tmpStr, EventCall
     } else if (tmpStr == "cameraCapabilitiesChange") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCameraCapabilitiesChangeCallback(
             stateCallback);
+#ifdef SUPPORT_RTT_CALL
+    } else if (tmpStr == "rttModifyInd") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterRttModifyIndCallback(stateCallback);
+    } else if (tmpStr == "rttErrCause") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterRttErrCauseCallback(stateCallback);
+    } else if (tmpStr == "receiveRttMessage") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterRttCallMessageCallback(stateCallback);
+#endif
     }
 }
 
@@ -2438,6 +2463,14 @@ void NapiCallManager::UnRegisterCallbackWithListenerType(std::string tmpStr)
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterPeerDimensionsChangeCallback();
     } else if (tmpStr == "cameraCapabilitiesChange") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterCameraCapabilitiesChangeCallback();
+#ifdef SUPPORT_RTT_CALL
+    } else if (tmpStr == "rttModifyInd") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterRttModifyIndCallback();
+    } else if (tmpStr == "rttErrCause") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterRttErrCauseCallback();
+    } else if (tmpStr == "receiveRttMessage") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterRttCallMessageCallback();
+#endif
     }
 }
 
@@ -2751,56 +2784,57 @@ napi_value NapiCallManager::SetCallPreferenceMode(napi_env env, napi_callback_in
         env, asyncContext.release(), "SetCallPreferenceMode", NativeSetCallPreferenceMode, NativeVoidCallBack);
 }
 
-napi_value NapiCallManager::StartRTT(napi_env env, napi_callback_info info)
+#ifdef SUPPORT_RTT_CALL
+napi_value NapiCallManager::StartRtt(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "StartRTT type error, should be number type");
-    matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_string);
-    NAPI_ASSERT(env, matchFlag, "StartRTT type error, should be string type");
-    auto asyncContext = std::make_unique<SupplementAsyncContext>();
-    if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "StartRTT error at supplementAsyncContext is nullptr";
-        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
+    if (!MatchTwoNumberParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::StartRtt match parameters numbers failed.");
+        NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
+    auto asyncContext = std::make_unique<SupplementAsyncContext>();
+    if (asyncContext == nullptr) {
+        std::string errorMessage = "StartRtt error at supplementAsyncContext is nullptr";
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+
     napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-    char tmpStr[kMaxNumberLen + 1] = {0};
-    size_t strLen = 0;
-    napi_get_value_string_utf8(env, argv[ARRAY_INDEX_SECOND], tmpStr, PHONE_NUMBER_MAXIMUM_LIMIT, &strLen);
-    std::string tmpCode(tmpStr, strLen);
-    asyncContext->content = tmpCode;
+    napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->type);
     if (argc == VALUE_MAXIMUM_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
     napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
-    return HandleAsyncWork(env, asyncContext.release(), "StartRTT", NativeStartRTT, NativeVoidCallBack);
+    return HandleAsyncWork(env, asyncContext.release(), "StartRtt", NativeStartRtt, NativeVoidCallBack);
 }
 
-napi_value NapiCallManager::StopRTT(napi_env env, napi_callback_info info)
+napi_value NapiCallManager::StopRtt(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "StopRTT type error, should be number type");
-    auto asyncContext = std::make_unique<SupplementAsyncContext>();
-    if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "StopRTT error at supplementAsyncContext is nullptr";
-        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
+    if (!MatchTwoNumberParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::StopRtt match parameters numbers failed.");
+        NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
+    auto asyncContext = std::make_unique<SupplementAsyncContext>();
+    if (asyncContext == nullptr) {
+        std::string errorMessage = "StopRtt error at supplementAsyncContext is nullptr";
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+
     napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+    napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->type);
     if (argc == TWO_VALUE_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
     napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
-    return HandleAsyncWork(env, asyncContext.release(), "StopRTT", NativeStopRTT, NativeVoidCallBack);
+    return HandleAsyncWork(env, asyncContext.release(), "StopRtt", NativeStopRtt, NativeVoidCallBack);
 }
+#endif
 
 napi_value NapiCallManager::JoinConference(napi_env env, napi_callback_info info)
 {
@@ -3710,6 +3744,7 @@ void NapiCallManager::GetDialInfo(napi_env env, napi_value objValue, DialAsyncCo
     asyncContext.videoState = NapiCallManagerUtils::GetIntProperty(env, objValue, "videoState");
     asyncContext.dialScene = NapiCallManagerUtils::GetIntProperty(env, objValue, "dialScene");
     asyncContext.dialType = NapiCallManagerUtils::GetIntProperty(env, objValue, "dialType");
+    asyncContext.isRTT = NapiCallManagerUtils::GetBoolProperty(env, objValue, "isRTT");
     asyncContext.extraParams = NapiCallManagerUtils::GetWantParamsProperty(env, objValue, "extraParams");
 }
 
@@ -3842,6 +3877,7 @@ void NapiCallManager::NativeDialCall(napi_env env, void *data)
     dialInfo.PutIntValue("videoState", asyncContext->videoState);
     dialInfo.PutIntValue("dialScene", asyncContext->dialScene);
     dialInfo.PutIntValue("dialType", asyncContext->dialType);
+    dialInfo.PutBooleanValue("isRTT", asyncContext->isRTT);
     dialInfo.PutStringValue("extraParams", AAFwk::WantParamWrapper(asyncContext->extraParams).ToString());
     asyncContext->errorCode =
         DelayedSingleton<CallManagerClient>::GetInstance()->DialCall(Str8ToStr16(phoneNumber), dialInfo);
@@ -3877,7 +3913,8 @@ void NapiCallManager::NativeAnswerCall(napi_env env, void *data)
     TELEPHONY_LOGI("NativeAnswerCall enter");
     auto asyncContext = (AnswerAsyncContext *)data;
     asyncContext->errorCode =
-        DelayedSingleton<CallManagerClient>::GetInstance()->AnswerCall(asyncContext->callId, asyncContext->videoState);
+        DelayedSingleton<CallManagerClient>::GetInstance()->AnswerCall(
+            asyncContext->callId, asyncContext->videoState, asyncContext->isRTT);
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = TELEPHONY_SUCCESS;
     }
@@ -4834,7 +4871,8 @@ void NapiCallManager::NativeSetCallPreferenceMode(napi_env env, void *data)
         asyncContext->callId, asyncContext->mode);
 }
 
-void NapiCallManager::NativeStartRTT(napi_env env, void *data)
+#ifdef SUPPORT_RTT_CALL
+void NapiCallManager::NativeStartRtt(napi_env env, void *data)
 {
     if (data == nullptr) {
         TELEPHONY_LOGE("data is nullptr");
@@ -4852,10 +4890,9 @@ void NapiCallManager::NativeStartRTT(napi_env env, void *data)
         TELEPHONY_LOGE("RegisterStartRttCallback failed!");
         return;
     }
-
-    std::u16string msg = Str8ToStr16(startRTTContext->content);
     startRTTContext->resolved =
-        DelayedSingleton<CallManagerClient>::GetInstance()->StartRtt(startRTTContext->callId, msg);
+        DelayedSingleton<CallManagerClient>::GetInstance()->UpdateImsRttCallMode(
+            startRTTContext->callId, (ImsRTTCallMode)startRTTContext->type);
     if (startRTTContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterStartRttCallback();
         TELEPHONY_LOGE("StartRtt failed!");
@@ -4865,7 +4902,7 @@ void NapiCallManager::NativeStartRTT(napi_env env, void *data)
     startRTTContext->deferred = nullptr;
 }
 
-void NapiCallManager::NativeStopRTT(napi_env env, void *data)
+void NapiCallManager::NativeStopRtt(napi_env env, void *data)
 {
     if (data == nullptr) {
         TELEPHONY_LOGE("data is nullptr");
@@ -4883,7 +4920,8 @@ void NapiCallManager::NativeStopRTT(napi_env env, void *data)
         TELEPHONY_LOGE("RegisterStopRttCallback failed!");
         return;
     }
-    stopRTTContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->StopRtt(stopRTTContext->callId);
+    stopRTTContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->UpdateImsRttCallMode(
+        stopRTTContext->callId, (ImsRTTCallMode)stopRTTContext->type);
     if (stopRTTContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterStopRttCallback();
         TELEPHONY_LOGE("StopRtt failed!");
@@ -4892,6 +4930,7 @@ void NapiCallManager::NativeStopRTT(napi_env env, void *data)
     stopRTTContext->callbackRef = nullptr;
     stopRTTContext->deferred = nullptr;
 }
+#endif
 
 void NapiCallManager::NativeJoinConference(napi_env env, void *data)
 {
@@ -5108,5 +5147,102 @@ void NapiCallManager::NativeSendUssdResponse(napi_env env, void *data)
     }
     asyncContext->eventId = CALL_MANAGER_SEND_USSD_RESPONSE;
 }
+
+#ifdef SUPPORT_RTT_CALL
+napi_value NapiCallManager::SetRttCapability(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
+    if (!MatchNumberAndBoolParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::SetRttCapability MatchOneNumberParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<SetRttCapabilityAsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::SetRttCapability asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->accountId);
+    napi_get_value_bool(env, argv[ARRAY_INDEX_SECOND], &asyncContext->isEnable);
+    if (argc == THREE_VALUE_MAXIMUM_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+
+    return HandleAsyncWork(env, asyncContext.release(), "SetRttCapability", NativeSetRttCapability,
+        NativeVoidCallBackWithErrorCode);
+}
+
+void NapiCallManager::NativeSetRttCapability(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeSetRttCapability data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (SetRttCapabilityAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->accountId)) {
+        TELEPHONY_LOGE("NativeSetRttCapability slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
+    asyncContext->errorCode =
+        DelayedSingleton<CallManagerClient>::GetInstance()->SetRttCapability(
+            asyncContext->accountId, asyncContext->isEnable);
+    if (asyncContext->isEnable) {
+        asyncContext->resolved = BOOL_VALUE_IS_TRUE;
+    }
+}
+
+napi_value NapiCallManager::SendRttMessage(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
+    if (!MatchNumberAndStringParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager: SendRttMessage MatchOneNumberParameter failed");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<RttAsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("SendRttMessage: asyncContext is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+    size_t messageLen = 0;
+    napi_get_value_string_utf8(
+        env, argv[ARRAY_INDEX_SECOND], nullptr, 0, &messageLen);
+    if (messageLen == 0) {
+        asyncContext->rttMessage = "";
+    } else {
+        asyncContext->rttMessage.resize(messageLen);
+        napi_get_value_string_utf8(
+            env, argv[ARRAY_INDEX_SECOND], asyncContext->rttMessage.data(),
+            messageLen + 1, &messageLen);
+    }
+    if (argc == VALUE_MAXIMUM_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+
+    return HandleAsyncWork(
+        env, asyncContext.release(), "SendRttMessage", NativeSendRttMessage, NativeVoidCallBackWithErrorCode);
+}
+
+void NapiCallManager::NativeSendRttMessage(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NativeSendRttMessage: data is nullptr");
+        return;
+    }
+    auto asyncContext = static_cast<RttAsyncContext*>(data);
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->SendRttMessage(
+        asyncContext->callId, asyncContext->rttMessage);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = true;
+    } else {
+        asyncContext->resolved = false;
+    }
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

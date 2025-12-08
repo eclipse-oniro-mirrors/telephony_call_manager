@@ -42,7 +42,7 @@ int32_t OTTCall::DialingProcess()
     return ret;
 }
 
-int32_t OTTCall::AnswerCall(int32_t videoState)
+int32_t OTTCall::AnswerCall(int32_t videoState, bool isRTT)
 {
     int32_t ret = AnswerCallBase();
     if (ret != TELEPHONY_SUCCESS) {

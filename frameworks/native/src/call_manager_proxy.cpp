@@ -383,7 +383,7 @@ int32_t CallManagerProxy::MakeCall(std::string number)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::AnswerCall(int32_t callId, int32_t videoState)
+int32_t CallManagerProxy::AnswerCall(int32_t callId, int32_t videoState, bool isRTT)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
@@ -394,7 +394,7 @@ int32_t CallManagerProxy::AnswerCall(int32_t callId, int32_t videoState)
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t errCode = callManagerServicePtr_->AnswerCall(callId, videoState);
+    int32_t errCode = callManagerServicePtr_->AnswerCall(callId, videoState, isRTT);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("AnswerCall failed, errcode:%{public}d", errCode);
         return errCode;
@@ -1357,7 +1357,8 @@ int32_t CallManagerProxy::GetVoNRState(int32_t slotId, int32_t &state)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::StartRtt(int32_t callId, std::u16string &msg)
+#ifdef SUPPORT_RTT_CALL
+int32_t CallManagerProxy::StartRtt(int32_t callId)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
@@ -1368,7 +1369,7 @@ int32_t CallManagerProxy::StartRtt(int32_t callId, std::u16string &msg)
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t errCode = callManagerServicePtr_->StartRtt(callId, msg);
+    int32_t errCode = callManagerServicePtr_->StartRtt(callId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("StartRtt failed, errcode:%{public}d", errCode);
         return errCode;
@@ -1394,6 +1395,26 @@ int32_t CallManagerProxy::StopRtt(int32_t callId)
     }
     return TELEPHONY_SUCCESS;
 }
+
+int32_t CallManagerProxy::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::shared_lock<ffrt::shared_mutex> lock(clientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t errCode = callManagerServicePtr_->UpdateImsRttCallMode(callId, mode);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateImsRttCallMode failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+#endif
 
 int32_t CallManagerProxy::JoinConference(int32_t callId, std::vector<std::u16string> &numberList)
 {
@@ -1821,5 +1842,45 @@ int32_t CallManagerProxy::NotifyVoIPAudioStreamStart(int32_t uid)
     }
     return TELEPHONY_SUCCESS;
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t CallManagerProxy::SendRttMessage(int32_t callId, const std::string &rttMessage)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::shared_lock<ffrt::shared_mutex> lock(clientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t errCode = callManagerServicePtr_->SendRttMessage(callId, rttMessage);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SendRttMessage failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerProxy::SetRttCapability(int32_t slotId, bool isEnable)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::shared_lock<ffrt::shared_mutex> lock(clientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t errCode = callManagerServicePtr_->SetRttCapability(slotId, isEnable);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

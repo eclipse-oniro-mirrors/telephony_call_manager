@@ -52,6 +52,11 @@ public:
     int32_t ReportCallDataUsageChange(const int64_t dataUsage);
     int32_t ReportCameraCapabilities(const CameraCapabilities &cameraCapabilities);
     int32_t ReportPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
+#ifdef SUPPORT_RTT_CALL
+    int32_t ReportRttCallEvtChanged(const RttEvent &info);
+    int32_t ReportRttCallError(const RttError &info);
+    int32_t ReportRttCallMessage(AppExecFwk::PacMap &info);
+#endif
 
 private:
     int32_t ReportCallEvent(const CallEventInfo &info);

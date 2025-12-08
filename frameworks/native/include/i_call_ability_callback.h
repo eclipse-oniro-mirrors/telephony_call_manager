@@ -44,6 +44,11 @@ public:
     virtual int32_t OnReportCameraCapabilities(const CameraCapabilities &cameraCapabilities) = 0;
     virtual int32_t OnPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState,
         const std::string &number) = 0;
+#ifdef SUPPORT_RTT_CALL
+    virtual int32_t OnReportRttCallEvtChanged(const RttEvent &info) = 0;
+    virtual int32_t OnReportRttCallError(const RttError &info) = 0;
+    virtual int32_t OnReportRttCallMessage(AppExecFwk::PacMap &msgResult) = 0;
+#endif
 
     void SetBundleInfo(const std::string &info)
     {

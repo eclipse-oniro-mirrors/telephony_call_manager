@@ -48,6 +48,11 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
     (void)memset_s(&callDataUsageCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&cameraCapabilitiesCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&callSessionEventCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+#ifdef SUPPORT_RTT_CALL
+    (void)memset_s(&rttModifyIndCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    (void)memset_s(&rttErrCauseCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    (void)memset_s(&rttCallMessageCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+#endif
     memberFuncMap_[CallResultReportId::GET_CALL_WAITING_REPORT_ID] =
         [this](AppExecFwk::PacMap &resultInfo) { return ReportGetWaitingInfo(resultInfo); };
     memberFuncMap_[CallResultReportId::SET_CALL_WAITING_REPORT_ID] =
@@ -485,6 +490,44 @@ int32_t NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInf
     return TELEPHONY_SUCCESS;
 }
 
+#ifdef SUPPORT_RTT_CALL
+void NapiCallAbilityCallback::RegisterRttModifyIndCallback(EventCallback eventCallback)
+{
+    rttModifyIndCallback_ = eventCallback;
+}
+
+void NapiCallAbilityCallback::UnRegisterRttModifyIndCallback()
+{
+    if (eventCallback_.callbackRef) {
+        (void)memset_s(&rttModifyIndCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    }
+}
+
+void NapiCallAbilityCallback::RegisterRttErrCauseCallback(EventCallback eventCallback)
+{
+    rttErrCauseCallback_ = eventCallback;
+}
+
+void NapiCallAbilityCallback::UnRegisterRttErrCauseCallback()
+{
+    if (eventCallback_.callbackRef) {
+        (void)memset_s(&rttErrCauseCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    }
+}
+
+void NapiCallAbilityCallback::RegisterRttCallMessageCallback(EventCallback eventCallback)
+{
+    rttCallMessageCallback_ = eventCallback;
+}
+
+void NapiCallAbilityCallback::UnRegisterRttCallMessageCallback()
+{
+    if (eventCallback_.callbackRef) {
+        (void)memset_s(&rttCallMessageCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    }
+}
+#endif
+
 int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &info)
 {
     if (stateCallback_.thisVar == nullptr) {
@@ -557,6 +600,8 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
         env, callbackValues[ARRAY_INDEX_FIRST], "originalCallType", info.originalCallType);
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_FIRST], "phoneOrWatch", info.phoneOrWatch);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "rttState", static_cast<int32_t>(info.rttState));
     napi_set_named_property(env, callbackValues[ARRAY_INDEX_FIRST], std::string("extraParams").c_str(),
         AppExecFwk::WrapWantParams(env, AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString)));
     ReportCallAttribute(env, callbackValues, ARRAY_INDEX_THIRD, info);
@@ -2376,5 +2421,292 @@ int32_t NapiCallAbilityCallback::ReportCameraCapabilitiesInfo(
     napi_close_handle_scope(env, cameraCapabilitiesScope);
     return TELEPHONY_SUCCESS;
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t NapiCallAbilityCallback::ReportRttCallEventInfo(const RttEvent &info)
+{
+    std::lock_guard<std::mutex> lock(rttCallEvtChangeCallbackMutex_);
+    if (rttModifyIndCallback_.thisVar == nullptr) {
+        TELEPHONY_LOGE("rttCallEvtChangeCallback is null!");
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    uv_loop_s *loop = nullptr;
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
+    napi_get_uv_event_loop(rttModifyIndCallback_.env, &loop);
+#endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    RttCallEvtWork *callRttEventWorker = std::make_unique<RttCallEvtWork>().release();
+    if (callRttEventWorker == nullptr) {
+        TELEPHONY_LOGE("callRttEventWorker is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    callRttEventWorker->eventInfo = info;
+    callRttEventWorker->callback = rttModifyIndCallback_;
+    uv_work_t *work = std::make_unique<uv_work_t>().release();
+    if (work == nullptr) {
+        delete callRttEventWorker;
+        callRttEventWorker = nullptr;
+        TELEPHONY_LOGE("work is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    work->data = (void *)callRttEventWorker;
+    int32_t errorCode = uv_queue_work_with_qos(
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("ReportRttCallEventInfo uv_queue_work_with_qos");
+        }, ReportRttCallEventInfoWork, uv_qos_default);
+    if (errorCode != 0) {
+        TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errorCode: %{public}d", errorCode);
+        delete callRttEventWorker;
+        callRttEventWorker = nullptr;
+        delete work;
+        work = nullptr;
+        return TELEPHONY_ERROR;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+void NapiCallAbilityCallback::ReportRttCallEventInfoWork(uv_work_t *work, int32_t status)
+{
+    RttCallEvtWork *dataWorkerData = (RttCallEvtWork *)work->data;
+    if (dataWorkerData == nullptr) {
+        TELEPHONY_LOGE("dataWorkerData is nullptr!");
+        return;
+    }
+    int32_t ret = ReportRttCallEventInfo(dataWorkerData->eventInfo, dataWorkerData->callback);
+    TELEPHONY_LOGI("ReportRttCallEventInfo result = %{public}d", ret);
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
+int32_t NapiCallAbilityCallback::ReportRttCallEventInfo(
+    RttEvent &eventInfo, EventCallback eventCallback)
+{
+    napi_env env = eventCallback.env;
+    napi_handle_scope eventInfoScope = nullptr;
+    napi_open_handle_scope(env, &eventInfoScope);
+    if (eventInfoScope == nullptr) {
+        TELEPHONY_LOGE("CallMediaModeInfoScope is nullptr");
+        napi_close_handle_scope(env, eventInfoScope);
+        return TELEPHONY_ERROR;
+    }
+    napi_value callbackFunc = nullptr;
+    napi_value callbackValues[ARRAY_INDEX_SECOND] = { 0 };
+
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "callId", eventInfo.callId);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "eventType", eventInfo.eventType);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "reason", eventInfo.reason);
+
+    napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
+    if (callbackFunc == nullptr) {
+        TELEPHONY_LOGE("callbackFunc is null!");
+        napi_close_handle_scope(env, eventInfoScope);
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    napi_value thisVar = nullptr;
+    napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
+    napi_close_handle_scope(env, eventInfoScope);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t NapiCallAbilityCallback::ReportRttCallErrorInfo(const RttError &info)
+{
+    std::lock_guard<std::mutex> lock(rttCallErrCauseCallbackMutex_);
+    if (rttErrCauseCallback_.thisVar == nullptr) {
+        TELEPHONY_LOGE("rttCallErrCauseCallback is null!");
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    uv_loop_s *loop = nullptr;
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
+    napi_get_uv_event_loop(rttErrCauseCallback_.env, &loop);
+#endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    RttCallErrorWork *callRttErrorWorker = std::make_unique<RttCallErrorWork>().release();
+    if (callRttErrorWorker == nullptr) {
+        TELEPHONY_LOGE("callRttErrorWorker is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    callRttErrorWorker->errorInfo = info;
+    callRttErrorWorker->callback = rttErrCauseCallback_;
+    uv_work_t *work = std::make_unique<uv_work_t>().release();
+    if (work == nullptr) {
+        delete callRttErrorWorker;
+        callRttErrorWorker = nullptr;
+        TELEPHONY_LOGE("work is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    work->data = (void *)callRttErrorWorker;
+    int32_t errorCode = uv_queue_work_with_qos(
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("ReportRttCallErrorInfo uv_queue_work_with_qos");
+        }, ReportRttCallErrorInfoWork, uv_qos_default);
+    if (errorCode != 0) {
+        TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errorCode: %{public}d", errorCode);
+        delete callRttErrorWorker;
+        callRttErrorWorker = nullptr;
+        delete work;
+        work = nullptr;
+        return TELEPHONY_ERROR;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+void NapiCallAbilityCallback::ReportRttCallErrorInfoWork(uv_work_t *work, int32_t status)
+{
+    RttCallErrorWork *dataWorkerData = (RttCallErrorWork *)work->data;
+    if (dataWorkerData == nullptr) {
+        TELEPHONY_LOGE("dataWorkerData is nullptr!");
+        return;
+    }
+    int32_t ret = ReportRttCallErrorInfo(dataWorkerData->errorInfo, dataWorkerData->callback);
+    TELEPHONY_LOGI("ReportRttCallErrorInfo result = %{public}d", ret);
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
+int32_t NapiCallAbilityCallback::ReportRttCallErrorInfo(
+    RttError &errorInfo, EventCallback eventCallback)
+{
+    napi_env env = eventCallback.env;
+    napi_handle_scope errorInfoScope = nullptr;
+    napi_open_handle_scope(env, &errorInfoScope);
+    if (errorInfoScope == nullptr) {
+        TELEPHONY_LOGE("CallMediaModeInfoScope is nullptr");
+        napi_close_handle_scope(env, errorInfoScope);
+        return TELEPHONY_ERROR;
+    }
+    napi_value callbackFunc = nullptr;
+    napi_value callbackValues[ARRAY_INDEX_SECOND] = { 0 };
+
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "callId", errorInfo.callId);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "operationType", errorInfo.operationType);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "causeCode", errorInfo.causeCode);
+    NapiCallManagerUtils::SetPropertyStringUtf8(
+        env, callbackValues[ARRAY_INDEX_FIRST], "reasonText", errorInfo.reasonText);
+
+    napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
+    if (callbackFunc == nullptr) {
+        TELEPHONY_LOGE("callbackFunc is null!");
+        napi_close_handle_scope(env, errorInfoScope);
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    napi_value thisVar = nullptr;
+    napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
+    napi_close_handle_scope(env, errorInfoScope);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t NapiCallAbilityCallback::ReportRttCallMessageInfo(AppExecFwk::PacMap &resultInfo)
+{
+    std::lock_guard<std::mutex> lock(rttCallMessageCallbackMutex_);
+    if (rttCallMessageCallback_.thisVar == nullptr) {
+        TELEPHONY_LOGE("rttCallMessageCallback_ is null!");
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    uv_loop_s *loop = nullptr;
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
+    napi_get_uv_event_loop(rttCallMessageCallback_.env, &loop);
+#endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    CallSupplementWorker *callRttMsgWorker = std::make_unique<CallSupplementWorker>().release();
+    if (callRttMsgWorker == nullptr) {
+        TELEPHONY_LOGE("callRttErrorWorker is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    callRttMsgWorker->info = resultInfo;
+    callRttMsgWorker->callback = rttCallMessageCallback_;
+    uv_work_t *work = std::make_unique<uv_work_t>().release();
+    if (work == nullptr) {
+        delete callRttMsgWorker;
+        callRttMsgWorker = nullptr;
+        TELEPHONY_LOGE("work is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    work->data = (void *)callRttMsgWorker;
+    int32_t errorCode = uv_queue_work_with_qos(
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("ReportRttMessageInfo uv_queue_work_with_qos");
+        }, ReportRttCallMessageWork, uv_qos_default);
+    if (errorCode != 0) {
+        TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errorCode: %{public}d", errorCode);
+        delete callRttMsgWorker;
+        callRttMsgWorker = nullptr;
+        delete work;
+        work = nullptr;
+        return TELEPHONY_ERROR;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+void NapiCallAbilityCallback::ReportRttCallMessageWork(uv_work_t *work, int32_t status)
+{
+    CallSupplementWorker *dataWorkerData = (CallSupplementWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        TELEPHONY_LOGE("dataWorkerData is nullptr!");
+        return;
+    }
+    int32_t ret = ReportRttCallMessage(dataWorkerData->info, dataWorkerData->callback);
+    TELEPHONY_LOGI("ReportRttCallMessage result = %{public}d", ret);
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
+int32_t NapiCallAbilityCallback::ReportRttCallMessage(
+    AppExecFwk::PacMap &resultInfo, EventCallback eventCallback)
+{
+    napi_env env = eventCallback.env;
+    napi_handle_scope executionScope = nullptr;
+    napi_open_handle_scope(env, &executionScope);
+    if (executionScope == nullptr) {
+        TELEPHONY_LOGE("executionScope is nullptr");
+        napi_close_handle_scope(env, executionScope);
+        return TELEPHONY_ERROR;
+    }
+
+    napi_value callbackFunc = nullptr;
+    napi_value callbackValues[ARRAY_INDEX_SECOND] = { 0 };
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "callId", resultInfo.GetIntValue("callId"));
+    NapiCallManagerUtils::SetPropertyStringUtf8(
+        env, callbackValues[ARRAY_INDEX_FIRST], "rttMessage", resultInfo.GetStringValue("rttMessage"));
+
+    napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
+    if (callbackFunc == nullptr) {
+        TELEPHONY_LOGE("callbackFunc is null!");
+        napi_close_handle_scope(env, executionScope);
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    napi_value thisVar = nullptr;
+    napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
+    napi_close_handle_scope(env, executionScope);
+    return TELEPHONY_SUCCESS;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

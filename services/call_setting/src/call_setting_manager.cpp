@@ -345,5 +345,16 @@ int32_t CallSettingManager::CloseUnFinishedUssdPolicy(int32_t slotId)
     }
     return TELEPHONY_SUCCESS;
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t CallSettingManager::SetRttCapability(int32_t slotId, bool isEnable)
+{
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->SetRttCapability(slotId, isEnable);
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

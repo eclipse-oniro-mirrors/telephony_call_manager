@@ -44,13 +44,13 @@ int32_t CallRequestHandler::DialCall()
     return callRequestProcessPtr_->DialRequest();
 }
 
-int32_t CallRequestHandler::AnswerCall(int32_t callId, int32_t videoState)
+int32_t CallRequestHandler::AnswerCall(int32_t callId, int32_t videoState, bool isRTT)
 {
     if (callRequestProcessPtr_ == nullptr) {
         TELEPHONY_LOGE("callRequestProcessPtr_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ffrt::submit([=]() { callRequestProcessPtr_->AnswerRequest(callId, videoState); });
+    ffrt::submit([=]() { callRequestProcessPtr_->AnswerRequest(callId, videoState, isRTT); });
     return TELEPHONY_SUCCESS;
 }
 
@@ -107,15 +107,15 @@ int32_t CallRequestHandler::SwitchCall(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallRequestHandler::StartRtt(int32_t callId, std::u16string &msg)
+#ifdef SUPPORT_RTT_CALL
+int32_t CallRequestHandler::StartRtt(int32_t callId)
 {
     if (callRequestProcessPtr_ == nullptr) {
         TELEPHONY_LOGE("callRequestProcessPtr_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     ffrt::submit([=]() {
-        std::u16string mMsg = msg;
-        callRequestProcessPtr_->StartRttRequest(callId, mMsg);
+        callRequestProcessPtr_->StartRttRequest(callId);
     });
     return TELEPHONY_SUCCESS;
 }
@@ -129,6 +129,17 @@ int32_t CallRequestHandler::StopRtt(int32_t callId)
     ffrt::submit([=]() { callRequestProcessPtr_->StopRttRequest(callId); });
     return TELEPHONY_SUCCESS;
 }
+
+int32_t CallRequestHandler::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
+{
+    if (callRequestProcessPtr_ == nullptr) {
+        TELEPHONY_LOGE("callRequestProcessPtr_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    ffrt::submit([=]() {callRequestProcessPtr_->UpdateImsRttCallModeRequest(callId, mode); });
+    return TELEPHONY_SUCCESS;
+}
+#endif
 
 int32_t CallRequestHandler::JoinConference(int32_t callId, std::vector<std::string> &numberList)
 {

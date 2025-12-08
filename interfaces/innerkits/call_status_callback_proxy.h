@@ -316,6 +316,24 @@ public:
      */
     int32_t UpdateVoipEventInfo(const VoipCallEventInfo &info) override;
 
+#ifdef SUPPORT_RTT_CALL
+    /**
+     * @brief handle RTT call evt changed
+     *
+     * @param rttEventInfo[in], contains voipCallEvent
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t HandleRttEvtChanged(const RttEventInfo &rttEventInfo) override;
+
+    /**
+     * @brief report the RTT call error event
+     *
+     * @param info[in], contains voipCallEvent
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t HandleRttErrReport(const RttErrorInfo &rttErrorInfo) override;
+#endif
+
 private:
     int32_t PackUpdateCallsReportInfo(const CallsReportInfo &info, MessageParcel &dataParcel);
 

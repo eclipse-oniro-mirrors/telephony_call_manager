@@ -204,8 +204,6 @@ void IMSCallFunc(const uint8_t *data, size_t size)
     int32_t videoState = static_cast<int32_t>(size % VIDIO_TYPE_NUM);
     int32_t mute = static_cast<int32_t>(size % BOOL_NUM);
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    std::string msg(reinterpret_cast<const char *>(data), size);
-    std::u16string msgU16 = Str8ToStr16(msg);
 
     callObjectPtr->InitVideoCall();
     callObjectPtr->DialingProcess();
@@ -231,8 +229,10 @@ void IMSCallFunc(const uint8_t *data, size_t size)
     std::vector<std::u16string> callIdList;
     callObjectPtr->GetCallIdListForConference(callIdList);
     callObjectPtr->IsSupportConferenceable();
-    callObjectPtr->StartRtt(msgU16);
-    callObjectPtr->StopRtt();
+#ifdef SUPPORT_RTT_CALL
+    callObjectPtr->StartRtt(mainCallId);
+    callObjectPtr->StopRtt(mainCallId);
+#endif
     callObjectPtr->SetMute(mute, slotId);
 }
 

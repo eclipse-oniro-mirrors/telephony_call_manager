@@ -69,6 +69,7 @@ struct DialAsyncContext : AsyncContext {
     int32_t videoState = 0;
     int32_t dialScene = 0;
     int32_t dialType = 0;
+    bool isRTT = false;
     AAFwk::WantParams extraParams;
 };
 
@@ -79,6 +80,7 @@ struct UssdAsyncContext : AsyncContext {
 
 struct AnswerAsyncContext : AsyncContext {
     int32_t videoState = 0;
+    bool isRTT = false;
 };
 
 struct BoolResultAsyncContext : AsyncContext {
@@ -282,6 +284,28 @@ struct CameraCapbilitiesWorker {
     CameraCapabilities cameraCapabilities;
     EventCallback callback;
 };
+
+#ifdef SUPPORT_RTT_CALL
+struct SetRttCapabilityAsyncContext : AsyncContext {
+    int32_t accountId = 0;
+    bool isEnable = false;
+};
+
+struct RttAsyncContext : AsyncContext {
+    int32_t callId = 0;
+    std::string rttMessage = "";
+};
+
+struct RttCallEvtWork {
+    RttEvent eventInfo;
+    EventCallback callback;
+};
+
+struct RttCallErrorWork {
+    RttError errorInfo;
+    EventCallback callback;
+};
+#endif
 } // namespace Telephony
 } // namespace OHOS
 

@@ -210,12 +210,6 @@ void CallAbilityCallbackProxy::PackDataParcel(
         case CallResultReportId::GET_IMS_FEATURE_VALUE_REPORT_ID:
             dataParcel.WriteInt32(resultInfo.GetIntValue("value"));
             break;
-        case CallResultReportId::START_RTT_REPORT_ID:
-            dataParcel.WriteInt32(resultInfo.GetIntValue("active"));
-            break;
-        case CallResultReportId::STOP_RTT_REPORT_ID:
-            dataParcel.WriteInt32(resultInfo.GetIntValue("inactive"));
-            break;
         default:
             break;
     }
@@ -473,5 +467,107 @@ int32_t CallAbilityCallbackProxy::OnPhoneStateChange(int32_t numActive, int32_t 
     }
     return replyParcel.ReadInt32();
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t CallAbilityCallbackProxy::OnReportRttCallEvtChanged(const RttEvent &info)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option(MessageOption::TF_ASYNC);
+    if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!dataParcel.WriteInt32(info.callId)) {
+        TELEPHONY_LOGE("OnReportRttCallEvtChanged Write callId fail!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!dataParcel.WriteInt32(info.eventType)) {
+        TELEPHONY_LOGE("OnReportRttCallEvtChanged Write eventType fail!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!dataParcel.WriteInt32(info.reason)) {
+        TELEPHONY_LOGE("OnReportRttCallEvtChanged Write reason fail!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(
+        CallManagerCallAbilityInterfaceCode::RTT_CALL_EVENT_CHANGE), dataParcel,
+        replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallAbilityCallbackProxy::OnReportRttCallError(const RttError &info)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option(MessageOption::TF_ASYNC);
+    if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!dataParcel.WriteInt32(info.callId)) {
+        TELEPHONY_LOGE("OnReportRttCallError Write callId fail!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!dataParcel.WriteInt32(info.causeCode)) {
+        TELEPHONY_LOGE("OnReportRttCallError Write causeCode fail!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!dataParcel.WriteInt32(info.operationType)) {
+        TELEPHONY_LOGE("OnReportRttCallError Write operationType fail!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!dataParcel.WriteString(info.reasonText)) {
+        TELEPHONY_LOGE("OnReportRttCallError Write reasonText fail!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(
+        CallManagerCallAbilityInterfaceCode::RTT_CALL_ERROR_REPORT), dataParcel,
+        replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallAbilityCallbackProxy::OnReportRttCallMessage(AppExecFwk::PacMap &msgResult)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option(MessageOption::TF_ASYNC);
+    if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    dataParcel.WriteInt32(msgResult.GetIntValue("callId"));
+    dataParcel.WriteString(msgResult.GetStringValue("rttMessage"));
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(
+        CallManagerCallAbilityInterfaceCode::RTT_CALL_SEND_MESSAGE), dataParcel,
+        replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

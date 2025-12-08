@@ -209,14 +209,15 @@ public:
      */
     int32_t SendDtmf(char cDtmfCode, const CellularCallInfo &callInfo) override;
 
+#ifdef SUPPORT_RTT_CALL
     /**
      * @brief Start a Rtt session
      *
-     * @param msg the rtt message
+     * @param callId
      * @param slotId[in] the slot id
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t StartRtt(int32_t slotId, const std::string &msg) override;
+    int32_t StartRtt(int32_t slotId, int32_t callId) override;
 
     /**
      * @brief Terminate the current RTT session
@@ -224,7 +225,27 @@ public:
      * @param slotId[in] the slot id
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t StopRtt(int32_t slotId) override;
+    int32_t StopRtt(int32_t slotId, int32_t callId) override;
+
+    /**
+     * @brief Rtt Upgrade or Downgrade
+     *
+     * @param slotId[in] the slot id
+     * @param callId[in] call id
+     * @param mode[in] rtt modify mode
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t UpdateImsRttCallMode(int32_t slotId, int32_t callId, ImsRTTCallMode mode) override;
+
+    /**
+     * @brief RTT Call Switch Settings
+     *
+     * @param slotId[in], The slot id
+     * @param isEnabled[out], The result of enable or not
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetRttCapability(int32_t slotId, bool isEnable) override;
+#endif
 
     /**
      * @brief set call transfer for the slot id

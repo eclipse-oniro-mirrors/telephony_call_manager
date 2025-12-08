@@ -74,6 +74,11 @@ private:
     int32_t OnCameraCapabilitiesChange(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateVoipEventInfo(MessageParcel &data, MessageParcel &reply);
 
+#ifdef SUPPORT_RTT_CALL
+    int32_t OnHandleRttEvtChanged(MessageParcel &data, MessageParcel &reply);
+    int32_t OnHandleRttErrReport(MessageParcel &data, MessageParcel &reply);
+#endif
+
     void InitBasicFuncMap();
     void InitSupplementFuncMap();
     void InitImsFuncMap();

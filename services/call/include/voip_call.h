@@ -26,7 +26,7 @@ public:
     VoIPCall(DialParaInfo &info);
     ~VoIPCall();
     int32_t DialingProcess() override;
-    int32_t AnswerCall(int32_t videoState) override;
+    int32_t AnswerCall(int32_t videoState, bool isRTT = false) override;
     int32_t RejectCall() override;
     int32_t HangUpCall() override;
     int32_t HoldCall() override;
