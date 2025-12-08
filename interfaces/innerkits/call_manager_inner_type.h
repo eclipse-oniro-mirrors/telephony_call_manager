@@ -400,6 +400,28 @@ enum ImsCallMode {
     CALL_MODE_VIDEO_PAUSED,
 };
 
+#ifdef SUPPORT_RTT_CALL
+/**
+ * @brief Indicates the IMS RTT call mode.
+ */
+enum ImsRTTCallMode : int32_t  {
+    LOCAL_REQUEST_UPGRADE = 0,
+    LOCAL_REQUEST_DOWNGRADE = 1,
+    REMOTE_REQUEST_UPGRADE_LOCAL_ACCEPT = 2,
+    REMOTE_REQUEST_UPGRADE_LOCAL_REJECT = 3,
+};
+
+/**
+ * @brief Indicates the IMS RTT Event type
+ */
+enum ImsRTTEventType : int32_t  {
+    EVENT_RTT_ENABLED = 0,
+    EVENT_RTT_CLOSED = 1,
+    EVENT_REMOTE_REQUEST_ENABLE_RTT = 2,
+    EVENT_RTT_PARAM_CHANGE = 3,
+};
+#endif
+
 /**
  * @brief Indicates the IMS call mode request result.
  */
@@ -485,6 +507,164 @@ struct CallModeReportInfo {
 
     int32_t slotId = -1;
 };
+
+#ifdef SUPPORT_RTT_CALL
+/**
+ * @brief Indicates the RTT Call Event report information from cellular call.
+ */
+struct RttEvent {
+    /**
+     * Call ID, value can be 1~7
+     */
+    int32_t callId;
+
+    /**
+     * RTT事件类型
+     */
+    int32_t eventType;
+
+    /**
+     * 0: 本地用户发起 1: 远端用户发起
+     */
+    int32_t reason;
+
+    RttEvent() {}
+
+    RttEvent(const RttEvent &temp)
+    {
+        *this = temp;
+    }
+
+    RttEvent &operator=(const RttEvent &temp)
+    {
+        callId = temp.callId;
+        eventType = temp.eventType;
+        reason = temp.reason;
+        return *this;
+    }
+};
+
+struct RttEventInfo {
+    /**
+     * Call ID, value can be 1~7
+     */
+    int32_t callId;
+
+    /**
+     * RTT事件类型
+     */
+    int32_t eventType;
+
+    /**
+     * 0: 本地用户发起 1: 远端用户发起
+     */
+    int32_t reason;
+};
+
+/**
+ * @brief Indicates the RTT Call Error report information from cellular call.
+ */
+struct RttError {
+    /**
+     * Call ID, value can be 1~7
+     */
+    int32_t callId;
+
+    /**
+     * 0:Add Text; 1:Close Text
+     */
+    int32_t operationType;
+
+    /**
+     * 错误码
+     */
+    int32_t causeCode;
+
+    /**
+     * 错误码字符串信息
+     */
+    std::string reasonText;
+
+    RttError() {}
+
+    RttError(const RttError &temp)
+    {
+        *this = temp;
+    }
+
+    RttError &operator=(const RttError &temp)
+    {
+        callId = temp.callId;
+        operationType = temp.operationType;
+        causeCode = temp.causeCode;
+        reasonText = temp.reasonText;
+        return *this;
+    }
+};
+
+struct RttErrorInfo {
+    /**
+     * Call ID, value can be 1~7
+     */
+    int32_t callId;
+
+    /**
+     * 0:Add Text; 1:Close Text
+     */
+    int32_t operationType;
+
+    /**
+     * 错误码
+     */
+    int32_t causeCode;
+
+    /**
+     * 错误码字符串信息
+     */
+    std::string reasonText;
+};
+
+/**
+ * @brief Indicates the RTT Call Message report information
+ */
+struct RttMessage {
+    /**
+     * Call ID, value can be 1~7
+     */
+    int32_t callId;
+
+    /**
+     * RTT消息
+     */
+    char* rttMessage;
+
+    RttMessage() {}
+
+    RttMessage(const RttMessage &temp)
+    {
+        *this = temp;
+    }
+
+    RttMessage &operator=(const RttMessage &temp)
+    {
+        callId = temp.callId;
+        rttMessage = temp.rttMessage;
+        return *this;
+    }
+};
+
+struct RttMessageInfo {
+    /**
+     * Call ID, value can be 1~7
+     */
+    int32_t callId;
+
+    /**
+     * RTT消息
+     */
+    char* rttMessage;
+};
+#endif
 
 /**
  * @brief Indicates the response of the call media mode request.

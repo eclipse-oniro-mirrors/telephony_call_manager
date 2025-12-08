@@ -860,7 +860,9 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_004, TestSize.Level0)
     ImsCallMode mode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
     ASSERT_EQ(callControlManager->UpdateImsCallMode(INVALID_CALLID, mode), TELEPHONY_SUCCESS);
     std::u16string str = u"";
-    ASSERT_NE(callControlManager->StartRtt(INVALID_CALLID, str), TELEPHONY_SUCCESS);
+#ifdef SUPPORT_RTT_CALL
+    ASSERT_NE(callControlManager->StartRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
+#endif
     AudioDevice audioDevice = {
         .deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO,
         .address = { 0 },
@@ -893,7 +895,9 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_004, TestSize.Level0)
     listen.OnRemoveSystemAbility(systemAbilityId, deviceId);
     listen.OnAddSystemAbility(COMMON_EVENT_SERVICE_ID, deviceId);
     listen.OnRemoveSystemAbility(COMMON_EVENT_SERVICE_ID, deviceId);
+#ifdef SUPPORT_RTT_CALL
     ASSERT_NE(callControlManager->StopRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
+#endif
     ASSERT_NE(callControlManager->SetMuted(false), TELEPHONY_SUCCESS);
     ASSERT_EQ(callControlManager->MuteRinger(), TELEPHONY_SUCCESS);
     bool enaled = false;
@@ -1892,6 +1896,25 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_015, TestSize.Level0)
     call->SetNumberMarkInfo(markInfo);
     callStatusManager->HandleVideoCallInAdvsecMode(call, callDetailInfo);
     EXPECT_EQ(call->IsForcedReportVoiceCall(), false);
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_017, TestSize.Level0)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+
+#ifdef SUPPORT_RTT_CALL
+    DialParaInfo dialInfo;
+    sptr<CallBase> imsCall = new IMSCall(dialInfo);
+    callStatusManager->InitRttManager(
+        imsCall->GetCallID(), imsCall->GetRttState(), imsCall->GetRttChannelId());
+    callStatusManager->UnInitRttManager();
+#endif
+
+#ifdef SUPPORT_RTT_CALL
+    int32_t ret = -100;
+    std::string rttMessage = "message";
+    EXPECT_NE(callStatusManager->SendRttMessage(rttMessage), ret);
+#endif
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -48,7 +48,7 @@ int32_t CarrierCall::CarrierDialingProcess()
     return ret;
 }
 
-int32_t CarrierCall::CarrierAnswerCall(int32_t videoState)
+int32_t CarrierCall::CarrierAnswerCall(int32_t videoState, bool isRTT)
 {
     CellularCallInfo callInfo;
     int32_t ret = AnswerCallBase();
@@ -60,6 +60,7 @@ int32_t CarrierCall::CarrierAnswerCall(int32_t videoState)
     }
     ret = PackCellularCallInfo(callInfo);
     callInfo.videoState = videoState;
+    callInfo.isRTT = isRTT;
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("PackCellularCallInfo failed!");
         CallManagerHisysevent::WriteAnswerCallFaultEvent(

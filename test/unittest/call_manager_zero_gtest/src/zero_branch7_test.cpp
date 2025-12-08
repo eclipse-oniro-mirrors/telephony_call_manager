@@ -177,6 +177,18 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallPolicy_001, Function | MediumTest | Leve
     mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true);
     mPacMap.PutIntValue("dialType", -1);
     EXPECT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
+
+#ifdef SUPPORT_RTT_CALL
+    int32_t slotId = -1;
+    int32_t isEnbale = 0;
+    int32_t callId = -1;
+    EXPECT_EQ(mCallPolicy.SetRttCapabilityPolicy(slotId, isEnbale), CALL_ERR_INVALID_SLOT_ID);
+    slotId = 0;
+    EXPECT_EQ(mCallPolicy.SetRttCapabilityPolicy(slotId, isEnbale), TELEPHONY_SUCCESS);
+    isEnbale = 1;
+    EXPECT_EQ(mCallPolicy.SetRttCapabilityPolicy(slotId, isEnbale), TELEPHONY_SUCCESS);
+    EXPECT_EQ(mCallPolicy.RttCallModifyPolicy(callId), CALL_ERR_INVALID_CALLID);
+#endif
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_001, Function | MediumTest | Level1)
@@ -491,6 +503,12 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallSettingManager_002, TestSize.Level0)
     int32_t state = 0;
     EXPECT_NE(callSettingManager->SetVoNRState(SIM1_SLOTID, state), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callSettingManager->GetVoNRState(SIM1_SLOTID, state), TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+#ifdef SUPPORT_RTT_CALL
+    int32_t ret = -100;
+    int32_t slotId = -1;
+    EXPECT_NE(callSettingManager->SetRttCapability(slotId, false), ret);
+#endif
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_CallRequestHandler_001, Function | MediumTest | Level1)
@@ -508,11 +526,21 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallRequestHandler_001, Function | MediumTes
     EXPECT_NE(callRequestHandler->CombineConference(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callRequestHandler->SeparateConference(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callRequestHandler->KickOutFromConference(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    std::u16string test = u"";
-    EXPECT_NE(callRequestHandler->StartRtt(1, test), TELEPHONY_ERR_LOCAL_PTR_NULL);
+#ifdef SUPPORT_RTT_CALL
+    EXPECT_NE(callRequestHandler->StartRtt(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callRequestHandler->StopRtt(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+#endif
     std::vector<std::string> emptyRecords = {};
     EXPECT_NE(callRequestHandler->JoinConference(1, emptyRecords), TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+#ifdef SUPPORT_RTT_CALL
+    int32_t callId = -1;
+    ImsRTTCallMode mode = ImsRTTCallMode::LOCAL_REQUEST_UPGRADE;
+    callRequestHandler->callRequestProcessPtr_ = nullptr;
+    EXPECT_EQ(callRequestHandler->UpdateImsRttCallMode(callId, mode), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    callRequestHandler->callRequestProcessPtr_ = std::make_shared<CallRequestProcess>();
+    EXPECT_EQ(callRequestHandler->UpdateImsRttCallMode(callId, mode), TELEPHONY_SUCCESS);
+#endif
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_CallManagerClient_001, Function | MediumTest | Level1)
@@ -542,8 +570,10 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerClient_001, Function | MediumTest
     EXPECT_NE(callManagerClient->SetImsFeatureValue(SIM1_SLOTID, FeatureType::TYPE_SS_OVER_UT, value),
         TELEPHONY_ERR_UNINIT);
     EXPECT_NE(callManagerClient->UpdateImsCallMode(callId, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_UNINIT);
-    EXPECT_NE(callManagerClient->StartRtt(callId, test), TELEPHONY_ERR_UNINIT);
+#ifdef SUPPORT_RTT_CALL
+    EXPECT_NE(callManagerClient->StartRtt(callId), TELEPHONY_ERR_UNINIT);
     EXPECT_NE(callManagerClient->StopRtt(callId), TELEPHONY_ERR_UNINIT);
+#endif
     EXPECT_NE(callManagerClient->CancelCallUpgrade(callId), TELEPHONY_ERR_UNINIT);
     EXPECT_NE(callManagerClient->RequestCameraCapabilities(callId), TELEPHONY_ERR_UNINIT);
     std::string eventName = "abc";

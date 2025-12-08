@@ -313,6 +313,24 @@ public:
      */
     virtual int32_t UpdateVoipEventInfo(const VoipCallEventInfo &info) = 0;
 
+#ifdef SUPPORT_RTT_CALL
+    /**
+     * @brief handle RTT call evt changed
+     *
+     * @param rttEventInfo[in], contains voipCallEvent
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t HandleRttEvtChanged(const RttEventInfo &rttEventInfo) = 0;
+
+    /**
+     * @brief report the RTT call error event
+     *
+     * @param info[in], contains voipCallEvent
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t HandleRttErrReport(const RttErrorInfo &rttErrorInfo) = 0;
+#endif
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallStatusCallback");
 };

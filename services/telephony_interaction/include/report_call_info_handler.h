@@ -36,6 +36,9 @@ public:
     int32_t ReceiveImsCallModeRequest(const CallModeReportInfo &response);
     int32_t ReceiveImsCallModeResponse(const CallModeReportInfo &response);
     int32_t UpdateVoipEventInfo(const VoipCallEventInfo &info);
+#ifdef SUPPORT_RTT_CALL
+    void UnInitRttManager();
+#endif
 
 private:
     void BuildCallDetailsInfo(CallDetailsInfo &info, CallDetailsInfo &callDetailsInfo);

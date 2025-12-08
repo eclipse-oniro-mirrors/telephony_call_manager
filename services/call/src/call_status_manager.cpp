@@ -59,6 +59,7 @@
 #include "uri.h"
 #include "voip_call.h"
 #include "want_params_wrapper.h"
+#include "ims_rtt_errcode.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -267,6 +268,9 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
         for (const auto &it3 : info.callVec) {
             if (it2.index == it3.index) {
                 TELEPHONY_LOGI("state:%{public}d", it2.state);
+                if (it3.state == TelCallState::CALL_STATUS_ACTIVE) {
+                    InitRttManager(it3.index, it3.rttState, it3.rttChannelId);
+                }
                 flag = true;
                 break;
             }
@@ -483,6 +487,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     HandleVideoCallInAdvsecMode(call, info);
     AddOneCallObject(call);
     StartInComingCallMotionRecognition();
+
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
@@ -890,6 +895,11 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     } else {
         TELEPHONY_LOGI("SubCallSeparateFromConference fail!");
     }
+#ifdef SUPPORT_RTT_CALL
+    TELEPHONY_LOGI("Ready to init Rtt Manager when ActiveHandle, callId: %{public}d, channelId: %{public}d",
+        call->GetCallID(), info.rttChannelId);
+    InitRttManager(call->GetCallID(), info.rttState, info.rttChannelId);
+#endif
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
@@ -1343,6 +1353,10 @@ void CallStatusManager::HandleHoldCallOrAutoAnswerCall(const sptr<CallBase> call
         }
     }
     DeleteOneCallObject(call->GetCallID());
+    TELEPHONY_LOGI("Ready to uninitialized RttManager when HandleHoldCallOrAutoAnswerCall");
+#ifdef SUPPORT_RTT_CALL
+    UnInitRttManager();
+#endif
     int32_t dsdsMode = DSDS_MODE_V2;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
     if (dsdsMode == DSDS_MODE_V3) {
@@ -1580,6 +1594,11 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
     }
     if (call->GetCallType() == CallType::TYPE_IMS) {
         call->SetCrsType(info.crsType);
+#ifdef SUPPORT_RTT_CALL
+        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+        imsCall->SetRttState(info.rttState);
+        imsCall->SetRttChannelId(info.rttChannelId);
+#endif
     }
     if (call->GetCallType() == info.callType) {
         TELEPHONY_LOGI("RefreshCallIfNecessary not need Refresh");
@@ -1798,6 +1817,10 @@ sptr<CallBase> CallStatusManager::CreateNewCallByCallType(
             if (callPtr->GetCallType() == CallType::TYPE_IMS) {
                 sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
                 imsCall->InitVideoCall();
+#ifdef SUPPORT_RTT_CALL
+                imsCall->SetRttState(info.rttState);
+                imsCall->SetRttChannelId(info.rttChannelId);
+#endif
             }
             break;
         }
@@ -2585,5 +2608,49 @@ void CallStatusManager::PackVoipCallInfo(DialParaInfo &paraInfo, const CallDetai
         paraInfo.voipCallInfo.uid = info.voipCallInfo.uid;
     }
 }
+
+#ifdef SUPPORT_RTT_CALL
+void CallStatusManager::InitRttManager(int32_t callId, RttCallState rttState, int32_t channelId)
+{
+    if (rttState != RttCallState::RTT_STATE_YES) {
+        TELEPHONY_LOGI("cannot InitRttManager, rttState: %{public}d", rttState);
+        return;
+    }
+
+    if (rttManager_ != nullptr) {
+        TELEPHONY_LOGI("RttManager already initialized, refresh callId: %{public}d, channelId: %{public}d",
+            callId, channelId);
+        rttManager_->SetCallID(callId);
+        rttManager_->SetChannelID(channelId);
+        return;
+    }
+
+    TELEPHONY_LOGI("callId: %{public}d, channelId: %{public}d", callId, channelId);
+    rttManager_ = std::make_shared<ImsRttManager>(callId, channelId);
+    rttManager_->InitRtt();
+}
+
+void CallStatusManager::UnInitRttManager()
+{
+    TELEPHONY_LOGI("Start to UnInitRttManager");
+    if (rttManager_ == nullptr) {
+        TELEPHONY_LOGI("RttManager already un-initialized");
+        return;
+    }
+
+    rttManager_->DestroyRtt();
+    rttManager_ = nullptr;
+}
+
+int32_t CallStatusManager::SendRttMessage(const std::string &rttMessage)
+{
+    if (rttManager_ != nullptr) {
+        return rttManager_->SendRttMessage(rttMessage);
+    } else {
+        TELEPHONY_LOGE("rttManager_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

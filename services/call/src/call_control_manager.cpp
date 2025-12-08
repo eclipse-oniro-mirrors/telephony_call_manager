@@ -213,6 +213,7 @@ void CallControlManager::PackageDialInformation(AppExecFwk::PacMap &extras, std:
     dialSrcInfo_.number = accountNumber;
     dialSrcInfo_.isDialing = true;
     dialSrcInfo_.isEcc = isEcc;
+    dialSrcInfo_.isRTT = extras.GetBooleanValue("isRTT");
     dialSrcInfo_.callType = (CallType)extras.GetIntValue("callType");
     dialSrcInfo_.accountId = extras.GetIntValue("accountId");
     dialSrcInfo_.dialType = (DialType)extras.GetIntValue("dialType");
@@ -223,7 +224,7 @@ void CallControlManager::PackageDialInformation(AppExecFwk::PacMap &extras, std:
     extras_ = extras;
 }
 
-int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
+int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState, bool isRTT)
 {
     StopFlashRemind();
 #ifdef NOT_SUPPORT_MULTICALL
@@ -278,16 +279,16 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
         return ret;
     }
     CallManagerHisysevent::WriteVoipCallStatisticalEvent(callId, "MtBannerAnswer");
-    return HandlerAnswerCall(callId, videoState);
+    return HandlerAnswerCall(callId, videoState, isRTT);
 }
 
-int32_t CallControlManager::HandlerAnswerCall(int32_t callId, int32_t videoState)
+int32_t CallControlManager::HandlerAnswerCall(int32_t callId, int32_t videoState, bool isRTT)
 {
     if (CallRequestHandlerPtr_ == nullptr) {
         TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int ret = CallRequestHandlerPtr_->AnswerCall(callId, videoState);
+    int ret = CallRequestHandlerPtr_->AnswerCall(callId, videoState, isRTT);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("AnswerCall failed!");
         return ret;
@@ -1142,9 +1143,10 @@ int32_t CallControlManager::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallControlManager::StartRtt(int32_t callId, std::u16string &msg)
+#ifdef SUPPORT_RTT_CALL
+int32_t CallControlManager::StartRtt(int32_t callId)
 {
-    int32_t ret = CallPolicy::StartRttPolicy(callId);
+    int32_t ret = CallPolicy::RttCallModifyPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("NO IMS call,can not StartRtt!");
         return ret;
@@ -1153,7 +1155,7 @@ int32_t CallControlManager::StartRtt(int32_t callId, std::u16string &msg)
         TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = CallRequestHandlerPtr_->StartRtt(callId, msg);
+    ret = CallRequestHandlerPtr_->StartRtt(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("StartRtt failed!");
         return ret;
@@ -1163,7 +1165,7 @@ int32_t CallControlManager::StartRtt(int32_t callId, std::u16string &msg)
 
 int32_t CallControlManager::StopRtt(int32_t callId)
 {
-    int32_t ret = CallPolicy::StopRttPolicy(callId);
+    int32_t ret = CallPolicy::RttCallModifyPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("NO IMS call,no need StopRtt!");
         return ret;
@@ -1179,6 +1181,22 @@ int32_t CallControlManager::StopRtt(int32_t callId)
     }
     return TELEPHONY_SUCCESS;
 }
+
+int32_t CallControlManager::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
+{
+    int32_t ret = CallPolicy::RttCallModifyPolicy(callId);
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    ret = CallRequestHandlerPtr_->UpdateImsRttCallMode(callId, mode);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateImsRttCallMode failed!");
+        return ret;
+    }
+    return TELEPHONY_SUCCESS;
+}
+#endif
 
 int32_t CallControlManager::JoinConference(int32_t callId, std::vector<std::u16string> &numberList)
 {
@@ -1771,7 +1789,7 @@ void CallControlManager::AcquireDisconnectedLock()
     }
 #endif
 }
- 
+
 void CallControlManager::ReleaseDisconnectedLock()
 {
 #ifdef ABILITY_POWER_SUPPORT
@@ -2243,5 +2261,22 @@ bool CallControlManager::EndCall()
     }
     return ret == TELEPHONY_SUCCESS;
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t CallControlManager::SetRttCapability(int32_t slotId, bool isEnable)
+{
+    int32_t ret = CallPolicy::SetRttCapabilityPolicy(slotId, isEnable);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SetRttCapability failed!");
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        return callSettingManagerPtr_->SetRttCapability(slotId, isEnable);
+    } else {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

@@ -29,8 +29,8 @@ public:
 
     int32_t DialRequest();
     int32_t HandleDialRequest(DialParaInfo &info);
-    void AnswerRequest(int32_t callId, int32_t videoState);
-    void AnswerRequestForDsda(sptr<CallBase> call, int32_t callId, int32_t videoState);
+    void AnswerRequest(int32_t callId, int32_t videoState, bool isRTT = false);
+    void AnswerRequestForDsda(sptr<CallBase> call, int32_t callId, int32_t videoState, bool isRTT = false);
     void RejectRequest(int32_t callId, bool isSendSms, std::string &content);
     void HangUpRequest(int32_t callId);
     bool HangUpForDsdaRequest(sptr<CallBase> call);
@@ -41,8 +41,10 @@ public:
     void CombineConferenceRequest(int32_t mainCallId);
     void SeparateConferenceRequest(int32_t callId);
     void KickOutFromConferenceRequest(int32_t callId);
-    void StartRttRequest(int32_t callId, std::u16string &msg);
+#ifdef SUPPORT_RTT_CALL
+    void StartRttRequest(int32_t callId);
     void StopRttRequest(int32_t callId);
+#endif
     void JoinConference(int32_t callId, std::vector<std::string> &numberList);
     bool IsDsdsMode3();
     bool IsDsdsMode5();
@@ -65,6 +67,9 @@ public:
         sptr<CallBase> call, int32_t activeCallNum, int32_t slotId, int32_t videoState, sptr<CallBase> incomingCall);
     void IsExistCallOtherSlot(std::list<int32_t> &list, int32_t slotId, bool &noOtherCall);
     int32_t HandleDialingInfo(std::string newPhoneNum, DialParaInfo &info);
+#ifdef SUPPORT_RTT_CALL
+    void UpdateImsRttCallModeRequest(int32_t callId, ImsRTTCallMode mode);
+#endif
 
 private:
     int32_t CarrierDialProcess(DialParaInfo &info);

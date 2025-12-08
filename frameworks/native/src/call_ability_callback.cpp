@@ -170,5 +170,34 @@ int32_t CallAbilityCallback::OnPhoneStateChange(int32_t numActive, int32_t numHe
     }
     return TELEPHONY_SUCCESS;
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t CallAbilityCallback::OnReportRttCallEvtChanged(const RttEvent &info)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnReportRttCallEvtChanged(info);
+    }
+    return TELEPHONY_SUCCESS;    
+}
+
+int32_t CallAbilityCallback::OnReportRttCallError(const RttError &info)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnReportRttCallError(info);
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallback::OnReportRttCallMessage(AppExecFwk::PacMap &msgResult)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnReportRttCallMessage(msgResult);
+    }
+    return TELEPHONY_SUCCESS;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

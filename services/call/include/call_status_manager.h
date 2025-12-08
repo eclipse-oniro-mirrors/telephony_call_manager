@@ -25,6 +25,9 @@
 #include "call_incoming_filter_manager.h"
 #include "time_wait_helper.h"
 #include "voip_call_manager_info.h"
+#ifdef SUPPORT_RTT_CALL
+#include "ims_rtt_manager.h"
+#endif
 
 /**
  * Singleton
@@ -71,6 +74,11 @@ public:
     static int32_t GetDevProvisioned();
     static void RegisterObserver();
     static void UpdateDevProvisioned();
+#ifdef SUPPORT_RTT_CALL
+    int32_t SendRttMessage(const std::string &rttMessage);
+    void InitRttManager(int32_t callId, RttCallState rttState, int32_t channelId);
+    void UnInitRttManager();
+#endif
 
 private:
     void InitCallBaseEvent();
@@ -150,6 +158,7 @@ private:
     int32_t HandleCallReportInfoEx(const CallDetailInfo &info);
     void ClearPendingState(sptr<CallBase> &call);
     void RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason, const std::string &message);
+
 #ifdef NOT_SUPPORT_MULTICALL
     void AutoAnswerSecondCall();
 #endif
@@ -181,6 +190,9 @@ private:
     const std::string IS_DELETED = "is_deleted";
     const int32_t CALL_NUMBER = 2;
     std::unique_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
+#ifdef SUPPORT_RTT_CALL
+    std::shared_ptr<ImsRttManager> rttManager_{nullptr};
+#endif
     std::chrono::system_clock::time_point detectStartTime = std::chrono::system_clock::from_time_t(0);
     int32_t antiFraudSlotId_ = -1;
     int32_t antiFraudIndex_ = -1;

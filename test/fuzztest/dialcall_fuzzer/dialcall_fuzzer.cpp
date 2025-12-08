@@ -229,6 +229,7 @@ int32_t JoinConference(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnJoinConference(messageParcel, reply);
 }
 
+#ifdef SUPPORT_RTT_CALL
 int32_t StartRtt(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -244,6 +245,7 @@ int32_t StartRtt(const uint8_t *data, size_t size)
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnStartRtt(messageParcel, reply);
 }
+#endif
 
 int32_t InputDialerSpecialCode(const uint8_t *data, size_t size)
 {
@@ -302,7 +304,9 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     SetCallWaiting(data, size);
     SetCallRestriction(data, size);
     JoinConference(data, size);
+#ifdef SUPPORT_RTT_CALL
     StartRtt(data, size);
+#endif
     InputDialerSpecialCode(data, size);
     CancelCallUpgrade(data, size);
     RequestCameraCapabilities(data, size);

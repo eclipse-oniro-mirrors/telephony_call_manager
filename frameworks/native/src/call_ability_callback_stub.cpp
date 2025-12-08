@@ -57,6 +57,14 @@ CallAbilityCallbackStub::CallAbilityCallbackStub()
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCameraCapabilities(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_PHONE_STATE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdatePhoneState(data, reply); };
+#ifdef SUPPORT_RTT_CALL
+    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::RTT_CALL_EVENT_CHANGE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateRttCallEvent(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::RTT_CALL_ERROR_REPORT)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateRttCallErrorReport(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::RTT_CALL_SEND_MESSAGE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateRttCallMessage(data, reply); };  
+#endif      
 }
 
 CallAbilityCallbackStub::~CallAbilityCallbackStub() {}
@@ -178,15 +186,9 @@ int32_t CallAbilityCallbackStub::OnUpdateAysncResults(MessageParcel &data, Messa
             resultInfo.PutIntValue("action", data.ReadInt32());
             resultInfo.PutIntValue("clirStat", data.ReadInt32());
             break;
-        case CallResultReportId::START_RTT_REPORT_ID:
-            resultInfo.PutIntValue("active", data.ReadInt32());
-            break;
         case CallResultReportId::GET_IMS_CONFIG_REPORT_ID:
         case CallResultReportId::GET_IMS_FEATURE_VALUE_REPORT_ID:
             resultInfo.PutIntValue("value", data.ReadInt32());
-            break;
-        case CallResultReportId::STOP_RTT_REPORT_ID:
-            resultInfo.PutIntValue("inactive", data.ReadInt32());
             break;
         default:
             break;
@@ -444,5 +446,63 @@ int32_t CallAbilityCallbackStub::OnUpdatePhoneState(MessageParcel &data, Message
     }
     return TELEPHONY_SUCCESS;
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t CallAbilityCallbackStub::OnUpdateRttCallEvent(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_SUCCESS;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+
+    RttEvent eventInfo;
+    eventInfo.callId = data.ReadInt32();
+    eventInfo.eventType = data.ReadInt32();
+    eventInfo.reason = data.ReadInt32();
+    result = OnReportRttCallEvtChanged(eventInfo);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallbackStub::OnUpdateRttCallErrorReport(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_SUCCESS;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+
+    RttError errInfo;
+    errInfo.callId = data.ReadInt32();
+    errInfo.causeCode = data.ReadInt32();
+    errInfo.operationType = data.ReadInt32();
+    errInfo.reasonText = data.ReadString();
+    result = OnReportRttCallError(errInfo);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallbackStub::OnUpdateRttCallMessage(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_SUCCESS;
+    AppExecFwk::PacMap resultInfo;
+    resultInfo.PutIntValue("callId", data.ReadInt32());
+    resultInfo.PutStringValue("rttMessage", data.ReadString());
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    result = OnReportRttCallMessage(resultInfo);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

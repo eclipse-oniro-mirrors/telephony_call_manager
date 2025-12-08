@@ -280,8 +280,10 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, TestSize.Level0
     ASSERT_EQ(client->IsImsSwitchEnabled(SIM1_SLOTID, boolValue), TELEPHONY_ERR_UNINIT);
     ASSERT_EQ(client->SetVoNRState(SIM1_SLOTID, value), TELEPHONY_ERR_UNINIT);
     ASSERT_EQ(client->GetVoNRState(SIM1_SLOTID, value), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->StartRtt(g_newCallId, str), TELEPHONY_ERR_UNINIT);
+#ifdef SUPPORT_RTT_CALL
+    ASSERT_EQ(client->StartRtt(g_newCallId), TELEPHONY_ERR_UNINIT);
     ASSERT_EQ(client->StopRtt(g_newCallId), TELEPHONY_ERR_UNINIT);
+#endif
     std::vector<std::u16string> numberList;
     ASSERT_EQ(client->JoinConference(g_newCallId, numberList), TELEPHONY_ERR_UNINIT);
     std::vector<OttCallDetailsInfo> ottVec;

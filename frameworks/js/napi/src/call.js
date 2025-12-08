@@ -203,7 +203,9 @@ export default {
     CallState: call.CallState,
     EmergencyNumberOptions: call.EmergencyNumberOptions,
     NumberFormatOptions: call.NumberFormatOptions,
-    startRTT: call.startRTT,
-    stopRTT: call.stopRTT,
-    sendUssdResponse: call.sendUssdResponse
+    startRtt: call.startRtt,
+    stopRtt: call.stopRtt,
+    sendUssdResponse: call.sendUssdResponse,
+    sendRttMessage: call.sendRttMessage,
+    setRttCapability: call.setRttCapability
 };

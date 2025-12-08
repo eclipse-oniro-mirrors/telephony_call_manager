@@ -104,9 +104,9 @@ int32_t IMSCall::DialingProcess()
     return CarrierDialingProcess();
 }
 
-int32_t IMSCall::AnswerCall(int32_t videoState)
+int32_t IMSCall::AnswerCall(int32_t videoState, bool isRTT)
 {
-    return CarrierAnswerCall(videoState);
+    return CarrierAnswerCall(videoState, isRTT);
 }
 
 int32_t IMSCall::RejectCall()
@@ -134,7 +134,8 @@ int32_t IMSCall::SwitchCall()
     return CarrierSwitchCall();
 }
 
-int32_t IMSCall::StartRtt(std::u16string &msg)
+#ifdef SUPPORT_RTT_CALL
+int32_t IMSCall::StartRtt(int32_t callId)
 {
     CellularCallInfo callInfo;
     int32_t ret = PackCellularCallInfo(callInfo);
@@ -142,7 +143,7 @@ int32_t IMSCall::StartRtt(std::u16string &msg)
         TELEPHONY_LOGW("PackCellularCallInfo failed!");
         return ret;
     }
-    ret = DelayedSingleton<CellularCallConnection>::GetInstance()->StartRtt(callInfo, msg);
+    ret = DelayedSingleton<CellularCallConnection>::GetInstance()->StartRtt(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("StartRtt failed!");
         return CALL_ERR_STARTRTT_FAILED;
@@ -150,7 +151,7 @@ int32_t IMSCall::StartRtt(std::u16string &msg)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t IMSCall::StopRtt()
+int32_t IMSCall::StopRtt(int32_t callId)
 {
     CellularCallInfo callInfo;
     int32_t ret = PackCellularCallInfo(callInfo);
@@ -166,6 +167,23 @@ int32_t IMSCall::StopRtt()
     return TELEPHONY_SUCCESS;
 }
 
+int32_t IMSCall::UpdateImsRttCallMode(ImsRTTCallMode mode)
+{
+    CellularCallInfo callInfo;
+    int32_t ret = PackCellularCallInfo(callInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGW("PackCellularCallInfo failed!");
+        return ret;
+    }
+    ret = DelayedSingleton<CellularCallConnection>::GetInstance()->UpdateImsRttCallMode(callInfo, mode);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateImsRttCallMode failed!");
+        return CALL_ERR_STOPRTT_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
+}
+#endif
+
 int32_t IMSCall::SetMute(int32_t mute, int32_t slotId)
 {
     return CarrierSetMute(mute, slotId);
@@ -174,6 +192,9 @@ int32_t IMSCall::SetMute(int32_t mute, int32_t slotId)
 void IMSCall::GetCallAttributeInfo(CallAttributeInfo &info)
 {
     GetCallAttributeCarrierInfo(info);
+#ifdef SUPPORT_RTT_CALL
+    info.rttState = rttState_;
+#endif
 }
 
 int32_t IMSCall::CombineConference()
@@ -518,5 +539,27 @@ bool IMSCall::IsVoiceModifyToVideo()
     }
     return false;
 }
+
+#ifdef SUPPORT_RTT_CALL
+void IMSCall::SetRttState(RttCallState rttState)
+{
+    rttState_ = rttState;
+}
+
+void IMSCall::SetRttChannelId(int32_t rttChannelId)
+{
+    rttChannelId_ = rttChannelId;
+}
+
+RttCallState IMSCall::GetRttState()
+{
+    return rttState_;
+}
+
+int32_t IMSCall::GetRttChannelId()
+{
+    return rttChannelId_;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

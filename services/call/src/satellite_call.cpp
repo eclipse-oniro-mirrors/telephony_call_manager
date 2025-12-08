@@ -31,7 +31,7 @@ int32_t SatelliteCall::DialingProcess()
     return CarrierDialingProcess();
 }
 
-int32_t SatelliteCall::AnswerCall(int32_t videoState)
+int32_t SatelliteCall::AnswerCall(int32_t videoState, bool isRTT)
 {
     return CarrierAnswerCall(videoState);
 }

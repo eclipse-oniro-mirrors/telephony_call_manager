@@ -111,8 +111,10 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallStatusCallbackStub_001, TestSize.Level0)
     callStatusCallback->OnUpdateSetRestrictionPasswordResult(dataParcel2, reply);
     callStatusCallback->OnUpdateSetTransferResult(dataParcel2, reply);
     callStatusCallback->OnUpdateSetCallClirResult(dataParcel2, reply);
+#ifdef SUPPORT_RTT_CALL
     callStatusCallback->OnStartRttResult(dataParcel2, reply);
     callStatusCallback->OnStopRttResult(dataParcel2, reply);
+#endif
     callStatusCallback->OnSetImsConfigResult(dataParcel2, reply);
     callStatusCallback->OnSetImsFeatureValueResult(dataParcel2, reply);
     callStatusCallback->OnInviteToConferenceResult(dataParcel2, reply);
@@ -162,6 +164,14 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallStatusCallbackStub_002, TestSize.Level0)
     dataParce6.WriteInt32(0);
     dataParce6.WriteInt32(0);
     ASSERT_EQ(callStatusCallback->OnUpdateVoipEventInfo(dataParce6, reply), TELEPHONY_SUCCESS);
+
+#ifdef SUPPORT_RTT_CALL
+    int32_t ret = -100;
+    RttEventInfo rttInfo;
+    RttErrorInfo rttErrorInfo;
+    EXPECT_NE(callStatusCallback->HandleRttEvtChanged(rttInfo), ret);
+    EXPECT_NE(callStatusCallback->HandleRttErrReport(rttErrorInfo), ret);
+#endif
 }
 
 HWTEST_F(ZeroBranch7Test, Telephony_FoldStatusManager_001, TestSize.Level1)
@@ -608,13 +618,17 @@ HWTEST_F(ZeroBranch7Test, Telephony_IMSCall_001, Function | MediumTest | Level1)
         call->accountNumber_ += "1";
     }
     std::u16string msg = u"";
-    EXPECT_EQ(call->StartRtt(msg), CALL_ERR_NUMBER_OUT_OF_RANGE);
-    EXPECT_EQ(call->StopRtt(), CALL_ERR_NUMBER_OUT_OF_RANGE);
+#ifdef SUPPORT_RTT_CALL
+    EXPECT_EQ(call->StartRtt(call->GetCallID()), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_EQ(call->StopRtt(call->GetCallID()), CALL_ERR_NUMBER_OUT_OF_RANGE);
+#endif
     EXPECT_EQ(call->SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY), CALL_ERR_NUMBER_OUT_OF_RANGE);
     EXPECT_EQ(call->SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY), CALL_ERR_NUMBER_OUT_OF_RANGE);
     call->accountNumber_ = "111";
-    EXPECT_GT(call->StartRtt(msg), TELEPHONY_ERROR);
-    EXPECT_GT(call->StopRtt(), TELEPHONY_ERROR);
+#ifdef SUPPORT_RTT_CALL
+    EXPECT_GT(call->StartRtt(call->GetCallID()), TELEPHONY_ERROR);
+    EXPECT_GT(call->StopRtt(call->GetCallID()), TELEPHONY_ERROR);
+#endif
     EXPECT_GT(call->SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERROR);
     EXPECT_GT(call->SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERROR);
     call->SetCallId(-2);
