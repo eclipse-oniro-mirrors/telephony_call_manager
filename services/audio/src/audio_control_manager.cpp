@@ -337,6 +337,42 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
     StopWaitingTone();
 }
 
+bool AudioControlManager::PreHandleAnswerdState(
+    sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
+{
+    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+    auto callId = callObjectPtr->GetCallID();
+    if (nextState == TelCallState::CALL_STATUS_ANSWERED && priorState == TelCallState::CALL_STATUS_INCOMING) {
+        TELEPHONY_LOGI("user answered, mute ringer instead of release renderer");
+        callStateProcessor->DeleteCall(callId, priorState);
+        callObjectPtr->SetIsAnsweredByPhone(true);
+        MuteRinger();
+        return true;
+    }
+
+    bool isMtCallActived = false;
+    if (nextState == TelCallState::CALL_STATUS_ACTIVE &&
+        (priorState == TelCallState::CALL_STATUS_INCOMING || priorState == TelCallState::CALL_STATUS_WAITING)) {
+        isMtCallActived = true;
+        UnmuteSoundTone();
+    }
+
+    if (callObjectPtr->GetAnsweredByPhone()) {
+        if (isMtCallActived || (nextState == TelCallState::CALL_STATUS_INCOMING && nextState == priorState)) {
+            callStateProcessor->DeleteCall(callId, priorState);
+            TELEPHONY_LOGI("not need into audio state machine");
+            return false;
+        }
+
+        if ((nextState == TelCallState::CALL_STATUS_DISCONNECTING ||
+            nextState == TelCallState::CALL_STATUS_DISCONNECTED)) {
+            callStateProcessor->DeleteCall(callId, TelCallState::CALL_STATUS_ACTIVE);
+        }
+    }
+
+    return true;
+}
+
 void AudioControlManager::HandleCallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
@@ -344,27 +380,11 @@ void AudioControlManager::HandleCallStateUpdated(
         TELEPHONY_LOGE("call object is nullptr");
         return;
     }
-    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
     HILOG_COMM_INFO("HandleCallStateUpdated priorState:%{public}d, nextState:%{public}d", priorState, nextState);
-    if ((nextState == TelCallState::CALL_STATUS_DISCONNECTING || nextState == TelCallState::CALL_STATUS_DISCONNECTED) &&
-        callObjectPtr->GetAnsweredByPhone()) {
-        callStateProcessor->DeleteCall(callObjectPtr->GetCallID(), TelCallState::CALL_STATUS_ACTIVE);
+    if (!PreHandleAnswerdState(callObjectPtr, priorState, nextState)) {
+        return;
     }
-    if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
-        TELEPHONY_LOGI("user answered, mute ringer instead of release renderer");
-        if (priorState == TelCallState::CALL_STATUS_INCOMING) {
-            callStateProcessor->DeleteCall(callObjectPtr->GetCallID(), priorState);
-            callObjectPtr->SetIsAnsweredByPhone(true);
-        }
-        MuteRinger();
-    }
-    if (nextState == TelCallState::CALL_STATUS_ACTIVE &&
-        (priorState == TelCallState::CALL_STATUS_INCOMING || priorState == TelCallState::CALL_STATUS_WAITING)) {
-        UnmuteSoundTone();
-        if (callObjectPtr->GetAnsweredByPhone()) {
-            return;
-        }
-    }
+
     HandleNextState(callObjectPtr, nextState);
     if (priorState == nextState) {
         TELEPHONY_LOGI("prior state equals next state");
@@ -373,6 +393,7 @@ void AudioControlManager::HandleCallStateUpdated(
         }
         return;
     }
+
     HandlePriorState(callObjectPtr, priorState);
 }
 
