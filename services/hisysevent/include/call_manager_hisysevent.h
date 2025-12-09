@@ -51,6 +51,7 @@ enum class IncomingCallType {
 enum class VoIPCallErrorCode {
     REPORTING_DISCONNECTED_VOIP_CALL_AGAIN = 300,
     GET_VOIPCALLMANAGER_INTERFACEPTR_IS_NULL,
+    VIRTUAL_CALL_SET_FAILED,
 };
 class CallManagerHisysevent : public TelephonyHiSysEvent {
 public:

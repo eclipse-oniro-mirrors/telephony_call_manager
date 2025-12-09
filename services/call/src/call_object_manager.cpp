@@ -862,6 +862,7 @@ std::string CallObjectManager::GetCallNumber(TelCallState callState, bool isIncl
                 continue;
             }
             number = (*it)->GetAccountNumber();
+            break;
         }
     }
     return number;
