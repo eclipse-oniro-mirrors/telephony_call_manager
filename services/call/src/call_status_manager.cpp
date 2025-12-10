@@ -634,7 +634,7 @@ int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
     }
     
     call->SetNonVirtualCall(!DelayedSingleton<AudioDeviceManager>::GetInstance()->GetVirtualCall());
-    if (call->isNonVirtualCall()) {
+    if (!call->isNonVirtualCall()) {
         CallManagerHisysevent::WriteVoipCallFaultEvent(info.voipCallInfo.voipCallId, info.voipCallInfo.uid,
             static_cast<int32_t>(VoIPCallErrorCode::VIRTUAL_CALL_SET_FAILED));
     }
@@ -672,7 +672,7 @@ int32_t CallStatusManager::OutgoingVoipCallHandle(const CallDetailInfo &info)
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
     call->SetNonVirtualCall(!DelayedSingleton<AudioDeviceManager>::GetInstance()->GetVirtualCall());
-    if (call->isNonVirtualCall()) {
+    if (!call->isNonVirtualCall()) {
         CallManagerHisysevent::WriteVoipCallFaultEvent(info.voipCallInfo.voipCallId, info.voipCallInfo.uid,
             static_cast<int32_t>(VoIPCallErrorCode::VIRTUAL_CALL_SET_FAILED));
     }
