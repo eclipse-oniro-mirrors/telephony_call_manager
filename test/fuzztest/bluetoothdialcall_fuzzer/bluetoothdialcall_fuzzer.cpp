@@ -197,7 +197,7 @@ void GetCurrentCallList(const uint8_t *data, size_t size)
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnGetCurrentCallList(messageParcel, reply);
 }
-
+#ifdef SUPPORT_HEARING_AID
 void AddAudioDeviceList(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -252,7 +252,7 @@ void ResetBtHearingAidDeviceList(const uint8_t *data, size_t size)
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnResetBtHearingAidDeviceList(messageParcel, reply);
 }
-
+#endif
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -272,10 +272,12 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     StartDtmf(data, size);
     StopDtmf(data, size);
     GetCurrentCallList(data, size);
+#ifdef SUPPORT_HEARING_AID
     AddAudioDeviceList(data, size);
     RemoveAudioDeviceList(data, size);
     ResetNearlinkDeviceList(data, size);
     ResetBtHearingAidDeviceList(data, size);
+#endif
 }
 } // namespace OHOS
 

@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//base/telephony/call_manager/callmanager.gni")
 
 SUBSYSTEM_DIR = "../.."
 config("call_manager_config") {
@@ -97,6 +98,8 @@ ohos_shared_library("tel_call_manager_api") {
   if (device_name == "rk3568") {
     defines += [ "CALL_MANAGER_AUTO_START_OPTIMIZE" ]
   }
+
+  defines += call_manager_defines
 
   part_name = "call_manager"
   innerapi_tags = [ "platformsdk" ]

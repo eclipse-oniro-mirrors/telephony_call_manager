@@ -15,6 +15,7 @@ declare_args() {
   call_manager_feature_hfp_async_enable = false
   call_manager_feature_not_support_multicall = false
   call_manager_feature_support_dsoftbus = true
+  call_manager_feature_support_hearing_aid = true
 }
 
 call_manager_path = "//base/telephony/call_manager"
@@ -342,4 +343,9 @@ if (call_manager_feature_hfp_async_enable) {
 if (call_manager_feature_not_support_multicall) {
   print("not Support multi call.")
   call_manager_defines += [ "NOT_SUPPORT_MULTICALL" ]
+}
+
+if (call_manager_feature_support_hearing_aid) {
+  print("support hearing aid")
+  call_manager_defines += [ "SUPPORT_HEARING_AID" ]
 }

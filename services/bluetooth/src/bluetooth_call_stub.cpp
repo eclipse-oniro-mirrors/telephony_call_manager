@@ -62,8 +62,10 @@ BluetoothCallStub::BluetoothCallStub()
         [this](MessageParcel &data, MessageParcel &reply) { return OnRemoveAudioDeviceList(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_RESET_NEARLINK_AUDIO_DEVICE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnResetNearlinkDeviceList(data, reply); };
+#ifdef SUPPORT_HEARING_AID
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_RESET_BT_HEARINGAID_AUDIO_DEVICE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnResetBtHearingAidDeviceList(data, reply); };
+#endif
 }
 
 BluetoothCallStub::~BluetoothCallStub()
@@ -275,7 +277,7 @@ int32_t BluetoothCallStub::OnResetNearlinkDeviceList(MessageParcel &data, Messag
     }
     return result;
 }
-
+#ifdef SUPPORT_HEARING_AID
 int32_t BluetoothCallStub::OnResetBtHearingAidDeviceList(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = ResetBtHearingAidDeviceList();
@@ -286,5 +288,6 @@ int32_t BluetoothCallStub::OnResetBtHearingAidDeviceList(MessageParcel &data, Me
     }
     return result;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS
