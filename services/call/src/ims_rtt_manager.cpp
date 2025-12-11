@@ -276,7 +276,6 @@ void ImsRttManager::RecvDataFromProxy(std::string &recvMessage)
     recvMessage = reinterpret_cast<char *>(rxInd->data);
     TELEPHONY_LOGI("get rtt data from proxy success, channelId: %{public}d",
         static_cast<int32_t>(rxInd->channelId));
-    recvConditionVar_.notify_one();
 }
 
 void ImsRttManager::DestroyRtt()
