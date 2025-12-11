@@ -268,9 +268,11 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
         for (const auto &it3 : info.callVec) {
             if (it2.index == it3.index) {
                 TELEPHONY_LOGI("state:%{public}d", it2.state);
+#ifdef SUPPORT_RTT_CALL
                 if (it3.state == TelCallState::CALL_STATUS_ACTIVE) {
                     InitRttManager(it3.index, it3.rttState, it3.rttChannelId);
                 }
+#endif
                 flag = true;
                 break;
             }
