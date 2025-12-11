@@ -230,9 +230,11 @@ napi_value NapiCallManager::DeclareAudioDeviceEnum(napi_env env, napi_value expo
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_EARPIECE))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_NEARLINK",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK))),
+#ifdef SUPPORT_HEARING_AID
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_BLUETOOTH_HEARING_AID",
             NapiCallManagerUtils::ToInt32Value(env,
                 static_cast<int32_t>(AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID))),
+#endif
     };
     napi_value result = nullptr;
     napi_define_class(env, "AudioDeviceType", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,

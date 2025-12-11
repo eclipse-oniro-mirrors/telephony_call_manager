@@ -161,12 +161,12 @@ int32_t BluetoothCallProxy::ResetNearlinkDeviceList()
 {
     return SendRequest(BluetoothCallInterfaceCode::INTERFACE_BT_RESET_NEARLINK_AUDIO_DEVICE);
 }
-
+#ifdef SUPPORT_HEARING_AID
 int32_t BluetoothCallProxy::ResetBtHearingAidDeviceList()
 {
     return SendRequest(BluetoothCallInterfaceCode::INTERFACE_BT_RESET_BT_HEARINGAID_AUDIO_DEVICE);
 }
-
+#endif
 int32_t BluetoothCallProxy::SendRequest(BluetoothCallInterfaceCode code)
 {
     MessageParcel dataParcel;

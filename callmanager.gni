@@ -16,6 +16,7 @@ declare_args() {
   call_manager_feature_not_support_multicall = false
   call_manager_feature_support_dsoftbus = true
   call_manager_feature_support_rtt = false
+  call_manager_feature_support_hearing_aid = true
 }
 
 call_manager_path = "//base/telephony/call_manager"
@@ -350,4 +351,9 @@ if (call_manager_feature_support_rtt) {
   call_manager_sources += [
     "${call_manager_path}/services/call/src/ims_rtt_manager.cpp"
   ]
+}
+
+if (call_manager_feature_support_hearing_aid) {
+  print("support hearing aid")
+  call_manager_defines += [ "SUPPORT_HEARING_AID" ]
 }
