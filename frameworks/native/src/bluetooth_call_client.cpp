@@ -337,12 +337,16 @@ int32_t BluetoothCallClient::RemoveAudioDevice(const std::string &address, Audio
 
 int32_t BluetoothCallClient::ResetHearingAidDeviceList()
 {
+#ifdef SUPPORT_HEARING_AID
     if (g_bluetoothCallProxyPtr == nullptr) {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
 
     return g_bluetoothCallProxyPtr->ResetBtHearingAidDeviceList();
+#else
+    return TELEPHONY_ERR_FAIL;
+#endif
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -174,7 +174,7 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t ResetNearlinkDeviceList() override;
-
+#ifdef SUPPORT_HEARING_AID
     /**
      * ResetBtHearingAidDeviceList
      *
@@ -182,7 +182,7 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t ResetBtHearingAidDeviceList() override;
-
+#endif
 private:
     int32_t SendRequest(BluetoothCallInterfaceCode code);
     int32_t SendRequest(BluetoothCallInterfaceCode code, MessageParcel &dataParcel, MessageParcel &replyParcel);

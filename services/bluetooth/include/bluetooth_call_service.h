@@ -162,7 +162,7 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t ResetNearlinkDeviceList() override;
-
+#ifdef SUPPORT_HEARING_AID
     /**
      * ResetBtHearingAidDeviceList
      *
@@ -170,6 +170,7 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t ResetBtHearingAidDeviceList() override;
+#endif
 
 private:
     std::vector<int32_t> getCallInfoNum(int32_t &callState, std::string &number);

@@ -428,7 +428,9 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallStub_001, TestSize.Level0)
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
     result = bluetoothCallService->OnResetNearlinkDeviceList(messageParcel, reply);
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+#ifdef SUPPORT_HEARING_AID
     result = bluetoothCallService->OnResetBtHearingAidDeviceList(messageParcel, reply);
+#endif
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
 

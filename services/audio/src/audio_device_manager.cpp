@@ -329,7 +329,7 @@ void AudioDeviceManager::ResetNearlinkAudioDevicesList()
     }
     TELEPHONY_LOGI("ResetNearlinkAudioDevicesList success");
 }
-
+#ifdef SUPPORT_HEARING_AID
 void AudioDeviceManager::ResetBtHearingAidDeviceList()
 {
     std::unique_lock<ffrt::mutex> lock(infoMutex_);
@@ -353,7 +353,7 @@ void AudioDeviceManager::ResetBtHearingAidDeviceList()
     }
     TELEPHONY_LOGI("ResetBtHearingAidDeviceList success");
 }
-
+#endif
 bool AudioDeviceManager::InitAudioDevice()
 {
     // when audio deactivate interrupt , reinit
@@ -428,9 +428,11 @@ bool AudioDeviceManager::SwitchDevice(AudioDeviceType device, bool isSetAudioDev
         case AudioDeviceType::DEVICE_NEARLINK:
             result = EnableNearlink();
             break;
+#ifdef SUPPORT_HEARING_AID
         case AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID:
             result = EnableBtHearingAid();
             break;
+#endif
         default:
             break;
     }
@@ -496,7 +498,7 @@ bool AudioDeviceManager::EnableNearlink()
     TELEPHONY_LOGI("enable nearlink device failed");
     return false;
 }
-
+#ifdef SUPPORT_HEARING_AID
 bool AudioDeviceManager::EnableBtHearingAid()
 {
     AudioDevice device;
@@ -508,7 +510,7 @@ bool AudioDeviceManager::EnableBtHearingAid()
     TELEPHONY_LOGI("enable bt hearing aid device failed");
     return false;
 }
-
+#endif
 bool AudioDeviceManager::DisableAll()
 {
     audioDeviceType_ = AudioDeviceType::DEVICE_UNKNOWN;
@@ -614,9 +616,17 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
         address = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallDeviceAddr();
     } else if (audioDeviceType_ == AudioDeviceType::DEVICE_NEARLINK) {
         UpdateNearlinkDevice(address, deviceName);
-    } else if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID) {
+    }
+#ifdef SUPPORT_HEARING_AID
+    else if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID) {
         UpdateBtHearingAidDevice(address, deviceName);
     }
+#endif
+    return CopyDeviceData(address, deviceName);
+}
+
+int32_t AudioDeviceManager::CopyDeviceData(const std::string &address, const std::string &deviceName)
+{
     if (address.length() > kMaxAddressLen) {
         TELEPHONY_LOGE("address is not too long");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
@@ -673,7 +683,7 @@ void AudioDeviceManager::UpdateNearlinkDevice(std::string &address, std::string 
     address = device.address;
     deviceName = device.deviceName;
 }
-
+#ifdef SUPPORT_HEARING_AID
 void AudioDeviceManager::UpdateBtHearingAidDevice(std::string &address, std::string &deviceName)
 {
     if (!address.empty() && !deviceName.empty()) {
@@ -688,7 +698,7 @@ void AudioDeviceManager::UpdateBtHearingAidDevice(std::string &address, std::str
     address = device.address;
     deviceName = device.deviceName;
 }
-
+#endif
 int32_t AudioDeviceManager::ReportAudioDeviceInfo()
 {
     sptr<CallBase> liveCall = CallObjectManager::GetAudioLiveCall();
@@ -699,8 +709,11 @@ std::string AudioDeviceManager::ConvertAddress()
 {
     std::string addr = info_.currentAudioDevice.address;
     if (info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
-        info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_NEARLINK ||
-        info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID) {
+        info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_NEARLINK
+#ifdef SUPPORT_HEARING_AID
+        || info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID
+#endif
+    ) {
         if (!addr.empty() && addr.length() > DEVICE_ADDR_LEN) {
             return (addr.substr(0, ADDR_HEAD_VALID_LEN) + ":*:*:*:" +
                 addr.substr(addr.length() - ADDR_TAIL_VALID_LEN));
@@ -798,7 +811,7 @@ bool AudioDeviceManager::IsNearlinkActived(AudioDevice &device)
     }
     return true;
 }
-
+#ifdef SUPPORT_HEARING_AID
 bool AudioDeviceManager::IsBtHearingAidActived(AudioDevice &device)
 {
     if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device) != TELEPHONY_SUCCESS) {
@@ -809,7 +822,7 @@ bool AudioDeviceManager::IsBtHearingAidActived(AudioDevice &device)
     }
     return true;
 }
-
+#endif
 bool AudioDeviceManager::IsDistributedCallConnected()
 {
     return isDCallDevConnected_;
