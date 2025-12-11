@@ -342,12 +342,14 @@ bool AudioControlManager::PreHandleAnswerdState(
 {
     auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
     auto callId = callObjectPtr->GetCallID();
-    if (nextState == TelCallState::CALL_STATUS_ANSWERED && priorState == TelCallState::CALL_STATUS_INCOMING) {
-        TELEPHONY_LOGI("user answered, mute ringer instead of release renderer");
-        callStateProcessor->DeleteCall(callId, priorState);
-        callObjectPtr->SetIsAnsweredByPhone(true);
-        MuteRinger();
-        return true;
+    if (!callObjectPtr->GetAnsweredByPhone()) {
+        if (nextState == TelCallState::CALL_STATUS_ANSWERED && priorState == TelCallState::CALL_STATUS_INCOMING) {
+            TELEPHONY_LOGI("user answered, mute ringer instead of release renderer");
+            callStateProcessor->DeleteCall(callId, priorState);
+            callObjectPtr->SetIsAnsweredByPhone(true);
+            MuteRinger();
+            return true;
+        }
     }
 
     bool isMtCallActived = false;
@@ -358,14 +360,15 @@ bool AudioControlManager::PreHandleAnswerdState(
     }
 
     if (callObjectPtr->GetAnsweredByPhone()) {
-        if (isMtCallActived || (nextState == TelCallState::CALL_STATUS_INCOMING && nextState == priorState)) {
+        if (isMtCallActived || (nextState == TelCallState::CALL_STATUS_INCOMING && nextState == priorState) ||
+            (nextState == TelCallState::CALL_STATUS_ANSWERED && priorState == TelCallState::CALL_STATUS_INCOMING)) {
             callStateProcessor->DeleteCall(callId, priorState);
             TELEPHONY_LOGI("not need into audio state machine");
             return false;
         }
 
-        if ((nextState == TelCallState::CALL_STATUS_DISCONNECTING ||
-            nextState == TelCallState::CALL_STATUS_DISCONNECTED)) {
+        if (nextState == TelCallState::CALL_STATUS_DISCONNECTING ||
+            nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
             callStateProcessor->DeleteCall(callId, TelCallState::CALL_STATUS_ACTIVE);
         }
     }
