@@ -824,10 +824,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_StartRtt_0100, TestSize.Level0)
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
-
-    std::u16string msg = u"123";
+#ifdef SUPPORT_RTT_CALL
     int32_t callId = 1;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->StartRtt(callId, msg), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->StartRtt(callId), RETURN_VALUE_IS_ZERO);
+#endif
 }
 
 /********************************************* Test StopRtt() ************************************************/
@@ -842,8 +842,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_StopRtt_0100, TestSize.Level0)
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
+#ifdef SUPPORT_RTT_CALL
     int32_t callId = 1;
     EXPECT_EQ(CallManagerGtest::clientPtr_->StopRtt(callId), RETURN_VALUE_IS_ZERO);
+#endif
 }
 
 /**************************************** Test CanSetCallTransferTime() ******************************************/

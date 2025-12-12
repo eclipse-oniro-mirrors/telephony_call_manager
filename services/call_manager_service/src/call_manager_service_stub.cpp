@@ -229,10 +229,14 @@ void CallManagerServiceStub::InitImsServiceRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoNRState(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VONR_STATE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoNRState(data, reply); };
+#ifdef SUPPORT_RTT_CALL
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_START_RTT)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnStartRtt(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_STOP_RTT)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnStopRtt(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UPDATE_RTT_CALL_MODE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateImsRttCallMode(data, reply); };
+#endif
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_VOIP_CALL_STATE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoIPCallState(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_STATE)] =
@@ -241,6 +245,12 @@ void CallManagerServiceStub::InitImsServiceRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoIPCallInfo(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_INFO)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoIPCallInfo(data, reply); };
+#ifdef SUPPORT_RTT_CALL
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_RTT_CAPABILITY_SETTING)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetRttCapability(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SEND_RTT_MESSAGE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSendRttMessage(data, reply); };
+#endif
 }
 
 void CallManagerServiceStub::InitOttServiceRequest()
@@ -361,6 +371,7 @@ int32_t CallManagerServiceStub::OnDialCall(MessageParcel &data, MessageParcel &r
     dialInfo.PutIntValue("dialScene", data.ReadInt32());
     dialInfo.PutIntValue("dialType", data.ReadInt32());
     dialInfo.PutIntValue("callType", data.ReadInt32());
+    dialInfo.PutBooleanValue("isRTT", data.ReadBool());
     dialInfo.PutStringValue("extraParams", data.ReadString());
     dialInfo.PutStringValue("bundleName", data.ReadString());
     dialInfo.PutBooleanValue("btSlotIdUnknown", data.ReadBool());
@@ -399,7 +410,8 @@ int32_t CallManagerServiceStub::OnAcceptCall(MessageParcel &data, MessageParcel 
 {
     int32_t callId = data.ReadInt32();
     int32_t videoState = data.ReadInt32();
-    int32_t result = AnswerCall(callId, videoState);
+    bool isRTT = data.ReadBool();
+    int32_t result = AnswerCall(callId, videoState, isRTT);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
@@ -1190,12 +1202,12 @@ int32_t CallManagerServiceStub::OnGetVoNRState(MessageParcel &data, MessageParce
     return TELEPHONY_SUCCESS;
 }
 
+#ifdef SUPPORT_RTT_CALL
 int32_t CallManagerServiceStub::OnStartRtt(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
     int32_t callId = data.ReadInt32();
-    std::u16string msg = data.ReadString16();
-    result = StartRtt(callId, msg);
+    result = StartRtt(callId);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
@@ -1214,6 +1226,20 @@ int32_t CallManagerServiceStub::OnStopRtt(MessageParcel &data, MessageParcel &re
     }
     return TELEPHONY_SUCCESS;
 }
+
+int32_t CallManagerServiceStub::OnUpdateImsRttCallMode(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t callId = data.ReadInt32();
+    ImsRTTCallMode mode = static_cast<ImsRTTCallMode>(data.ReadUint32());
+    result = UpdateImsRttCallMode(callId, mode);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+#endif
 
 int32_t CallManagerServiceStub::OnReportOttCallDetailsInfo(MessageParcel &data, MessageParcel &reply)
 {
@@ -1559,5 +1585,34 @@ int32_t CallManagerServiceStub::OnNotifyVoIPAudioStreamStart(MessageParcel &data
     }
     return result;
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t CallManagerServiceStub::OnSendRttMessage(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t callId = data.ReadInt32();
+    std::string rttMessage = data.ReadString();
+    result = SendRttMessage(callId, rttMessage);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CallManagerServiceStub::OnSetRttCapability(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t slotId = data.ReadInt32();
+    bool isEnable = data.ReadBool();
+    result = SetRttCapability(slotId, isEnable);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("SetRttCapability fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

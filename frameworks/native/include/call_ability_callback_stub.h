@@ -51,6 +51,11 @@ private:
     int32_t OnUpdateCallDataUsageChange(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateCameraCapabilities(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdatePhoneState(MessageParcel &data, MessageParcel &reply);
+#ifdef SUPPORT_RTT_CALL
+    int32_t OnUpdateRttCallEvent(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateRttCallErrorReport(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateRttCallMessage(MessageParcel &data, MessageParcel &reply);
+#endif
 
     std::map<uint32_t, CallAbilityCallbackFunc> memberFuncMap_;
 };

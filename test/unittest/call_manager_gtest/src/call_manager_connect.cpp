@@ -145,15 +145,9 @@ int32_t CallAbilityCallbackStub::OnUpdateAsyncResultRequest(MessageParcel &data,
             info.PutIntValue("action", data.ReadInt32());
             info.PutIntValue("clirStat", data.ReadInt32());
             break;
-        case CallResultReportId::START_RTT_REPORT_ID:
-            info.PutIntValue("active", data.ReadInt32());
-            break;
         case CallResultReportId::GET_IMS_CONFIG_REPORT_ID:
         case CallResultReportId::GET_IMS_FEATURE_VALUE_REPORT_ID:
             info.PutIntValue("value", data.ReadInt32());
-            break;
-        case CallResultReportId::STOP_RTT_REPORT_ID:
-            info.PutIntValue("inactive", data.ReadInt32());
             break;
         default:
             break;

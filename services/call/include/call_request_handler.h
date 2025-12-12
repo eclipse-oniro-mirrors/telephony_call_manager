@@ -64,7 +64,7 @@ public:
     ~CallRequestHandler();
     void Init();
     int32_t DialCall();
-    int32_t AnswerCall(int32_t callId, int32_t videoState);
+    int32_t AnswerCall(int32_t callId, int32_t videoState, bool isRTT = false);
     int32_t RejectCall(int32_t callId, bool isSendSms, std::string &content);
     int32_t HangUpCall(int32_t callId);
     int32_t HoldCall(int32_t callId);
@@ -73,8 +73,11 @@ public:
     int32_t CombineConference(int32_t mainCallId);
     int32_t SeparateConference(int32_t callId);
     int32_t KickOutFromConference(int32_t callId);
-    int32_t StartRtt(int32_t callId, std::u16string &msg);
+#ifdef SUPPORT_RTT_CALL
+    int32_t StartRtt(int32_t callId);
     int32_t StopRtt(int32_t callId);
+    int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode);
+#endif
     int32_t JoinConference(int32_t callId, std::vector<std::string> &numberList);
 
 private:

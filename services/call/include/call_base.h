@@ -41,7 +41,7 @@ public:
     virtual ~CallBase();
 
     virtual int32_t DialingProcess() = 0;
-    virtual int32_t AnswerCall(int32_t videoState) = 0;
+    virtual int32_t AnswerCall(int32_t videoState, bool isRTT = false) = 0;
     virtual int32_t RejectCall() = 0;
     virtual int32_t HangUpCall() = 0;
     virtual int32_t HoldCall() = 0;

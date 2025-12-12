@@ -133,4 +133,7 @@ group("unittest") {
   deps += [ "call_manager_special_test:tel_call_manager_special1_test" ]
   deps += [ "call_manager_special_test:tel_call_manager_special2_test" ]
   deps += [ "call_manager_special_test:tel_call_manager_special3_test" ]
+  if (call_manager_feature_support_rtt) {
+    deps += [ "rtt_test:rtt_call_test" ]
+  }
 }

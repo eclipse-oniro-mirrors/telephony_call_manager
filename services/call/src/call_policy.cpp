@@ -360,44 +360,6 @@ int32_t CallPolicy::VideoCallPolicy(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallPolicy::StartRttPolicy(int32_t callId)
-{
-    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
-    if (callPtr == nullptr) {
-        TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
-        return CALL_ERR_INVALID_CALLID;
-    }
-    if (callPtr->GetCallType() != CallType::TYPE_IMS) {
-        TELEPHONY_LOGE("calltype is illegal, calltype:%{public}d", callPtr->GetCallType());
-        return CALL_ERR_UNSUPPORTED_NETWORK_TYPE;
-    }
-    TelCallState state = GetCallState(callId);
-    if (state != TelCallState::CALL_STATUS_ACTIVE) {
-        TELEPHONY_LOGE("current call state is:%{public}d, StartRtt not allowed", state);
-        return CALL_ERR_ILLEGAL_CALL_OPERATION;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallPolicy::StopRttPolicy(int32_t callId)
-{
-    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
-    if (callPtr == nullptr) {
-        TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
-        return CALL_ERR_INVALID_CALLID;
-    }
-    if (callPtr->GetCallType() != CallType::TYPE_IMS) {
-        TELEPHONY_LOGE("calltype is illegal, calltype:%{public}d", callPtr->GetCallType());
-        return CALL_ERR_UNSUPPORTED_NETWORK_TYPE;
-    }
-    TelCallState state = GetCallState(callId);
-    if (state != TelCallState::CALL_STATUS_ACTIVE) {
-        TELEPHONY_LOGE("current call state is:%{public}d, StopRtt not allowed", state);
-        return CALL_ERR_ILLEGAL_CALL_OPERATION;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
 int32_t CallPolicy::IsValidSlotId(int32_t slotId)
 {
     bool result = DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(slotId);
@@ -600,5 +562,38 @@ bool CallPolicy::IsIncomingEnable(const std::string &phoneNum)
 {
     return edmCallPolicy_->IsIncomingEnable(phoneNum);
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t CallPolicy::SetRttCapabilityPolicy(int32_t slotId, bool isEnbale)
+{
+    if (IsValidSlotId(slotId) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("invalid slotId!");
+        return CALL_ERR_INVALID_SLOT_ID;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallPolicy::RttCallModifyPolicy(int32_t callId)
+{
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
+        return CALL_ERR_INVALID_CALLID;
+    }
+
+    if (callPtr->GetCallType() != CallType::TYPE_IMS) {
+        TELEPHONY_LOGE("calltype is illegal, calltype:%{public}d", callPtr->GetCallType());
+        return CALL_ERR_UNSUPPORTED_NETWORK_TYPE;
+    }
+
+    TelCallState state = GetCallState(callId);
+    if (state != TelCallState::CALL_STATUS_ACTIVE) {
+        TELEPHONY_LOGE("current call state is:%{public}d, RttCallModify not allowed", state);
+        return CALL_ERR_ILLEGAL_CALL_OPERATION;
+    }
+
+    return TELEPHONY_SUCCESS;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

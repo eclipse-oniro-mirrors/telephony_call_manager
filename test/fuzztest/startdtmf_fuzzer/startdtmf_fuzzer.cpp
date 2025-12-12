@@ -41,6 +41,7 @@ void StartDtmf(const uint8_t *data, size_t size)
     DelayedSingleton<CallManagerService>::GetInstance()->OnStartDtmf(messageParcel, reply);
 }
 
+#ifdef SUPPORT_RTT_CALL
 void StopRtt(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -54,6 +55,7 @@ void StopRtt(const uint8_t *data, size_t size)
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnStopRtt(messageParcel, reply);
 }
+#endif
 
 void SetMuted(const uint8_t *data, size_t size)
 {
@@ -90,7 +92,9 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     StartDtmf(data, size);
+#ifdef SUPPORT_RTT_CALL
     StopRtt(data, size);
+#endif
     SetMuted(data, size);
     MuteRinger(data, size);
 }

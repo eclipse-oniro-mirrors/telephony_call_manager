@@ -47,6 +47,11 @@ public:
     int32_t OnReportCameraCapabilities(const CameraCapabilities &cameraCapabilities) override;
     int32_t OnPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState,
         const std::string &number) override;
+#ifdef SUPPORT_RTT_CALL
+    int32_t OnReportRttCallEvtChanged(const RttEvent &info) override;
+    int32_t OnReportRttCallError(const RttError &info) override;
+    int32_t OnReportRttCallMessage(AppExecFwk::PacMap &msgResult) override;
+#endif
 
 private:
     std::unique_ptr<CallManagerCallback> callbackPtr_;

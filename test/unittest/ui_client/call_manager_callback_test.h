@@ -42,6 +42,11 @@ public:
     int32_t OnPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail) override;
     int32_t OnCallDataUsageChange(const int64_t dataUsage) override;
     int32_t OnUpdateCameraCapabilities(const CameraCapabilities &cameraCapabilities) override;
+#ifdef SUPPORT_RTT_CALL
+    int32_t OnReportRttCallEvtChanged(const RttEvent &info) override;
+    int32_t OnReportRttCallError(const RttError &info) override;
+    int32_t OnReportRttCallMessage(AppExecFwk::PacMap &msgResult) override;
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

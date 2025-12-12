@@ -215,8 +215,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_001, TestSize.Level1)
     ASSERT_NE(callManagerService->SetCallTransferInfo(0, callTransferInfo), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->CanSetCallTransferTime(0, enabled), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->SetCallPreferenceMode(0, 0), TELEPHONY_SUCCESS);
-    ASSERT_NE(callManagerService->StartRtt(0, test), TELEPHONY_SUCCESS);
-    ASSERT_NE(callManagerService->StopRtt(0), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->CombineConference(0), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->SeparateConference(0), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->KickOutFromConference(0), TELEPHONY_SUCCESS);
@@ -332,6 +330,23 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, TestSize.Level1)
     callManagerService->WriteVoipCallFaultEvent("callId", 123);
     ASSERT_NE(callManagerService->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_SUCCESS);
 }
+
+#ifdef SUPPORT_RTT_CALL
+/**
+ * @tc.number   Telephony_CallManagerService_004
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerService_004, TestSize.Level1)
+{
+    AccessToken token;
+    sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
+    EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_NE(callManagerService->StartRtt(0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->StopRtt(0), TELEPHONY_SUCCESS);
+}
+#endif
 
 /**
  * @tc.number   Telephony_CallManagerServiceStub_001
@@ -477,10 +492,6 @@ callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCo
     data, reply, option);
 callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_IS_VOLTE_ENABLED),
     data, reply, option);
-callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_START_RTT),
-    data, reply, option);
-callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_STOP_RTT),
-    data, reply, option);
 callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_JOIN_CONFERENCE),
     data, reply, option);
 callManagerService->OnRemoteRequest(static_cast<uint32_t>(
@@ -579,7 +590,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_005, TestSize.Level0
     callManagerService->OnDisableVoLte(data, reply);
     callManagerService->OnIsVoLteEnabled(data, reply);
     callManagerService->OnGetVoNRState(data, reply);
+#ifdef SUPPORT_RTT_CALL
     callManagerService->OnStopRtt(data, reply);
+#endif
     callManagerService->OnCloseUnFinishedUssd(data, reply);
     callManagerService->OnInputDialerSpecialCode(data, reply);
     callManagerService->OnRemoveMissedIncomingCallNotification(data, reply);
@@ -697,7 +710,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_007, TestSize.Level0
     data3.WriteBool(true);
     data3.RewindRead(0);
     callManagerService->OnCanSetCallTransferTime(data3, reply);
-    
+
     MessageParcel data4;
     std::string message("hello");
     data4.WriteInt32(callId);
@@ -705,7 +718,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_007, TestSize.Level0
     data4.RewindRead(0);
     callManagerService->OnControlCamera(data4, reply);
     callManagerService->OnSetPausePicture(data4, reply);
+#ifdef SUPPORT_RTT_CALL
     callManagerService->OnStartRtt(data4, reply);
+#endif
 
     MessageParcel data5;
     float fnum = 0.0;
@@ -845,7 +860,41 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_010, TestSize.Level0
     MessageParcel data14;
     data14.WriteInt32(20020211);
     ASSERT_EQ(callManagerService->OnNotifyVoIPAudioStreamStart(data14, reply), TELEPHONY_SUCCESS);
+#ifdef SUPPORT_RTT_CALL
+    int32_t callId = -1;
+    int32_t ret = -100;
+    std::string message = "message";
+    int32_t slotId = -1;
+    bool isEnable = false;
+    ImsRTTCallMode mode = ImsRTTCallMode::REMOTE_REQUEST_UPGRADE_LOCAL_ACCEPT;
+    EXPECT_NE(callManagerService->UpdateImsRttCallMode(callId, mode), ret);
+    EXPECT_NE(callManagerService->SendRttMessage(callId, message), ret);
+    EXPECT_NE(callManagerService->SetRttCapability(slotId, isEnable), ret);
+#endif
 }
+
+#ifdef SUPPORT_RTT_CALL
+/**
+ * @tc.number   Telephony_CallManagerServiceStub_011
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_011, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data.RewindRead(0);
+    callManagerService->OnRemoteRequest(
+        static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_START_RTT), data, reply, option);
+    callManagerService->OnRemoteRequest(
+        static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_STOP_RTT), data, reply, option);
+    EXPECT_NE(callManagerService, nullptr);
+}
+#endif
+
 /**
  * @tc.number   Telephony_VoipCall_001
  * @tc.name     test error nullptr branch with permission

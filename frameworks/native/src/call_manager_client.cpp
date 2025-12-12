@@ -104,10 +104,10 @@ int32_t CallManagerClient::MakeCall(std::string number)
     }
 }
 
-int32_t CallManagerClient::AnswerCall(int32_t callId, int32_t videoState)
+int32_t CallManagerClient::AnswerCall(int32_t callId, int32_t videoState, bool isRTT)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->AnswerCall(callId, videoState);
+        return g_callManagerProxy->AnswerCall(callId, videoState, isRTT);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
@@ -639,10 +639,11 @@ int32_t CallManagerClient::GetVoNRState(int32_t slotId, int32_t &state)
     }
 }
 
-int32_t CallManagerClient::StartRtt(int32_t callId, std::u16string &msg)
+#ifdef SUPPORT_RTT_CALL
+int32_t CallManagerClient::StartRtt(int32_t callId)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->StartRtt(callId, msg);
+        return g_callManagerProxy->StartRtt(callId);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
@@ -658,6 +659,17 @@ int32_t CallManagerClient::StopRtt(int32_t callId)
         return TELEPHONY_ERR_UNINIT;
     }
 }
+
+int32_t CallManagerClient::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->UpdateImsRttCallMode(callId, mode);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+#endif
 
 int32_t CallManagerClient::JoinConference(int32_t callId, std::vector<std::u16string> &numberList)
 {
@@ -862,5 +874,27 @@ int32_t CallManagerClient::NotifyVoIPAudioStreamStart(int32_t uid)
         return TELEPHONY_ERR_UNINIT;
     }
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t CallManagerClient::SendRttMessage(int32_t callId, const std::string &rttMessage)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->SendRttMessage(callId, rttMessage);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+ 
+int32_t CallManagerClient::SetRttCapability(int32_t slotId, bool isEnable)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->SetRttCapability(slotId, isEnable);
+    } else {
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

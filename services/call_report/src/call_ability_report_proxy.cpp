@@ -190,8 +190,8 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
     DelayedSingleton<BluetoothCallManager>::GetInstance()->SendCallDetailsChange(static_cast<int32_t>(info.callId),
         static_cast<int32_t>(info.callState));
     TELEPHONY_LOGI("report call state info success, callId[%{public}d] state[%{public}d] conferenceState[%{public}d] "
-                   "videoState[%{public}d]",
-        info.callId, info.callState, info.conferenceState, info.videoState);
+                   "videoState[%{public}d] rttState[%{public}d]",
+        info.callId, info.callState, info.conferenceState, info.videoState, info.rttState);
     return ret;
 }
 
@@ -489,5 +489,62 @@ void CallAbilityReportProxy::UpdateBtCallSlotId(CallAttributeInfo &info)
 #endif
 }
 
+#ifdef SUPPORT_RTT_CALL
+int32_t CallAbilityReportProxy::ReportRttCallEvtChanged(const RttEvent &info)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it)) {
+            ret = (*it)->OnReportRttCallEvtChanged(info);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW("ReportRttCallEvtChanged failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
+                continue;
+            }
+        }
+    }
+    TELEPHONY_LOGI("ReportRttCallEvtChanged success");
+    return ret;
+}
+
+int32_t CallAbilityReportProxy::ReportRttCallError(const RttError &info)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it)) {
+            ret = (*it)->OnReportRttCallError(info);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW("ReportRttCallError failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
+                continue;
+            }
+        }
+    }
+    TELEPHONY_LOGI("ReportRttCallError success");
+    return ret;
+}
+
+int32_t CallAbilityReportProxy::ReportRttCallMessage(AppExecFwk::PacMap &info)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it)) {
+            ret = (*it)->OnReportRttCallMessage(info);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW("ReportRttCallMessage failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
+                continue;
+            }
+        }
+    }
+    return ret;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

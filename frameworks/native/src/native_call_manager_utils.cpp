@@ -90,6 +90,7 @@ CallAttributeInfo NativeCallManagerUtils::ReadCallAttributeInfo(MessageParcel &m
         (info.voipCallInfo.userProfile).assign(userProfile.begin(), userProfile.end());
     }
     info.phoneOrWatch = messageParcel.ReadInt32();
+    info.rttState = static_cast<RttCallState>(messageParcel.ReadInt32());
     return info;
 }
 

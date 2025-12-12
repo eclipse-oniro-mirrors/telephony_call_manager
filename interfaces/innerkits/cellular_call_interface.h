@@ -197,6 +197,7 @@ public:
      */
     virtual int32_t SendDtmf(char cDtmfCode, const CellularCallInfo &callInfo) = 0;
 
+#ifdef SUPPORT_RTT_CALL
     /**
      * @brief Start a RTT session
      *
@@ -204,7 +205,7 @@ public:
      * @param slotId[in] the slot id
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t StartRtt(int32_t slotId, const std::string &msg) = 0;
+    virtual int32_t StartRtt(int32_t slotId, int32_t callId) = 0;
 
     /**
      * @brief Terminate the current RTT session
@@ -212,7 +213,18 @@ public:
      * @param slotId[in] the slot id
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t StopRtt(int32_t slotId) = 0;
+    virtual int32_t StopRtt(int32_t slotId, int32_t callId) = 0;
+
+    /**
+     * @brief Rtt Upgrade or Downgrade
+     *
+     * @param slotId[in] the slot id
+     * @param callId[in] call id
+     * @param mode[in] rtt modify mode
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t UpdateImsRttCallMode(int32_t slotId, int32_t callId, ImsRTTCallMode mode) = 0;
+#endif
 
     /**
      * @brief set call transfer for the slot id
@@ -562,6 +574,17 @@ public:
      * @return Returns true on phone number is mmi code, else return false.
      */
     virtual bool IsMmiCode(int32_t slotId, std::string &number) = 0;
+
+#ifdef SUPPORT_RTT_CALL
+    /**
+     * @brief RTT Call Switch Settings
+     *
+     * @param slotId[in], The slot id
+     * @param isEnable[out], The result of enable or not
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t SetRttCapability(int32_t slotId, bool isEnable) = 0;
+#endif
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.CellularCallInterface");

@@ -752,8 +752,6 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_002, TestSize.Level0)
     callManagerClient->EnableImsSwitch(0);
     callManagerClient->DisableImsSwitch(0);
     callManagerClient->IsImsSwitchEnabled(0, enabled);
-    callManagerClient->StartRtt(0, value);
-    callManagerClient->StopRtt(0);
     std::vector<std::u16string> numberList;
     callManagerClient->JoinConference(0, numberList);
     std::vector<OttCallDetailsInfo> ottVec;
@@ -773,6 +771,42 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_002, TestSize.Level0)
     std::vector<std::string> incomingList;
     ASSERT_GT(callManagerClient->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_ERROR);
 }
+
+#ifdef SUPPORT_RTT_CALL
+/**
+ * @tc.number   Telephony_CallManagerClient_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_003, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerClient> callManagerClient = std::make_shared<CallManagerClient>();
+    int32_t callId = -1;
+    int32_t slotId = -1;
+    bool isEnable = false;
+    std::string rttMessage = "message";
+    ImsRTTCallMode mode = ImsRTTCallMode::LOCAL_REQUEST_UPGRADE;
+    EXPECT_EQ(callManagerClient->UpdateImsRttCallMode(callId, mode), TELEPHONY_ERR_UNINIT);
+    EXPECT_EQ(callManagerClient->SendRttMessage(callId, rttMessage), TELEPHONY_ERR_UNINIT);
+    EXPECT_EQ(callManagerClient->SetRttCapability(slotId, isEnable), TELEPHONY_ERR_UNINIT);
+    callManagerClient->Init(1);
+    EXPECT_NE(callManagerClient->UpdateImsRttCallMode(callId, mode), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->SendRttMessage(callId, rttMessage), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->SetRttCapability(slotId, isEnable), TELEPHONY_ERR_UNINIT);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerClient_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_004, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerClient> callManagerClient = std::make_shared<CallManagerClient>();
+    EXPECT_NE(callManagerClient->StartRtt(0), -100);
+    EXPECT_NE(callManagerClient->StopRtt(0), -100);
+}
+#endif
 
 /**
  * @tc.number   Telephony_CallManagerHisysevent_001

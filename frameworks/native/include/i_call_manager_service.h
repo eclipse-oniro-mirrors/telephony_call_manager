@@ -44,7 +44,7 @@ public:
     virtual int32_t ObserverOnCallDetailsChange() = 0;
     virtual int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras) = 0;
     virtual int32_t MakeCall(std::string number) = 0;
-    virtual int32_t AnswerCall(int32_t callId, int32_t videoState) = 0;
+    virtual int32_t AnswerCall(int32_t callId, int32_t videoState, bool isRTT = false) = 0;
     virtual int32_t RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage) = 0;
     virtual int32_t HangUpCall(int32_t callId) = 0;
     virtual int32_t GetCallState() = 0;
@@ -98,8 +98,11 @@ public:
     virtual int32_t IsImsSwitchEnabled(int32_t slotId, bool &enabled) = 0;
     virtual int32_t SetVoNRState(int32_t slotId, int32_t state) = 0;
     virtual int32_t GetVoNRState(int32_t slotId, int32_t &state) = 0;
-    virtual int32_t StartRtt(int32_t callId, std::u16string &msg) = 0;
+#ifdef SUPPORT_RTT_CALL
+    virtual int32_t StartRtt(int32_t callId) = 0;
     virtual int32_t StopRtt(int32_t callId) = 0;
+    virtual int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode) = 0;
+#endif
     virtual int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList) = 0;
     virtual int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec) = 0;
     virtual int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo) = 0;
@@ -125,6 +128,10 @@ public:
     virtual bool EndCall() = 0;
     virtual bool HasDistributedCommunicationCapability() = 0;
     virtual int32_t NotifyVoIPAudioStreamStart(int32_t uid) = 0;
+#ifdef SUPPORT_RTT_CALL
+    virtual int32_t SendRttMessage(int32_t callId, const std::string &rttMessage) = 0;
+    virtual int32_t SetRttCapability(int32_t slotId, bool enabled) = 0;
+#endif
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallManagerService");

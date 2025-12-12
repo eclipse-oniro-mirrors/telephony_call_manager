@@ -93,6 +93,17 @@ public:
     int32_t PeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail);
     int32_t CallDataUsageChange(const int64_t dataUsage);
     int32_t UpdateCameraCapabilities(const CameraCapabilities &cameraCapabilities);
+#ifdef SUPPORT_RTT_CALL
+    void RegisterRttModifyIndCallback(EventCallback eventCallback);
+    void UnRegisterRttModifyIndCallback();
+    void RegisterRttErrCauseCallback(EventCallback eventCallback);
+    void UnRegisterRttErrCauseCallback();
+    void RegisterRttCallMessageCallback(EventCallback eventCallback);
+    void UnRegisterRttCallMessageCallback();
+    int32_t ReportRttCallEventInfo(const RttEvent &info);
+    int32_t ReportRttCallErrorInfo(const RttError &info);
+    int32_t ReportRttCallMessageInfo(AppExecFwk::PacMap &resultInfo);
+#endif
 
 private:
     static void ReportCallStateWork(uv_work_t *work, int32_t status);
@@ -146,6 +157,14 @@ private:
     static int32_t ReportCallDataUsage(int64_t dataUsage, EventCallback eventCallback);
     static void ReportCameraCapabilitiesInfoWork(uv_work_t *work, int32_t status);
     static int32_t ReportCameraCapabilitiesInfo(CameraCapabilities &cameraCapabilities, EventCallback eventCallback);
+#ifdef SUPPORT_RTT_CALL
+    static void ReportRttCallEventInfoWork(uv_work_t *work, int32_t status);
+    static int32_t ReportRttCallEventInfo(RttEvent &eventInfo, EventCallback eventCallback);
+    static void ReportRttCallErrorInfoWork(uv_work_t *work, int32_t status);
+    static int32_t ReportRttCallErrorInfo(RttError &errorInfo, EventCallback eventCallback);
+    static void ReportRttCallMessageWork(uv_work_t *work, int32_t status);
+    static int32_t ReportRttCallMessage(AppExecFwk::PacMap &resultInfo, EventCallback eventCallback);
+#endif
 
 private:
     EventCallback stateCallback_;
@@ -171,6 +190,11 @@ private:
     EventCallback callDataUsageCallback_;
     EventCallback cameraCapabilitiesCallback_;
     EventCallback callSessionEventCallback_;
+#ifdef SUPPORT_RTT_CALL
+    EventCallback rttModifyIndCallback_;
+    EventCallback rttErrCauseCallback_;
+    EventCallback rttCallMessageCallback_;
+#endif
     using CallResultReportIdProcessorFunc = std::function<int32_t(AppExecFwk::PacMap &resultInfo)>;
     std::map<CallResultReportId, CallResultReportIdProcessorFunc> memberFuncMap_;
     int32_t getCallTransferReason_ = -1;
@@ -181,6 +205,11 @@ private:
     std::mutex closeUnfinishedUssdCallbackMutex_;
     std::mutex setWaitingCallbackMutex_;
     std::mutex getWaitingCallbackMutex_;
+#ifdef SUPPORT_RTT_CALL
+    std::mutex rttCallEvtChangeCallbackMutex_;
+    std::mutex rttCallErrCauseCallbackMutex_;
+    std::mutex rttCallMessageCallbackMutex_;
+#endif
     static std::mutex audioDeviceCallbackMutex_;
 };
 } // namespace Telephony

@@ -120,6 +120,12 @@ void CallStatusCallbackStub::InitImsFuncMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnCameraCapabilitiesChange(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(UPDATE_VOIP_EVENT_INFO)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateVoipEventInfo(data, reply); };
+#ifdef SUPPORT_RTT_CALL
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_RTT_EVENT_STATUS)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnHandleRttEvtChanged(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_RTT_ERR_INFO)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnHandleRttErrReport(data, reply); };
+#endif
 }
 
 int32_t CallStatusCallbackStub::OnRemoteRequest(
@@ -228,6 +234,8 @@ void CallStatusCallbackStub::BuildCallReportInfo(MessageParcel &data, CallReport
     }
     parcelPtr.message = data.ReadString();
     parcelPtr.newCallUseBox = data.ReadInt32();
+    parcelPtr.rttState = static_cast<RttCallState>(data.ReadInt32());
+    parcelPtr.rttChannelId = data.ReadInt32();
 }
 
 int32_t CallStatusCallbackStub::OnUpdateDisconnectedCause(MessageParcel &data, MessageParcel &reply)
@@ -902,5 +910,45 @@ int32_t CallStatusCallbackStub::OnUpdateVoipEventInfo(MessageParcel &data, Messa
     }
     return TELEPHONY_SUCCESS;
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t CallStatusCallbackStub::OnHandleRttEvtChanged(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+
+    RttEventInfo eventInfo;
+    eventInfo.callId = data.ReadInt32();
+    eventInfo.eventType = data.ReadInt32();
+    eventInfo.reason = data.ReadInt32();
+    error = HandleRttEvtChanged(eventInfo);
+    if (!reply.WriteInt32(error)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallStatusCallbackStub::OnHandleRttErrReport(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    RttErrorInfo errInfo;
+    errInfo.callId = data.ReadInt32();
+    errInfo.causeCode = data.ReadInt32();
+    errInfo.operationType = data.ReadInt32();
+    errInfo.reasonText = data.ReadString();
+    error = HandleRttErrReport(errInfo);
+    if (!reply.WriteInt32(error)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

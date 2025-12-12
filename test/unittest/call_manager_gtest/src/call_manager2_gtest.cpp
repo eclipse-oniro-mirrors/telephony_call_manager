@@ -280,8 +280,6 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, TestSize.Level0
     ASSERT_EQ(client->IsImsSwitchEnabled(SIM1_SLOTID, boolValue), TELEPHONY_ERR_UNINIT);
     ASSERT_EQ(client->SetVoNRState(SIM1_SLOTID, value), TELEPHONY_ERR_UNINIT);
     ASSERT_EQ(client->GetVoNRState(SIM1_SLOTID, value), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->StartRtt(g_newCallId, str), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->StopRtt(g_newCallId), TELEPHONY_ERR_UNINIT);
     std::vector<std::u16string> numberList;
     ASSERT_EQ(client->JoinConference(g_newCallId, numberList), TELEPHONY_ERR_UNINIT);
     std::vector<OttCallDetailsInfo> ottVec;
@@ -312,6 +310,20 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, TestSize.Level0
     std::vector<std::string> incomingList;
     ASSERT_EQ(client->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_ERR_UNINIT);
 }
+
+#ifdef SUPPORT_RTT_CALL
+/**
+ * @tc.number   Telephony_CallManagerClient_004
+ * @tc.name     test error nullptr branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_004, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    ASSERT_EQ(client->StartRtt(g_newCallId), TELEPHONY_ERR_UNINIT);
+    ASSERT_EQ(client->StopRtt(g_newCallId), TELEPHONY_ERR_UNINIT);
+}
+#endif
 
 /**
  * @tc.number   Telephony_BluetoothCallClient_001

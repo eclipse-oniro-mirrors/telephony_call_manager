@@ -101,6 +101,8 @@ void ReportCallInfoHandler::BuildCallDetailsInfo(CallDetailsInfo &info, CallDeta
         callDetailInfo.reason = (*iter).reason;
         callDetailInfo.message = (*iter).message;
         callDetailInfo.newCallUseBox = (*iter).newCallUseBox;
+        callDetailInfo.rttState = (*iter).rttState;
+        callDetailInfo.rttChannelId = (*iter).rttChannelId;
         callDetailsInfo.callVec.push_back(callDetailInfo);
     }
 }
@@ -285,5 +287,26 @@ int32_t ReportCallInfoHandler::UpdateVoipEventInfo(const VoipCallEventInfo &info
     });
     return TELEPHONY_SUCCESS;
 }
+
+#ifdef SUPPORT_RTT_CALL
+void ReportCallInfoHandler::UnInitRttManager()
+{
+    if (callStatusManagerPtr_ == nullptr) {
+        TELEPHONY_LOGE("callStatusManagerPtr_ is null");
+        return;
+    }
+
+    std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
+    TELEPHONY_LOGI("UnInitRttManager submit task enter");
+    reportCallInfoQueue.submit([callStatusManagerPtr]() {
+        std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
+        if (managerPtr == nullptr) {
+            TELEPHONY_LOGE("managerPtr is null");
+            return;
+        }
+        managerPtr->UnInitRttManager();
+    });
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

@@ -518,7 +518,7 @@ enum class CallAbilityEventId {
      * Indicates that the super privacy mode ON.
      */
     EVENT_IS_SUPER_PRIVACY_MODE_ON = 20,
-	  /**
+    /**
      * Indicates that the super privacy mode OFF.
      */
     EVENT_IS_SUPER_PRIVACY_MODE_OFF = 21,
@@ -857,6 +857,31 @@ enum class PhoneOrWatchDial {
     WATCH_DIAL = 1,
 };
 
+
+/**
+ * @brief Indicates RTT call state.
+ */
+enum class RttCallState {
+    /*
+     *  Non-RTT call
+     */
+    RTT_STATE_NO = 0,
+
+    /*
+     *  RTT call
+     */
+    RTT_STATE_YES = 1,
+
+    /*
+     *  remote is a TTY call.
+     */
+    RTT_STATE_REMOTE_TTY = 2,
+
+    /*
+     *  remote do not support RTT
+     */
+    RTT_STATE_REMOTE_NOT_SUPPORT = 3,
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // CALL_MANAGER_BASE_H

@@ -51,7 +51,7 @@ int32_t VoIPCall::DialingProcess()
     return TELEPHONY_SUCCESS;
 }
 
-int32_t VoIPCall::AnswerCall(int32_t videoState)
+int32_t VoIPCall::AnswerCall(int32_t videoState, bool isRTT)
 {
     TELEPHONY_LOGI("VoIPCall::AnswerCall");
     VoipCallEventInfo voipcallInfo;

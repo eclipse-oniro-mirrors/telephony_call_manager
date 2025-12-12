@@ -132,9 +132,10 @@ public:
      * @brief Answer a phone call
      * @param callId[in], call id
      * @param videoState[in], 0: audio, 1: video
+     * @param isRTT[in], 0: Not RTT, 1: Ims RTT Call
      * @return Returns 0 on success, others on failure.
      */
-    int32_t AnswerCall(int32_t callId, int32_t videoState) override;
+    int32_t AnswerCall(int32_t callId, int32_t videoState, bool isRTT = false) override;
 
     /**
      * RejectCall
@@ -619,6 +620,7 @@ public:
      */
     int32_t GetVoNRState(int32_t slotId, int32_t &state) override;
 
+#ifdef SUPPORT_RTT_CALL
     /**
      * StartRtt
      *
@@ -627,7 +629,7 @@ public:
      * @param msg[in], RTT information
      * @return Returns 0 on success, others on failure.
      */
-    int32_t StartRtt(int32_t callId, std::u16string &msg) override;
+    int32_t StartRtt(int32_t callId) override;
 
     /**
      * StopRtt
@@ -637,6 +639,17 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t StopRtt(int32_t callId) override;
+
+    /**
+     * UpdateImsRttCallMode
+     *
+     * @brief rtt upgrade or downgrade
+     * @param callId[in], call id
+     * @param mode[in], rtt modify mode
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode) override;
+#endif
 
     /**
      * JoinConference
@@ -851,6 +864,26 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t NotifyVoIPAudioStreamStart(int32_t uid) override;
+
+#ifdef SUPPORT_RTT_CALL
+    /**
+     * @brief Send RTT text message.
+     *
+     * @param callId[in], The call id
+     * @param rttMessage[in], Send RTT message.
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SendRttMessage(int32_t callId, const std::string &rttMessage) override;
+
+    /**
+     * @brief RTT Call Switch Settings
+     *
+     * @param slotId[in], The slot id
+     * @param isEnable[out], The result of enable or not
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetRttCapability(int32_t slotId, bool isEnable) override;
+#endif
 
 private:
     std::string GetBundleInfo();

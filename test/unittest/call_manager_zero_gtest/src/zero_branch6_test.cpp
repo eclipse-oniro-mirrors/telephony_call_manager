@@ -577,6 +577,29 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_004, TestSize.Level0)
 }
 
 /**
+ * @tc.number   Telephony_CallAbilityReportProxy_006
+ * @tc.name     test update bt call slotId
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_006, TestSize.Level0)
+{
+    std::shared_ptr<CallAbilityReportProxy> callAbilityReportProxy = std::make_shared<CallAbilityReportProxy>();
+
+#ifdef SUPPORT_RTT_CALL
+    int32_t ret = -100;
+    RttEvent rttInfo;
+    RttError errInfo;
+    std::string rttMessage = "message";
+    AppExecFwk::PacMap pacMap;
+    pacMap.PutIntValue("callId", ret);
+    pacMap.PutStringValue("rttMessage", rttMessage);
+    EXPECT_NE(callAbilityReportProxy->ReportRttCallEvtChanged(rttInfo), ret);
+    EXPECT_NE(callAbilityReportProxy->ReportRttCallError(errInfo), ret);
+    EXPECT_NE(callAbilityReportProxy->ReportRttCallMessage(pacMap), ret);
+#endif
+}
+
+/**
  * @tc.number   Telephony_CallAbilityConnectCallback_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1031,6 +1054,20 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackProxy_001, TestSize.Level
     callAbilityCallbackProxy.OnReportPostDialDelay(str);
     callAbilityCallbackProxy.OnPhoneStateChange(0, 0, 0, "");
     ASSERT_TRUE(!str.empty());
+
+#ifdef SUPPORT_RTT_CALL
+    int32_t ret = -100;
+    int32_t callId = -1;
+    std::string message = "message";
+    RttEvent rttInfo;
+    RttError errorInfo;
+    AppExecFwk::PacMap pacMap;
+    pacMap.PutIntValue("callId", callId);
+    pacMap.PutStringValue("rttMessage", message);
+    EXPECT_NE(callAbilityCallbackProxy.OnReportRttCallEvtChanged(rttInfo), ret);
+    EXPECT_NE(callAbilityCallbackProxy.OnReportRttCallError(errorInfo), ret);
+    EXPECT_NE(callAbilityCallbackProxy.OnReportRttCallMessage(pacMap), ret);
+#endif
 }
 
 /**

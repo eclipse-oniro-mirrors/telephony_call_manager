@@ -40,6 +40,7 @@ struct DialParaInfo {
     int32_t accountId = 0;
     int32_t callId = 0;
     int32_t index = 0;
+    bool isRTT = false;
     std::string number = "";
     DialType dialType = DialType::DIAL_CARRIER_TYPE;
     VideoStateType videoState = VideoStateType::TYPE_VOICE;

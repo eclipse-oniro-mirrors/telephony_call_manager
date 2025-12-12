@@ -75,8 +75,10 @@ int32_t CallManagerServiceProxy::DialCall(std::u16string number, AppExecFwk::Pac
     dataParcel.WriteInt32(extras.GetIntValue("dialScene"));
     dataParcel.WriteInt32(extras.GetIntValue("dialType"));
     dataParcel.WriteInt32(extras.GetIntValue("callType"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isRTT"));
     dataParcel.WriteString(extras.GetStringValue("extraParams"));
     dataParcel.WriteBool(extras.GetBooleanValue("btSlotIdUnknown", false));
+    TELEPHONY_LOGI("DialCall isRTT: %{public}d", extras.GetBooleanValue("isRTT"));
     MessageParcel replyParcel;
     int32_t error = SendRequest(INTERFACE_DIAL_CALL, dataParcel, replyParcel);
     if (error != TELEPHONY_SUCCESS) {
@@ -107,7 +109,7 @@ int32_t CallManagerServiceProxy::MakeCall(std::string number)
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::AnswerCall(int32_t callId, int32_t videoState)
+int32_t CallManagerServiceProxy::AnswerCall(int32_t callId, int32_t videoState, bool isRTT)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
@@ -116,6 +118,7 @@ int32_t CallManagerServiceProxy::AnswerCall(int32_t callId, int32_t videoState)
     }
     dataParcel.WriteInt32(callId);
     dataParcel.WriteInt32(videoState);
+    dataParcel.WriteBool(isRTT);
     MessageParcel replyParcel;
     int32_t error = SendRequest(INTERFACE_ANSWER_CALL, dataParcel, replyParcel);
     if (error != TELEPHONY_SUCCESS) {
@@ -577,19 +580,15 @@ int32_t CallManagerServiceProxy::SetCallPreferenceMode(int32_t slotId, int32_t m
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::StartRtt(int32_t callId, std::u16string &msg)
+#ifdef SUPPORT_RTT_CALL
+int32_t CallManagerServiceProxy::StartRtt(int32_t callId)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    if (msg.empty()) {
-        TELEPHONY_LOGE("msg is empty");
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
     dataParcel.WriteInt32(callId);
-    dataParcel.WriteString16(msg);
     MessageParcel replyParcel;
     int32_t error = SendRequest(CallManagerInterfaceCode::INTERFACE_START_RTT, dataParcel, replyParcel);
     if (error != TELEPHONY_SUCCESS) {
@@ -615,6 +614,25 @@ int32_t CallManagerServiceProxy::StopRtt(int32_t callId)
     }
     return replyParcel.ReadInt32();
 }
+
+int32_t CallManagerServiceProxy::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(callId);
+    dataParcel.WriteInt32(mode);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_UPDATE_RTT_CALL_MODE, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function UpdateImsRttCallMode call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+#endif
 
 int32_t CallManagerServiceProxy::CombineConference(int32_t mainCallId)
 {
@@ -1526,5 +1544,43 @@ int32_t CallManagerServiceProxy::NotifyVoIPAudioStreamStart(int32_t uid)
     }
     return replyParcel.ReadInt32();
 }
+
+#ifdef SUPPORT_RTT_CALL
+int32_t CallManagerServiceProxy::SendRttMessage(int32_t callId, const std::string &rttMessage)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(callId);
+    dataParcel.WriteString(rttMessage);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_SEND_RTT_MESSAGE, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function SendUssdResponse call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallManagerServiceProxy::SetRttCapability(int32_t slotId, bool enabled)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    dataParcel.WriteInt32(slotId);
+    dataParcel.WriteBool(enabled);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_SET_RTT_CAPABILITY_SETTING, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function SetRttCapability failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

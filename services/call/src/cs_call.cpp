@@ -31,7 +31,7 @@ int32_t CSCall::DialingProcess()
     return CarrierDialingProcess();
 }
 
-int32_t CSCall::AnswerCall(int32_t videoState)
+int32_t CSCall::AnswerCall(int32_t videoState, bool isRTT)
 {
     return CarrierAnswerCall(videoState);
 }

@@ -30,7 +30,7 @@ public:
     ~IMSCall();
     int32_t InitVideoCall() override;
     int32_t DialingProcess() override;
-    int32_t AnswerCall(int32_t videoState) override;
+    int32_t AnswerCall(int32_t videoState, bool isRTT = false) override;
     int32_t RejectCall() override;
     int32_t HangUpCall() override;
     int32_t HoldCall() override;
@@ -51,8 +51,11 @@ public:
     int32_t GetSubCallIdList(std::vector<std::u16string> &callIdList) override;
     int32_t GetCallIdListForConference(std::vector<std::u16string> &callIdList) override;
     int32_t IsSupportConferenceable() override;
-    int32_t StartRtt(std::u16string &msg);
-    int32_t StopRtt();
+#ifdef SUPPORT_RTT_CALL
+    int32_t StartRtt(int32_t callId);
+    int32_t StopRtt(int32_t callId);
+    int32_t UpdateImsRttCallMode(ImsRTTCallMode mode);
+#endif
     int32_t SetMute(int32_t mute, int32_t slotId) override;
     int32_t UpdateImsCallMode(ImsCallMode mode) override;
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
@@ -71,6 +74,12 @@ public:
     int32_t CancelCallUpgrade() override;
     int32_t RequestCameraCapabilities() override;
     bool IsVoiceModifyToVideo();
+#ifdef SUPPORT_RTT_CALL
+    void SetRttState(RttCallState rttState);
+    RttCallState GetRttState();
+    void SetRttChannelId(int32_t rttChannelId);
+    int32_t GetRttChannelId();
+#endif
 
 private:
     void AssignVideoCallState(VideoStateType videoStateType);
@@ -80,6 +89,10 @@ private:
     sptr<VideoCallState> videoCallState_;
     bool isInitialized_;
     std::map<ImsCallMode, sptr<VideoCallState>> videoStateMap_;
+#ifdef SUPPORT_RTT_CALL
+    RttCallState rttState_ = RttCallState::RTT_STATE_NO;
+    int32_t rttChannelId_ = -1;
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

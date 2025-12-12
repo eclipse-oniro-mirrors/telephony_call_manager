@@ -890,6 +890,19 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_004, TestSize.Level0)
     callRequestProcess->HangUpForDsdaRequest(callBase2);
     callRequestProcess->HandleStartDial(false, mDialParaInfo);
     ASSERT_EQ(callRequestProcess->EccDialPolicy(), TELEPHONY_SUCCESS);
+
+#ifdef SUPPORT_RTT_CALL
+    int32_t ret = -100;
+    int32_t rttChannelId = 1;
+    RttCallState rttState = RttCallState::RTT_STATE_YES;
+    IMSCall imsCall(mDialParaInfo);
+    ImsRTTCallMode mode = ImsRTTCallMode::LOCAL_REQUEST_UPGRADE;
+    imsCall.SetRttChannelId(rttChannelId);
+    imsCall.SetRttState(rttState);
+    EXPECT_EQ(imsCall.GetRttChannelId(), rttChannelId);
+    EXPECT_EQ(imsCall.GetRttState(), rttState);
+    EXPECT_NE(imsCall.UpdateImsRttCallMode(mode), ret);
+#endif
 }
 
 /**
