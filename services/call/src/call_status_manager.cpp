@@ -634,6 +634,10 @@ int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
     }
     
     call->SetNonVirtualCall(!DelayedSingleton<AudioDeviceManager>::GetInstance()->GetVirtualCall());
+    if (!call->isNonVirtualCall()) {
+        CallManagerHisysevent::WriteVoipCallFaultEvent(info.voipCallInfo.voipCallId, info.voipCallInfo.uid,
+            static_cast<int32_t>(VoIPCallErrorCode::VIRTUAL_CALL_SET_FAILED));
+    }
     AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
@@ -668,6 +672,10 @@ int32_t CallStatusManager::OutgoingVoipCallHandle(const CallDetailInfo &info)
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
     call->SetNonVirtualCall(!DelayedSingleton<AudioDeviceManager>::GetInstance()->GetVirtualCall());
+    if (!call->isNonVirtualCall()) {
+        CallManagerHisysevent::WriteVoipCallFaultEvent(info.voipCallInfo.voipCallId, info.voipCallInfo.uid,
+            static_cast<int32_t>(VoIPCallErrorCode::VIRTUAL_CALL_SET_FAILED));
+    }
     AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
@@ -1211,12 +1219,12 @@ int32_t CallStatusManager::DisconnectedVoipCallHandle(const CallDetailInfo &info
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
     }
-    DeleteOneCallObject(call->GetCallID());
     if (GetVoipCallNum(true) == 1) {
         bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(true);
         TELEPHONY_LOGE("SetVirtualCall res:%{public}d", res);
     }
     call->SetNonVirtualCall(false);
+    DeleteOneCallObject(call->GetCallID());
     TELEPHONY_LOGI("handle disconnected voip call state success");
     return ret;
 }
