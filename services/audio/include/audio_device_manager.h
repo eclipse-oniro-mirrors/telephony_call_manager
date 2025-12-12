@@ -41,7 +41,9 @@ public:
     static bool IsBtScoConnected();
     static bool IsBtActived();
     static bool IsNearlinkActived(AudioDevice &device);
+#ifdef SUPPORT_HEARING_AID
     static bool IsBtHearingAidActived(AudioDevice &device);
+#endif
     static bool IsDistributedCallConnected();
     static bool IsWiredHeadsetConnected();
     static void SetDeviceAvailable(AudioDeviceType deviceType, bool available);
@@ -53,8 +55,11 @@ public:
     void ResetBtAudioDevicesList();
     void ResetDistributedCallDevicesList();
     void ResetNearlinkAudioDevicesList();
+#ifdef SUPPORT_HEARING_AID
     void ResetBtHearingAidDeviceList();
+#endif
     int32_t ReportAudioDeviceChange(const AudioDevice &device);
+    int32_t CopyDeviceData(const std::string &address, const std::string &deviceName);
     bool CheckAndSwitchDistributedAudioDevice();
     int32_t ReportAudioDeviceInfo();
     int32_t ReportAudioDeviceInfo(sptr<CallBase> call);
@@ -93,7 +98,9 @@ public:
 private:
     bool EnableBtSco();
     bool EnableNearlink();
+#ifdef SUPPORT_HEARING_AID
     bool EnableBtHearingAid();
+#endif
     bool EnableWiredHeadset(bool isSetAudioDeviceByUser);
     bool EnableSpeaker(bool isSetAudioDeviceByUser);
     bool EnableEarpiece(bool isSetAudioDeviceByUser);
@@ -108,7 +115,9 @@ private:
     void AddEarpiece();
     void UpdateBtDevice(std::string &address, std::string &deviceName);
     void UpdateNearlinkDevice(std::string &address, std::string &deviceName);
+#ifdef SUPPORT_HEARING_AID
     void UpdateBtHearingAidDevice(std::string &address, std::string &deviceName);
+#endif
     bool UpdateDeviceName(const std::string &macAddress, const std::string &deviceName, AudioDeviceType deviceType);
     ffrt::mutex mutex_;
     ffrt::mutex infoMutex_;

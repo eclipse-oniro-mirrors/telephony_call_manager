@@ -75,10 +75,10 @@ int32_t CallManagerServiceProxy::DialCall(std::u16string number, AppExecFwk::Pac
     dataParcel.WriteInt32(extras.GetIntValue("dialScene"));
     dataParcel.WriteInt32(extras.GetIntValue("dialType"));
     dataParcel.WriteInt32(extras.GetIntValue("callType"));
-    dataParcel.WriteInt32(extras.GetIntValue("isRTT"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isRTT"));
     dataParcel.WriteString(extras.GetStringValue("extraParams"));
     dataParcel.WriteBool(extras.GetBooleanValue("btSlotIdUnknown", false));
-    TELEPHONY_LOGI("DialCall isRTT: %{public}d", extras.GetIntValue("isRTT"));
+    TELEPHONY_LOGI("DialCall isRTT: %{public}d", extras.GetBooleanValue("isRTT"));
     MessageParcel replyParcel;
     int32_t error = SendRequest(INTERFACE_DIAL_CALL, dataParcel, replyParcel);
     if (error != TELEPHONY_SUCCESS) {

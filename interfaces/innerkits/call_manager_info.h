@@ -47,9 +47,6 @@ struct CellularCallInfo {
      */
     int32_t videoState = 0;
     int32_t index = 0;
-    /**
-     * Indicates the call is RTT.
-     */    
     bool isRTT = false;
 };
 

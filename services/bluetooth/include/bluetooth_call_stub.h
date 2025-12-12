@@ -52,7 +52,9 @@ private:
     int32_t OnAddAudioDeviceList(MessageParcel &data, MessageParcel &reply);
     int32_t OnRemoveAudioDeviceList(MessageParcel &data, MessageParcel &reply);
     int32_t OnResetNearlinkDeviceList(MessageParcel &data, MessageParcel &reply);
+#ifdef SUPPORT_HEARING_AID
     int32_t OnResetBtHearingAidDeviceList(MessageParcel &data, MessageParcel &reply);
+#endif
     std::map<uint32_t, BluetoothCallFunc> memberFuncMap_;
 };
 } // namespace Telephony

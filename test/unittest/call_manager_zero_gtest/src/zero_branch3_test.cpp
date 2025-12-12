@@ -428,7 +428,9 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallStub_001, TestSize.Level0)
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
     result = bluetoothCallService->OnResetNearlinkDeviceList(messageParcel, reply);
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+#ifdef SUPPORT_HEARING_AID
     result = bluetoothCallService->OnResetBtHearingAidDeviceList(messageParcel, reply);
+#endif
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
@@ -860,9 +862,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_004, TestSize.Level0)
     ImsCallMode mode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
     ASSERT_EQ(callControlManager->UpdateImsCallMode(INVALID_CALLID, mode), TELEPHONY_SUCCESS);
     std::u16string str = u"";
-#ifdef SUPPORT_RTT_CALL
-    ASSERT_NE(callControlManager->StartRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
-#endif
     AudioDevice audioDevice = {
         .deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO,
         .address = { 0 },
@@ -895,9 +894,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_004, TestSize.Level0)
     listen.OnRemoveSystemAbility(systemAbilityId, deviceId);
     listen.OnAddSystemAbility(COMMON_EVENT_SERVICE_ID, deviceId);
     listen.OnRemoveSystemAbility(COMMON_EVENT_SERVICE_ID, deviceId);
-#ifdef SUPPORT_RTT_CALL
-    ASSERT_NE(callControlManager->StopRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
-#endif
     ASSERT_NE(callControlManager->SetMuted(false), TELEPHONY_SUCCESS);
     ASSERT_EQ(callControlManager->MuteRinger(), TELEPHONY_SUCCESS);
     bool enaled = false;
@@ -1280,6 +1276,20 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_012, Function | MediumTes
     EXPECT_NE(callControlManager->RemoveMissedIncomingCallNotification(), TELEPHONY_SUCCESS);
 }
 
+#ifdef SUPPORT_RTT_CALL
+/**
+ * @tc.number   Telephony_CallControlManager_013
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_013, TestSize.Level0)
+{
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    ASSERT_NE(callControlManager->StartRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->StopRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
+}
+#endif
+
 /**
  * @tc.number   Telephony_CallStatusManager_016
  * @tc.name     test error branch
@@ -1427,7 +1437,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_003, TestSize.Level0)
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     // scene-0: null input
     ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(nullptr), false);
-    
+
     // init
     const std::string phoneNumber = "12345678911";
     time_t oldCallCreateTime = time(nullptr);
@@ -1435,7 +1445,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_003, TestSize.Level0)
         oldCallCreateTime = 0;
     }
     int32_t incomingMaxDuration = 10 * 1000;
-    
+
     //old call
     DialParaInfo dialParaInfoOld;
     sptr<OHOS::Telephony::CallBase> oldCall = new BluetoothCall(dialParaInfoOld, "");
@@ -1452,11 +1462,11 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_003, TestSize.Level0)
     newCall->SetCallCreateTime(oldCallCreateTime + incomingMaxDuration - 1000);
     newCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
     newCall->SetCallType(CallType::TYPE_IMS);
-    
+
     // scene-1: do not exist old call with the same phone number
     ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(newCall), false);
     ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
-    
+
     // scene-2: invalid diff-CallID
     callStatusManager->AddOneCallObject(oldCall);
     newCall->SetCallId(9);
@@ -1467,7 +1477,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_003, TestSize.Level0)
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_004, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    
+
     // init
     const std::string phoneNumber = "12345678911";
     time_t oldCallCreateTime = time(nullptr);
@@ -1475,7 +1485,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_004, TestSize.Level0)
         oldCallCreateTime = 0;
     }
     int32_t incomingMaxDuration = 10 * 1000;
-    
+
     //old call
     DialParaInfo dialParaInfoOld;
     sptr<OHOS::Telephony::CallBase> oldCall = new BluetoothCall(dialParaInfoOld, "");
@@ -1492,7 +1502,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_004, TestSize.Level0)
     newCall->SetCallCreateTime(oldCallCreateTime + incomingMaxDuration + 1000);
     newCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
     newCall->SetCallType(CallType::TYPE_IMS);
-    
+
     // scene-3: invalid diff-CreateTime
     ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(newCall), false);
     ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
@@ -1509,7 +1519,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_004, TestSize.Level0)
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_005, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    
+
     // init
     const std::string phoneNumber = "12345678911";
     time_t oldCallCreateTime = time(nullptr);
@@ -1517,7 +1527,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_005, TestSize.Level0)
         oldCallCreateTime = 0;
     }
     int32_t incomingMaxDuration = 10 * 1000;
-    
+
     // old call
     DialParaInfo dialParaInfoOld;
     sptr<OHOS::Telephony::CallBase> oldCall = new BluetoothCall(dialParaInfoOld, "");
@@ -1552,7 +1562,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_006, TestSize.Level0)
     if (dataShareHelper != nullptr) {
         std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
         ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
-        
+
         OHOS::Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
         DataShare::DataShareValueObject keyObj("key_esim_card_type");
         DataShare::DataShareValueObject valueObj("2");

@@ -417,8 +417,12 @@ int32_t BluetoothCallService::AddAudioDeviceList(const std::string &address, int
         TELEPHONY_LOGE("AddAudioDeviceList, Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
+#ifdef SUPPORT_HEARING_AID
     if (deviceType != static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK) &&
         deviceType != static_cast<int32_t>(AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID)) {
+#else
+    if (deviceType != static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK)) {
+#endif
         TELEPHONY_LOGE("AddAudioDeviceList, invalid device type!");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -433,8 +437,12 @@ int32_t BluetoothCallService::RemoveAudioDeviceList(const std::string &address, 
         TELEPHONY_LOGE("RemoveAudioDeviceList, Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
+#ifdef SUPPORT_HEARING_AID
     if (deviceType != static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK) &&
         deviceType != static_cast<int32_t>(AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID)) {
+#else
+    if (deviceType != static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK)) {
+#endif
         TELEPHONY_LOGE("RemoveAudioDeviceList, invalid device type!");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -452,7 +460,7 @@ int32_t BluetoothCallService::ResetNearlinkDeviceList()
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ResetNearlinkAudioDevicesList();
     return TELEPHONY_SUCCESS;
 }
-
+#ifdef SUPPORT_HEARING_AID
 int32_t BluetoothCallService::ResetBtHearingAidDeviceList()
 {
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
@@ -462,5 +470,6 @@ int32_t BluetoothCallService::ResetBtHearingAidDeviceList()
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ResetBtHearingAidDeviceList();
     return TELEPHONY_SUCCESS;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

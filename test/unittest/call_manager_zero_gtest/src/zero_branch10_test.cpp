@@ -171,7 +171,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_NearlinkCallClient_001, TestSize.Level1)
     EXPECT_NE(client.ResetNearlinkDeviceList(), TELEPHONY_ERR_UNINIT);
     client.UnInit();
 }
-
+#ifdef SUPPORT_HEARING_AID
 /**
  * @tc.number   Telephony_BluetoothCallClient_001
  * @tc.name     test BluetoothCallClient
@@ -184,7 +184,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_BluetoothCallClient_001, TestSize.Level1)
     EXPECT_EQ(client.RemoveAudioDevice("", AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID), TELEPHONY_ERR_UNINIT);
     EXPECT_EQ(client.ResetHearingAidDeviceList(), TELEPHONY_ERR_UNINIT);
 }
-
+#endif
 /**
  * @tc.number   Telephony_BluetoothCallService_001
  * @tc.name     test BluetoothCallService
@@ -202,8 +202,10 @@ HWTEST_F(ZeroBranch10Test, Telephony_BluetoothCallService_001, TestSize.Level1)
     EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
     result = bluetoothCallService->OnResetNearlinkDeviceList(data, reply);
     EXPECT_NE(result, TELEPHONY_ERR_PERMISSION_ERR);
+#ifdef SUPPORT_HEARING_AID
     result = bluetoothCallService->OnResetBtHearingAidDeviceList(data, reply);
     EXPECT_NE(result, TELEPHONY_ERR_PERMISSION_ERR);
+#endif
     data.WriteString("addr");
     data.WriteInt32(static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK));
     data.WriteString("name");
@@ -214,6 +216,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_BluetoothCallService_001, TestSize.Level1)
     data1.WriteInt32(static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK));
     result = bluetoothCallService->OnRemoveAudioDeviceList(data1, reply);
     EXPECT_NE(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+#ifdef SUPPORT_HEARING_AID
     result = bluetoothCallService->AddAudioDeviceList("addr",
         static_cast<int32_t>(AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID), "name");
     EXPECT_NE(result, TELEPHONY_ERR_ARGUMENT_INVALID);
@@ -226,6 +229,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_BluetoothCallService_001, TestSize.Level1)
     result = bluetoothCallService->RemoveAudioDeviceList("addr",
         static_cast<int32_t>(AudioDeviceType::DEVICE_EARPIECE));
     EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+#endif
 }
 
 class MockCallManagerCallback : public CallManagerCallback {
@@ -396,6 +400,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioControlManager_001, TestSize.Level0)
     audioControlManager->CheckTypeAndSetAudioDevice(call, VideoStateType::TYPE_VOICE,
         VideoStateType::TYPE_VIDEO, initDeviceType, device);
     EXPECT_EQ(device.deviceType, AudioDeviceType::DEVICE_NEARLINK);
+#ifdef SUPPORT_HEARING_AID
     initDeviceType = AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID;
     audioControlManager->CheckTypeAndSetAudioDevice(call, VideoStateType::TYPE_VOICE,
         VideoStateType::TYPE_VIDEO, initDeviceType, device);
@@ -408,8 +413,11 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioControlManager_001, TestSize.Level0)
     audioControlManager->SetAudioDevice(device, false);
     device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
     audioControlManager->SetAudioDevice(device, false);
+#endif
     CallObjectManager::DeleteOneCallObject(call);
+#ifdef SUPPORT_HEARING_AID
     EXPECT_TRUE(audioControlManager->IsExternalAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID));
+#endif
     EXPECT_TRUE(audioControlManager->dealCrsScene(AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL));
 }
 
@@ -428,9 +436,11 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioControlManager_002, TestSize.Level0)
     device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
     EXPECT_EQ(audioControlManager->HandleWirelessAudioDevice(device),
         CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
+#ifdef SUPPORT_HEARING_AID
     device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID;
     EXPECT_EQ(audioControlManager->HandleWirelessAudioDevice(device),
         CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
+#endif
     strcpy_s(device.address, kMaxAddressLen, "1");
     device.deviceType = AudioDeviceType::DEVICE_NEARLINK;
     EXPECT_EQ(audioControlManager->HandleWirelessAudioDevice(device),
@@ -438,9 +448,11 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioControlManager_002, TestSize.Level0)
     device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
     EXPECT_EQ(audioControlManager->HandleWirelessAudioDevice(device),
         CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
+#ifdef SUPPORT_HEARING_AID
     device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID;
     EXPECT_EQ(audioControlManager->HandleWirelessAudioDevice(device),
         CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
+#endif
     audioControlManager->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
     EXPECT_NE(audioControlManager->GetInitAudioDeviceType(), AudioDeviceType::DEVICE_NEARLINK);
 }
@@ -459,18 +471,22 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioDeviceManager_001, TestSize.Level0)
     audioDeviceManager->info_.audioDeviceList.push_back(device);
     audioDeviceManager->audioDeviceType_ = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
     audioDeviceManager->ResetNearlinkAudioDevicesList();
+#ifdef SUPPORT_HEARING_AID
     audioDeviceManager->ResetBtHearingAidDeviceList();
+#endif
     device.deviceType = AudioDeviceType::DEVICE_NEARLINK;
     audioDeviceManager->info_.audioDeviceList.push_back(device);
     audioDeviceManager->audioDeviceType_ = AudioDeviceType::DEVICE_NEARLINK;
     audioDeviceManager->ResetNearlinkAudioDevicesList();
     EXPECT_EQ(audioDeviceManager->info_.audioDeviceList.size(), 1);
+#ifdef SUPPORT_HEARING_AID
     audioDeviceManager->ReportAudioDeviceChange(device);
     device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID;
     audioDeviceManager->info_.audioDeviceList.push_back(device);
     audioDeviceManager->audioDeviceType_ = AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID;
     audioDeviceManager->ResetBtHearingAidDeviceList();
     EXPECT_EQ(audioDeviceManager->info_.audioDeviceList.size(), 1);
+#endif
     EXPECT_FALSE(audioDeviceManager->SwitchDevice(AudioDeviceType::DEVICE_NEARLINK));
     audioDeviceManager->info_.currentAudioDevice.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
     device.deviceType = AudioDeviceType::DEVICE_NEARLINK;
@@ -480,23 +496,31 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioDeviceManager_001, TestSize.Level0)
     std::string deviceName = "1";
     audioDeviceManager->UpdateNearlinkDevice(address, deviceName);
     audioDeviceManager->UpdateBtDevice(address, deviceName);
+#ifdef SUPPORT_HEARING_AID
     audioDeviceManager->UpdateBtHearingAidDevice(address, deviceName);
+#endif
     address = "";
     audioDeviceManager->UpdateNearlinkDevice(address, deviceName);
     audioDeviceManager->UpdateBtDevice(address, deviceName);
+#ifdef SUPPORT_HEARING_AID
     audioDeviceManager->UpdateBtHearingAidDevice(address, deviceName);
+#endif
     address = "1";
     deviceName = "";
     audioDeviceManager->UpdateNearlinkDevice(address, deviceName);
     audioDeviceManager->UpdateBtDevice(address, deviceName);
+#ifdef SUPPORT_HEARING_AID
     audioDeviceManager->UpdateBtHearingAidDevice(address, deviceName);
+#endif
     EXPECT_EQ(audioDeviceManager->info_.currentAudioDevice.deviceType, AudioDeviceType::DEVICE_NEARLINK);
     EXPECT_TRUE(audioDeviceManager->ConvertAddress().empty());
+#ifdef SUPPORT_HEARING_AID
     audioDeviceManager->info_.currentAudioDevice.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID;
     EXPECT_TRUE(audioDeviceManager->ConvertAddress().empty());
     EXPECT_FALSE(audioDeviceManager->SwitchDevice(AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID));
+#endif
 }
-
+#ifdef SUPPORT_HEARING_AID
 /**
  * @tc.number   Telephony_AudioDeviceManager_002
  * @tc.name     test AudioDeviceManager
@@ -516,7 +540,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioDeviceManager_002, TestSize.Level0)
     EXPECT_EQ(audioDeviceManager->info_.audioDeviceList.size(), 1);
     EXPECT_EQ(std::string(audioDeviceManager->info_.audioDeviceList.front().deviceName), "nameReplace");
 }
-
+#endif
 /**
  * @tc.number   Telephony_AudioDeviceManager_003
  * @tc.name     test AudioDeviceManager

@@ -544,7 +544,7 @@ int32_t CallStatusCallback::HandleCameraCapabilitiesChanged(
 int32_t CallStatusCallback::HandleRttEvtChanged(const RttEventInfo &rttEventInfo)
 {
     TELEPHONY_LOGI("HandleRttEvtChanged callId = %{public}d, eventType = %{public}d, info = %{public}d",
-        rttEventInfo.callId, rttEventInfo.eventType, rttEventInfo.reason);    
+        rttEventInfo.callId, rttEventInfo.eventType, rttEventInfo.reason);
     RttEvent rttEvent;
     rttEvent.callId = rttEventInfo.callId;
     rttEvent.eventType = rttEventInfo.eventType;
@@ -569,7 +569,7 @@ int32_t CallStatusCallback::HandleRttErrReport(const RttErrorInfo &rttErrorInfo)
 
     TELEPHONY_LOGI("start to close proxy for RTT error reported");
     DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UnInitRttManager();
-    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportRttCallError(rttError);  
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportRttCallError(rttError);
 }
 #endif
 } // namespace Telephony

@@ -371,7 +371,7 @@ int32_t CallManagerServiceStub::OnDialCall(MessageParcel &data, MessageParcel &r
     dialInfo.PutIntValue("dialScene", data.ReadInt32());
     dialInfo.PutIntValue("dialType", data.ReadInt32());
     dialInfo.PutIntValue("callType", data.ReadInt32());
-    dialInfo.PutIntValue("isRTT", data.ReadInt32());
+    dialInfo.PutBooleanValue("isRTT", data.ReadBool());
     dialInfo.PutStringValue("extraParams", data.ReadString());
     dialInfo.PutStringValue("bundleName", data.ReadString());
     dialInfo.PutBooleanValue("btSlotIdUnknown", data.ReadBool());

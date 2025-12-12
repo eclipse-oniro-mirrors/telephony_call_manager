@@ -892,14 +892,10 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     std::vector<sptr<CallBase>> conferenceCallList = GetConferenceCallList(call->GetSlotId());
     if (info.mpty == 1 && conferenceCallList.size() > 1) {
         SetConferenceCall(conferenceCallList);
-    } else if (call->ExitConference() == TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("SubCallSeparateFromConference success!");
-    } else {
-        TELEPHONY_LOGI("SubCallSeparateFromConference fail!");
+} else {
+        TELEPHONY_LOGI("SubCallSeparateFromConference %{public}d", call->ExitConference());
     }
 #ifdef SUPPORT_RTT_CALL
-    TELEPHONY_LOGI("Ready to init Rtt Manager when ActiveHandle, callId: %{public}d, channelId: %{public}d",
-        call->GetCallID(), info.rttChannelId);
     InitRttManager(call->GetCallID(), info.rttState, info.rttChannelId);
 #endif
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
