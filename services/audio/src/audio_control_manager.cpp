@@ -896,8 +896,6 @@ bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &rin
         ring_->Play(accountId, "", Media::HapticStartupMode::DEFAULT);
         return true;
     }
-    TELEPHONY_LOGI("type_crs but not play ringtone");
-    return false;
 }
 
 void AudioControlManager::PostProcessRingtone()
