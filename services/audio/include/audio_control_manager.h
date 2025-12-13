@@ -133,6 +133,8 @@ private:
     bool IsInEarAudioDevice(AudioDeviceType initDeviceType);
     void UnmuteSoundTone();
     void ProcessSoundtone(sptr<CallBase> &callObjectPtr);
+    void MuteWaitingTone();
+
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;

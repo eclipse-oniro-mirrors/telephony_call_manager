@@ -1145,6 +1145,7 @@ int32_t AudioControlManager::MuteRinger()
             AAFwk::WantParams params = incomingCall->GetExtraParams();
             params.SetParam("isNeedMuteRing", AAFwk::Integer::Box(1));
             incomingCall->SetExtraParams(params);
+            MuteWaitingTone();
         }
         return TELEPHONY_SUCCESS;
     }
@@ -1159,6 +1160,17 @@ int32_t AudioControlManager::MuteRinger()
     }
     TELEPHONY_LOGI("mute ring success");
     return TELEPHONY_SUCCESS;
+}
+
+void AudioControlManager::MuteWaitingTone()
+{
+    if (toneState_ == ToneState::TONEING) {
+        int32_t waitingCallCount = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_WAITING, false);
+        if (waitingCallCount > 0) {
+            StopWaitingTone();
+            TELEPHONY_LOGI("MuteWaitingTone::stop waitingTone by muteRinger");
+        }
+    }
 }
 
 void AudioControlManager::SendMuteRingEvent()
