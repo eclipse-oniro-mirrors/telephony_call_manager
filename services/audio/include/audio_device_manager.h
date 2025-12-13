@@ -94,6 +94,7 @@ public:
     void UpdateNearlinkDeviceName(const std::string &macAddress, const std::string &deviceName);
 
     AudioDeviceType GetCurrentAudioDevice();
+    AudioDeviceType IsRemoteDevicesConnected();
 
 private:
     bool EnableBtSco();

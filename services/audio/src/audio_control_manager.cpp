@@ -816,7 +816,7 @@ bool AudioControlManager::PlayRingtone()
     ContactInfo contactInfo = incomingCall->GetCallerInfo();
     AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
     if (incomingCall->GetCrsType() == CRS_TYPE) {
-        return dealCrsScene(ringMode);
+        return dealCrsScene(ringMode, info.accountId);
     }
     if (CallObjectManager::IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
@@ -865,16 +865,15 @@ bool AudioControlManager::PlayForNoRing()
     return isStarted;
 }
 
-bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &ringMode)
+bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &ringMode, int32_t accountId)
 {
     std::lock_guard<ffrt::mutex> lock(crsMutex_);
-    if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
-        if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
-            isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
-        }
+    if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)
+        && IsRingingVibrateModeOn()) {
+        isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
     }
     bool isNormalRingMode = (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL);
-    if (isNormalRingMode || IsBtOrWireHeadPlugin()) {
+    if (isNormalRingMode || AudioDeviceManager::IsRemoteDevicesConnected()) {
         isCrsStartSoundTone_ = true;
         if (!IsVoIPCallActived() && isNormalRingMode) {
             AudioDevice device = {
@@ -892,6 +891,10 @@ bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &rin
         AdjustVolumesForCrs();
         HILOG_COMM_ERROR("play soundtone fail.");
         return false;
+    } else {
+        TELEPHONY_LOGI("type_crs palyRingTone in silent and vibrat mode");
+        ring_->Play(accountId, "", Media::HapticStartupMode::DEFAULT);
+        return true;
     }
     TELEPHONY_LOGI("type_crs but not play ringtone");
     return false;
@@ -1490,11 +1493,6 @@ void AudioControlManager::MuteNetWorkRingTone(bool isMute)
 bool AudioControlManager::IsVideoCall(VideoStateType videoState)
 {
     return videoState == VideoStateType::TYPE_VIDEO;
-}
-
-bool AudioControlManager::IsBtOrWireHeadPlugin()
-{
-    return AudioDeviceManager::IsBtActived() || AudioDeviceManager::IsWiredHeadsetConnected();
 }
 
 bool AudioControlManager::IsRingingVibrateModeOn()

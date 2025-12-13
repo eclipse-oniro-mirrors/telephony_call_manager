@@ -82,7 +82,6 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_001, TestSize.Level0)
     audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
     audioControl->UpdateDeviceTypeForVideoOrSatelliteCall();
     audioControl->MuteNetWorkRingTone(true);
-    audioControl->IsBtOrWireHeadPlugin();
     ASSERT_FALSE(audioControl->IsVideoCall(VideoStateType::TYPE_RECEIVE_ONLY));
     sptr<CallBase> call = nullptr;
     audioControl->IncomingCallHungUp(call, false, "");

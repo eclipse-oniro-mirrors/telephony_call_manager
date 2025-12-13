@@ -363,6 +363,7 @@ HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_001, TestSize.Level0)
     audioDeviceManager->ProcessEvent(AudioEvent::WIRED_HEADSET_DISCONNECTED);
     audioDeviceManager->EnableBtSco();
     audioDeviceManager->GetCurrentAudioDevice();
+    audioDeviceManager->IsRemoteDevicesConnected();
     audioDeviceManager->IsEarpieceDevEnable();
     audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_SPEAKER, false);
     audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_EARPIECE, false);
@@ -403,6 +404,25 @@ HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_002, TestSize.Level0)
     audioDeviceManager->IsSpeakerDevEnable();
     ASSERT_FALSE(audioDeviceManager->IsSpeakerAvailable());
     ASSERT_FALSE(audioDeviceManager->IsBtActived());
+}
+
+/**
+ * @tc.number   Telephony_AudioDeviceManager_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_003, TestSize.Level0)
+{
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    audioDeviceManager->IsRemoteDevicesConnected();
+    audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_BLUETOOTH_SCO, true);
+    audioDeviceManager->IsRemoteDevicesConnected();
+    audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_WIRED_HEADSET, true);
+    audioDeviceManager->IsRemoteDevicesConnected();
+    audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_BLUETOOTH_SCO, false);
+    audioDeviceManager->IsRemoteDevicesConnected();
+    ASSERT_FALSE(audioDeviceManager->IsBtActived());
+    ASSERT_FALSE(audioDeviceManager->IsWiredHeadsetConnected());
 }
 
 /**
