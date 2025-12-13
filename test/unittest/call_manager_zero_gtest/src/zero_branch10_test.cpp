@@ -418,7 +418,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioControlManager_001, TestSize.Level0)
 #ifdef SUPPORT_HEARING_AID
     EXPECT_TRUE(audioControlManager->IsExternalAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID));
 #endif
-    EXPECT_TRUE(audioControlManager->dealCrsScene(AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL));
+    EXPECT_TRUE(audioControlManager->dealCrsScene(AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL, 0));
 }
 
 /**
