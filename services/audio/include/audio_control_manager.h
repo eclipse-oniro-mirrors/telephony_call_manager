@@ -133,7 +133,7 @@ private:
     bool IsInEarAudioDevice(AudioDeviceType initDeviceType);
     void UnmuteSoundTone();
     void ProcessSoundtone(sptr<CallBase> &callObjectPtr);
-    void DealMuteWaitingTone();
+    void MuteWaitingTone();
 
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
