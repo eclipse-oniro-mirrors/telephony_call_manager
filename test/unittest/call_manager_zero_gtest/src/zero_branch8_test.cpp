@@ -347,6 +347,9 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBroadCastSubscriber_002, Function | Medi
     want.SetAction("multimodal.event.MUTE_KEY_PRESS");
     data.SetWant(want);
     subscriberPtr->OnReceiveEvent(data);
+    want.SetAction("usual.event.TELEPHONY_EXIT_STR");
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
     want.SetAction("unknown.event");
     data.SetWant(want);
     subscriberPtr->OnReceiveEvent(data);
@@ -434,6 +437,32 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBroadCastSubscriber_005, Function | Medi
     EventFwk::CommonEventData data;
     OHOS::EventFwk::Want want;
     want.SetAction("usual.event.nearlink.remotedevice.NAME_UPDATE");
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    want.SetAction("unknown.event");
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    subscriberPtr->memberFuncMap_.clear();
+    subscriberPtr->OnReceiveEvent(data);
+    EXPECT_TRUE(g_receiveUnknownEvent);
+}
+
+/**
+ * @tc.number   Telephony_CallBroadCastSubscriber_006
+ * @tc.name     test OnReceiveEvent ex
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallBroadCastSubscriber_006, Function | MediumTest | Level1)
+{
+    g_receiveUnknownEvent = false;
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
+    subscriberPtr->memberFuncMap_[CallBroadcastSubscriber::UNKNOWN_BROADCAST_EVENT] =
+        [](const EventFwk::CommonEventData &data) { UnknownBroadcastStub(data); };
+    EventFwk::CommonEventData data;
+    OHOS::EventFwk::Want want;
+    want.SetAction("usual.event.TELEPHONY_EXIT_STR");
     data.SetWant(want);
     subscriberPtr->OnReceiveEvent(data);
     want.SetAction("unknown.event");

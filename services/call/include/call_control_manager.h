@@ -217,6 +217,7 @@ private:
         void HSDRBroadcastSubscriber();
         void HfpBroadcastSubscriber();
         void MuteKeyBroadcastSubscriber();
+        void TelephonyExitSTRBroadcastSubscriber();
 
     private:
         std::vector<std::shared_ptr<CallBroadcastSubscriber>> subscriberPtrList_;
