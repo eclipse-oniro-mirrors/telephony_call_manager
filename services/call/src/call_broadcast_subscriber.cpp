@@ -63,6 +63,8 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { ScreenUnlockedBroadcast(data); };
     memberFuncMap_[MUTE_KEY_PRESS] =
         [this](const EventFwk::CommonEventData &data) { MuteKeyBroadcast(data); };
+    memberFuncMap_[TELEPHONY_EXIT_STR] =
+        [this](const EventFwk::CommonEventData &data) { TelephonyExitSTRBroadcast(data); };
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -95,6 +97,8 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
         code = HFP_EVENT;
     } else if (action == "multimodal.event.MUTE_KEY_PRESS") {
         code = MUTE_KEY_PRESS;
+    } else if (action == "usual.event.TELEPHONY_EXIT_STR") {
+        code = TELEPHONY_EXIT_STR;
     } else {
         code = UNKNOWN_BROADCAST_EVENT;
     }
@@ -251,6 +255,20 @@ void CallBroadcastSubscriber::ScreenUnlockedBroadcast(const EventFwk::CommonEven
 void CallBroadcastSubscriber::MuteKeyBroadcast(const EventFwk::CommonEventData &data)
 {
     DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
+}
+
+void CallBroadcastSubscriber::TelephonyExitSTRBroadcast(const EventFwk::CommonEventData &data)
+{
+    int32_t wearStatus = data.GetWant().GetIntParam("wearStatus", 2);
+    TELEPHONY_LOGI("wearStatus= %{public}d", wearStatus);
+    auto callControlMgr = DelayedSingleton<CallControlManager>::GetInstance();
+    if (wearStatus == 0) {
+        callControlMgr->SetWearState(WEAR_STATUS_OFF);
+    } else if (wearStatus == 1) {
+        callControlMgr->SetWearState(WEAR_STATUS_ON);
+    } else {
+        callControlMgr->SetWearState(WEAR_STATUS_INVALID);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

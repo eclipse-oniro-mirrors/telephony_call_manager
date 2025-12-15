@@ -46,7 +46,8 @@ private:
         HSDR_EVENT,
         HFP_EVENT,
         SCREEN_UNLOCKED,
-        MUTE_KEY_PRESS
+        MUTE_KEY_PRESS,
+        TELEPHONY_EXIT_STR
     };
     using broadcastSubscriberFunc = std::function<void(const EventFwk::CommonEventData &data)>;
 
@@ -63,6 +64,7 @@ private:
     void HfpConnectBroadcast(const EventFwk::CommonEventData &data);
     void ScreenUnlockedBroadcast(const EventFwk::CommonEventData &data);
     void MuteKeyBroadcast(const EventFwk::CommonEventData &data);
+    void TelephonyExitSTRBroadcast(const EventFwk::CommonEventData &data);
     std::map<uint32_t, broadcastSubscriberFunc> memberFuncMap_;
 };
 } // namespace Telephony

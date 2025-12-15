@@ -1836,6 +1836,7 @@ void CallControlManager::SystemAbilityListener::OnAddSystemAbility(int32_t syste
     HSDRBroadcastSubscriber();
     HfpBroadcastSubscriber();
     MuteKeyBroadcastSubscriber();
+    TelephonyExitSTRBroadcastSubscriber();
     IPCSkeleton::SetCallingIdentity(identity);
     TELEPHONY_LOGI("CallControlManager add BroadcastSubscriber");
 }
@@ -1954,6 +1955,19 @@ void CallControlManager::SystemAbilityListener::MuteKeyBroadcastSubscriber()
     subscriberPtrList_.emplace_back(subscriber);
     bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
     TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
+}
+
+void CallControlManager::SystemAbilityListener::TelephonyExitSTRBroadcastSubscriber()
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent("usual.event.TELEPHONY_EXIT_STR");
+    EventFwk::CommonEventSubscribeInfo subscriberInfos(matchingSkills);
+    subscriberInfos.SetPriority(SECOND_PRIORITY);
+    subscriberInfos.SetPermission("ohos.permission.RECEIVER_STARTUP_COMPLETED");
+    subscriberInfos.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    std::shared_ptr<CallBroadcastSubscriber> subscriber = std::make_shared<CallBroadcastSubscriber>(subscriberInfos);
+    subscriberPtrList_.emplace_back(subscriber);
+    EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
 }
 
 int32_t CallControlManager::SubscriberSaStateChange()
