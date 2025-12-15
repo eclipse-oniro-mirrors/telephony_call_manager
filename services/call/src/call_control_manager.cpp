@@ -1967,7 +1967,7 @@ void CallControlManager::SystemAbilityListener::TelephonyExitSTRBroadcastSubscri
     subscriberInfos.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     std::shared_ptr<CallBroadcastSubscriber> subscriber = std::make_shared<CallBroadcastSubscriber>(subscriberInfos);
     subscriberPtrList_.emplace_back(subscriber);
-    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
+    EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
 }
 
 int32_t CallControlManager::SubscriberSaStateChange()
