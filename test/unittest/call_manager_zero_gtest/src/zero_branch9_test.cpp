@@ -82,7 +82,6 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_001, TestSize.Level0)
     audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
     audioControl->UpdateDeviceTypeForVideoOrSatelliteCall();
     audioControl->MuteNetWorkRingTone(true);
-    audioControl->IsBtOrWireHeadPlugin();
     ASSERT_FALSE(audioControl->IsVideoCall(VideoStateType::TYPE_RECEIVE_ONLY));
     sptr<CallBase> call = nullptr;
     audioControl->IncomingCallHungUp(call, false, "");
@@ -443,7 +442,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
     audioControl->HandleWirelessAudioDevice(device);
     device.deviceType = AudioDeviceType::DEVICE_NEARLINK;
     audioControl->HandleWirelessAudioDevice(device);
-    audioControl->dealCrsScene(AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL);
+    audioControl->DealCrsScene(AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL, mDialParaInfo.accountId);
     audioControl->AdjustVolumesForCrs();
     sptr<CallBase> imsCall = new IMSCall(mDialParaInfo);
     imsCall->SetIsAnsweredByPhone(true);

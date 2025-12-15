@@ -879,5 +879,14 @@ void AudioDeviceManager::SetDeviceAvailable(AudioDeviceType deviceType, bool ava
             break;
     }
 }
+
+bool AudioDeviceManager::IsRemoteDevicesConnected()
+{
+    AudioDevice device = {
+        .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+        .address = { 0 },
+    };
+    return IsBtActived() || IsWiredHeadsetConnected() || IsNearlinkActived(device);
+}
 } // namespace Telephony
 } // namespace OHOS

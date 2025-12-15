@@ -49,6 +49,8 @@ public:
     static void SetDeviceAvailable(AudioDeviceType deviceType, bool available);
     static bool SetVirtualCall(bool isVirtual);
     static bool GetVirtualCall();
+    static bool IsRemoteDevicesConnected();
+
     bool SwitchDevice(AudioDeviceType device, bool isSetAudioDeviceByUser = false);
     void AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType, const std::string &deviceName);
     void RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType);
