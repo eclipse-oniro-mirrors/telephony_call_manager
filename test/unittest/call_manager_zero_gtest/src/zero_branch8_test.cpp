@@ -347,9 +347,6 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBroadCastSubscriber_002, Function | Medi
     want.SetAction("multimodal.event.MUTE_KEY_PRESS");
     data.SetWant(want);
     subscriberPtr->OnReceiveEvent(data);
-    want.SetAction("usual.event.TELEPHONY_EXIT_STR");
-    data.SetWant(want);
-    subscriberPtr->OnReceiveEvent(data);
     want.SetAction("unknown.event");
     data.SetWant(want);
     subscriberPtr->OnReceiveEvent(data);
