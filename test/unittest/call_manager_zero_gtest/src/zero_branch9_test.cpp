@@ -442,7 +442,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
     audioControl->HandleWirelessAudioDevice(device);
     device.deviceType = AudioDeviceType::DEVICE_NEARLINK;
     audioControl->HandleWirelessAudioDevice(device);
-    audioControl->dealCrsScene(AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL, mDialParaInfo.accountId);
+    audioControl->DealCrsScene(AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL, mDialParaInfo.accountId);
     audioControl->AdjustVolumesForCrs();
     sptr<CallBase> imsCall = new IMSCall(mDialParaInfo);
     imsCall->SetIsAnsweredByPhone(true);
