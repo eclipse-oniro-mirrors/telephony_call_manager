@@ -51,7 +51,7 @@
 #include "distributed_communication_manager.h"
 #endif
 #include "settings_datashare_helper.h"
-#include "telephony_types.h"
+
 #ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
 #endif
@@ -1968,7 +1968,6 @@ void CallControlManager::SystemAbilityListener::TelephonyExitSTRBroadcastSubscri
     std::shared_ptr<CallBroadcastSubscriber> subscriber = std::make_shared<CallBroadcastSubscriber>(subscriberInfos);
     subscriberPtrList_.emplace_back(subscriber);
     bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
-    TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
 }
 
 int32_t CallControlManager::SubscriberSaStateChange()

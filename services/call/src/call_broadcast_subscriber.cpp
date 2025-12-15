@@ -259,7 +259,6 @@ void CallBroadcastSubscriber::MuteKeyBroadcast(const EventFwk::CommonEventData &
 
 void CallBroadcastSubscriber::TelephonyExitSTRBroadcast(const EventFwk::CommonEventData &data)
 {
-    const std::string WEAR_STATIS = "broadcast";
     int32_t wearStatus = data.GetWant().GetIntParam("wearStatus", 2);
     TELEPHONY_LOGI("wearStatus= %{public}d", wearStatus);
     auto callControlMgr = DelayedSingleton<CallControlManager>::GetInstance();
