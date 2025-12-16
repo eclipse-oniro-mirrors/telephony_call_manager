@@ -798,6 +798,17 @@ struct CameraCapabilitiesReportInfo {
     int32_t height = 0;
 };
 
+struct ImsSuppSvcNotificationReportInfo {
+    /**
+     * Indicates the call supplementary service notification.
+     */
+    int32_t code = 0;
+    /**
+     * Indicates the call id.
+     */
+    int32_t callId = 0;
+};
+
 /**
  * @brief Indicates the specific IMS config item.
  */
