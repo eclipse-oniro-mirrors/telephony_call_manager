@@ -165,6 +165,17 @@ void CallRequestProcess::AnswerRequestForDsda(
         call->SetAutoAnswerState(true);
         HoldOrDisconnectedCall(callId, slotId, videoState);
     } else {
+        if (NeedAnswerVTAndEndActiveVO(callId, videoState)) {
+            TELEPHONY_LOGI("Answer videoCall for not Dsda");
+            DisconnectOtherCallForVideoCall(callId);
+            call->SetAutoAnswerState(true);
+            return;
+        } else if (NeedAnswerVOAndEndActiveVT(callId, videoState)) {
+            TELEPHONY_LOGI("Answer voiceCall for not Dsda, but has video call");
+            DisconnectOtherCallForVideoCall(callId);
+            call->SetAutoAnswerState(true);
+            return;
+        }
         int32_t ret = call->AnswerCall(videoState, isRTT);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("AnswerCall failed!");
