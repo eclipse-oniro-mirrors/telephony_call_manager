@@ -541,6 +541,20 @@ int32_t CallStatusCallback::HandleCameraCapabilitiesChanged(
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCameraCapabilities(cameraCapabilities);
 }
 
+int32_t CallStatusCallback::HandleImsSuppSvcNotification(const ImsSuppSvcNotificationReportInfo &response)
+{
+    TELEPHONY_LOGI("--lzq entry CallStatusCallback::HandleImsSuppSvcNotification");
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(response.callId);
+    AAFwk::WantParams params = callPtr->GetExtraParams();
+    params.SetParam("code", AAFwk::Integer::Box(response.code));
+    params.SetParam("callId", AAFwk::Integer::Box(response.callId));
+    TELEPHONY_LOGI("--lzq callId: %{public}d, code: %{public}d", response.callId, response.code);
+    callPtr->SetExtraParams(params);
+    TelCallState callState = callPtr->GetTelCallState();
+    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->CallStateUpdated(callPtr, callState, callState);
+    return TELEPHONY_SUCCESS;
+}
+
 #ifdef SUPPORT_RTT_CALL
 int32_t CallStatusCallback::HandleRttEvtChanged(const RttEventInfo &rttEventInfo)
 {
