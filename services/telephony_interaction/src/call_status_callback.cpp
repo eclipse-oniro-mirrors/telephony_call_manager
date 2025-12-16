@@ -23,6 +23,7 @@
 #include "hitrace_meter.h"
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
+#include "int_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
