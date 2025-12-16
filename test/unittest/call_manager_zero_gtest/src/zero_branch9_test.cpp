@@ -448,6 +448,21 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
     imsCall->SetIsAnsweredByPhone(true);
     EXPECT_NO_THROW(audioControl->HandleCallStateUpdated(imsCall, TelCallState::CALL_STATUS_INCOMING,
         TelCallState::CALL_STATUS_ACTIVE));
+    EXPECT_TRUE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_INCOMING,
+        TelCallState::CALL_STATUS_ANSWERED));
+    EXPECT_FALSE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_INCOMING,
+        TelCallState::CALL_STATUS_INCOMING));
+    EXPECT_TRUE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_ACTIVE,
+        TelCallState::CALL_STATUS_DISCONNECTING));
+    EXPECT_TRUE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_DISCONNECTING,
+        TelCallState::CALL_STATUS_DISCONNECTED));
+    imsCall->SetIsAnsweredByPhone(false);
+    EXPECT_TRUE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_INCOMING,
+        TelCallState::CALL_STATUS_ANSWERED));
+    EXPECT_FALSE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_INCOMING,
+        TelCallState::CALL_STATUS_ACTIVE));
+    EXPECT_FALSE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_WAITING,
+        TelCallState::CALL_STATUS_ACTIVE));
 }
 
 /**

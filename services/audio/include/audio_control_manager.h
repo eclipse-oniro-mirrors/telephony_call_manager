@@ -104,6 +104,7 @@ private:
     void ApplyFocusForBlueToothCall(TelCallState nextState);
     void HandlePriorState(sptr<CallBase> &callObjectPtr, TelCallState priorState);
     void HandleCallStateUpdatedForVoip(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
+    bool PreHandleAnswerdState(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
     void HandleCallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
     void HandleNewActiveCall(sptr<CallBase> &callObjectPtr);
     bool IsNumberAllowed(const std::string &phoneNum);
