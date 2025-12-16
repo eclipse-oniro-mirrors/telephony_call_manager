@@ -66,6 +66,7 @@ public:
     int32_t HandleCallDataUsageChanged(const int64_t result) override;
     int32_t HandleCameraCapabilitiesChanged(const CameraCapabilitiesReportInfo &cameraCapabilities) override;
     int32_t UpdateVoipEventInfo(const VoipCallEventInfo &info) override;
+    int32_t HandleImsSuppSvcNotification(const ImsSuppSvcNotificationReportInfo &response) override;
 #ifdef SUPPORT_RTT_CALL
     int32_t HandleRttEvtChanged(const RttEventInfo &rttEventInfo) override;
     int32_t HandleRttErrReport(const RttErrorInfo &rttErrorInfo) override;
