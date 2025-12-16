@@ -351,6 +351,12 @@ public:
         return TELEPHONY_SUCCESS;
     }
 
+    int32_t OnImsSuppSvcNotification(const CameraCapabilities &cameraCapabilities)
+        {
+            TELEPHONY_LOGI("OnImsSuppSvcNotification success!");
+            return TELEPHONY_SUCCESS;
+    }
+
 #ifdef SUPPORT_RTT_CALL
     int32_t OnReportRttCallEvtChanged(const RttEvent &info)
     {
