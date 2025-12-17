@@ -71,32 +71,11 @@ public:
     void SetMuteState(bool isMuted);
     bool GetMuteState();
     std::string ConvertAddress();
-
-    /**
-     * UpdateEarpieceDevice
-     *
-     * @brief update earpiece device
-     */
     void UpdateEarpieceDevice();
-
-    /**
-     * @brief Update bluetooth device name
-     *
-     * @param macAddress[in], mac address
-     * @param deviceName[in], device name
-     */
     void UpdateBluetoothDeviceName(const std::string &macAddress, const std::string &deviceName);
-
-    /**
-     * @brief Update nearlink device name
-     *
-     * @param macAddress[in], mac address
-     * @param deviceName[in], device name
-     */
     void UpdateNearlinkDeviceName(const std::string &macAddress, const std::string &deviceName);
-
     AudioDeviceType GetCurrentAudioDevice();
-
+    void UpdateCurrentAudioDevice();
 private:
     bool EnableBtSco();
     bool EnableNearlink();
