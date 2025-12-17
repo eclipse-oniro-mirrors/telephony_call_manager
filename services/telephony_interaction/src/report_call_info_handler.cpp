@@ -79,7 +79,7 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
     });
     return TELEPHONY_SUCCESS;
 }
- 
+
 #ifdef NOT_SUPPORT_MULTICALL
 void ReportCallInfoHandler::DisconnectBtCallWhenPhoneAnswered(const CallDetailInfo &info)
 {
