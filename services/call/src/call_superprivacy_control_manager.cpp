@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
- #include "call_superprivacy_control_manager.h"
+#include "call_superprivacy_control_manager.h"
 
- #include "syspara/parameters.h"
- #include "audio_device_manager.h"
+#include "syspara/parameters.h"
+#include "audio_device_manager.h"
 #include "call_ability_report_proxy.h"
 #include "call_control_manager.h"
 #include "call_manager_hisysevent.h"
