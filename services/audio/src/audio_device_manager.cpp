@@ -897,7 +897,7 @@ void AudioDeviceManager::UpdateCurrentAudioDevice()
     };
     if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device) == TELEPHONY_SUCCESS) {
         SetCurrentAudioDevice(device);
-    }  
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
