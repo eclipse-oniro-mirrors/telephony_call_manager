@@ -13,15 +13,17 @@
  * limitations under the License.
  */
 
+ #include "call_superprivacy_control_manager.h"
+
+ #include "syspara/parameters.h"
+ #include "audio_device_manager.h"
 #include "call_ability_report_proxy.h"
-#include "call_superprivacy_control_manager.h"
-#include "call_number_utils.h"
 #include "call_control_manager.h"
-#include "syspara/parameters.h"
-#include "super_privacy_manager_client.h"
+#include "call_manager_hisysevent.h"
+#include "call_number_utils.h"
 #include "display_manager.h"
 #include "display_info.h"
-#include "call_manager_hisysevent.h"
+#include "super_privacy_manager_client.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -154,6 +156,7 @@ void CallSuperPrivacyControlManager::CloseAnswerSuperPrivacyMode(int32_t callId,
     if (privacy == SUPER_PRIVACY_MODE_REQUEST_SUCCESS) {
         DelayedSingleton<CallControlManager>::GetInstance()->AnswerCall(callId, videoState);
         SuperPrivacyModeChangeEvent();
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->UpdateCurrentAudioDevice();
     }
 }
 

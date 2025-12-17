@@ -97,6 +97,8 @@ public:
 
     AudioDeviceType GetCurrentAudioDevice();
 
+    void UpdateCurrentAudioDevice();
+
 private:
     bool EnableBtSco();
     bool EnableNearlink();
