@@ -42,6 +42,9 @@ public:
 
 private:
     void BuildCallDetailsInfo(CallDetailsInfo &info, CallDetailsInfo &callDetailsInfo);
+#ifdef NOT_SUPPORT_MULTICALL
+    void DisconnectBtCallWhenPhoneAnswered(const CallDetailInfo &info);
+#endif
 
 private:
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_;
