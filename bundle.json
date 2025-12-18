@@ -92,7 +92,10 @@
                 ],
                 "service_group": [
                     "//base/telephony/call_manager:tel_call_manager",
-                    "//base/telephony/call_manager/sa_profile:call_manager_sa_profile"
+                    "//base/telephony/call_manager/sa_profile:call_manager_sa_profile",
+                    "//base/telephony/call_manager/services/etc/init:telecom_trust",
+                    "//base/telephony/call_manager/services/etc/init:telecom.cfg"
+
                 ]
             },
             "inner_kits": [
