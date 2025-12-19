@@ -28,7 +28,7 @@
 
 #include "i_call_manager_service.h"
 #include "i_call_ability_callback.h"
-#include "timer.h"
+#include "telephony_log_wrapper.h"
 
 #include "call_manager_callback.h"
 #include "call_ability_callback.h"
