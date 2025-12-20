@@ -545,7 +545,7 @@ int CellularCallConnection::StopRtt(const CellularCallInfo &callInfo)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t slotId = callInfo.slotId;
-    int32_t callId = callInfo.callId;
+    int32_t callId = callInfo.index;
     int errCode = cellularCallInterfacePtr_->StopRtt(slotId, callId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("StopRtt failed, errcode:%{public}d", errCode);
@@ -562,7 +562,7 @@ int CellularCallConnection::UpdateImsRttCallMode(const CellularCallInfo &callInf
     }
 
     int32_t slotId = callInfo.slotId;
-    int32_t callId = callInfo.callId;
+    int32_t callId = callInfo.index;
     int errCode = cellularCallInterfacePtr_->UpdateImsRttCallMode(slotId, callId, mode);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateImsRttCallMode failed, errcode:%{public}d", errCode);

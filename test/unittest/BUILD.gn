@@ -95,6 +95,8 @@ ohos_static_library("call_manager_test_base") {
     "LOG_DOMAIN = 0xD001F10",
   ]
 
+  defines += call_manager_defines
+
   if (device_name == "rk3568") {
     defines += [ "CALL_MANAGER_AUTO_START_OPTIMIZE" ]
   }

@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <string.h>
 #include "ffrt.h"
+#include <sys/ioctl.h>
 
 namespace OHOS {
 namespace Telephony {

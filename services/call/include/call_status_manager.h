@@ -172,6 +172,10 @@ private:
     bool UpdateDialingHandle(const CallDetailInfo &info, bool &isDistributedDeviceDialing);
     bool RefreshDialingStateByOtherState(sptr<CallBase> &call, const CallDetailInfo &info);
     void PackVoipCallInfo(DialParaInfo &paraInfo, const CallDetailInfo &info);
+#ifdef SUPPORT_RTT_CALL
+    void UpdatePrevRttState(const CallDetailInfo &info);
+    void DoInitRtt(sptr<CallBase> &call, const CallDetailInfo &info);
+#endif
 
 private:
     CallDetailInfo callReportInfo_;

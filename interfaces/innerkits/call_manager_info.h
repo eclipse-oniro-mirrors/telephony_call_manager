@@ -47,6 +47,9 @@ struct CellularCallInfo {
      */
     int32_t videoState = 0;
     int32_t index = 0;
+    /**
+     * Indicates the call is RTT.
+     */
     bool isRTT = false;
 };
 
@@ -403,6 +406,11 @@ struct CallAttributeInfo {
      * Whether to use the RTT call.
      */
     RttCallState rttState = RttCallState::RTT_STATE_NO;
+
+    /**
+     * The disconnected call is RTT call.
+     */
+    bool isPrevRtt = false;
 };
 
 /**
