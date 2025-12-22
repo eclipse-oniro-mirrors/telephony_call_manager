@@ -1901,6 +1901,15 @@ int32_t CallManagerService::WriteVoipCallFaultEvent(std::string voipCallId, int3
 
 bool CallManagerService::EndCall()
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL) &&
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->EndCall();
     } else {
