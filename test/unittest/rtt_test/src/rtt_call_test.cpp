@@ -431,8 +431,8 @@ HWTEST_F(RttCallTest, Telephony_ImsRttManagerTest002, Function | MediumTest | Le
 
     uint16_t channelId = 1;
     int32_t callId = 1;
-    EXPECT_NO_THROW(manager.SetChannelId(channelId));
-    EXPECT_NO_THROW(manager.SetCallId(callId));
+    EXPECT_NO_THROW(manager.SetChannelID(channelId));
+    EXPECT_NO_THROW(manager.SetCallID(callId));
     EXPECT_NO_THROW(manager.SendRttMessage(reportMessage));
 }
 

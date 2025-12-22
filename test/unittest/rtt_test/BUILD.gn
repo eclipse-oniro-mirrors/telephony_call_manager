@@ -64,6 +64,7 @@ ohos_unittest("rtt_call_test") {
     "LOG_DOMAIN = 0xD000F00",
     "private = public",
     "protected = public",
-    "ABILITY_BLUETOOTH_SUPPORT = 0x1",
   ]
+
+  defines += call_manager_defines
 }

@@ -149,6 +149,12 @@ public:
 #ifdef SUPPORT_RTT_CALL
     static napi_value SendRttMessage(napi_env env, napi_callback_info info);
     static napi_value SetRttCapability(napi_env env, napi_callback_info info);
+    static napi_value OffRttModifyInd(napi_env env, napi_callback_info info);
+    static napi_value OffRttErrCause(napi_env env, napi_callback_info info);
+    static napi_value OffReceiveRttMessage(napi_env env, napi_callback_info info);
+    static napi_value OnRttModifyInd(napi_env env, napi_callback_info info);
+    static napi_value OnReceiveRttMessage(napi_env env, napi_callback_info info);
+    static napi_value OnRttErrCause(napi_env env, napi_callback_info info);
 #endif
 
 private:

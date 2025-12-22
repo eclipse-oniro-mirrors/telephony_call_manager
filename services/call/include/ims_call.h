@@ -79,6 +79,8 @@ public:
     RttCallState GetRttState();
     void SetRttChannelId(int32_t rttChannelId);
     int32_t GetRttChannelId();
+    void SetIsPrevRtt(bool isPrevRtt);
+    bool GetIsPrevRtt();
 #endif
 
 private:
@@ -92,6 +94,7 @@ private:
 #ifdef SUPPORT_RTT_CALL
     RttCallState rttState_ = RttCallState::RTT_STATE_NO;
     int32_t rttChannelId_ = -1;
+    bool isPrevRtt_ = false;
 #endif
 };
 } // namespace Telephony

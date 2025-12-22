@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 #include <unistd.h>
-#include <sys/ioctl.h>
 #include <cerrno>
 #include <cstdlib>
 #include <fcntl.h>

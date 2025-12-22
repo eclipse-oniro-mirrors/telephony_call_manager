@@ -565,6 +565,12 @@ void CallBase::SetCallCreateTime(time_t callCreateTime)
     callCreateTime_ = callCreateTime;
 }
 
+time_t CallBase::GetCallCreateTime()
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    return callCreateTime_;
+}
+
 void CallBase::SetCallEndTime(time_t callEndTime)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);

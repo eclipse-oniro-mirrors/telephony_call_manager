@@ -71,7 +71,7 @@ public:
     void AddOneCallRecord(CallAttributeInfo &info);
     void CopyCallInfoToRecord(CallAttributeInfo &info, CallRecordInfo &data);
     int32_t RemoveMissedIncomingCallNotification();
-    int32_t GetCallFeatures(int32_t videoState);
+    int32_t GetCallFeatures(CallAttributeInfo &info);
     bool IsVideoCall(int32_t videoState);
     void SetDataShareReady(bool isDataShareReady);
     void SetSystemAbilityAdd(bool isSystemAbilityAdd);
@@ -84,6 +84,9 @@ private:
     int32_t CopyFormatNumberToE164ToRecord(std::string &countryIso, CallRecordInfo &data);
     void RegisterDataShareReadySubscriber();
     void GetNumberMarkSource(int32_t userId, char *source, unsigned int size);
+#ifdef SUPPORT_RTT_CALL
+    void RefreshRttFlag(sptr<CallBase> &callObjectPtr, CallAttributeInfo &info);
+#endif
     std::shared_ptr<CallRecordsHandlerService> callRecordsHandlerServerPtr_;
     ffrt::mutex mutex_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;

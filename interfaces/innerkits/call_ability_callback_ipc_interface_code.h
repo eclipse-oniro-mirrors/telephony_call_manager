@@ -35,11 +35,9 @@ enum CallManagerCallAbilityInterfaceCode {
     CALL_DATA_USAGE_CHANGE,
     CAMERA_CAPABILITIES_CHANGE,
     UPDATE_PHONE_STATE,
-#ifdef SUPPORT_RTT_CALL
     RTT_CALL_EVENT_CHANGE,
     RTT_CALL_ERROR_REPORT,
     RTT_CALL_SEND_MESSAGE,
-#endif
 };
 } // namespace Telephony
 } // namespace OHOS

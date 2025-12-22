@@ -207,5 +207,11 @@ export default {
     stopRtt: call.stopRtt,
     sendUssdResponse: call.sendUssdResponse,
     sendRttMessage: call.sendRttMessage,
-    setRttCapability: call.setRttCapability
+    setRttCapability: call.setRttCapability,
+    onRttModifyInd: call.onRttModifyInd,
+    offRttModifyInd: call.offRttModifyInd,
+    onRttErrCause: call.onRttErrCause,
+    offRttErrCause: call.offRttErrCause,
+    onReceiveRttMessage: call.onReceiveRttMessage,
+    offReceiveRttMessage: call.offReceiveRttMessage
 };

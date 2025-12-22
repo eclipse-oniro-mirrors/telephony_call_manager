@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//base/telephony/call_manager/callmanager.gni")
+import("../../callmanager.gni")
 
 SUBSYSTEM_DIR = "../.."
 config("call_manager_config") {

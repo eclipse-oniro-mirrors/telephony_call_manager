@@ -15,6 +15,7 @@ import("//build/config/components/ets_frontend/es2abc_config.gni")
 import("//build/ohos.gni")
 import("//build/ohos/ace/ace.gni")
 import("//build/templates/abc/ohos_abc.gni")
+import("../../callmanager.gni")
 
 SUBSYSTEM_DIR = "../../.."
 config("call_manager_js_config") {
@@ -113,6 +114,8 @@ ohos_shared_library("call") {
     "LOG_DOMAIN = 0xD001F10",
   ]
 
+  defines += call_manager_defines
+  
   part_name = "call_manager"
   subsystem_name = "telephony"
   relative_install_dir = "module/telephony"

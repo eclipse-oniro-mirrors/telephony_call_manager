@@ -99,6 +99,7 @@ public:
     void SetRingBeginTime(time_t ringBeginTime);
     void SetRingEndTime(time_t ringEndTime);
     void SetAnswerType(CallAnswerType answerType);
+    time_t GetCallCreateTime();
     CallAnswerType GetAnswerType();
     CallEndedType GetCallEndedType();
     int32_t SetCallEndedType(CallEndedType callEndedType);

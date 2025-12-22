@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("../../../callmanager.gni")
 CALL_MANAGER_PATH = "../../.."
 
 ohos_executable("tel_call_manager_ui_test") {
@@ -60,6 +61,8 @@ ohos_executable("tel_call_manager_ui_test") {
     "TELEPHONY_LOG_TAG = \"CallManagerUiTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+
+  defines += call_manager_defines
 
   part_name = "call_manager"
   subsystem_name = "telephony"

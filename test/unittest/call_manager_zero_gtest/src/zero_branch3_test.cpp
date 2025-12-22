@@ -671,8 +671,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallRecordsManager_001, TestSize.Level0)
     info.ringEndTime = ONE_TIME;
     callRecordsManager.AddOneCallRecord(info);
     callRecordsManager.RemoveMissedIncomingCallNotification();
-    int32_t videoState = static_cast<int32_t>(VideoStateType::TYPE_VIDEO);
-    callRecordsManager.GetCallFeatures(videoState);
+    info.originalCallType = static_cast<int32_t>(VideoStateType::TYPE_VIDEO);
+    callRecordsManager.GetCallFeatures(info);
     nextState = TelCallState::CALL_STATUS_DISCONNECTED;
     callRecordsManager.CallStateUpdated(callObjectPtr, priorState, nextState);
     callObjectPtr->SetCallDirection(CallDirection::CALL_DIRECTION_IN);
@@ -681,6 +681,35 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallRecordsManager_001, TestSize.Level0)
     callRecordsManager.CallStateUpdated(callObjectPtr, priorState, nextState);
 }
 
+/**
+ * @tc.number   Telephony_CallRecordsManager_003
+ * @tc.name     test marksource
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_CallRecordsManager_003, TestSize.Level0)
+{
+    CallRecordsManager callRecordsManager;
+    int32_t userId = 0;
+    NumberMarkInfo markInfo;
+    ASSERT_NO_THROW(callRecordsManager.GetNumberMarkSource(userId, markInfo.markSource, kMaxNumberLen + 1));
+#ifdef SUPPORT_RTT_CALL
+    CallAttributeInfo info;
+    DialParaInfo dialParaInfo;
+    info.videoState = VideoStateType::TYPE_VIDEO;
+    callRecordsManager.GetCallFeatures(info);
+    info.isPrevRtt = true;
+    callRecordsManager.GetCallFeatures(info);
+    sptr<CallBase> callObjectPtr = new IMSCall(dialParaInfo);
+    ASSERT_TRUE(callObjectPtr != nullptr);
+    callObjectPtr->SetCallType(CallType::TYPE_IMS);
+    ASSERT_NO_THROW(callRecordsManager.RefreshRttFlag(callObjectPtr, info));
+    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(callObjectPtr.GetRefPtr());
+    EXPECT_EQ(info.isPrevRtt, imsCall->GetIsPrevRtt());
+    callObjectPtr->SetCallType(CallType::TYPE_CS);
+    ASSERT_NO_THROW(callRecordsManager.RefreshRttFlag(callObjectPtr, info));
+    ASSERT_NE(callObjectPtr, nullptr);
+#endif
+}
 /**
  * @tc.number   Telephony_CallControlManager_001
  * @tc.name     test error branch
@@ -1914,7 +1943,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_017, TestSize.Level0)
 
 #ifdef SUPPORT_RTT_CALL
     DialParaInfo dialInfo;
-    sptr<CallBase> imsCall = new IMSCall(dialInfo);
+    sptr<IMSCall> imsCall = new IMSCall(dialInfo);
     callStatusManager->InitRttManager(
         imsCall->GetCallID(), imsCall->GetRttState(), imsCall->GetRttChannelId());
     callStatusManager->UnInitRttManager();
