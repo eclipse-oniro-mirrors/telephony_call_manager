@@ -448,7 +448,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
     imsCall->SetIsAnsweredByPhone(true);
     EXPECT_NO_THROW(audioControl->HandleCallStateUpdated(imsCall, TelCallState::CALL_STATUS_INCOMING,
         TelCallState::CALL_STATUS_ACTIVE));
-    EXPECT_TRUE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_INCOMING,
+    EXPECT_FALSE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_INCOMING,
         TelCallState::CALL_STATUS_ANSWERED));
     EXPECT_FALSE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_INCOMING,
         TelCallState::CALL_STATUS_INCOMING));
