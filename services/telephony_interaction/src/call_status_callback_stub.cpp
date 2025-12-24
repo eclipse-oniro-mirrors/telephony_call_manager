@@ -236,6 +236,7 @@ void CallStatusCallbackStub::BuildCallReportInfo(MessageParcel &data, CallReport
     parcelPtr.newCallUseBox = data.ReadInt32();
     parcelPtr.rttState = static_cast<RttCallState>(data.ReadInt32());
     parcelPtr.rttChannelId = data.ReadInt32();
+    parcelPtr.imsDomain = data.ReadInt32();
 }
 
 int32_t CallStatusCallbackStub::OnUpdateDisconnectedCause(MessageParcel &data, MessageParcel &reply)
