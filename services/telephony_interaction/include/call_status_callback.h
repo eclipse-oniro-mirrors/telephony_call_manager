@@ -65,7 +65,7 @@ public:
     int32_t HandlePeerDimensionsChanged(const PeerDimensionsReportInfo &dimensionsDetail) override;
     int32_t HandleCallDataUsageChanged(const int64_t result) override;
     int32_t HandleCameraCapabilitiesChanged(const CameraCapabilitiesReportInfo &cameraCapabilities) override;
-    int32_t HandleImsSuppSvcNotification(const ImsSuppSvcNotificationReportInfo &response) override;
+    int32_t HandleImsSuppExtChanged(const ImsSuppExtReportInfo &suppExtInfo) override;
     int32_t UpdateVoipEventInfo(const VoipCallEventInfo &info) override;
 #ifdef SUPPORT_RTT_CALL
     int32_t HandleRttEvtChanged(const RttEventInfo &rttEventInfo) override;
