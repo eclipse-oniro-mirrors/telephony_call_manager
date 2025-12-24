@@ -73,7 +73,7 @@ private:
     int32_t OnCallDataUsageChange(MessageParcel &data, MessageParcel &reply);
     int32_t OnCameraCapabilitiesChange(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateVoipEventInfo(MessageParcel &data, MessageParcel &reply);
-    int32_t OnImsSuppSvcNotification(MessageParcel &data, MessageParcel &reply);
+    int32_t OnImsSuppExtChange(MessageParcel &data, MessageParcel &reply);
 
 #ifdef SUPPORT_RTT_CALL
     int32_t OnHandleRttEvtChanged(MessageParcel &data, MessageParcel &reply);
