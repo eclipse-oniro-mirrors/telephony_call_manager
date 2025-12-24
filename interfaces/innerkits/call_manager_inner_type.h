@@ -826,7 +826,6 @@ struct ImsSuppExtReportInfo {
      */
     int32_t callIndex = 0;
 };
- 
 
 /**
  * @brief Indicates the specific IMS config item.
