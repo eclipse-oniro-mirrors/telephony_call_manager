@@ -317,12 +317,12 @@ public:
     int32_t UpdateVoipEventInfo(const VoipCallEventInfo &info) override;
 
     /**
-     * @brief handle the call hold state
+     * @brief Handle the supplementary service information update event
      *
-     * @param reportInfo[in], supplementary service notification.
+     * @param suppExtInfo[in], contains supplementary service information
      * @return Returns 0 on success, others on failure.
      */
-    int32_t HandleImsSuppSvcNotification(const ImsSuppSvcNotificationReportInfo &response) override;
+    int32_t HandleImsSuppExtChanged(const ImsSuppExtReportInfo &suppExtInfo) override;
 
 #ifdef SUPPORT_RTT_CALL
     /**
