@@ -141,18 +141,10 @@ void CallRequestProcess::AnswerRequestForDsda(
     if (IsDsdsMode3()) {
         DisconnectOtherSubIdCall(callId, slotId, videoState);
     } else if (IsDsdsMode5()) {
-        if (NeedAnswerVTAndEndActiveVO(callId, videoState)) {
-            TELEPHONY_LOGI("Answer videoCall for Dsda");
-            DisconnectOtherCallForVideoCall(callId);
-            call->SetAutoAnswerState(true);
-            return;
-        } else if (NeedAnswerVOAndEndActiveVT(callId, videoState)) {
-            TELEPHONY_LOGI("Answer voiceCall for Dsda, but has video call");
-            DisconnectOtherCallForVideoCall(callId);
-            call->SetAutoAnswerState(true);
+        TELEPHONY_LOGI("AnswerCall for DSDA");
+        if (AnswerImcomingCallInActiveState(call, callId, videoState)) {
             return;
         }
-        // There is already an incoming call to the CRS.
         int32_t otherRingCallId = GetOtherRingingCall(callId);
         if (otherRingCallId != INVALID_CALLID) {
             sptr<CallBase> ringingCall = GetOneCallObject(otherRingCallId);
@@ -165,15 +157,8 @@ void CallRequestProcess::AnswerRequestForDsda(
         call->SetAutoAnswerState(true);
         HoldOrDisconnectedCall(callId, slotId, videoState);
     } else {
-        if (NeedAnswerVTAndEndActiveVO(callId, videoState)) {
-            TELEPHONY_LOGI("Answer videoCall for not Dsda");
-            DisconnectOtherCallForVideoCall(callId);
-            call->SetAutoAnswerState(true);
-            return;
-        } else if (NeedAnswerVOAndEndActiveVT(callId, videoState)) {
-            TELEPHONY_LOGI("Answer voiceCall for not Dsda, but has video call");
-            DisconnectOtherCallForVideoCall(callId);
-            call->SetAutoAnswerState(true);
+        TELEPHONY_LOGI("AnswerCall for not DSDA");
+        if (AnswerImcomingCallInActiveState(call, callId, videoState)) {
             return;
         }
         int32_t ret = call->AnswerCall(videoState, isRTT);
@@ -183,6 +168,22 @@ void CallRequestProcess::AnswerRequestForDsda(
         }
         DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallAnswered(call);
     }
+}
+
+bool CallRequestProcess::AnswerImcomingCallInActiveState(sptr<CallBase> &call, int32_t callId, int32_t videoState)
+{
+    if (NeedAnswerVTAndEndActiveVO(callId, videoState)) {
+        TELEPHONY_LOGI("Answer a video call");
+        DisconnectOtherCallForVideoCall(callId);
+        call->SetAutoAnswerState(true);
+        return true;
+    } else if (NeedAnswerVOAndEndActiveVT(callId, videoState)) {
+        TELEPHONY_LOGI("Answer a voice call, but has video call");
+        DisconnectOtherCallForVideoCall(callId);
+        call->SetAutoAnswerState(true);
+        return true;
+    }
+    return false;
 }
 
 bool CallRequestProcess::IsDsdsMode3()
