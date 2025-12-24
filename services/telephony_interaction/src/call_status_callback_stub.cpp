@@ -24,6 +24,10 @@ namespace OHOS {
 namespace Telephony {
 const int32_t MAX_LEN = 100000;
 const int32_t MAX_CALL_NUM = 10;
+const int32_t IMS_SUPP_EXT_CODE_MIN = 0;
+const int32_t IMS_SUPP_EXT_CODE_MAX = 10;
+const int32_t IMS_SUPP_EXT_CODE_SPECIAL = 22;
+
 CallStatusCallbackStub::CallStatusCallbackStub()
 {
     InitBasicFuncMap();
