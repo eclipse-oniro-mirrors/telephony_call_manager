@@ -895,6 +895,11 @@ bool AudioControlManager::DealCrsScene(const AudioStandard::AudioRingerMode &rin
     if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)
         && IsRingingVibrateModeOn()) {
         isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
+        if (CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_INCOMING, false) <= 0) {
+            TELEPHONY_LOGE("the call does not exist, vibration should stop!");
+            MuteNetWorkRingTone(true);
+            return false;
+        }
     }
     bool isNormalRingMode = (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL);
     if (isNormalRingMode || AudioDeviceManager::IsRemoteDevicesConnected()) {
