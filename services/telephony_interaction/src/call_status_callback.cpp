@@ -527,7 +527,7 @@ int32_t CallStatusCallback::HandleCallDataUsageChanged(const int64_t dataUsage)
 int32_t CallStatusCallback::HandleCameraCapabilitiesChanged(
     const CameraCapabilitiesReportInfo &cameraCapabilitiesReportInfo)
 {
-    TELEPHONY_LOGI("CameraCapabilitiesChange");
+    TELEPHONY_LOGI("CameraCapabilitiesChanged");
     sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndex(cameraCapabilitiesReportInfo.index);
     CameraCapabilities cameraCapabilities;
     if (callPtr == nullptr) {
@@ -541,18 +541,23 @@ int32_t CallStatusCallback::HandleCameraCapabilitiesChanged(
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCameraCapabilities(cameraCapabilities);
 }
 
-int32_t CallStatusCallback::HandleImsSuppSvcNotification(const ImsSuppSvcNotificationReportInfo &response)
+int32_t CallStatusCallback::HandleImsSuppExtChanged(const ImsSuppExtReportInfo &suppExtInfo)
 {
-    TELEPHONY_LOGI("--lzq entry CallStatusCallback::HandleImsSuppSvcNotification");
-    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(response.callId);
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndexAndSlotId(
+        suppExtInfo.callIndex, suppExtInfo.slotId);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGE("callPtr is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    TELEPHONY_LOGI("suppExtInfo [slot%{public}d] callIndex: %{public}d, code: %{public}d",
+        suppExtInfo.slotId, suppExtInfo.callIndex, suppExtInfo.code);
+
+    CallAttributeInfo info;
+    callPtr->GetCallAttributeInfo(info);
     AAFwk::WantParams params = callPtr->GetExtraParams();
-    params.SetParam("code", AAFwk::Integer::Box(response.code));
-    params.SetParam("callId", AAFwk::Integer::Box(response.callId));
-    TELEPHONY_LOGI("--lzq callId: %{public}d, code: %{public}d", response.callId, response.code);
+    params.SetParam("suppExtCode", AAFwk::Integer::Box(suppExtInfo.code));
     callPtr->SetExtraParams(params);
-    TelCallState callState = callPtr->GetTelCallState();
-    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->CallStateUpdated(callPtr, callState, callState);
-    return TELEPHONY_SUCCESS;
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
 }
 
 #ifdef SUPPORT_RTT_CALL
