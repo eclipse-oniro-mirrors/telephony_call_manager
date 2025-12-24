@@ -360,6 +360,40 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_007, TestSize.Level0)
 }
 
 /**
+ * @tc.number   Telephony_CallStatusCallbackStub_008
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_008, TestSize.Level0)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    MessageParcel dataParcel;
+    MessageParcel reply;
+    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    dataParcel.WriteInt32(0);
+    dataParcel.WriteInt32(2);
+    dataParcel.WriteInt32(1);
+    ASSERT_NE(callStatusCallback->OnImsSuppExtChange(dataParcel, reply), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusCallbackStub_009
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_009, TestSize.Level0)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    MessageParcel dataParcel;
+    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    dataParcel.WriteInt32(1);
+    dataParcel.WriteInt32(12);
+    dataParcel.WriteInt32(1);
+    MessageParcel reply;
+    ASSERT_NE(callStatusCallback->OnImsSuppExtChange(dataParcel, reply), TELEPHONY_SUCCESS);
+}
+
+/**
  * @tc.number   Telephony_SatelliteCallControl_001
  * @tc.name     test error branch
  * @tc.desc     Function test
