@@ -873,22 +873,25 @@ int32_t CallStatusCallbackProxy::PackUpdateCallsReportInfo(const CallsReportInfo
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallStatusCallbackProxy::HandleImsSuppSvcNotification(const ImsSuppSvcNotificationReportInfo &response)
+int32_t CallStatusCallbackProxy::HandleImsSuppExtChanged(const ImsSuppExtReportInfo &suppExtInfo)
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
     MessageOption option;
-    TELEPHONY_LOGI("entry CallStatusCallbackProxy::HandleImsSuppSvcNotification");
     if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    dataParcel.WriteInt32(response.code);
-    dataParcel.WriteInt32(response.callId);
+    dataParcel.WriteInt32(suppExtInfo.slotId);
+    dataParcel.WriteInt32(suppExtInfo.code);
+    dataParcel.WriteInt32(suppExtInfo.callIndex);
     if (Remote() == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(IMS_SUPP_SVC_NOTIFICATION, dataParcel, replyParcel, option);
-    return 0;
+    int32_t error = Remote()->SendRequest(IMS_SUPP_EXT_CHANGE, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
 }
 
 #ifdef SUPPORT_RTT_CALL
