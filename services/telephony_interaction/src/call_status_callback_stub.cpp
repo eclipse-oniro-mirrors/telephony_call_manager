@@ -102,8 +102,8 @@ void CallStatusCallbackStub::InitSupplementFuncMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateGetCallClirResult(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_CALL_CLIR)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateSetCallClirResult(data, reply); };
-    memberFuncMap_[static_cast<uint32_t>(IMS_SUPP_SVC_NOTIFICATION)] =
-        [this](MessageParcel &data, MessageParcel &reply) { return OnImsSuppSvcNotification(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(IMS_SUPP_EXT_CHANGE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnImsSuppExtChange(data, reply); };
 }
 
 void CallStatusCallbackStub::InitImsFuncMap()
@@ -893,21 +893,22 @@ int32_t CallStatusCallbackStub::OnCameraCapabilitiesChange(MessageParcel &data, 
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallStatusCallbackStub::OnImsSuppSvcNotification(MessageParcel &data, MessageParcel &reply)
+int32_t CallStatusCallbackStub::OnImsSuppExtChange(MessageParcel &data, MessageParcel &reply)
 {
-    TELEPHONY_LOGI("entry CallStatusCallbackStub::OnImsSuppSvcNotification");
     int32_t error = TELEPHONY_ERR_FAIL;
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    ImsSuppSvcNotificationReportInfo parcelPtr;
+    ImsSuppExtReportInfo parcelPtr;
+    parcelPtr.slotId = data.ReadInt32();
     parcelPtr.code = data.ReadInt32();
-    if (parcelPtr.code < 0 || (parcelPtr.code > 10 && parcelPtr.code != 22)) {
+    if (parcelPtr.code < IMS_SUPP_EXT_CODE_MIN || (parcelPtr.code > IMS_SUPP_EXT_CODE_MAX &&
+        parcelPtr.code != IMS_SUPP_EXT_CODE_SPECIAL)) {
         TELEPHONY_LOGE("Invalid parameter, code = %{public}d", parcelPtr.code);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    parcelPtr.callId = data.ReadInt32();
-    error = HandleImsSuppSvcNotification(parcelPtr);
+    parcelPtr.callIndex = data.ReadInt32();
+    error = HandleImsSuppExtChanged(parcelPtr);
     if (!reply.WriteInt32(error)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
