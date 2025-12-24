@@ -351,10 +351,10 @@ public:
         return TELEPHONY_SUCCESS;
     }
 
-    int32_t OnImsSuppSvcNotification(const CameraCapabilities &cameraCapabilities)
-        {
-            TELEPHONY_LOGI("OnImsSuppSvcNotification success!");
-            return TELEPHONY_SUCCESS;
+    int32_t OnImsSuppExtChange(const ImsSuppExtReportInfo &suppExtInfo)
+    {
+        TELEPHONY_LOGI("OnImsSuppExtChange success!");
+        return TELEPHONY_SUCCESS;
     }
 
 #ifdef SUPPORT_RTT_CALL
