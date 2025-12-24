@@ -1188,6 +1188,8 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_002, TestSize.Level0)
     callStatusCallback->HandleCallDataUsageChanged(res);
     CameraCapabilitiesReportInfo cameraCapabilities;
     callStatusCallback->HandleCameraCapabilitiesChanged(cameraCapabilities);
+    ImsSuppExtReportInfo suppExtInfo;
+    callStatusCallback->HandleImsSuppExtChanged(suppExtInfo);
     VoipCallEventInfo voipCallEventInfo;
     res = callStatusCallback->UpdateVoipEventInfo(voipCallEventInfo);
     ASSERT_EQ(res, TELEPHONY_SUCCESS);
@@ -1300,6 +1302,8 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_002, TestSize.Level0)
         data, reply, option);
     callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(
         CallStatusInterfaceCode::RECEIVE_UPDATE_MEDIA_MODE_REQUEST), data, reply, option);
+    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::IMS_SUPP_EXT_CHANGE),
+        data, reply, option);
     int32_t res = callStatusCallback->OnRemoteRequest(
         static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_VOIP_EVENT_INFO), data, reply, option);
     ASSERT_NE(res, TELEPHONY_SUCCESS);
