@@ -898,7 +898,7 @@ bool AudioControlManager::DealCrsScene(const AudioStandard::AudioRingerMode &rin
         if (CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_INCOMING, false) <= 0) {
             TELEPHONY_LOGI("the call does not exist, vibration should stop!");
             MuteNetWorkRingTone(true);
-            retrun false;
+            return false;
         }
     }
     bool isNormalRingMode = (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL);
