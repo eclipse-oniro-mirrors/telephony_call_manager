@@ -789,6 +789,8 @@ HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_003, TestSize.Level0)
     callStatusCallbackProxy->HandleCallDataUsageChanged(static_cast<int64_t>(result));
     CameraCapabilitiesReportInfo cameraCapabilitiesInfo;
     callStatusCallbackProxy->HandleCameraCapabilitiesChanged(cameraCapabilitiesInfo);
+    ImsSuppExtReportInfo suppExtInfo;
+    callStatusCallbackProxy->HandleImsSuppExtChanged(suppExtInfo);
     ASSERT_EQ(callStatusCallbackProxy->SendMmiCodeResult(mmiCodeInfo), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     ASSERT_EQ(callStatusCallbackProxy->GetImsCallDataResult(result), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     ASSERT_EQ(callStatusCallbackProxy->CloseUnFinishedUssdResult(result), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -909,6 +911,8 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_004, TestSize.Level0)
     sptr<OHOS::Telephony::CallBase> callBase2 = new IMSCall(mDialParaInfo);
     callRequestProcess->HangUpForDsdaRequest(callBase2);
     callRequestProcess->HandleStartDial(false, mDialParaInfo);
+    sptr<OHOS::Telephony::CallBase> callBase3 = new IMSCall(mDialParaInfo);
+    callRequestProcess->AnswerRequestForDsda(callBase3, 1, 3);
     ASSERT_EQ(callRequestProcess->EccDialPolicy(), TELEPHONY_SUCCESS);
 
 #ifdef SUPPORT_RTT_CALL
