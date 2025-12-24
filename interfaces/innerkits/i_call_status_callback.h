@@ -306,20 +306,20 @@ public:
     virtual int32_t HandleCameraCapabilitiesChanged(const CameraCapabilitiesReportInfo &cameraCapabilities) = 0;
 
     /**
+     * @brief handle the supplementary service information
+     *
+     * @param suppExtInfo[in], contains supplementary service information
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t HandleImsSuppExtChanged(const ImsSuppExtReportInfo &suppExtInfo) = 0;
+
+    /**
      * @brief update the voip call event
      *
      * @param info[in], contains voipCallEvent
      * @return Returns 0 on success, others on failure.
      */
     virtual int32_t UpdateVoipEventInfo(const VoipCallEventInfo &info) = 0;
-
-    /**
-     * @brief handle the call hold state
-     *
-     * @param reportInfo[in], supplementary service notification.
-     * @return Returns 0 on success, others on failure.
-     */
-    virtual int32_t HandleImsSuppSvcNotification(const ImsSuppSvcNotificationReportInfo &response) = 0;
 
 #ifdef SUPPORT_RTT_CALL
     /**
