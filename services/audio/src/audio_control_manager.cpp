@@ -897,7 +897,8 @@ bool AudioControlManager::DealCrsScene(const AudioStandard::AudioRingerMode &rin
         isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
         if (CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_INCOMING, false) <= 0) {
             TELEPHONY_LOGE("the call does not exist, vibration should stop!");
-            MuteNetWorkRingTone(true);
+            DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
+            isCrsVibrating_ = false;
             return false;
         }
     }
