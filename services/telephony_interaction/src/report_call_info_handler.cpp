@@ -125,6 +125,7 @@ void ReportCallInfoHandler::BuildCallDetailsInfo(CallDetailsInfo &info, CallDeta
         callDetailInfo.newCallUseBox = (*iter).newCallUseBox;
         callDetailInfo.rttState = (*iter).rttState;
         callDetailInfo.rttChannelId = (*iter).rttChannelId;
+        callDetailInfo.imsDomain = (*iter).imsDomain;
         callDetailsInfo.callVec.push_back(callDetailInfo);
     }
 }

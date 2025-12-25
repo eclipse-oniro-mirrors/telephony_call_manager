@@ -75,6 +75,7 @@ public:
     void GetCallAttributeBaseInfo(CallAttributeInfo &info);
     int32_t GetCallID();
     CallType GetCallType();
+    int32_t GetImsDomain();
     CallRunningState GetCallRunningState();
     int32_t SetTelCallState(TelCallState nextState);
     TelCallState GetTelCallState();
@@ -122,6 +123,7 @@ public:
     bool IsAliveState();
     void SetBundleName(const char *bundleName);
     void SetCallType(CallType callType);
+    void SetImsDomain(int32_t imsDomain);
     void SetCrsType(int32_t crsType);
     int32_t GetCrsType();
     void SetOriginalCallType(int32_t originalCallType);
@@ -217,6 +219,7 @@ private:
     int32_t newCallUseBox_ = 0;
     int32_t btCallSlotId_{BT_CALL_INVALID_SLOT};
     bool isNonVirtualCall_{false};
+    int32_t imsDomain_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
