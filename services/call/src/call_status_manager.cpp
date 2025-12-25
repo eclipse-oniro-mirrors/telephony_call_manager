@@ -211,6 +211,19 @@ void CallStatusManager::HandleBluetoothCallReportInfo(const CallDetailInfo &info
     return;
 }
 
+void CallStatusManager::SetImsDomainInfo(const sptr<CallBase> call, int32_t imsDomain)
+{
+    if (call != nullptr) {
+        TELEPHONY_LOGI("imsDomain=%{public}d", imsDomain);
+        call->SetImsDomain(imsDomain);
+        CallAttributeInfo info;
+        call->GetCallAttributeInfo(info);
+        AAFwk::WantParams object = AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString);
+        object.SetParam("imsDomain", AAFwk::Integer::Box(imsDomain));
+        call->SetExtraParams(object);
+    }
+}
+
 void CallStatusManager::HandleDsdaInfo(int32_t slotId)
 {
     int32_t dsdsMode = DSDS_MODE_V2;
@@ -827,6 +840,7 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
     call->SetVideoStateType(info.callMode);
     call->SetCallType(info.callType);
     call->SetAccountNumber(oriNum);
+    call->SetImsDomain(info.imsDomain);
     ClearPendingState(call);
     return TELEPHONY_SUCCESS;
 }
@@ -1628,6 +1642,7 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
         sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
         imsCall->InitVideoCall();
     }
+    SetImsDomainInfo(call, info.imsDomain);
     if (call->GetCallType() == CallType::TYPE_IMS) {
         call->SetCrsType(info.crsType);
 #ifdef SUPPORT_RTT_CALL
@@ -1675,6 +1690,7 @@ sptr<CallBase> CallStatusManager::RefreshCall(const sptr<CallBase> &call, const 
     }
     newCall->SetCallId(call->GetCallID());
     newCall->SetTelCallState(priorState);
+    SetImsDomainInfo(newCall, attrInfo.imsDomain);
     if (call->GetNumberLocation() != "default") {
         newCall->SetNumberLocation(call->GetNumberLocation());
     }

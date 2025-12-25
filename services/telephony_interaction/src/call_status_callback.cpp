@@ -110,6 +110,7 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
         detailInfo.newCallUseBox = (*it).newCallUseBox;
         detailInfo.rttState = (*it).rttState;
         detailInfo.rttChannelId = (*it).rttChannelId;
+        detailInfo.imsDomain = (*it).imsDomain;
         detailsInfo.callVec.push_back(detailInfo);
     }
     detailsInfo.slotId = callsInfo.slotId;
