@@ -211,6 +211,19 @@ void CallStatusManager::HandleBluetoothCallReportInfo(const CallDetailInfo &info
     return;
 }
 
+void CallStatusManager::SetImsDomainInfo(const sptr<CallBase> call, int32_t imsDomain)
+{
+    if (call != nullptr) {
+        TELEPHONY_LOGI("imsDomain=%{public}d", imsDomain);
+        call->SetImsDomain(imsDomain);
+        CallAttributeInfo info;
+        call->GetCallAttributeInfo(info);
+        AAFwk::WantParams object = AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString);
+        object.SetParam("imsDomain", AAFwk::Integer::Box(imsDomain));
+        call->SetExtraParams(object);
+    }
+}
+
 void CallStatusManager::HandleDsdaInfo(int32_t slotId)
 {
     int32_t dsdsMode = DSDS_MODE_V2;
@@ -231,6 +244,21 @@ void CallStatusManager::HandleDsdaInfo(int32_t slotId)
         }
     }
 }
+
+#ifdef SUPPORT_RTT_CALL
+void CallStatusManager::UpdatePrevRttState(const CallDetailInfo &info)
+{
+    if (info.state != TelCallState::CALL_STATUS_ACTIVE) {
+        return;
+    }
+    InitRttManager(info.index, info.rttState, info.rttChannelId);
+    sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
+    if ((info.callType == CallType::TYPE_IMS) && info.rttState == RttCallState::RTT_STATE_YES) {
+        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+        imsCall->SetIsPrevRtt(true);
+    }
+}
+#endif
 
 // handle call state changes, incoming call, outgoing call.
 int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
@@ -269,9 +297,7 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
             if (it2.index == it3.index) {
                 TELEPHONY_LOGI("state:%{public}d", it2.state);
 #ifdef SUPPORT_RTT_CALL
-                if (it3.state == TelCallState::CALL_STATUS_ACTIVE) {
-                    InitRttManager(it3.index, it3.rttState, it3.rttChannelId);
-                }
+                UpdatePrevRttState(it3);
 #endif
                 flag = true;
                 break;
@@ -814,6 +840,7 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
     call->SetVideoStateType(info.callMode);
     call->SetCallType(info.callType);
     call->SetAccountNumber(oriNum);
+    call->SetImsDomain(info.imsDomain);
     ClearPendingState(call);
     return TELEPHONY_SUCCESS;
 }
@@ -904,7 +931,7 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
         TELEPHONY_LOGI("SubCallSeparateFromConference %{public}d", call->ExitConference());
     }
 #ifdef SUPPORT_RTT_CALL
-    InitRttManager(call->GetCallID(), info.rttState, info.rttChannelId);
+    DoInitRtt(call, info);
 #endif
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
     if (ret != TELEPHONY_SUCCESS) {
@@ -928,6 +955,17 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     }
     return ret;
 }
+
+#ifdef SUPPORT_RTT_CALL
+void CallStatusManager::DoInitRtt(sptr<CallBase> &call, const CallDetailInfo &info)
+{
+    InitRttManager(call->GetCallID(), info.rttState, info.rttChannelId);
+    if ((call->GetCallType() == CallType::TYPE_IMS) && info.rttState == RttCallState::RTT_STATE_YES) {
+        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+        imsCall->SetIsPrevRtt(true);
+    }
+}
+#endif
 
 int32_t CallStatusManager::GetAntiFraudSlotId()
 {
@@ -1561,6 +1599,12 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
         TELEPHONY_LOGE("SetTelCallState failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (nextState == TelCallState::CALL_STATUS_INCOMING || nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
+        time_t createTime = call->GetCallCreateTime();
+        AAFwk::WantParams params = call->GetExtraParams();
+        params.SetParam("createTime", AAFwk::Integer::Box(static_cast<int64_t>(createTime)));
+        call->SetExtraParams(params);
+    }
     if (!DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallStateUpdated(call, priorState, nextState)) {
         TELEPHONY_LOGE(
             "NotifyCallStateUpdated failed! priorState:%{public}d,nextState:%{public}d", priorState, nextState);
@@ -1605,6 +1649,7 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
         sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
         imsCall->InitVideoCall();
     }
+    SetImsDomainInfo(call, info.imsDomain);
     if (call->GetCallType() == CallType::TYPE_IMS) {
         call->SetCrsType(info.crsType);
 #ifdef SUPPORT_RTT_CALL
@@ -1652,6 +1697,7 @@ sptr<CallBase> CallStatusManager::RefreshCall(const sptr<CallBase> &call, const 
     }
     newCall->SetCallId(call->GetCallID());
     newCall->SetTelCallState(priorState);
+    SetImsDomainInfo(newCall, attrInfo.imsDomain);
     if (call->GetNumberLocation() != "default") {
         newCall->SetNumberLocation(call->GetNumberLocation());
     }

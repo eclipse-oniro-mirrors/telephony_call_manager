@@ -508,7 +508,6 @@ struct CallModeReportInfo {
     int32_t slotId = -1;
 };
 
-#ifdef SUPPORT_RTT_CALL
 /**
  * @brief Indicates the RTT Call Event report information from cellular call.
  */
@@ -664,7 +663,6 @@ struct RttMessageInfo {
      */
     char* rttMessage;
 };
-#endif
 
 /**
  * @brief Indicates the response of the call media mode request.

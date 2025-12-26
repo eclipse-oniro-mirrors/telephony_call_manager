@@ -888,5 +888,16 @@ bool AudioDeviceManager::IsRemoteDevicesConnected()
     };
     return IsBtActived() || IsWiredHeadsetConnected() || IsNearlinkActived(device);
 }
+
+void AudioDeviceManager::UpdateCurrentAudioDevice()
+{
+    AudioDevice device = {
+        .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+        .address = { 0 },
+    };
+    if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device) == TELEPHONY_SUCCESS) {
+        SetCurrentAudioDevice(device);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

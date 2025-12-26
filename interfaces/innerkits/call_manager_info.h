@@ -47,6 +47,9 @@ struct CellularCallInfo {
      */
     int32_t videoState = 0;
     int32_t index = 0;
+    /**
+     * Indicates the call is RTT.
+     */
     bool isRTT = false;
 };
 
@@ -233,6 +236,13 @@ struct CallReportInfo {
      * RTT Call Channel Id
      */
     int32_t rttChannelId = -1;
+    /**
+     * Indicates the ims domain.
+     * - 0：volte
+     * - 1：vowifi
+     * - 2：vonr
+     */
+    int32_t imsDomain = 0;
 };
 
 /**
@@ -403,6 +413,18 @@ struct CallAttributeInfo {
      * Whether to use the RTT call.
      */
     RttCallState rttState = RttCallState::RTT_STATE_NO;
+
+    /**
+     * The disconnected call is RTT call.
+     */
+    bool isPrevRtt = false;
+    /**
+     * Indicates the ims domain.
+     * - 0：volte
+     * - 1：vowifi
+     * - 2：vonr
+     */
+    int32_t imsDomain = 0;
 };
 
 /**
@@ -673,6 +695,13 @@ struct CallDetailInfo {
      * RTT Call Channel Id
      */
     int32_t rttChannelId = -1;
+    /**
+     * Indicates the ims domain.
+     * - 0：volte
+     * - 1：vowifi
+     * - 2：vonr
+     */
+    int32_t imsDomain = 0;
 
     CallDetailInfo() {}
 
@@ -718,6 +747,7 @@ struct CallDetailInfo {
         newCallUseBox = temp.newCallUseBox;
         rttState = temp.rttState;
         rttChannelId = temp.rttChannelId;
+        imsDomain = temp.imsDomain;
         return *this;
     }
 };

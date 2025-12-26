@@ -44,7 +44,7 @@ CallBase::CallBase(DialParaInfo &info)
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
       blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams), isAnswered_(false),
       detectDetails_(""), phoneOrWatch_(info.phoneOrWatch), isAiAutoAnswer_(false),
-      isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox)
+      isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox), imsDomain_(0)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -62,7 +62,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
       numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1),
       extraParams_(info.extraParams), isAnswered_(false), detectDetails_(""), phoneOrWatch_(info.phoneOrWatch),
-      isAiAutoAnswer_(false), isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox)
+      isAiAutoAnswer_(false), isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox), imsDomain_(0)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -185,6 +185,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.namePresentation = object.GetIntParam("namePresentation", 0);
         info.antiFraudState = object.GetIntParam("antiFraudState", 0);
         info.phoneOrWatch = phoneOrWatch_;
+        info.imsDomain = imsDomain_;
         info.simType = object.GetIntParam("simType", 0);
         info.simIndex = object.GetIntParam("simIndex", 0);
         if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
@@ -228,6 +229,11 @@ int32_t CallBase::GetCallID()
 CallType CallBase::GetCallType()
 {
     return callType_;
+}
+
+int32_t CallBase::GetImsDomain()
+{
+    return imsDomain_;
 }
 
 CallRunningState CallBase::GetCallRunningState()
@@ -565,6 +571,12 @@ void CallBase::SetCallCreateTime(time_t callCreateTime)
     callCreateTime_ = callCreateTime;
 }
 
+time_t CallBase::GetCallCreateTime()
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    return callCreateTime_;
+}
+
 void CallBase::SetCallEndTime(time_t callEndTime)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
@@ -694,6 +706,11 @@ void CallBase::SetBundleName(const char *bundleName)
 void CallBase::SetCallType(CallType callType)
 {
     callType_ = callType;
+}
+
+void CallBase::SetImsDomain(int32_t imsDomain)
+{
+    imsDomain_ = imsDomain;
 }
 
 int32_t CallBase::SetMicPhoneState(bool isMuted)

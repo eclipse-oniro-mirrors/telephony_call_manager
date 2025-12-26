@@ -60,6 +60,7 @@ public:
     int32_t UnInit();
     int32_t HandleCallReportInfo(const CallDetailInfo &info);
     void HandleDsdaInfo(int32_t slotId);
+    void SetImsDomainInfo(const sptr<CallBase> call, int32_t imsDomain);
     int32_t HandleCallsReportInfo(const CallDetailsInfo &info);
     int32_t HandleDisconnectedCause(const DisconnectedDetails &details);
     int32_t HandleEventResultReportInfo(const CellularCallEventInfo &info);
@@ -172,6 +173,10 @@ private:
     bool UpdateDialingHandle(const CallDetailInfo &info, bool &isDistributedDeviceDialing);
     bool RefreshDialingStateByOtherState(sptr<CallBase> &call, const CallDetailInfo &info);
     void PackVoipCallInfo(DialParaInfo &paraInfo, const CallDetailInfo &info);
+#ifdef SUPPORT_RTT_CALL
+    void UpdatePrevRttState(const CallDetailInfo &info);
+    void DoInitRtt(sptr<CallBase> &call, const CallDetailInfo &info);
+#endif
 
 private:
     CallDetailInfo callReportInfo_;

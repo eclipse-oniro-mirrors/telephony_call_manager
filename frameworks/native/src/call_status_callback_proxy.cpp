@@ -868,6 +868,7 @@ int32_t CallStatusCallbackProxy::PackUpdateCallsReportInfo(const CallsReportInfo
         dataParcel.WriteInt32(it.newCallUseBox);
         dataParcel.WriteInt32(static_cast<int32_t>(it.rttState));
         dataParcel.WriteInt32(it.rttChannelId);
+        dataParcel.WriteInt32(it.imsDomain);
     }
     dataParcel.WriteInt32(info.slotId);
     return TELEPHONY_SUCCESS;

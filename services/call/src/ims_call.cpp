@@ -560,6 +560,16 @@ int32_t IMSCall::GetRttChannelId()
 {
     return rttChannelId_;
 }
+
+void IMSCall::SetIsPrevRtt(bool isPrevRtt)
+{
+    isPrevRtt_ = isPrevRtt;
+}
+
+bool IMSCall::GetIsPrevRtt()
+{
+    return isPrevRtt_;
+}
 #endif
 } // namespace Telephony
 } // namespace OHOS

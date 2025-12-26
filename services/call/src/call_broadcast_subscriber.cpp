@@ -266,8 +266,6 @@ void CallBroadcastSubscriber::TelephonyExitSTRBroadcast(const EventFwk::CommonEv
         callControlMgr->SetWearState(WEAR_STATUS_OFF);
     } else if (wearStatus == 1) {
         callControlMgr->SetWearState(WEAR_STATUS_ON);
-    } else {
-        callControlMgr->SetWearState(WEAR_STATUS_INVALID);
     }
 }
 } // namespace Telephony

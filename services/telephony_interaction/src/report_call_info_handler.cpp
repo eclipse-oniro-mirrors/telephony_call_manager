@@ -58,8 +58,8 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
 
 #ifdef NOT_SUPPORT_MULTICALL
     if (CallObjectManager::IsCallExist(TelCallState::CALL_STATUS_ACTIVE) &&
-        info.state == TelCallState::CALL_STATUS_ACTIVE) {
-        TELEPHONY_LOGI("do not report callui when already exist active call");
+        info.state == TelCallState::CALL_STATUS_ACTIVE && info.callType == CallType::TYPE_BLUETOOTH) {
+        DisconnectBtCallWhenPhoneAnswered(info);
         return TELEPHONY_SUCCESS;
     }
 #endif
@@ -80,6 +80,28 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
+#ifdef NOT_SUPPORT_MULTICALL
+void ReportCallInfoHandler::DisconnectBtCallWhenPhoneAnswered(const CallDetailInfo &info)
+{
+        TELEPHONY_LOGI("do not report callui when already exist active call index:%{public}d", info.index);
+        sptr<CallBase> btCall = CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(
+            info.index, DEFAULT_SIM_SLOT_ID, CallType::TYPE_BLUETOOTH);
+        if (btCall != nullptr) {
+            CallDetailInfo detailInfo;
+            detailInfo.callType = info.callType;
+            detailInfo.accountId = info.accountId;
+            detailInfo.index = info.index;
+            detailInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
+            (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, info.phoneNum, kMaxNumberLen);
+            (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen  + 1, 0, kMaxBundleNameLen + 1);
+            int32_t ret = UpdateCallReportInfo(detailInfo);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("UpdateCallReportInfo failed! errCode:%{public}d", ret);
+            }
+        }
+}
+#endif
+ 
 void ReportCallInfoHandler::BuildCallDetailsInfo(CallDetailsInfo &info, CallDetailsInfo &callDetailsInfo)
 {
     CallDetailInfo callDetailInfo;
@@ -103,6 +125,7 @@ void ReportCallInfoHandler::BuildCallDetailsInfo(CallDetailsInfo &info, CallDeta
         callDetailInfo.newCallUseBox = (*iter).newCallUseBox;
         callDetailInfo.rttState = (*iter).rttState;
         callDetailInfo.rttChannelId = (*iter).rttChannelId;
+        callDetailInfo.imsDomain = (*iter).imsDomain;
         callDetailsInfo.callVec.push_back(callDetailInfo);
     }
 }

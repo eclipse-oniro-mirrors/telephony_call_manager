@@ -268,7 +268,7 @@ AudioStandard::StreamUsage Tone::GetStreamUsageByToneType(ToneDescriptor descrip
             }
             break;
         case ToneDescriptor::TONE_FINISHED:
-            streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_RINGTONE;
+            streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
             break;
         default:
             break;

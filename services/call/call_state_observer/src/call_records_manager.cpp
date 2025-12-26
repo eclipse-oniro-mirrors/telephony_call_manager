@@ -31,6 +31,7 @@
 #include "interoperable_settings_handler.h"
 #endif
 #include "call_control_manager.h"
+#include "ims_call.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -40,6 +41,9 @@ constexpr int16_t DEFAULT_COUNTRY_CODE = 0;
 constexpr int16_t DEFAULT_TIME = 0;
 const int32_t ACTIVE_USER_ID = 100;
 const uint32_t FEATURES_VIDEO = 1 << 0;
+#ifdef SUPPORT_RTT_CALL
+const uint32_t FEATURES_ISRTT = 1 << 1;
+#endif
 const int32_t PROP_SYSPARA_SIZE = 128;
 const char *FORMAT_PATTERN = ",|;";
 const char *MARK_SOURCE_OF_ANTIFRAUT_CENTER = "5";
@@ -150,8 +154,21 @@ void CallRecordsManager::CallStateUpdated(
     } else {
         info.newCallUseBox = 0;
     }
+#ifdef SUPPORT_RTT_CALL
+    RefreshRttFlag(callObjectPtr, info);
+#endif
     AddOneCallRecord(info);
 }
+
+#ifdef SUPPORT_RTT_CALL
+void CallRecordsManager::RefreshRttFlag(sptr<CallBase> &callObjectPtr, CallAttributeInfo &info)
+{
+    if (callObjectPtr->GetCallType() == CallType::TYPE_IMS) {
+        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(callObjectPtr.GetRefPtr());
+        info.isPrevRtt = imsCall->GetIsPrevRtt();
+    }
+}
+#endif
 
 void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
 {
@@ -280,7 +297,7 @@ void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecor
     data.slotId = info.accountId;
     data.callType = info.callType;
     // use original call type for video call record
-    int32_t callFeatures = GetCallFeatures(info.originalCallType);
+    int32_t callFeatures = GetCallFeatures(info);
     data.features = callFeatures;
     data.numberMarkInfo = info.numberMarkInfo;
     if (strcmp(data.numberMarkInfo.markSource, MARK_SOURCE_OF_ANTIFRAUT_CENTER) == 0) {
@@ -342,12 +359,17 @@ int32_t CallRecordsManager::RemoveMissedIncomingCallNotification()
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallRecordsManager::GetCallFeatures(int32_t videoState)
+int32_t CallRecordsManager::GetCallFeatures(CallAttributeInfo &info)
 {
     uint32_t features = 0;
-    if (IsVideoCall(videoState)) {
+    if (IsVideoCall(info.originalCallType)) {
         features |= FEATURES_VIDEO;
     }
+#ifdef SUPPORT_RTT_CALL
+    if (info.isPrevRtt == true) {
+        features |= FEATURES_ISRTT;
+    }
+#endif
     return static_cast<int32_t>(features);
 }
 

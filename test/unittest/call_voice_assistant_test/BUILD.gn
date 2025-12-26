@@ -61,4 +61,6 @@ ohos_unittest("tel_call_voice_assistant_test") {
     "TELEPHONY_LOG_TAG = \"CallManagerGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+
+  defines += call_manager_defines
 }
