@@ -1367,7 +1367,6 @@ void CallStatusManager::HandleHoldCallOrAutoAnswerCall(const sptr<CallBase> call
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
 
     if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
- 
         dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
         bool canSwitchCallState = call->GetCanSwitchCallState();
         AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), true);
