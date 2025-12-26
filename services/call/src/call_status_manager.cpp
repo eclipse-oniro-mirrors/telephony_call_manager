@@ -1365,12 +1365,20 @@ void CallStatusManager::HandleHoldCallOrAutoAnswerCall(const sptr<CallBase> call
 #endif
     int32_t dsdsMode = DSDS_MODE_V2;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
-    if (dsdsMode == DSDS_MODE_V3) {
-        AutoAnswer(activeCallNum, waitingCallNum);
-    } else if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
+
+    if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
+ 
         dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
         bool canSwitchCallState = call->GetCanSwitchCallState();
         AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), true);
+        return;
+    }
+    if (call->GetAnswerVideoState() != static_cast<int32_t>(VideoStateType::TYPE_VOICE)) {
+        AutoAnswerForVideoCall(activeCallNum);
+        return;
+    }
+    if (dsdsMode == DSDS_MODE_V3) {
+        AutoAnswer(activeCallNum, waitingCallNum);
     }
 }
 
