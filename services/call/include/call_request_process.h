@@ -87,7 +87,6 @@ private:
     int32_t BluetoothDialProcess(DialParaInfo &info);
     void GetDialingCall(sptr<CallBase> &call);
     bool IsCnSimCard(int32_t slotId);
-    bool AnswerImcomingCallInActiveState(sptr<CallBase> &call, int32_t callId, int32_t videoState);
     
 private:
     ffrt::mutex mutex_;
