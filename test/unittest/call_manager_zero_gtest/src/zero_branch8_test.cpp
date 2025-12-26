@@ -772,12 +772,17 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallSuperPrivacyControlManager_001, Function
     call5->SetCallId(5);
     call5->isEccContact_ = false;
     call5->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
+    sptr<CallBase> call6 = new VoIPCall(info);
+    call6->SetCallId(6);
+    info.isEcc = false;
+    call6->isEccContact_ = false;
     CallObjectManager::AddOneCallObject(call0);
     CallObjectManager::AddOneCallObject(call1);
     CallObjectManager::AddOneCallObject(call2);
     CallObjectManager::AddOneCallObject(call3);
     CallObjectManager::AddOneCallObject(call4);
     CallObjectManager::AddOneCallObject(call5);
+    CallObjectManager::AddOneCallObject(call6);
     DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseAllCall();
     EXPECT_FALSE(DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetCurrentIsSuperPrivacyMode());
     CallObjectManager::callObjectPtrList_.clear();
