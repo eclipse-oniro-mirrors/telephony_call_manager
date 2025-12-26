@@ -498,9 +498,7 @@ void NapiCallAbilityCallback::RegisterRttModifyIndCallback(EventCallback eventCa
 
 void NapiCallAbilityCallback::UnRegisterRttModifyIndCallback()
 {
-    if (eventCallback_.callbackRef) {
-        (void)memset_s(&rttModifyIndCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    }
+    (void)memset_s(&rttModifyIndCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
 void NapiCallAbilityCallback::RegisterRttErrCauseCallback(EventCallback eventCallback)
@@ -510,9 +508,7 @@ void NapiCallAbilityCallback::RegisterRttErrCauseCallback(EventCallback eventCal
 
 void NapiCallAbilityCallback::UnRegisterRttErrCauseCallback()
 {
-    if (eventCallback_.callbackRef) {
-        (void)memset_s(&rttErrCauseCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    }
+    (void)memset_s(&rttErrCauseCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
 void NapiCallAbilityCallback::RegisterRttCallMessageCallback(EventCallback eventCallback)
@@ -522,9 +518,7 @@ void NapiCallAbilityCallback::RegisterRttCallMessageCallback(EventCallback event
 
 void NapiCallAbilityCallback::UnRegisterRttCallMessageCallback()
 {
-    if (eventCallback_.callbackRef) {
-        (void)memset_s(&rttCallMessageCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    }
+    (void)memset_s(&rttCallMessageCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 #endif
 

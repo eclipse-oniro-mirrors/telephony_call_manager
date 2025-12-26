@@ -59,7 +59,6 @@
 #include "uri.h"
 #include "voip_call.h"
 #include "want_params_wrapper.h"
-#include "ims_rtt_errcode.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -245,21 +244,6 @@ void CallStatusManager::HandleDsdaInfo(int32_t slotId)
     }
 }
 
-#ifdef SUPPORT_RTT_CALL
-void CallStatusManager::UpdatePrevRttState(const CallDetailInfo &info)
-{
-    if (info.state != TelCallState::CALL_STATUS_ACTIVE) {
-        return;
-    }
-    InitRttManager(info.index, info.rttState, info.rttChannelId);
-    sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
-    if ((info.callType == CallType::TYPE_IMS) && info.rttState == RttCallState::RTT_STATE_YES) {
-        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
-        imsCall->SetIsPrevRtt(true);
-    }
-}
-#endif
-
 // handle call state changes, incoming call, outgoing call.
 int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
 {
@@ -297,7 +281,7 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
             if (it2.index == it3.index) {
                 TELEPHONY_LOGI("state:%{public}d", it2.state);
 #ifdef SUPPORT_RTT_CALL
-                UpdatePrevRttState(it3);
+                DelayedSingleton<CallControlManager>::GetInstance()->RefreshRttParam(it3);
 #endif
                 flag = true;
                 break;
@@ -930,9 +914,6 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 } else {
         TELEPHONY_LOGI("SubCallSeparateFromConference %{public}d", call->ExitConference());
     }
-#ifdef SUPPORT_RTT_CALL
-    DoInitRtt(call, info);
-#endif
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
@@ -955,17 +936,6 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     }
     return ret;
 }
-
-#ifdef SUPPORT_RTT_CALL
-void CallStatusManager::DoInitRtt(sptr<CallBase> &call, const CallDetailInfo &info)
-{
-    InitRttManager(call->GetCallID(), info.rttState, info.rttChannelId);
-    if ((call->GetCallType() == CallType::TYPE_IMS) && info.rttState == RttCallState::RTT_STATE_YES) {
-        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
-        imsCall->SetIsPrevRtt(true);
-    }
-}
-#endif
 
 int32_t CallStatusManager::GetAntiFraudSlotId()
 {
@@ -1398,9 +1368,6 @@ void CallStatusManager::HandleHoldCallOrAutoAnswerCall(const sptr<CallBase> call
     }
     DeleteOneCallObject(call->GetCallID());
     TELEPHONY_LOGI("Ready to uninitialized RttManager when HandleHoldCallOrAutoAnswerCall");
-#ifdef SUPPORT_RTT_CALL
-    UnInitRttManager();
-#endif
     int32_t dsdsMode = DSDS_MODE_V2;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
     if (dsdsMode == DSDS_MODE_V3) {
@@ -2662,45 +2629,14 @@ void CallStatusManager::PackVoipCallInfo(DialParaInfo &paraInfo, const CallDetai
 }
 
 #ifdef SUPPORT_RTT_CALL
-void CallStatusManager::InitRttManager(int32_t callId, RttCallState rttState, int32_t channelId)
+void CallStatusManager::HandleRttEventInfo(const ImsRTTEventType &eventType)
 {
-    if (rttState != RttCallState::RTT_STATE_YES) {
-        TELEPHONY_LOGI("cannot InitRttManager, rttState: %{public}d", rttState);
-        return;
-    }
-
-    if (rttManager_ != nullptr) {
-        TELEPHONY_LOGI("RttManager already initialized, refresh callId: %{public}d, channelId: %{public}d",
-            callId, channelId);
-        rttManager_->SetCallID(callId);
-        rttManager_->SetChannelID(channelId);
-        return;
-    }
-
-    TELEPHONY_LOGI("callId: %{public}d, channelId: %{public}d", callId, channelId);
-    rttManager_ = std::make_shared<ImsRttManager>(callId, channelId);
-    rttManager_->InitRtt();
-}
-
-void CallStatusManager::UnInitRttManager()
-{
-    TELEPHONY_LOGI("Start to UnInitRttManager");
-    if (rttManager_ == nullptr) {
-        TELEPHONY_LOGI("RttManager already un-initialized");
-        return;
-    }
-
-    rttManager_->DestroyRtt();
-    rttManager_ = nullptr;
-}
-
-int32_t CallStatusManager::SendRttMessage(const std::string &rttMessage)
-{
-    if (rttManager_ != nullptr) {
-        return rttManager_->SendRttMessage(rttMessage);
-    } else {
-        TELEPHONY_LOGE("rttManager_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    switch (eventType) {
+        case ImsRTTEventType::EVENT_RTT_CLOSED:
+            DelayedSingleton<CallControlManager>::GetInstance()->UnInitRttManager();
+            break;
+        default:
+            break;
     }
 }
 #endif

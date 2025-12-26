@@ -312,22 +312,22 @@ int32_t ReportCallInfoHandler::UpdateVoipEventInfo(const VoipCallEventInfo &info
 }
 
 #ifdef SUPPORT_RTT_CALL
-void ReportCallInfoHandler::UnInitRttManager()
+void ReportCallInfoHandler::UpdateRttEventInfo(const ImsRTTEventType &eventType)
 {
     if (callStatusManagerPtr_ == nullptr) {
         TELEPHONY_LOGE("callStatusManagerPtr_ is null");
         return;
     }
-
+    ImsRTTEventType currEventType = eventType;
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
-    TELEPHONY_LOGI("UnInitRttManager submit task enter");
-    reportCallInfoQueue.submit([callStatusManagerPtr]() {
+    TELEPHONY_LOGI("UpdateRttEventInfo submit task enter");
+    reportCallInfoQueue.submit([callStatusManagerPtr, currEventType]() {
         std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {
             TELEPHONY_LOGE("managerPtr is null");
             return;
         }
-        managerPtr->UnInitRttManager();
+        managerPtr->HandleRttEventInfo(currEventType);
     });
 }
 #endif

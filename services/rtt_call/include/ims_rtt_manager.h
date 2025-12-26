@@ -15,12 +15,14 @@
 
 #ifndef IMS_RTT_MANAGER_H
 #define IMS_RTT_MANAGER_H
-#include <stdint.h>
-#include <vector>
+
 #include <cstdint>
 #include <string.h>
-#include "ffrt.h"
+#include <vector>
+#include <atomic>
 #include <sys/ioctl.h>
+
+#include "ffrt_inner.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -32,6 +34,7 @@ constexpr const int32_t MAX_SEND_MSG_LEN = 30;
 constexpr const int8_t STEP_ONE = 1;
 constexpr const int8_t STEP_TWO = 2;
 constexpr const int8_t STEP_THREE = 3;
+constexpr size_t SEND_WAIT_TIME_MS = 3000;
 
 enum VoiceProxyMsgId {
     ID_PROXY_VOICE_RTT_TX_NTF = 0xDFD1,
@@ -52,19 +55,13 @@ struct VoiceProxyRttRxInd {
     uint8_t  data[0];
 };
 
-struct RttDataStream {
-    uint16_t channelId;
-    uint32_t length;
-    std::vector<uint8_t> data;
-};
-
 class ImsRttManager {
 public:
     ImsRttManager(const int32_t callId, const uint16_t channelId);
     ~ImsRttManager();
     int32_t InitRtt();
     int32_t SendRttMessage(const std::string &rttMessage);
-    static void DestroyRtt();
+    void DestroyRtt();
     void SetChannelID(int32_t channelId);
     void SetCallID(int32_t callId);
 
@@ -72,28 +69,32 @@ private:
     int32_t CreateRttThread();
     int32_t CreateSendThread();
     int32_t CreateRecvThread();
-    static int32_t CloseProxy();
-    static void *RecvThreadLoop(void *arg);
-    static void *SendThreadLoop(void *arg);
-    static void ReadStreamData(const int32_t len, std::string &sendMessage);
-    static int32_t SendDataToProxy(const std::string &sendMessage);
-    static void RecvDataFromProxy(std::string &recvMessage);
-    static void ReportRecvMessage(const std::string &recvMessage);
-    static void WakeUpKernelRead();
-    static std::string RttDataStreamToString(const uint8_t* rttStreamData, int32_t dataLen);
-    static bool ProcEscapeSeq(const uint8_t* input, int32_t dataLen, int32_t index, std::vector<uint8_t>& output);
-    static bool ProcBellSeq(const uint8_t* input, int32_t index);
-    static bool ProcControlSeq(const uint8_t* input, int32_t dataLen, int32_t index);
-    static bool ProcOtherControlBytes(const uint8_t* input, int32_t dataLen, int32_t index);
-    static bool ProcessOrderMark(const uint8_t* input, int32_t dataLen, int32_t index);
+    int32_t CloseProxy();
+    void RecvThreadLoop();
+    void SendThreadLoop();
+    void ReadStreamData(const int32_t len, std::string &sendMessage);
+    int32_t SendDataToProxy(const std::string &sendMessage);
+    void RecvDataFromProxy(std::string &recvMessage);
+    void ReportRecvMessage(const std::string &recvMessage);
+    void WakeUpKernelRead();
+    std::string RttDataStreamToString(const uint8_t* rttStreamData, int32_t dataLen);
+    bool ProcEscapeSeq(const uint8_t* input, int32_t dataLen, int32_t index, std::vector<uint8_t>& output);
+    bool ProcBellSeq(const uint8_t* input, int32_t index);
+    bool ProcControlSeq(const uint8_t* input, int32_t dataLen, int32_t index);
+    bool ProcOtherControlBytes(const uint8_t* input, int32_t dataLen, int32_t index);
+    bool ProcessOrderMark(const uint8_t* input, int32_t dataLen, int32_t index);
 
-    static uint16_t channelId_;
-    static int32_t callId_;
-    static ffrt::mutex destroyRttThreadMtx_;
-    static int32_t devFd_;
-    static bool writeThreadActive_;
-    static bool readThreadActive_;
-    static std::string sendStream_;
+    std::atomic<int32_t> devFd_{-1};
+    std::atomic<bool> sendThreadActive_{false};
+    std::atomic<bool> recvThreadActive_{false};
+    std::string sendStream_{""};
+    std::atomic<int32_t> callId_{-1};
+    std::atomic<uint16_t> channelId_{0};
+    std::unique_ptr<ffrt::thread> sendThread_;
+    std::unique_ptr<ffrt::thread> recvThread_;
+    ffrt::mutex destroyRttThreadMtx_;
+    ffrt::mutex sendMtx_;
+    ffrt::condition_variable sendCond_{};
 };
 } // namespace Telephony
 } // namespace OHOS

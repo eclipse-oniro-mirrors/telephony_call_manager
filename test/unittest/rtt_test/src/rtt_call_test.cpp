@@ -30,6 +30,7 @@
 #include "call_manager_service_stub.h"
 #include "napi_call_ability_callback.h"
 #include "call_ability_callback_stub.h"
+#include "rtt_call_listener.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -329,39 +330,26 @@ HWTEST_F(RttCallTest, Telephony_NapiCallManagerCallbackTest001, Function | Mediu
  */
 HWTEST_F(RttCallTest, Telephony_CallAbilityCallbackStubTest001, Function | MediumTest | Level1)
 {
-    RttEvent event;
-    MessageParcel reply;
-    int32_t length = 0;
     std::shared_ptr<CallAbilityCallbackStub> callbackStub = std::make_shared<MockCallAbilityCallbackStub>();
+    MessageParcel reply;
 
     MessageParcel data_one;
-    data_one.WriteInt32(length);
-    data_one.WriteRawData((void *)&event, sizeof(RttEvent));
-    EXPECT_EQ(callbackStub->OnUpdateRttCallEvent(data_one, reply), TELEPHONY_ERR_ARGUMENT_INVALID);
+    data_one.WriteInt32(1); // callID
+    data_one.WriteInt32(2); // evnetType
+    data_one.WriteInt32(1); // reason
+    EXPECT_EQ(callbackStub->OnUpdateRttCallEvent(data_one, reply), TELEPHONY_SUCCESS);
 
-    length = sizeof(RttEvent);
     MessageParcel data_two;
-    data_two.WriteInt32(length);
-    data_two.WriteRawData((void *)&event, length);
-    EXPECT_EQ(callbackStub->OnUpdateRttCallEvent(data_two, reply), TELEPHONY_SUCCESS);
+    data_two.WriteInt32(2); // callID
+    data_two.WriteInt32(1); // causeCode
+    data_two.WriteInt32(0); // opeartionType
+    data_two.WriteString("reasonText"); // reasonText
+    EXPECT_EQ(callbackStub->OnUpdateRttCallErrorReport(data_two, reply), TELEPHONY_SUCCESS);
 
-    RttError rttError;
-    length = 0;
     MessageParcel data_three;
-    data_three.WriteInt32(length);
-    data_three.WriteRawData((void *)&rttError, sizeof(RttError));
-    EXPECT_EQ(callbackStub->OnUpdateRttCallErrorReport(data_three, reply), TELEPHONY_ERR_ARGUMENT_INVALID);
-
-    length = sizeof(RttError);
-    MessageParcel data_four;
-    data_four.WriteInt32(length);
-    data_four.WriteRawData((void *)&rttError, sizeof(RttError));
-    EXPECT_EQ(callbackStub->OnUpdateRttCallErrorReport(data_four, reply), TELEPHONY_SUCCESS);
-
-    MessageParcel data_five;
-    data_five.WriteInt32(0); // call id
-    data_five.WriteString("rttMessage"); // rttMessage
-    EXPECT_EQ(callbackStub->OnUpdateRttCallMessage(data_five, reply), TELEPHONY_SUCCESS);
+    data_three.WriteInt32(0); // call id
+    data_three.WriteString("rttMessage"); // rttMessage
+    EXPECT_EQ(callbackStub->OnUpdateRttCallMessage(data_three, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -377,20 +365,6 @@ HWTEST_F(RttCallTest, Telephony_ImsRttManagerTest001, Function | MediumTest | Le
     EXPECT_EQ(manager.InitRtt(), RTT_SUCCESS);
     manager.devFd_ = 0;
     EXPECT_NE(manager.InitRtt(), ret);
-
-    manager.devFd_ = -1;
-    EXPECT_EQ(manager.CloseProxy(), RTT_SUCCESS);
-    manager.devFd_ = 1;
-    EXPECT_NE(manager.CloseProxy(), ret);
-
-    manager.devFd_ = 0;
-    EXPECT_NO_THROW(manager.WakeUpKernelRead());
-
-    EXPECT_NE(manager.CreateRttThread(), ret);
-    EXPECT_NE(manager.CreateSendThread(), ret);
-
-    RttCallEvtWork *rttCallEvtwork = std::make_unique<RttCallEvtWork>().release();
-    EXPECT_NO_THROW(manager.SendThreadLoop((void *)rttCallEvtwork));
 
     int32_t len = 0;
     std::string sendMessage = "message";
@@ -412,13 +386,7 @@ HWTEST_F(RttCallTest, Telephony_ImsRttManagerTest001, Function | MediumTest | Le
  */
 HWTEST_F(RttCallTest, Telephony_ImsRttManagerTest002, Function | MediumTest | Level1)
 {
-    int32_t ret = -100;
     ImsRttManager manager(1, 1);
-    EXPECT_NE(manager.CreateRecvThread(), ret);
-
-    RttCallEvtWork *rttCallEvtwork = std::make_unique<RttCallEvtWork>().release();
-    EXPECT_NO_THROW(manager.RecvThreadLoop((void *)rttCallEvtwork));
-
     std::string reportMessage = "message";
     EXPECT_NO_THROW(manager.ReportRecvMessage(reportMessage));
 
@@ -427,7 +395,23 @@ HWTEST_F(RttCallTest, Telephony_ImsRttManagerTest002, Function | MediumTest | Le
     manager.devFd_ = PROXY_IS_OFF + 1;
     EXPECT_NO_THROW(manager.RecvDataFromProxy(reportMessage));
 
+    manager.sendThread_ = std::make_unique<ffrt::thread>([]() {});
+    manager.recvThread_ = std::make_unique<ffrt::thread>([]() {});
+    manager.sendThreadActive_ = true;
+    manager.recvThreadActive_ = true;
     EXPECT_NO_THROW(manager.DestroyRtt());
+    EXPECT_FALSE(manager.sendThreadActive_);
+    EXPECT_FALSE(manager.recvThreadActive_);
+    EXPECT_EQ(manager.sendThread_, nullptr);
+    EXPECT_EQ(manager.recvThread_, nullptr);
+
+    manager.sendThread_ = std::make_unique<ffrt::thread>([]() {});
+    manager.sendThread_->detach();
+    manager.recvThread_ = std::make_unique<ffrt::thread>([]() {});
+    manager.recvThread_->detach();
+    EXPECT_NO_THROW(manager.DestroyRtt());
+    EXPECT_EQ(manager.sendThread_, nullptr);
+    EXPECT_EQ(manager.recvThread_, nullptr);
 
     uint16_t channelId = 1;
     int32_t callId = 1;
@@ -436,6 +420,93 @@ HWTEST_F(RttCallTest, Telephony_ImsRttManagerTest002, Function | MediumTest | Le
     EXPECT_NO_THROW(manager.SendRttMessage(reportMessage));
 }
 
+/**
+ * @tc.number   Telephony_ImsRttManagerTest003
+ * @tc.name     test Rtt data stream processing functions
+ * @tc.desc     Test Rtt data stream conversion and special sequence processing
+ */
+HWTEST_F(RttCallTest, Telephony_ImsRttManagerTest003, Function | MediumTest | Level1)
+{
+    ImsRttManager manager(1, 1);
+
+    uint8_t testData1[] = {0x48, 0x65, 0x6C, 0x6C, 0x6F};
+    std::string result1 = manager.RttDataStreamToString(testData1, sizeof(testData1));
+    EXPECT_EQ(result1, "Hello");
+
+    uint8_t testData2[] = {0xE2, 0x80, 0xA8};
+    std::string result2 = manager.RttDataStreamToString(testData2, sizeof(testData2));
+    EXPECT_EQ(result2, "\r\n");
+
+    uint8_t testData3[] = {0x07};
+    std::string result3 = manager.RttDataStreamToString(testData3, sizeof(testData3));
+    EXPECT_EQ(result3.size(), 0);
+
+    uint8_t testData4[] = {0x1B, 0x61};
+    std::string result4 = manager.RttDataStreamToString(testData4, sizeof(testData4));
+    EXPECT_EQ(result4.size(), 0);
+
+    uint8_t testData5[] = {0xC2, 0x98};
+    std::string result5 = manager.RttDataStreamToString(testData5, sizeof(testData5));
+    EXPECT_EQ(result5.size(), 0);
+
+    uint8_t testData6[] = {0xEF, 0xBB, 0xBF};
+    std::string result6 = manager.RttDataStreamToString(testData6, sizeof(testData6));
+    EXPECT_EQ(result6.size(), 0);
+
+    uint8_t testData7[] = {0x48, 0x65, 0x6C, 0x6C, 0x6F, 0xE2, 0x80, 0xA8, 0x07, 0x1B,
+        0x61, 0xC2, 0x98, 0xEF, 0xBB, 0xBF};
+    std::string result7 = manager.RttDataStreamToString(testData7, sizeof(testData7));
+    EXPECT_EQ(result7, "Hello\r\n");
+}
+
+/**
+ * @tc.number   Telephony_ImsRttManagerTest004
+ * @tc.name     test special sequence processing functions
+ * @tc.desc     Test various special sequence processing functions
+ */
+HWTEST_F(RttCallTest, Telephony_ImsRttManagerTest004, Function | MediumTest | Level1)
+{
+    ImsRttManager manager(1, 1);
+    std::vector<uint8_t> output;
+
+    uint8_t escapeData[] = {0xE2, 0x80, 0xA8};
+    EXPECT_TRUE(manager.ProcEscapeSeq(escapeData, sizeof(escapeData), 0, output));
+    EXPECT_EQ(output.size(), 2);
+    EXPECT_EQ(output[0], 0x0D);
+    EXPECT_EQ(output[1], 0x0A);
+
+    uint8_t invalidEscapeData[] = {0xE2, 0x80};
+    output.clear();
+    EXPECT_FALSE(manager.ProcEscapeSeq(invalidEscapeData, sizeof(invalidEscapeData), 0, output));
+    EXPECT_TRUE(output.empty());
+
+    uint8_t bellData[] = {0x07};
+    EXPECT_TRUE(manager.ProcBellSeq(bellData, 0));
+
+    uint8_t normalData[] = {0x41};
+    EXPECT_FALSE(manager.ProcBellSeq(normalData, 0));
+
+    uint8_t controlData[] = {0x1B, 0x61};
+    EXPECT_TRUE(manager.ProcControlSeq(controlData, sizeof(controlData), 0));
+
+    uint8_t invalidControlData[] = {0x1B};
+    EXPECT_FALSE(manager.ProcControlSeq(invalidControlData, sizeof(invalidControlData), 0));
+
+    uint8_t otherControlData1[] = {0xC2, 0x98};
+    EXPECT_TRUE(manager.ProcOtherControlBytes(otherControlData1, sizeof(otherControlData1), 0));
+
+    uint8_t otherControlData2[] = {0xC2, 0x9C};
+    EXPECT_TRUE(manager.ProcOtherControlBytes(otherControlData2, sizeof(otherControlData2), 0));
+
+    uint8_t invalidOtherControlData[] = {0xC2};
+    EXPECT_FALSE(manager.ProcOtherControlBytes(invalidOtherControlData, sizeof(invalidOtherControlData), 0));
+
+    uint8_t bomData[] = {0xEF, 0xBB, 0xBF};
+    EXPECT_TRUE(manager.ProcessOrderMark(bomData, sizeof(bomData), 0));
+
+    uint8_t invalidBomData[] = {0xEF, 0xBB};
+    EXPECT_FALSE(manager.ProcessOrderMark(invalidBomData, sizeof(invalidBomData), 0));
+}
 /**
  * @tc.number   Telephony_CallManagerServiceStubTest001
  * @tc.name     test CallManagerServiceStub normal func
@@ -472,26 +543,157 @@ HWTEST_F(RttCallTest, Telephony_CallManagerServiceStubTest001, Function | Medium
 HWTEST_F(RttCallTest, Telephony_CallStatusCallbackTest001, Function | MediumTest | Level1)
 {
     int32_t ret = -100;
-    int32_t len = 0;
+    int32_t callId = -1;
     MessageParcel reply;
-    MessageParcel data;
-    data.WriteInt32(len);
     std::shared_ptr<CallStatusCallbackStub> statusStub = std::make_shared<CallStatusCallback>();
-    EXPECT_EQ(statusStub->OnHandleRttEvtChanged(data, reply), TELEPHONY_ERR_ARGUMENT_INVALID);
 
-    RttEventInfo eventInfo;
-    len = sizeof(RttEventInfo);
     MessageParcel data2;
-    data2.WriteInt32(len);
-    data2.WriteRawData((void *)&eventInfo, sizeof(RttEventInfo));
+    data2.WriteInt32(callId);
+    data2.WriteInt32(2);
+    data2.WriteInt32(3);
+    data2.WriteInt32(1);
     EXPECT_NE(statusStub->OnHandleRttEvtChanged(data2, reply), ret);
 
-    RttErrorInfo errorInfo;
-    len = sizeof(RttErrorInfo);
     MessageParcel data3;
-    data3.WriteInt32(len);
-    data3.WriteRawData((void *)&errorInfo, sizeof(RttErrorInfo));
+    data3.WriteInt32(callId);
+    data3.WriteInt32(2);
+    data3.WriteInt32(3);
+    data3.WriteString("resonText");
+    data3.WriteInt32(2);
     EXPECT_NE(statusStub->OnHandleRttErrReport(data3, reply), ret);
+}
+
+/**
+ * @tc.number   Telephony_RttCallListenerTest001
+ * @tc.name     test RttCallListener normal func
+ * @tc.desc     Function test
+ */
+HWTEST_F(RttCallTest, Telephony_RttCallListenerTest001, Function | MediumTest | Level1)
+{
+    DialParaInfo dialInfo;
+    std::shared_ptr<RttCallListener> listener_ = std::make_shared<RttCallListener>();
+    sptr<CallBase> callObjectPtr = new IMSCall(dialInfo);
+    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(callObjectPtr.GetRefPtr());
+    imsCall->SetCallType(CallType::TYPE_IMS);
+    imsCall->SetRttState(RttCallState::RTT_STATE_YES);
+    listener_->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_NE(listener_->rttManager_, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_RttCallListenerTest002
+ * @tc.name     test RttCallListener normal func
+ * @tc.desc     Function test
+ */
+HWTEST_F(RttCallTest, Telephony_RttCallListenerTest002, Function | MediumTest | Level1)
+{
+    DialParaInfo dialInfo;
+    std::shared_ptr<RttCallListener> listener_ = std::make_shared<RttCallListener>();
+    sptr<CallBase> callObjectPtr = new IMSCall(dialInfo);
+    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(callObjectPtr.GetRefPtr());
+    imsCall->SetCallType(CallType::TYPE_CS);
+    imsCall->SetRttState(RttCallState::RTT_STATE_YES);
+    listener_->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_EQ(listener_->rttManager_, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_RttCallListenerTest003
+ * @tc.name     test InitRttManager normal func
+ * @tc.desc     Function test for InitRttManager
+ */
+HWTEST_F(RttCallTest, Telephony_RttCallListenerTest003, Function | MediumTest | Level1)
+{
+    DialParaInfo dialInfo;
+    std::shared_ptr<RttCallListener> listener_ = std::make_shared<RttCallListener>();
+    sptr<CallBase> callObjectPtr = new IMSCall(dialInfo);
+    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(callObjectPtr.GetRefPtr());
+
+    listener_->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_EQ(listener_->rttManager_, nullptr);
+
+    imsCall->SetRttState(RttCallState::RTT_STATE_NO);
+    listener_->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_EQ(listener_->rttManager_, nullptr);
+
+    imsCall->SetRttState(RttCallState::RTT_STATE_YES);
+    listener_->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_EQ(listener_->rttManager_, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_RttCallListenerTest004
+ * @tc.name     test UnInitRttManager normal func
+ * @tc.desc     Function test for UnInitRttManager
+ */
+HWTEST_F(RttCallTest, Telephony_RttCallListenerTest004, Function | MediumTest | Level1)
+{
+    DialParaInfo dialInfo;
+    std::shared_ptr<RttCallListener> listener_ = std::make_shared<RttCallListener>();
+    sptr<CallBase> callObjectPtr = new IMSCall(dialInfo);
+    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(callObjectPtr.GetRefPtr());
+    imsCall->SetCallType(CallType::TYPE_IMS);
+    imsCall->SetRttState(RttCallState::RTT_STATE_YES);
+
+    listener_->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_NE(listener_->rttManager_, nullptr);
+
+    listener_->CallStateUpdated(
+        callObjectPtr, TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_DISCONNECTED);
+    EXPECT_EQ(listener_->rttManager_, nullptr);
+
+    listener_->CallStateUpdated(
+        callObjectPtr, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ACTIVE);
+    listener_->rttManager_ = nullptr;
+    listener_->CallStateUpdated(
+        callObjectPtr, TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_DISCONNECTED);
+    EXPECT_EQ(listener_->rttManager_, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_RttCallListenerTest005
+ * @tc.name     test RefreshRttParam normal func
+ * @tc.desc     Function test for RefreshRttParam
+ */
+HWTEST_F(RttCallTest, Telephony_RttCallListenerTest005, Function | MediumTest | Level1)
+{
+    DialParaInfo dialInfo;
+    std::shared_ptr<RttCallListener> listener_ = std::make_shared<RttCallListener>();
+    sptr<CallBase> callObjectPtr = new IMSCall(dialInfo);
+    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(callObjectPtr.GetRefPtr());
+    imsCall->SetCallType(CallType::TYPE_IMS);
+    imsCall->SetRttState(RttCallState::RTT_STATE_YES);
+
+    listener_->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_NE(listener_->rttManager_, nullptr);
+
+    listener_->rttManager_ = nullptr;
+    listener_->RefreshRttParam(333, RttCallState::RTT_STATE_YES, 444);
+    EXPECT_EQ(listener_->rttManager_, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_RttCallListenerTest006
+ * @tc.name     test SendRttMessage normal func
+ * @tc.desc     Function test for SendRttMessage
+ */
+HWTEST_F(RttCallTest, Telephony_RttCallListenerTest006, Function | MediumTest | Level1)
+{
+    DialParaInfo dialInfo;
+    std::shared_ptr<RttCallListener> listener_ = std::make_shared<RttCallListener>();
+    sptr<CallBase> callObjectPtr = new IMSCall(dialInfo);
+    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(callObjectPtr.GetRefPtr());
+    imsCall->SetCallType(CallType::TYPE_IMS);
+    imsCall->SetRttState(RttCallState::RTT_STATE_YES);
+
+    listener_->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_NE(listener_->rttManager_, nullptr);
+
+    std::string testMessage = "Hello RTT";
+    EXPECT_EQ(listener_->SendRttMessage(testMessage), RTT_SUCCESS);
+
+    listener_->rttManager_ = nullptr;
+    EXPECT_EQ(listener_->SendRttMessage(testMessage), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 } // namespace Telephony
 } // namespace OHOS

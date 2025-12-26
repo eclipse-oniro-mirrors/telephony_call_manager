@@ -558,6 +558,8 @@ struct RttEventInfo {
      * 0: 本地用户发起 1: 远端用户发起
      */
     int32_t reason;
+
+    int32_t slotId;
 };
 
 /**
@@ -621,6 +623,8 @@ struct RttErrorInfo {
      * 错误码字符串信息
      */
     std::string reasonText;
+
+    int32_t slotId;
 };
 
 /**

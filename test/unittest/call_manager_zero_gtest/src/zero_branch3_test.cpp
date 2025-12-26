@@ -704,7 +704,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallRecordsManager_003, TestSize.Level0)
     callObjectPtr->SetCallType(CallType::TYPE_IMS);
     ASSERT_NO_THROW(callRecordsManager.RefreshRttFlag(callObjectPtr, info));
     sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(callObjectPtr.GetRefPtr());
-    EXPECT_EQ(info.isPrevRtt, imsCall->GetIsPrevRtt());
+    EXPECT_EQ(info.isPrevRtt, imsCall->IsPrevRtt());
     callObjectPtr->SetCallType(CallType::TYPE_CS);
     ASSERT_NO_THROW(callRecordsManager.RefreshRttFlag(callObjectPtr, info));
     ASSERT_NE(callObjectPtr, nullptr);
@@ -1316,6 +1316,13 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_013, TestSize.Level0)
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     ASSERT_NE(callControlManager->StartRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->StopRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->UpdateImsRttCallMode(INVALID_CALLID, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE),
+        TELEPHONY_SUCCESS);
+    int32_t slotId = 1;
+    ASSERT_NE(callControlManager->SetRttCapability(slotId, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE), TELEPHONY_SUCCESS);
+    CallDetailInfo callInfo;
+    EXPECT_NO_THROW(callControlManager->RefreshRttParam(callInfo));
+    callControlManager->UnInitRttManager();
 }
 #endif
 
@@ -1944,15 +1951,15 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_017, TestSize.Level0)
 #ifdef SUPPORT_RTT_CALL
     DialParaInfo dialInfo;
     sptr<IMSCall> imsCall = new IMSCall(dialInfo);
-    callStatusManager->InitRttManager(
-        imsCall->GetCallID(), imsCall->GetRttState(), imsCall->GetRttChannelId());
-    callStatusManager->UnInitRttManager();
+    std::shared_ptr<RttCallListener> rttCallListener = std::make_shared<RttCallListener>();
+    rttCallListener->InitRttManager(imsCall);
+    rttCallListener->UnInitRttManager();
 #endif
 
 #ifdef SUPPORT_RTT_CALL
     int32_t ret = -100;
     std::string rttMessage = "message";
-    EXPECT_NE(callStatusManager->SendRttMessage(rttMessage), ret);
+    EXPECT_NE(rttCallListener->SendRttMessage(rttMessage), ret);
 #endif
 }
 } // namespace Telephony
