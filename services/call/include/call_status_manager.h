@@ -159,6 +159,7 @@ private:
     int32_t HandleCallReportInfoEx(const CallDetailInfo &info);
     void ClearPendingState(sptr<CallBase> &call);
     void RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason, const std::string &message);
+    void AutoAnswerVideoCallForNotDsda(const sptr<CallBase> disconnectedCall, int32_t activeCallNum);
 
 #ifdef NOT_SUPPORT_MULTICALL
     void AutoAnswerSecondCall();
