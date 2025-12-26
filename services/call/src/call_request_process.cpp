@@ -137,14 +137,8 @@ void CallRequestProcess::AnswerRequestForDsda(sptr<CallBase> call, int32_t callI
 {
     int32_t slotId = call->GetSlotId();
     int32_t callCrsType = 2;
-    if (NeedAnswerVTAndEndActiveVO(callId, videoState)) {
-        TELEPHONY_LOGI("Answer a video call");
-        DisconnectOtherCallForVideoCall(callId);
-        call->SetAutoAnswerState(true);
-        return;
-    }
-    if (NeedAnswerVOAndEndActiveVT(callId, videoState)) {
-        TELEPHONY_LOGI("Answer a voice call, but has video call");
+    if (NeedAnswerVTAndEndActiveVO(callId, videoState) || NeedAnswerVOAndEndActiveVT(callId, videoState)) {
+        TELEPHONY_LOGI("Answer a video call or Answer a voice call but has video call");
         DisconnectOtherCallForVideoCall(callId);
         call->SetAutoAnswerState(true);
         return;
