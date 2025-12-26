@@ -1939,7 +1939,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
 #ifdef CONFIG_FACTORY_VERSION
     TELEPHONY_LOGI("ShouldRejectIncomingCall: CONFIG_FACTORY_VERSION is true");
     return false;
-#endif
+#else
 
     if (CallStatusManager::GetDevProvisioned() != DEVICE_PROVISION_VALID) {
         TELEPHONY_LOGW("ShouldRejectIncomingCall: device_provisioned = 0");
@@ -1963,6 +1963,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         return true;
     }
     return false;
+#endif
 }
 
 bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, const CallDetailInfo &info)
