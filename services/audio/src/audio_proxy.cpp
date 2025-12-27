@@ -565,6 +565,11 @@ int32_t AudioProxy::UnsetAudioMicStateChangeCallback()
 void AudioMicStateChangeCallback::OnMicStateUpdated(
     const AudioStandard::MicStateChangeEvent &micStateChangeEvent)
 {
+    sptr<CallBase> call = CallObjectManager::GetAudioLiveCall();
+    if (call == nullptr || call->GetCallType() == CallType::TYPE_VOIP) {
+        TELEPHONY_LOGI("no live call or is voip call, do nothing");
+        return;
+    }
     std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
         AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
     if (audioGroupManager == nullptr) {
