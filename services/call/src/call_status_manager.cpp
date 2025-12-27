@@ -1429,10 +1429,11 @@ bool CallStatusManager::AutoAnswerVideoCallForNotDsda(const sptr<CallBase> disco
             if (ringVideoState == static_cast<int32_t>(VideoStateType::TYPE_VIDEO) ||
                 disconnectedVideoState == static_cast<int32_t>(VideoStateType::TYPE_VIDEO) ) {
                 AutoAnswerForVideoCall(activeCallNum);
-                return;
+                return true;
             }
         }
     }
+    return false;
 }
 
 void CallStatusManager::IsCanUnHold(int32_t activeCallNum, int32_t waitingCallNum, int32_t size, bool &canUnHold)
