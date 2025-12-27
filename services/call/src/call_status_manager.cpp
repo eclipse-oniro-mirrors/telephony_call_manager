@@ -1935,6 +1935,12 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         TELEPHONY_LOGI("HasEmergencyCall reject incoming call.");
         return true;
     }
+
+#ifdef CONFIG_FACTORY_VERSION
+    TELEPHONY_LOGI("ShouldRejectIncomingCall: CONFIG_FACTORY_VERSION is true");
+    return false;
+#else
+
     if (CallStatusManager::GetDevProvisioned() != DEVICE_PROVISION_VALID) {
         TELEPHONY_LOGW("ShouldRejectIncomingCall: device_provisioned = 0");
         return true;
@@ -1957,6 +1963,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         return true;
     }
     return false;
+#endif
 }
 
 bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, const CallDetailInfo &info)
