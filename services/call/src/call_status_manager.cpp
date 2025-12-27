@@ -1409,13 +1409,15 @@ void CallStatusManager::HandleHoldCallOrAutoAnswerCall(const sptr<CallBase> call
         AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), true);
         return;
     }
-    AutoAnswerVideoCallForNotDsda(call, activeCallNum);
+    if (AutoAnswerVideoCallForNotDsda(call, activeCallNum)) {
+        return;
+    }
     if (dsdsMode == DSDS_MODE_V3) {
         AutoAnswer(activeCallNum, waitingCallNum);
     }
 }
 
-void CallStatusManager::AutoAnswerVideoCallForNotDsda(const sptr<CallBase> disconnectedCall, int32_t activeCallNum)
+bool CallStatusManager::AutoAnswerVideoCallForNotDsda(const sptr<CallBase> disconnectedCall, int32_t activeCallNum)
 {
     std::list<int32_t> callIdList;
     GetCarrierCallList(callIdList);
@@ -1536,28 +1538,7 @@ void CallStatusManager::AutoAnswerForVoiceCall(sptr<CallBase> ringCall, int32_t 
 
 void CallStatusManager::AutoAnswerForVideoCall(int32_t activeCallNum)
 {
-    int32_t holdingCallNum = GetCallNum(TelCallState::CALL_STATUS_HOLDING);
-    int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
-    int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
-    if (activeCallNum == 0 && holdingCallNum == 0 && dialingCallNum == 0 && alertingCallNum == 0) {
-        std::list<int32_t> ringCallIdList;
-        GetCarrierCallList(ringCallIdList);
-        for (int32_t ringingCallId : ringCallIdList) {
-            sptr<CallBase> ringingCall = GetOneCallObject(ringingCallId);
-            if (ringingCall == nullptr) {
-                TELEPHONY_LOGE("ringingCall is nullptr");
-                return;
-            }
-            CallRunningState ringingCallState = ringingCall->GetCallRunningState();
-            if ((ringingCallState == CallRunningState::CALL_RUNNING_STATE_RINGING &&
-                    (ringingCall->GetAutoAnswerState()))) {
-                ringingCall->SetAutoAnswerState(false);
-                int ret = ringingCall->AnswerCall(ringingCall->GetAnswerVideoState());
-                TELEPHONY_LOGI("ret = %{public}d", ret);
-                break;
-            }
-        }
-    }
+    AutoAnswer(activeCallNum, 0);
 }
 
 void CallStatusManager::AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum)
