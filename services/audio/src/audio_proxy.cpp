@@ -285,6 +285,13 @@ void AudioDeviceChangeCallback::OnDeviceChange(const AudioStandard::DeviceChange
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
                     AudioEvent::WIRED_HEADSET_DISCONNECTED);
             }
+        } else if (audioDeviceDescriptor->deviceType_ == AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO ||
+            audioDeviceDescriptor->deviceType_ == AudioStandard::DEVICE_TYPE_NEARLINK) {
+            if (deviceChangeAction.type == AudioStandard::DISCONNECT) {
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->RemoveAudioDeviceList(
+                    audioDeviceDescriptor->macAddress_,
+                    static_cast<OHOS::Telephony::AudioDeviceType>(audioDeviceDescriptor->deviceType_));
+            }
         }
     }
 }
