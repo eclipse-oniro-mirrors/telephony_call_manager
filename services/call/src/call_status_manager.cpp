@@ -1403,13 +1403,37 @@ void CallStatusManager::HandleHoldCallOrAutoAnswerCall(const sptr<CallBase> call
 #endif
     int32_t dsdsMode = DSDS_MODE_V2;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
-    if (dsdsMode == DSDS_MODE_V3) {
-        AutoAnswer(activeCallNum, waitingCallNum);
-    } else if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
+    if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
         dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
         bool canSwitchCallState = call->GetCanSwitchCallState();
         AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), true);
+        return;
     }
+    if (AutoAnswerVideoCallForNotDsda(call, activeCallNum)) {
+        return;
+    }
+    if (dsdsMode == DSDS_MODE_V3) {
+        AutoAnswer(activeCallNum, waitingCallNum);
+    }
+}
+
+bool CallStatusManager::AutoAnswerVideoCallForNotDsda(const sptr<CallBase> disconnectedCall, int32_t activeCallNum)
+{
+    std::list<int32_t> callIdList;
+    GetCarrierCallList(callIdList);
+    for (int32_t ringCallId : callIdList) {
+        sptr<CallBase> ringCall = GetOneCallObject(ringCallId);
+        if (ringCall != nullptr && ringCall->GetAutoAnswerState()) {
+            int32_t ringVideoState = static_cast<int32_t>(ringCall->GetVideoStateType());
+            int32_t disconnectedVideoState = static_cast<int32_t>(disconnectedCall->GetVideoStateType());
+            if (ringVideoState == static_cast<int32_t>(VideoStateType::TYPE_VIDEO) ||
+                disconnectedVideoState == static_cast<int32_t>(VideoStateType::TYPE_VIDEO) ) {
+                AutoAnswerForVideoCall(activeCallNum);
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void CallStatusManager::IsCanUnHold(int32_t activeCallNum, int32_t waitingCallNum, int32_t size, bool &canUnHold)
@@ -1515,28 +1539,7 @@ void CallStatusManager::AutoAnswerForVoiceCall(sptr<CallBase> ringCall, int32_t 
 
 void CallStatusManager::AutoAnswerForVideoCall(int32_t activeCallNum)
 {
-    int32_t holdingCallNum = GetCallNum(TelCallState::CALL_STATUS_HOLDING);
-    int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
-    int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
-    if (activeCallNum == 0 && holdingCallNum == 0 && dialingCallNum == 0 && alertingCallNum == 0) {
-        std::list<int32_t> ringCallIdList;
-        GetCarrierCallList(ringCallIdList);
-        for (int32_t ringingCallId : ringCallIdList) {
-            sptr<CallBase> ringingCall = GetOneCallObject(ringingCallId);
-            if (ringingCall == nullptr) {
-                TELEPHONY_LOGE("ringingCall is nullptr");
-                return;
-            }
-            CallRunningState ringingCallState = ringingCall->GetCallRunningState();
-            if ((ringingCallState == CallRunningState::CALL_RUNNING_STATE_RINGING &&
-                    (ringingCall->GetAutoAnswerState()))) {
-                ringingCall->SetAutoAnswerState(false);
-                int ret = ringingCall->AnswerCall(ringingCall->GetAnswerVideoState());
-                TELEPHONY_LOGI("ret = %{public}d", ret);
-                break;
-            }
-        }
-    }
+    AutoAnswer(activeCallNum, 0);
 }
 
 void CallStatusManager::AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum)

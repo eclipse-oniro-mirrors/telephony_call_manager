@@ -294,6 +294,8 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallStatusCallbackProxy_001, TestSize.Lev
     CameraCapabilitiesReportInfo cameraInfo;
     EXPECT_EQ(callStatusCallbackProxy->HandleCameraCapabilitiesChanged(cameraInfo),
         TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    ImsSuppExtReportInfo suppExtInfo;
+    EXPECT_EQ(callStatusCallbackProxy->HandleImsSuppExtChanged(suppExtInfo), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 
 #ifdef SUPPORT_RTT_CALL
     int32_t ret = -100;

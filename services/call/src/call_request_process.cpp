@@ -133,26 +133,21 @@ void CallRequestProcess::AnswerRequest(int32_t callId, int32_t videoState, bool 
     AnswerRequestForDsda(call, callId, videoState, isRTT);
 }
 
-void CallRequestProcess::AnswerRequestForDsda(
-    sptr<CallBase> call, int32_t callId, int32_t videoState, bool isRTT)
+void CallRequestProcess::AnswerRequestForDsda(sptr<CallBase> call, int32_t callId, int32_t videoState, bool isRTT)
 {
     int32_t slotId = call->GetSlotId();
     int32_t callCrsType = 2;
+    if (NeedAnswerVTAndEndActiveVO(callId, videoState) || NeedAnswerVOAndEndActiveVT(callId, videoState)) {
+        TELEPHONY_LOGI("Answer a video call or Answer a voice call but has video call");
+        DisconnectOtherCallForVideoCall(callId);
+        call->SetAutoAnswerState(true);
+        return;
+    }
+
     if (IsDsdsMode3()) {
         DisconnectOtherSubIdCall(callId, slotId, videoState);
     } else if (IsDsdsMode5()) {
-        if (NeedAnswerVTAndEndActiveVO(callId, videoState)) {
-            TELEPHONY_LOGI("Answer videoCall for Dsda");
-            DisconnectOtherCallForVideoCall(callId);
-            call->SetAutoAnswerState(true);
-            return;
-        } else if (NeedAnswerVOAndEndActiveVT(callId, videoState)) {
-            TELEPHONY_LOGI("Answer voiceCall for Dsda, but has video call");
-            DisconnectOtherCallForVideoCall(callId);
-            call->SetAutoAnswerState(true);
-            return;
-        }
-        // There is already an incoming call to the CRS.
+        TELEPHONY_LOGI("AnswerCall for DSDA");
         int32_t otherRingCallId = GetOtherRingingCall(callId);
         if (otherRingCallId != INVALID_CALLID) {
             sptr<CallBase> ringingCall = GetOneCallObject(otherRingCallId);
@@ -165,6 +160,7 @@ void CallRequestProcess::AnswerRequestForDsda(
         call->SetAutoAnswerState(true);
         HoldOrDisconnectedCall(callId, slotId, videoState);
     } else {
+        TELEPHONY_LOGI("AnswerCall for not DSDA");
         int32_t ret = call->AnswerCall(videoState, isRTT);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("AnswerCall failed!");

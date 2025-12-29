@@ -23,6 +23,7 @@
 #include "hitrace_meter.h"
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
+#include "int_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -527,7 +528,7 @@ int32_t CallStatusCallback::HandleCallDataUsageChanged(const int64_t dataUsage)
 int32_t CallStatusCallback::HandleCameraCapabilitiesChanged(
     const CameraCapabilitiesReportInfo &cameraCapabilitiesReportInfo)
 {
-    TELEPHONY_LOGI("CameraCapabilitiesChange");
+    TELEPHONY_LOGI("CameraCapabilitiesChanged");
     sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndex(cameraCapabilitiesReportInfo.index);
     CameraCapabilities cameraCapabilities;
     if (callPtr == nullptr) {
@@ -539,6 +540,25 @@ int32_t CallStatusCallback::HandleCameraCapabilitiesChanged(
     cameraCapabilities.width = cameraCapabilitiesReportInfo.width;
     cameraCapabilities.height = cameraCapabilitiesReportInfo.height;
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCameraCapabilities(cameraCapabilities);
+}
+
+int32_t CallStatusCallback::HandleImsSuppExtChanged(const ImsSuppExtReportInfo &suppExtInfo)
+{
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndexAndSlotId(
+        suppExtInfo.callIndex, suppExtInfo.slotId);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGE("callPtr is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    TELEPHONY_LOGI("suppExtInfo [slot%{public}d] callIndex: %{public}d, code: %{public}d",
+        suppExtInfo.slotId, suppExtInfo.callIndex, suppExtInfo.code);
+
+    CallAttributeInfo info;
+    callPtr->GetCallAttributeInfo(info);
+    AAFwk::WantParams params = callPtr->GetExtraParams();
+    params.SetParam("suppExtCode", AAFwk::Integer::Box(suppExtInfo.code));
+    callPtr->SetExtraParams(params);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
 }
 
 #ifdef SUPPORT_RTT_CALL

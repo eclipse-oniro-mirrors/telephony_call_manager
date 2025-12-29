@@ -306,6 +306,14 @@ public:
     virtual int32_t HandleCameraCapabilitiesChanged(const CameraCapabilitiesReportInfo &cameraCapabilities) = 0;
 
     /**
+     * @brief handle the supplementary service information
+     *
+     * @param suppExtInfo[in], contains supplementary service information
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t HandleImsSuppExtChanged(const ImsSuppExtReportInfo &suppExtInfo) = 0;
+
+    /**
      * @brief update the voip call event
      *
      * @param info[in], contains voipCallEvent

@@ -796,6 +796,35 @@ struct CameraCapabilitiesReportInfo {
     int32_t height = 0;
 };
 
+struct ImsSuppExtReportInfo {
+    /**
+     * Indicates the slot id for the call.
+     */
+    int32_t slotId = -1;
+    /**
+     * Indicates the supplementary service extension code for the call.
+     * The possible values and their meanings are as follows:
+     * - -1: default or invalid value.
+     * - 0: The incoming call is a redirected call.
+     * - 1: The incoming call is a Closed User Group (CUG) call.
+     * - 2: The active call is on hold by the other party.
+     * - 3: The on-hold call is resumed by the other party.
+     * - 4: The call is joined in a conference call.
+     * - 5: The on-hold call is terminated by the other party.
+     * - 6: A forward check supplementary service message is received.
+     * - 7: The call is transferred to a third party, and the caller sees the third party's number.
+     * - 8: The call is transferred to a third party, and the callee sees the third party's number.
+     * - 9: The incoming call is a deflected call.
+     * - 10: The incoming call is redirected.
+     * - 22: The incoming call is initiated by the network.
+     */
+    int32_t code = -1;
+    /**
+     * Indicates the call index for the call.
+     */
+    int32_t callIndex = 0;
+};
+
 /**
  * @brief Indicates the specific IMS config item.
  */
