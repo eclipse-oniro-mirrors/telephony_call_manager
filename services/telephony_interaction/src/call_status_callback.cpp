@@ -565,7 +565,8 @@ int32_t CallStatusCallback::HandleImsSuppExtChanged(const ImsSuppExtReportInfo &
 int32_t CallStatusCallback::HandleRttEvtChanged(const RttEventInfo &rttEventInfo)
 {
     RttEvent rttEvent;
-    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndex(rttEventInfo.callId);
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndexAndSlotId(
+        rttEventInfo.callId, rttEventInfo.slotId);
     rttEvent.callId = (callPtr == nullptr) ? ERR_CALL_ID : callPtr->GetCallID();
     rttEvent.callId = rttEventInfo.callId;
     rttEvent.eventType = rttEventInfo.eventType;
@@ -573,17 +574,16 @@ int32_t CallStatusCallback::HandleRttEvtChanged(const RttEventInfo &rttEventInfo
     TELEPHONY_LOGI("HandleRttEvtChanged callId:%{public}d, indexId:%{public}d, eventType:%{public}d, "
         "info:%{public}d", rttEvent.callId, rttEventInfo.callId, rttEvent.eventType, rttEvent.reason);
 
-    if (rttEvent.eventType == ImsRTTEventType::EVENT_RTT_CLOSED) {
-        TELEPHONY_LOGI("start to close proxy for RTT event type is 1");
-        DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UnInitRttManager();
-    }
+    DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateRttEventInfo(
+        static_cast<ImsRTTEventType>(rttEvent.eventType));
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportRttCallEvtChanged(rttEvent);
 }
 
 int32_t CallStatusCallback::HandleRttErrReport(const RttErrorInfo &rttErrorInfo)
 {
     RttError rttError;
-    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndex(rttErrorInfo.callId);
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndexAndSlotId(
+        rttErrorInfo.callId, rttErrorInfo.slotId);
     rttError.callId = (callPtr == nullptr) ? ERR_CALL_ID : callPtr->GetCallID();
     rttError.operationType = rttErrorInfo.operationType;
     rttError.causeCode = rttErrorInfo.causeCode;
@@ -592,9 +592,8 @@ int32_t CallStatusCallback::HandleRttErrReport(const RttErrorInfo &rttErrorInfo)
     TELEPHONY_LOGI("HandleRttErrReport callId:%{public}d, indexId:%{public}d, operationType:%{public}d, "
         "causeCode:%{public}d, reasonText:%{public}s", rttError.callId, rttErrorInfo.callId,
         rttError.operationType, rttError.causeCode, rttError.reasonText.c_str());
-
-    TELEPHONY_LOGI("start to close proxy for RTT error reported");
-    DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UnInitRttManager();
+    DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateRttEventInfo(
+        static_cast<ImsRTTEventType>(ImsRTTEventType::EVENT_RTT_CLOSED));
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportRttCallError(rttError);
 }
 #endif

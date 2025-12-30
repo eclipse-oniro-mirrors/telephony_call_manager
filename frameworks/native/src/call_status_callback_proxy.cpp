@@ -905,11 +905,10 @@ int32_t CallStatusCallbackProxy::HandleRttEvtChanged(const RttEventInfo &rttEven
     if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    
     dataParcel.WriteInt32(rttEventInfo.callId);
     dataParcel.WriteInt32(rttEventInfo.eventType);
     dataParcel.WriteInt32(rttEventInfo.reason);
-
+    dataParcel.WriteInt32(rttEventInfo.slotId);
     if (Remote() == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -929,11 +928,11 @@ int32_t CallStatusCallbackProxy::HandleRttErrReport(const RttErrorInfo &rttError
     if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    
     dataParcel.WriteInt32(rttErrorInfo.callId);
     dataParcel.WriteInt32(rttErrorInfo.causeCode);
     dataParcel.WriteInt32(rttErrorInfo.operationType);
     dataParcel.WriteString(rttErrorInfo.reasonText);
+    dataParcel.WriteInt32(rttErrorInfo.slotId);
     if (Remote() == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }

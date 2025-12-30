@@ -953,6 +953,7 @@ int32_t CallStatusCallbackStub::OnHandleRttEvtChanged(MessageParcel &data, Messa
     eventInfo.callId = data.ReadInt32();
     eventInfo.eventType = data.ReadInt32();
     eventInfo.reason = data.ReadInt32();
+    eventInfo.slotId = data.ReadInt32();
     error = HandleRttEvtChanged(eventInfo);
     if (!reply.WriteInt32(error)) {
         TELEPHONY_LOGE("writing parcel failed");
@@ -972,6 +973,7 @@ int32_t CallStatusCallbackStub::OnHandleRttErrReport(MessageParcel &data, Messag
     errInfo.causeCode = data.ReadInt32();
     errInfo.operationType = data.ReadInt32();
     errInfo.reasonText = data.ReadString();
+    errInfo.slotId = data.ReadInt32();
     error = HandleRttErrReport(errInfo);
     if (!reply.WriteInt32(error)) {
         TELEPHONY_LOGE("writing parcel failed");

@@ -835,20 +835,11 @@ int32_t CallManagerService::StartRtt(int32_t callId)
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    sptr<CallBase> currCall = CallObjectManager::GetOneCallObjectByIndex(callId);
-    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(currCall.GetRefPtr());
-    if (callStatusManagerPtr_ != nullptr) {
-        TELEPHONY_LOGE("InitRttManager by start RTT, callId: %{public}d, channelId: %{public}d",
-            imsCall->GetCallID(), imsCall->GetRttChannelId());
-        callStatusManagerPtr_->InitRttManager(
-            imsCall->GetCallID(), imsCall->GetRttState(), imsCall->GetRttChannelId());
-    }
-    if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->StartRtt(callId);
-    } else {
+    if (callControlManagerPtr_ == nullptr) {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    return callControlManagerPtr_->StartRtt(callId);
 }
 
 int32_t CallManagerService::StopRtt(int32_t callId)
@@ -861,16 +852,11 @@ int32_t CallManagerService::StopRtt(int32_t callId)
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    if (callStatusManagerPtr_ != nullptr) {
-        TELEPHONY_LOGE("UnInitRttManager by stop RTT");
-        callStatusManagerPtr_->UnInitRttManager();
-    }
-    if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->StopRtt(callId);
-    } else {
+    if (callControlManagerPtr_ == nullptr) {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    return callControlManagerPtr_->StopRtt(callId);
 }
 
 int32_t CallManagerService::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
@@ -1942,24 +1928,6 @@ int32_t CallManagerService::NotifyVoIPAudioStreamStart(int32_t uid)
 }
 
 #ifdef SUPPORT_RTT_CALL
-int32_t CallManagerService::SendRttMessage(int32_t callId, const std::string &rttMessage)
-{
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        TELEPHONY_LOGE("Non-system applications use system APIs!");
-        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
-    }
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
-        TELEPHONY_LOGE("Permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
-    if (callStatusManagerPtr_ != nullptr) {
-        return callStatusManagerPtr_->SendRttMessage(rttMessage);
-    } else {
-        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-}
-
 int32_t CallManagerService::SetRttCapability(int32_t slotId, bool isEnable)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
@@ -1970,12 +1938,28 @@ int32_t CallManagerService::SetRttCapability(int32_t slotId, bool isEnable)
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->SetRttCapability(slotId, isEnable);
-    } else {
+    if (callControlManagerPtr_ == nullptr) {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    return callControlManagerPtr_->SetRttCapability(slotId, isEnable);
+}
+
+int32_t CallManagerService::SendRttMessage(int32_t callId, const std::string &rttMessage)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (callControlManagerPtr_ == nullptr) {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return callControlManagerPtr_->SendRttMessage(rttMessage);
 }
 #endif
 } // namespace Telephony

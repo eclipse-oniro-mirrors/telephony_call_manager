@@ -348,8 +348,14 @@ if (call_manager_feature_not_support_multicall) {
 
 if (call_manager_feature_support_rtt) {
   call_manager_defines += [ "SUPPORT_RTT_CALL" ]
+
+  call_manager_include_dirs += [
+    "${call_manager_path}/services/rtt_call/include"
+  ]
+
   call_manager_sources += [
-    "${call_manager_path}/services/call/src/ims_rtt_manager.cpp"
+    "${call_manager_path}/services/call/call_state_observer/src/rtt_call_listener.cpp",
+    "${call_manager_path}/services/rtt_call/src/ims_rtt_manager.cpp"    
   ]
 }
 

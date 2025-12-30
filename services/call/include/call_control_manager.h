@@ -37,6 +37,9 @@
 #ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
 #endif
+#ifdef SUPPORT_RTT_CALL
+#include "rtt_call_listener.h"
+#endif
 
 /**
  * Singleton
@@ -121,6 +124,9 @@ public:
     int32_t StopRtt(int32_t callId);
     int32_t SetRttCapability(int32_t slotId, bool isEnable);
     int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode);
+    int32_t UnInitRttManager();
+    void RefreshRttParam(const CallDetailInfo &callInfo);
+    int32_t SendRttMessage(const std::string &rttMessage);
 #endif
     // invite calls to participate conference
     int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList);
@@ -232,6 +238,10 @@ private:
     std::shared_ptr<PowerMgr::RunningLock> disconnectedRunningLock_;
 #endif
     const int32_t DISCONNECTED_LOCK_TIMEOUT = 2000;
+
+#ifdef SUPPORT_RTT_CALL
+    std::shared_ptr<RttCallListener> rttCallListener_ = nullptr;
+#endif
     std::shared_ptr<MissedCallNotification> missedCallNotification_;
     std::unique_ptr<CallSettingManager> callSettingManagerPtr_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;

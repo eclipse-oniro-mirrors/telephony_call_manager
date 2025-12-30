@@ -76,9 +76,7 @@ public:
     static void RegisterObserver();
     static void UpdateDevProvisioned();
 #ifdef SUPPORT_RTT_CALL
-    int32_t SendRttMessage(const std::string &rttMessage);
-    void InitRttManager(int32_t callId, RttCallState rttState, int32_t channelId);
-    void UnInitRttManager();
+    void HandleRttEventInfo(const ImsRTTEventType &eventType);
 #endif
 
 private:
@@ -174,10 +172,6 @@ private:
     bool UpdateDialingHandle(const CallDetailInfo &info, bool &isDistributedDeviceDialing);
     bool RefreshDialingStateByOtherState(sptr<CallBase> &call, const CallDetailInfo &info);
     void PackVoipCallInfo(DialParaInfo &paraInfo, const CallDetailInfo &info);
-#ifdef SUPPORT_RTT_CALL
-    void UpdatePrevRttState(const CallDetailInfo &info);
-    void DoInitRtt(sptr<CallBase> &call, const CallDetailInfo &info);
-#endif
 
 private:
     CallDetailInfo callReportInfo_;
@@ -196,9 +190,6 @@ private:
     const std::string IS_DELETED = "is_deleted";
     const int32_t CALL_NUMBER = 2;
     std::unique_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
-#ifdef SUPPORT_RTT_CALL
-    std::shared_ptr<ImsRttManager> rttManager_{nullptr};
-#endif
     std::chrono::system_clock::time_point detectStartTime = std::chrono::system_clock::from_time_t(0);
     int32_t antiFraudSlotId_ = -1;
     int32_t antiFraudIndex_ = -1;
