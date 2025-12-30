@@ -102,8 +102,6 @@ public:
     void SetAnswerType(CallAnswerType answerType);
     time_t GetCallCreateTime();
     CallAnswerType GetAnswerType();
-    CallEndedType GetCallEndedType();
-    int32_t SetCallEndedType(CallEndedType callEndedType);
     void SetCallId(int32_t callId);
     bool IsSpeakerphoneEnabled();
     bool IsCurrentRinging();
@@ -191,7 +189,6 @@ private:
     bool canSwitchCallState_;
     int32_t answerVideoState_;
     bool isSpeakerphoneOn_;
-    CallEndedType callEndedType_;
     ContactInfo contactInfo_;
     time_t callBeginTime_;
     time_t callCreateTime_;

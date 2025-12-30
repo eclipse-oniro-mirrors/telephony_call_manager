@@ -1645,7 +1645,6 @@ sptr<CallBase> CallStatusManager::RefreshCall(const sptr<CallBase> &call, const 
     newCall->SetStartTime(attrInfo.startTime);
     newCall->SetPolicyFlag(PolicyFlag(call->GetPolicyFlag()));
     newCall->SetSpeakerphoneOn(call->IsSpeakerphoneOn());
-    newCall->SetCallEndedType(call->GetCallEndedType());
     newCall->SetCallBeginTime(attrInfo.callBeginTime);
     newCall->SetCallCreateTime(attrInfo.callCreateTime);
     newCall->SetCallEndTime(attrInfo.callEndTime);

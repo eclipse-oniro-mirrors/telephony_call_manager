@@ -147,8 +147,6 @@ void AudioProxyFunc(const uint8_t *data, size_t size)
     audioProxy->GetMaxVolume(audioVolumeType);
     audioProxy->GetMinVolume(audioVolumeType);
     audioProxy->SetAudioDeviceChangeCallback();
-    audioProxy->GetDefaultTonePath();
-    audioProxy->GetDefaultDtmfPath();
 }
 
 void AudioSceneProcessorFunc(const uint8_t *data, size_t size)

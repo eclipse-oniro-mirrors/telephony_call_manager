@@ -333,27 +333,6 @@ enum class CallRunningState {
     CALL_RUNNING_STATE_ENDING,
 };
 
-/**
- * @brief Indicates the cause of the ended call.
- */
-enum class CallEndedType {
-    /**
-     * Indicates the cause is unknown.
-     */
-    UNKNOWN = 0,
-    /**
-     * Indicates the cause is phone busy.
-     */
-    PHONE_IS_BUSY,
-    /**
-     * Indicates the cause is invalid phone number.
-     */
-    INVALID_NUMBER,
-    /**
-     * Indicates the call is ended normally.
-     */
-    CALL_ENDED_NORMALLY,
-};
 
 /**
  * @brief Indicates the information of SIM card.

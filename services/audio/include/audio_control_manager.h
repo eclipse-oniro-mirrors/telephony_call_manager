@@ -87,8 +87,8 @@ public:
     bool IsSoundPlaying();
     bool StopSoundtone();
     bool PlaySoundtone();
-    void PlayCallEndedTone(CallEndedType type);
-    void HandleNotNormalRingerMode(CallEndedType type);
+    void PlayCallEndedTone();
+    void HandleNotNormalRingerMode();
     bool IsDistributeCallSinkStatus();
     void SetRingToneVolume(float volume);
     bool IsScoTemporarilyDisabled();

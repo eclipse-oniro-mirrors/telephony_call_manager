@@ -312,8 +312,6 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_002, TestSize.Level0)
     audioProxy->GetPreferredOutputAudioDevice(device);
     audioProxy->SetAudioPreferDeviceChangeCallback();
     audioProxy->UnsetAudioPreferDeviceChangeCallback();
-    ASSERT_FALSE(audioProxy->GetDefaultTonePath().empty());
-    ASSERT_FALSE(audioProxy->GetDefaultDtmfPath().empty());
     DialParaInfo info;
     info.voipCallInfo.uid = 1;
     sptr<CallBase> call0 = new CSCall(info);

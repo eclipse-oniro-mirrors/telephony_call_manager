@@ -139,11 +139,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_002, TestSize.Level1)
     audioControl->GetInitAudioDeviceType();
     audioControl->SetMute(false);
     audioControl->MuteRinger();
-    audioControl->PlayCallEndedTone(CallEndedType::PHONE_IS_BUSY);
-    audioControl->PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);
-    audioControl->PlayCallEndedTone(CallEndedType::UNKNOWN);
-    audioControl->PlayCallEndedTone(CallEndedType::INVALID_NUMBER);
-    audioControl->PlayCallEndedTone(static_cast<CallEndedType>(5));
+    audioControl->PlayCallEndedTone();
     audioControl->GetCallBase(VALID_CALL_ID);
     audioControl->IsEmergencyCallExists();
     audioControl->SetToneState(ToneState::TONEING);

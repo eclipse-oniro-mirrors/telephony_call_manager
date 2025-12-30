@@ -82,7 +82,6 @@ private:
     ToneDescriptor currentToneDescriptor_ = ToneDescriptor::TONE_UNKNOWN;
     bool InitTonePlayer();
     AudioStandard::ToneType ConvertToneDescriptorToToneType(ToneDescriptor tone);
-    std::string GetToneDescriptorPath(ToneDescriptor tone);
     bool IsUseTonePlayer(ToneDescriptor tone);
     ffrt::mutex mutex_;
     AudioPlayer *audioPlayer_ = nullptr;
