@@ -1321,7 +1321,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_013, TestSize.Level0)
     int32_t slotId = 1;
     ASSERT_NE(callControlManager->SetRttCapability(slotId, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE), TELEPHONY_SUCCESS);
     CallDetailInfo callInfo;
-    EXPECT_NO_THROW(callControlManager->RefreshRttParam(callInfo));
+    EXPECT_NO_THROW(callControlManager->RefreshRttManager(callInfo));
     callControlManager->UnInitRttManager();
 }
 #endif

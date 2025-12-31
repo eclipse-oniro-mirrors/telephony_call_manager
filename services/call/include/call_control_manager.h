@@ -125,7 +125,7 @@ public:
     int32_t SetRttCapability(int32_t slotId, bool isEnable);
     int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode);
     int32_t UnInitRttManager();
-    void RefreshRttParam(const CallDetailInfo &callInfo);
+    void RefreshRttManager(const CallDetailInfo &callInfo);
     int32_t SendRttMessage(const std::string &rttMessage);
 #endif
     // invite calls to participate conference

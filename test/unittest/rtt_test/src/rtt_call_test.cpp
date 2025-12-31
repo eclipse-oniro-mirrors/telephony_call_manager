@@ -652,32 +652,10 @@ HWTEST_F(RttCallTest, Telephony_RttCallListenerTest004, Function | MediumTest | 
 
 /**
  * @tc.number   Telephony_RttCallListenerTest005
- * @tc.name     test RefreshRttParam normal func
- * @tc.desc     Function test for RefreshRttParam
- */
-HWTEST_F(RttCallTest, Telephony_RttCallListenerTest005, Function | MediumTest | Level1)
-{
-    DialParaInfo dialInfo;
-    std::shared_ptr<RttCallListener> listener_ = std::make_shared<RttCallListener>();
-    sptr<CallBase> callObjectPtr = new IMSCall(dialInfo);
-    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(callObjectPtr.GetRefPtr());
-    imsCall->SetCallType(CallType::TYPE_IMS);
-    imsCall->SetRttState(RttCallState::RTT_STATE_YES);
-
-    listener_->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ACTIVE);
-    EXPECT_NE(listener_->rttManager_, nullptr);
-
-    listener_->rttManager_ = nullptr;
-    listener_->RefreshRttParam(333, RttCallState::RTT_STATE_YES, 444);
-    EXPECT_EQ(listener_->rttManager_, nullptr);
-}
-
-/**
- * @tc.number   Telephony_RttCallListenerTest006
  * @tc.name     test SendRttMessage normal func
  * @tc.desc     Function test for SendRttMessage
  */
-HWTEST_F(RttCallTest, Telephony_RttCallListenerTest006, Function | MediumTest | Level1)
+HWTEST_F(RttCallTest, Telephony_RttCallListenerTest005, Function | MediumTest | Level1)
 {
     DialParaInfo dialInfo;
     std::shared_ptr<RttCallListener> listener_ = std::make_shared<RttCallListener>();
