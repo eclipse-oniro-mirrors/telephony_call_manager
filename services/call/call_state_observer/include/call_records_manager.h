@@ -67,6 +67,7 @@ class CallRecordsManager : public CallStateListenerBase {
     DECLARE_DELAYED_SINGLETON(CallRecordsManager)
 public:
     void Init();
+    void UnInit();
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
     void AddOneCallRecord(CallAttributeInfo &info);
     void CopyCallInfoToRecord(CallAttributeInfo &info, CallRecordInfo &data);

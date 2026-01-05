@@ -166,6 +166,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     ReportOttCallEventInfo(data, size);
     CloseUnFinishedUssd(data, size);
     FormatPhoneNumber(data, size);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
 }
 } // namespace OHOS
 

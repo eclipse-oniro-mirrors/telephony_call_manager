@@ -31,6 +31,7 @@ constexpr int32_t IMS_CALL_MODE_NUM = 5;
 constexpr int32_t CALL_INDEX_MAX_NUM = 8;
 constexpr int32_t VIDEO_REQUEST_RESULT_TYPE_NUM = 102;
 constexpr int32_t CALL_SESSION_EVENT_ID_NUM = 4;
+constexpr int32_t WAIT_TIME = 3;
 std::unique_ptr<CallStatusCallback> CallStatusCallbackPtr_ = nullptr;
 
 bool ServiceInited()
@@ -477,6 +478,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     HandlePeerDimensionsChanged(data, size);
     HandleCallDataUsageChanged(data, size);
     HandleCameraCapabilitiesChanged(data, size);
+    sleep(WAIT_TIME);
 }
 } // namespace OHOS
 
