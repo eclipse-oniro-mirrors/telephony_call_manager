@@ -281,7 +281,10 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
             if (it2.index == it3.index) {
                 TELEPHONY_LOGI("state:%{public}d", it2.state);
 #ifdef SUPPORT_RTT_CALL
-                DelayedSingleton<CallControlManager>::GetInstance()->RefreshRttParam(it3);
+                auto controlManager = DelayedSingleton<CallControlManager>::GetInstance();
+                if (controlManager != nullptr) {
+                    controlManager->RefreshRttManager(it3);
+                }
 #endif
                 flag = true;
                 break;
@@ -2641,9 +2644,14 @@ void CallStatusManager::PackVoipCallInfo(DialParaInfo &paraInfo, const CallDetai
 #ifdef SUPPORT_RTT_CALL
 void CallStatusManager::HandleRttEventInfo(const ImsRTTEventType &eventType)
 {
+    auto controlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    if (controlManager == nullptr) {
+        TELEPHONY_LOGE("CallControlManager is null");
+        return;
+    }
     switch (eventType) {
         case ImsRTTEventType::EVENT_RTT_CLOSED:
-            DelayedSingleton<CallControlManager>::GetInstance()->UnInitRttManager();
+            controlManager->UnInitRttManager();
             break;
         default:
             break;

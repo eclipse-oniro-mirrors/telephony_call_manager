@@ -2323,24 +2323,26 @@ int32_t CallControlManager::UnInitRttManager()
     return TELEPHONY_SUCCESS;
 }
 
-void CallControlManager::RefreshRttParam(const CallDetailInfo &callInfo)
+void CallControlManager::RefreshRttManager(const CallDetailInfo &callInfo)
 {
-    if (callInfo.state != TelCallState::CALL_STATUS_ACTIVE) {
+    if (callInfo.state != TelCallState::CALL_STATUS_ACTIVE || callInfo.callType != CallType::TYPE_IMS ||
+        callInfo.rttState != RttCallState::RTT_STATE_YES) {
         return;
     }
+    sptr<CallBase> currCall = CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(
+        callInfo.index, callInfo.accountId, callInfo.callType);
+    if (currCall == nullptr) {
+        TELEPHONY_LOGE("cannot RefreshRttManager currCall is nullptr.");
+        return;
+    }
+    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(currCall.GetRefPtr());
+    imsCall->SetRttState(callInfo.rttState);
+    imsCall->SetRttChannelId(callInfo.rttChannelId);
     if (rttCallListener_ == nullptr) {
         TELEPHONY_LOGE("rttCallListener_ is nullptr!");
         return;
     }
-    rttCallListener_->RefreshRttParam(callInfo.index, callInfo.rttState, callInfo.rttChannelId);
-    if ((callInfo.callType != CallType::TYPE_IMS) || callInfo.rttState != RttCallState::RTT_STATE_YES) {
-        return;
-    }
-
-    sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(
-        callInfo.index, callInfo.accountId, callInfo.callType);
-    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
-    imsCall->SetPrevRtt(true);
+    rttCallListener_->InitRttManager(imsCall);
 }
 
 int32_t CallControlManager::SendRttMessage(const std::string &rttMessage)

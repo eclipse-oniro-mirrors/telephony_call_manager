@@ -51,15 +51,17 @@ void RttCallListener::InitRttManager(sptr<IMSCall> &imsCall)
         TELEPHONY_LOGI("cannot InitRttManager, rttState: %{public}d", imsCall->GetRttState());
         return;
     }
-    if (rttManager_ != nullptr) {
-        TELEPHONY_LOGI("RttManager already initialized");
-        return;
+    int32_t currCallID = imsCall->GetCallID();
+    int32_t currChannelID = imsCall->GetRttChannelId();
+    if (rttManager_ == nullptr) {
+        rttManager_ = std::make_shared<ImsRttManager>(currCallID, currChannelID);
+    } else {
+        rttManager_->SetCallID(currCallID);
+        rttManager_->SetChannelID(currChannelID);
     }
-    rttManager_ = std::make_shared<ImsRttManager>(imsCall->GetCallID(), imsCall->GetRttChannelId());
     rttManager_->InitRtt();
     imsCall->SetPrevRtt(true);
-    TELEPHONY_LOGI("InitRtt success, callId: %{public}d, channelId: %{public}d",
-        imsCall->GetCallID(), imsCall->GetRttChannelId());
+    TELEPHONY_LOGI("InitRtt success, callId: %{public}d, channelId: %{public}d", currCallID, currChannelID);
 }
 
 void RttCallListener::UnInitRttManager()
@@ -72,23 +74,6 @@ void RttCallListener::UnInitRttManager()
 
     rttManager_->DestroyRtt();
     rttManager_ = nullptr;
-}
-
-void RttCallListener::RefreshRttParam(int32_t callId, RttCallState rttState, int32_t channelId)
-{
-    if (rttState != RttCallState::RTT_STATE_YES) {
-        TELEPHONY_LOGI("cannot RefreshRttParam, rttState: %{public}d", rttState);
-        return;
-    }
-
-    if (rttManager_ == nullptr) {
-        TELEPHONY_LOGI("cannot refresh callId and channelId, rttManager_ is null!");
-        return;
-    }
-
-    rttManager_->SetCallID(callId);
-    rttManager_->SetChannelID(channelId);
-    TELEPHONY_LOGI("RefreshRttParam success, callId: %{public}d, channelId: %{public}d", callId, channelId);
 }
 
 int32_t RttCallListener::SendRttMessage(const std::string &rttMessage)

@@ -30,7 +30,6 @@ public:
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
     void InitRttManager(sptr<IMSCall> &imsCall);
     void UnInitRttManager();
-    void RefreshRttParam(int32_t callId, RttCallState rttState, int32_t channelId);
     int32_t SendRttMessage(const std::string &rttMessage);
 
 private:
