@@ -447,7 +447,7 @@ int32_t NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultIn
 int32_t NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInfo)
 {
     if (stopRttCallback_.thisVar == nullptr) {
-        TELEPHONY_LOGE("startRttCallback_ is null!");
+        TELEPHONY_LOGE("stopRttCallback_ is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;

@@ -1962,5 +1962,35 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_017, TestSize.Level0)
     EXPECT_NE(rttCallListener->SendRttMessage(rttMessage), ret);
 #endif
 }
+
+#ifdef NOT_SUPPORT_MULTICALL
+#ifdef SUPPORT_RTT_CALL
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_018, TestSize.Level0)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.callType = CallType::TYPE_IMS;
+    sptr<CallBase> imsCallActive = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    ASSERT_TRUE(imsCallActive != nullptr);
+    imsCallActive->autoAnswerState_ = false;
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::AddOneCallObject(imsCallActive);
+    EXPECT_NO_THROW(callStatusManager->AutoAnswerSecondCall());
+
+    info.state = TelCallState::CALL_STATUS_INCOMING;
+    info.callType = CallType::TYPE_IMS;
+    sptr<CallBase> imsCallIncoming = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    ASSERT_TRUE(imsCallIncoming != nullptr);
+    imsCallIncoming->autoAnswerState_ = false;
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::AddOneCallObject(imsCallIncoming);
+    EXPECT_NO_THROW(callStatusManager->AutoAnswerSecondCall());
+
+    imsCallIncoming->autoAnswerState_ = true;
+    EXPECT_NO_THROW(callStatusManager->AutoAnswerSecondCall());
+}
+#endif
+#endif
 } // namespace Telephony
 } // namespace OHOS
