@@ -43,6 +43,7 @@ private:
     int32_t slotId_;
     std::shared_ptr<SpamCallAdapter> spamCallAdapter_ {nullptr};
     sptr<IRemoteObject> remoteObject_ = nullptr;
+    ffrt::mutex mutex_{};
 };
 } // namespace Telephony
 } // namespace OHOS

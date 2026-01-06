@@ -173,6 +173,29 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallConnection_001, Function | MediumTest |
 }
 
 /**
+ * @tc.number   Telephony_SpamCallConnection_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpamCallTest, Telephony_SpamCallConnection_002, Function | MediumTest | Level1)
+{
+    std::string phoneNumber = "123456789012";
+    int32_t slotId = 0;
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
+    ASSERT_NE(spamCallAdapter, nullptr);
+    SpamCallConnection spamCallConnection(phoneNumber, slotId, spamCallAdapter);
+    std::string bundle = "111";
+    std::string ability = "222";
+    AppExecFwk::ElementName element("", bundle, ability);
+    sptr<IRemoteObject> remoteObject;
+    int resultCode = 0;
+    spamCallConnection.RequireCallReminder();
+    ASSERT_EQ(resultCode, 0);
+    spamCallConnection.RequireCallReminder();
+    ASSERT_EQ(resultCode, 0);
+}
+
+/**
  * @tc.number   Telephony_TimeWaitHelper_001
  * @tc.name     test error branch
  * @tc.desc     Function test
