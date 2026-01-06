@@ -5067,6 +5067,7 @@ void NapiCallManager::NativeStartRtt(napi_env env, void *data)
         TELEPHONY_LOGE("RegisterStartRttCallback failed!");
         return;
     }
+    TELEPHONY_LOGI("NativeStartRtt enter");
     startRTTContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->UpdateImsRttCallMode(
             startRTTContext->callId, (ImsRTTCallMode)startRTTContext->type);

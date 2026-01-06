@@ -1565,7 +1565,7 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
         TELEPHONY_LOGE("SetTelCallState failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (nextState == TelCallState::CALL_STATUS_INCOMING || nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
+    if (nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
         time_t createTime = call->GetCallCreateTime();
         AAFwk::WantParams params = call->GetExtraParams();
         params.SetParam("createTime", AAFwk::Integer::Box(static_cast<int64_t>(createTime)));
@@ -2375,10 +2375,17 @@ void CallStatusManager::AutoAnswerSecondCall()
             call->GetTelCallState() != TelCallState::CALL_STATUS_WAITING) {
             continue;
         }
+        bool isRtt = false;
+#ifdef SUPPORT_RTT_CALL
+        if (call->GetCallType() == CallType::TYPE_IMS) {
+            sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+            isRtt = (imsCall->GetRttState() == RttCallState::RTT_STATE_YES);
+        }
+#endif
         if (call->GetAutoAnswerState()) {
             TELEPHONY_LOGI("Auto AnswerCall callid=%{public}d", call->GetCallID());
             int ret = DelayedSingleton<CallControlManager>::GetInstance()->AnswerCall(call->GetCallID(),
-                static_cast<int32_t>(call->GetVideoStateType()));
+                static_cast<int32_t>(call->GetVideoStateType()), isRtt);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("Auto AnswerCall failed callid=%{public}d", call->GetCallID());
             }
