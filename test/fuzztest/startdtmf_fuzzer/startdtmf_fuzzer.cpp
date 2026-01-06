@@ -97,6 +97,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 #endif
     SetMuted(data, size);
     MuteRinger(data, size);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
 }
 } // namespace OHOS
 

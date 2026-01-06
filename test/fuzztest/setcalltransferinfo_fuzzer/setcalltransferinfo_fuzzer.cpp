@@ -137,6 +137,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetImsFeatureValue(data, size);
     GetCallTransferInfo(data, size);
     SetCallTransferInfo(data, size);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
 }
 } // namespace OHOS
 

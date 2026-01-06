@@ -47,6 +47,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     FormatPhoneNumberToE164(data, size);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
 }
 } // namespace OHOS
 

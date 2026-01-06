@@ -57,22 +57,7 @@ const std::string SETTINGS_DB_VALUE_EXIST = "1";
 CallRecordsManager::CallRecordsManager() : callRecordsHandlerServerPtr_(nullptr) {}
 
 CallRecordsManager::~CallRecordsManager()
-{
-    if (statusChangeListener_ != nullptr) {
-        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (samgrProxy != nullptr) {
-            samgrProxy->UnSubscribeSystemAbility(OHOS::SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN, statusChangeListener_);
-            statusChangeListener_ = nullptr;
-        }
-    }
-    if (dataShareReadySubscriber_ != nullptr) {
-        bool subRet = CommonEventManager::UnSubscribeCommonEvent(dataShareReadySubscriber_);
-        if (!subRet) {
-            TELEPHONY_LOGE("UnSubscribe data share ready event failed!");
-        }
-        dataShareReadySubscriber_ = nullptr;
-    }
-}
+{}
 
 void CallRecordsManager::Init()
 {
@@ -97,6 +82,24 @@ void CallRecordsManager::Init()
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("failed to subscribe account manager service SA!");
         return;
+    }
+}
+
+void CallRecordsManager::UnInit()
+{
+    if (statusChangeListener_ != nullptr) {
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy != nullptr) {
+            samgrProxy->UnSubscribeSystemAbility(OHOS::SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN, statusChangeListener_);
+            statusChangeListener_ = nullptr;
+        }
+    }
+    if (dataShareReadySubscriber_ != nullptr) {
+        bool subRet = CommonEventManager::UnSubscribeCommonEvent(dataShareReadySubscriber_);
+        if (!subRet) {
+            TELEPHONY_LOGE("UnSubscribe data share ready event failed!");
+        }
+        dataShareReadySubscriber_ = nullptr;
     }
 }
 

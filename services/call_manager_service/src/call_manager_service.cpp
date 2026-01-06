@@ -139,6 +139,7 @@ void CallManagerService::UnInit()
 {
     DelayedSingleton<CellularCallConnection>::GetInstance()->UnInit();
     DelayedSingleton<CallControlManager>::GetInstance()->UnInit();
+    DelayedSingleton<CallRecordsManager>::GetInstance()->UnInit();
     callControlManagerPtr_ = nullptr;
     std::lock_guard<ffrt::mutex> guard(bluetoothCallCallbackLock_);
     if (bluetoothCallCallbackPtr_ != nullptr) {
