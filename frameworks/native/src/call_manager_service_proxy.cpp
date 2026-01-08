@@ -75,7 +75,7 @@ int32_t CallManagerServiceProxy::DialCall(std::u16string number, AppExecFwk::Pac
     dataParcel.WriteInt32(extras.GetIntValue("dialScene"));
     dataParcel.WriteInt32(extras.GetIntValue("dialType"));
     dataParcel.WriteInt32(extras.GetIntValue("callType"));
-    dataParcel.WriteBool(extras.GetBooleanValue("isRTT"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isRTT", false));
     dataParcel.WriteString(extras.GetStringValue("extraParams"));
     dataParcel.WriteBool(extras.GetBooleanValue("btSlotIdUnknown", false));
     TELEPHONY_LOGI("DialCall isRTT: %{public}d", extras.GetBooleanValue("isRTT"));
@@ -581,40 +581,6 @@ int32_t CallManagerServiceProxy::SetCallPreferenceMode(int32_t slotId, int32_t m
 }
 
 #ifdef SUPPORT_RTT_CALL
-int32_t CallManagerServiceProxy::StartRtt(int32_t callId)
-{
-    MessageParcel dataParcel;
-    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    dataParcel.WriteInt32(callId);
-    MessageParcel replyParcel;
-    int32_t error = SendRequest(CallManagerInterfaceCode::INTERFACE_START_RTT, dataParcel, replyParcel);
-    if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("Function StartRtt errCode:%{public}d", error);
-        return error;
-    }
-    return replyParcel.ReadInt32();
-}
-
-int32_t CallManagerServiceProxy::StopRtt(int32_t callId)
-{
-    MessageParcel dataParcel;
-    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    dataParcel.WriteInt32(callId);
-    MessageParcel replyParcel;
-    int32_t error = SendRequest(CallManagerInterfaceCode::INTERFACE_STOP_RTT, dataParcel, replyParcel);
-    if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("Function StopRtt errCode:%{public}d", error);
-        return error;
-    }
-    return replyParcel.ReadInt32();
-}
-
 int32_t CallManagerServiceProxy::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
 {
     MessageParcel dataParcel;

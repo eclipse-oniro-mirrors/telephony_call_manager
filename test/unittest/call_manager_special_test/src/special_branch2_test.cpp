@@ -229,8 +229,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_001, TestSize.Leve
     cellularCallConnection->SetCallPreferenceMode(0, 0);
 
 #ifdef SUPPORT_RTT_CALL
-    cellularCallConnection->StartRtt(callInfo);
-    int ret = cellularCallConnection->StopRtt(callInfo);
+    int ret = cellularCallConnection->UpdateImsRttCallMode(callInfo, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE);
     EXPECT_NE(ret, 0);
 #endif
 }

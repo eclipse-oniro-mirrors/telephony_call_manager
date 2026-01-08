@@ -2232,58 +2232,6 @@ void CallControlManager::EnqueueAnsweredCall(int32_t callId, int32_t videoState)
 }
 
 #ifdef SUPPORT_RTT_CALL
-int32_t CallControlManager::StartRtt(int32_t callId)
-{
-    int32_t ret = CallPolicy::RttCallModifyPolicy(callId);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("NO IMS call,can not StartRtt!");
-        return ret;
-    }
-    sptr<CallBase> currCall = GetOneCallObject(callId);
-    if (currCall == nullptr) {
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(currCall.GetRefPtr());
-    if (rttCallListener_ != nullptr) {
-        TELEPHONY_LOGI("InitRttManager by start RTT, callId: %{public}d, channelId: %{public}d",
-            imsCall->GetCallID(), imsCall->GetRttChannelId());
-        rttCallListener_->InitRttManager(imsCall);
-    }
-    if (CallRequestHandlerPtr_ == nullptr) {
-        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    ret = CallRequestHandlerPtr_->StartRtt(callId);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("StartRtt failed!");
-        return ret;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallControlManager::StopRtt(int32_t callId)
-{
-    int32_t ret = CallPolicy::RttCallModifyPolicy(callId);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("NO IMS call,no need StopRtt!");
-        return ret;
-    }
-    if (rttCallListener_ != nullptr) {
-        TELEPHONY_LOGI("UnInitRttManager by stop RTT");
-        rttCallListener_->UnInitRttManager();
-    }
-    if (CallRequestHandlerPtr_ == nullptr) {
-        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    ret = CallRequestHandlerPtr_->StopRtt(callId);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("StopRtt failed!");
-        return ret;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
 int32_t CallControlManager::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
 {
     int32_t ret = CallPolicy::RttCallModifyPolicy(callId);

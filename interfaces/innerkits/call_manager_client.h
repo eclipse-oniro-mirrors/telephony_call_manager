@@ -516,32 +516,6 @@ public:
      */
     int32_t GetVoNRState(int32_t slotId, int32_t &state);
 
-#ifdef SUPPORT_RTT_CALL
-    /**
-     * @brief Enable and send RTT information
-     *
-     * @param callId[in], The call id
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t StartRtt(int32_t callId);
-
-    /**
-     * @brief Close the RTT
-     *
-     * @param callId[in], The call id
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t StopRtt(int32_t callId);
-
-    /**
-     * @brief rtt upgrade or downgrade
-     * @param callId[in], call id
-     * @param mode[in], rtt modify type
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode);
-#endif
-
     /**
      * @brief Bring someone into a meeting
      *
@@ -735,6 +709,14 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t SetRttCapability(int32_t slotId, bool isEnable);
+
+    /**
+     * @brief rtt upgrade or downgrade
+     * @param callId[in], call id
+     * @param mode[in], rtt modify type
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode);
 #endif
 };
 } // namespace Telephony

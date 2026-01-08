@@ -171,10 +171,9 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestHandler_001, Function | MediumTes
     ASSERT_NE(callRequestHandler->CombineConference(1), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(callRequestHandler->SeparateConference(1), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(callRequestHandler->KickOutFromConference(1), TELEPHONY_ERR_SUCCESS);
-    std::u16string test = u"";
 #ifdef SUPPORT_RTT_CALL
-    ASSERT_NE(callRequestHandler->StartRtt(1), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(callRequestHandler->StopRtt(1), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(callRequestHandler->UpdateImsRttCallMode(1, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE),
+        TELEPHONY_ERR_SUCCESS);
 #endif
     std::vector<std::string> emptyRecords = {};
     ASSERT_NE(callRequestHandler->JoinConference(1, emptyRecords), TELEPHONY_ERR_SUCCESS);
@@ -200,8 +199,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_001, Function | MediumTes
     callRequestProcess->SeparateConferenceRequest(1);
     callRequestProcess->KickOutFromConferenceRequest(1);
 #ifdef SUPPORT_RTT_CALL
-    callRequestProcess->StartRttRequest(1);
-    callRequestProcess->StopRttRequest(1);
+    callRequestProcess->UpdateImsRttCallModeRequest(1, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE);
 #endif
     std::vector<std::string> numberList = {};
     callRequestProcess->JoinConference(1, numberList);
@@ -322,10 +320,8 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_003, Function | MediumTes
     callRequestProcess->SeparateConferenceRequest(VALID_CALLID);
     callRequestProcess->KickOutFromConferenceRequest(VALID_CALLID);
 #ifdef SUPPORT_RTT_CALL
-    callRequestProcess->StartRttRequest(VALID_CALLID);
-    callRequestProcess->StartRttRequest(2);
-    callRequestProcess->StopRttRequest(VALID_CALLID);
-    callRequestProcess->StopRttRequest(2);
+    callRequestProcess->UpdateImsRttCallModeRequest(VALID_CALLID, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE);
+    callRequestProcess->UpdateImsRttCallModeRequest(2, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE);
 #endif
     std::vector<std::string> numberList;
     callRequestProcess->JoinConference(VALID_CALLID, numberList);
@@ -768,8 +764,8 @@ HWTEST_F(ZeroBranch2Test, Telephony_CellularCallConnection_003, Function | Mediu
     std::shared_ptr<CellularCallConnection> cellularCallConnection =
         DelayedSingleton<CellularCallConnection>::GetInstance();
 #ifdef SUPPORT_RTT_CALL
-    ASSERT_NE(cellularCallConnection->StartRtt(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(cellularCallConnection->StopRtt(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->UpdateImsRttCallMode(mCellularCallInfo, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE),
+        TELEPHONY_ERR_SUCCESS);
 #endif
     ASSERT_NE(cellularCallConnection->SendUpdateCallMediaModeRequest(
         mCellularCallInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_SUCCESS);

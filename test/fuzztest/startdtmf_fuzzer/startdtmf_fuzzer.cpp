@@ -51,9 +51,10 @@ void StopRtt(const uint8_t *data, size_t size)
     int32_t callId = *data % CALL_ID_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
+    messageParcel.WriteInt32(1);
     messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnStopRtt(messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnUpdateImsRttCallMode(messageParcel, reply);
 }
 #endif
 

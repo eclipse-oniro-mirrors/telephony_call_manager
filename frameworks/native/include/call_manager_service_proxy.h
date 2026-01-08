@@ -591,37 +591,6 @@ public:
      */
     int32_t GetVoNRState(int32_t slotId, int32_t &state) override;
 
-#ifdef SUPPORT_RTT_CALL
-    /**
-     * StartRtt
-     *
-     * @brief Enable and send RTT information
-     * @param callId[in], The call id
-     * @param msg[in], RTT information
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t StartRtt(int32_t callId) override;
-
-    /**
-     * StopRtt
-     *
-     * @brief Close the RTT
-     * @param callId[in], The call id
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t StopRtt(int32_t callId) override;
-
-    /**
-     * UpdateImsRttCallMode
-     *
-     * @brief rtt call upgrade or downgrade
-     * @param callId[in], call id
-     * @param mode[in], rtt modify mode
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode) override;
-#endif
-
     /**
      * ReportOttCallDetailsInfo
      *
@@ -777,7 +746,7 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t SendUssdResponse(int32_t slotId, const std::string &content) override;
-    
+
     /**
      * SetCallPolicyInfo
      *
@@ -835,6 +804,16 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t SetRttCapability(int32_t slotId, bool enabled) override;
+
+    /**
+     * UpdateImsRttCallMode
+     *
+     * @brief rtt call upgrade or downgrade
+     * @param callId[in], call id
+     * @param mode[in], rtt modify mode
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode) override;
 #endif
 
 private:

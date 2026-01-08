@@ -211,23 +211,6 @@ public:
 
 #ifdef SUPPORT_RTT_CALL
     /**
-     * @brief Start a Rtt session
-     *
-     * @param callId
-     * @param slotId[in] the slot id
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
-     */
-    int32_t StartRtt(int32_t slotId, int32_t callId) override;
-
-    /**
-     * @brief Terminate the current RTT session
-     *
-     * @param slotId[in] the slot id
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
-     */
-    int32_t StopRtt(int32_t slotId, int32_t callId) override;
-
-    /**
      * @brief Rtt Upgrade or Downgrade
      *
      * @param slotId[in] the slot id

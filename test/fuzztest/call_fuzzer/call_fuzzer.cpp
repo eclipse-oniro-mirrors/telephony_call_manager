@@ -230,8 +230,8 @@ void IMSCallFunc(const uint8_t *data, size_t size)
     callObjectPtr->GetCallIdListForConference(callIdList);
     callObjectPtr->IsSupportConferenceable();
 #ifdef SUPPORT_RTT_CALL
-    callObjectPtr->StartRtt(mainCallId);
-    callObjectPtr->StopRtt(mainCallId);
+    CellularCallInfo callInfo;
+    callObjectPtr->UpdateImsRttCallMode(ImsRTTCallMode::LOCAL_REQUEST_UPGRADE);
 #endif
     callObjectPtr->SetMute(mute, slotId);
 }

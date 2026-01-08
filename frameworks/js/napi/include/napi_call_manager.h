@@ -129,10 +129,6 @@ public:
     static napi_value IsImsSwitchEnabledSync(napi_env env, napi_callback_info info);
     static napi_value SetVoNRState(napi_env env, napi_callback_info info);
     static napi_value GetVoNRState(napi_env env, napi_callback_info info);
-#ifdef SUPPORT_RTT_CALL
-    static napi_value StartRtt(napi_env env, napi_callback_info info);
-    static napi_value StopRtt(napi_env env, napi_callback_info info);
-#endif
     static napi_value JoinConference(napi_env env, napi_callback_info info);
     static napi_value UpdateImsCallMode(napi_env env, napi_callback_info info);
     static napi_value ReportOttCallDetailsInfo(napi_env env, napi_callback_info info);
@@ -147,6 +143,8 @@ public:
     static napi_value SendCallUiEvent(napi_env env, napi_callback_info info);
     static napi_value SendUssdResponse(napi_env env, napi_callback_info info);
 #ifdef SUPPORT_RTT_CALL
+    static napi_value StartRtt(napi_env env, napi_callback_info info);
+    static napi_value StopRtt(napi_env env, napi_callback_info info);
     static napi_value SendRttMessage(napi_env env, napi_callback_info info);
     static napi_value SetRttCapability(napi_env env, napi_callback_info info);
     static napi_value OffRttModifyInd(napi_env env, napi_callback_info info);

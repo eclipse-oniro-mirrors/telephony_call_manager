@@ -98,11 +98,6 @@ public:
     virtual int32_t IsImsSwitchEnabled(int32_t slotId, bool &enabled) = 0;
     virtual int32_t SetVoNRState(int32_t slotId, int32_t state) = 0;
     virtual int32_t GetVoNRState(int32_t slotId, int32_t &state) = 0;
-#ifdef SUPPORT_RTT_CALL
-    virtual int32_t StartRtt(int32_t callId) = 0;
-    virtual int32_t StopRtt(int32_t callId) = 0;
-    virtual int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode) = 0;
-#endif
     virtual int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList) = 0;
     virtual int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec) = 0;
     virtual int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo) = 0;
@@ -131,6 +126,7 @@ public:
 #ifdef SUPPORT_RTT_CALL
     virtual int32_t SendRttMessage(int32_t callId, const std::string &rttMessage) = 0;
     virtual int32_t SetRttCapability(int32_t slotId, bool enabled) = 0;
+    virtual int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode) = 0;
 #endif
 
 public:

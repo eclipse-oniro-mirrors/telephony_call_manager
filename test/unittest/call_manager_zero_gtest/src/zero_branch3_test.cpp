@@ -1314,8 +1314,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_012, Function | MediumTes
 HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_013, TestSize.Level0)
 {
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
-    ASSERT_NE(callControlManager->StartRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
-    ASSERT_NE(callControlManager->StopRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->UpdateImsRttCallMode(INVALID_CALLID, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE),
         TELEPHONY_SUCCESS);
     int32_t slotId = 1;

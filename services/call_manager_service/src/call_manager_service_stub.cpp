@@ -229,14 +229,6 @@ void CallManagerServiceStub::InitImsServiceRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoNRState(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VONR_STATE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoNRState(data, reply); };
-#ifdef SUPPORT_RTT_CALL
-    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_START_RTT)] =
-        [this](MessageParcel &data, MessageParcel &reply) { return OnStartRtt(data, reply); };
-    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_STOP_RTT)] =
-        [this](MessageParcel &data, MessageParcel &reply) { return OnStopRtt(data, reply); };
-    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UPDATE_RTT_CALL_MODE)] =
-        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateImsRttCallMode(data, reply); };
-#endif
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_VOIP_CALL_STATE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoIPCallState(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_STATE)] =
@@ -250,6 +242,8 @@ void CallManagerServiceStub::InitImsServiceRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetRttCapability(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SEND_RTT_MESSAGE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSendRttMessage(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UPDATE_RTT_CALL_MODE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateImsRttCallMode(data, reply); };
 #endif
 }
 
@@ -1202,45 +1196,6 @@ int32_t CallManagerServiceStub::OnGetVoNRState(MessageParcel &data, MessageParce
     return TELEPHONY_SUCCESS;
 }
 
-#ifdef SUPPORT_RTT_CALL
-int32_t CallManagerServiceStub::OnStartRtt(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = TELEPHONY_ERR_FAIL;
-    int32_t callId = data.ReadInt32();
-    result = StartRtt(callId);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerServiceStub::OnStopRtt(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = TELEPHONY_ERR_FAIL;
-    int32_t callId = data.ReadInt32();
-    result = StopRtt(callId);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerServiceStub::OnUpdateImsRttCallMode(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = TELEPHONY_ERR_FAIL;
-    int32_t callId = data.ReadInt32();
-    ImsRTTCallMode mode = static_cast<ImsRTTCallMode>(data.ReadUint32());
-    result = UpdateImsRttCallMode(callId, mode);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return result;
-}
-#endif
-
 int32_t CallManagerServiceStub::OnReportOttCallDetailsInfo(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
@@ -1612,6 +1567,19 @@ int32_t CallManagerServiceStub::OnSetRttCapability(MessageParcel &data, MessageP
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnUpdateImsRttCallMode(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t callId = data.ReadInt32();
+    ImsRTTCallMode mode = static_cast<ImsRTTCallMode>(data.ReadInt32());
+    result = UpdateImsRttCallMode(callId, mode);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
 }
 #endif
 } // namespace Telephony

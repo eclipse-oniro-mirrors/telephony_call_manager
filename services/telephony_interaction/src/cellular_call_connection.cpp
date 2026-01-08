@@ -521,57 +521,6 @@ int CellularCallConnection::SetCallPreferenceMode(int32_t slotId, int32_t mode)
     return TELEPHONY_SUCCESS;
 }
 
-#ifdef SUPPORT_RTT_CALL
-int CellularCallConnection::StartRtt(const CellularCallInfo &callInfo)
-{
-    if (ReConnectService() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("ipc reconnect failed!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t slotId = callInfo.slotId;
-    int32_t callId = callInfo.callId;
-    int errCode = cellularCallInterfacePtr_->StartRtt(slotId, callId);
-    if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("StartRtt failed, errcode:%{public}d", errCode);
-        return errCode;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int CellularCallConnection::StopRtt(const CellularCallInfo &callInfo)
-{
-    if (ReConnectService() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("ipc reconnect failed!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t slotId = callInfo.slotId;
-    int32_t callId = callInfo.index;
-    int errCode = cellularCallInterfacePtr_->StopRtt(slotId, callId);
-    if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("StopRtt failed, errcode:%{public}d", errCode);
-        return errCode;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int CellularCallConnection::UpdateImsRttCallMode(const CellularCallInfo &callInfo, ImsRTTCallMode mode)
-{
-    if (ReConnectService() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("ipc reconnect failed!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-
-    int32_t slotId = callInfo.slotId;
-    int32_t callId = callInfo.index;
-    int errCode = cellularCallInterfacePtr_->UpdateImsRttCallMode(slotId, callId, mode);
-    if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateImsRttCallMode failed, errcode:%{public}d", errCode);
-        return errCode;
-    }
-    return TELEPHONY_SUCCESS;
-}
-#endif
-
 int CellularCallConnection::RegisterCallBack(const sptr<ICallStatusCallback> &callback)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
@@ -1049,6 +998,22 @@ int32_t CellularCallConnection::SetRttCapability(int32_t slotId, bool isEnable)
     int errCode = cellularCallInterfacePtr_->SetRttCapability(slotId, isEnable);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetRttCapability failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int CellularCallConnection::UpdateImsRttCallMode(const CellularCallInfo &callInfo, ImsRTTCallMode mode)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t slotId = callInfo.slotId;
+    int32_t callId = callInfo.index;
+    int errCode = cellularCallInterfacePtr_->UpdateImsRttCallMode(slotId, callId, mode);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateImsRttCallMode failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;

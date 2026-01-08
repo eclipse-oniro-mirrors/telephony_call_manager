@@ -638,56 +638,6 @@ int32_t CellularCallProxy::SendDtmf(char cDtmfCode, const CellularCallInfo &call
 }
 
 #ifdef SUPPORT_RTT_CALL
-int32_t CellularCallProxy::StartRtt(int32_t slotId, int32_t callId)
-{
-    MessageOption option;
-    MessageParcel in;
-    MessageParcel out;
-    int32_t result = TELEPHONY_SUCCESS;
-    result = SetCommonParamForMessageParcel(slotId, in);
-    if (result != TELEPHONY_SUCCESS) {
-        return result;
-    }
-    if (!in.WriteInt32(callId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = remote->SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::START_RTT), in, out, option);
-    if (error == ERR_NONE) {
-        return out.ReadInt32();
-    }
-    return error;
-}
-
-int32_t CellularCallProxy::StopRtt(int32_t slotId, int32_t callId)
-{
-    MessageOption option;
-    MessageParcel in;
-    MessageParcel out;
-    int32_t result = TELEPHONY_SUCCESS;
-    result = SetCommonParamForMessageParcel(slotId, in);
-    if (result != TELEPHONY_SUCCESS) {
-        return result;
-    }
-    if (!in.WriteInt32(callId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = remote->SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::STOP_RTT), in, out, option);
-    if (error == ERR_NONE) {
-        return out.ReadInt32();
-    }
-    return error;
-}
-
 int32_t CellularCallProxy::UpdateImsRttCallMode(int32_t slotId, int32_t callId, ImsRTTCallMode mode)
 {
     MessageOption option;

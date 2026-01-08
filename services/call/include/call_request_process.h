@@ -41,10 +41,6 @@ public:
     void CombineConferenceRequest(int32_t mainCallId);
     void SeparateConferenceRequest(int32_t callId);
     void KickOutFromConferenceRequest(int32_t callId);
-#ifdef SUPPORT_RTT_CALL
-    void StartRttRequest(int32_t callId);
-    void StopRttRequest(int32_t callId);
-#endif
     void JoinConference(int32_t callId, std::vector<std::string> &numberList);
     bool IsDsdsMode3();
     bool IsDsdsMode5();
