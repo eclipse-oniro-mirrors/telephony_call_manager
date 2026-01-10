@@ -105,7 +105,7 @@ int32_t CallRequestProcess::HandleDialRequest(DialParaInfo &info)
             ret = OttDialProcess(info);
             break;
         case DialType::DIAL_BLUETOOTH_TYPE:
-            ret  = BluetoothDialProcess(info);
+            ret = BluetoothDialProcess(info);
             break;
         default:
             break;
@@ -723,38 +723,6 @@ void CallRequestProcess::KickOutFromConferenceRequest(int32_t callId)
 }
 
 #ifdef SUPPORT_RTT_CALL
-void CallRequestProcess::StartRttRequest(int32_t callId)
-{
-    sptr<CallBase> call = GetOneCallObject(callId);
-    if (call == nullptr) {
-        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
-        return;
-    }
-    if (call->GetCallType() != CallType::TYPE_IMS) {
-        TELEPHONY_LOGE("Unsupported Network type, callId:%{public}d", callId);
-        return;
-    }
-    
-    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
-    imsCall->StartRtt(callId);
-}
-
-void CallRequestProcess::StopRttRequest(int32_t callId)
-{
-    sptr<CallBase> call = GetOneCallObject(callId);
-    if (call == nullptr) {
-        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
-        return;
-    }
-    if (call->GetCallType() != CallType::TYPE_IMS) {
-        TELEPHONY_LOGE("Unsupported Network type, callId:%{public}d", callId);
-        return;
-    }
-    
-    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
-    imsCall->StopRtt(callId);
-}
-
 void CallRequestProcess::UpdateImsRttCallModeRequest(int32_t callId, ImsRTTCallMode mode)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
@@ -766,7 +734,7 @@ void CallRequestProcess::UpdateImsRttCallModeRequest(int32_t callId, ImsRTTCallM
         TELEPHONY_LOGE("Unsupported Network type, callId:%{public}d", callId);
         return;
     }
-    
+
     sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
     imsCall->UpdateImsRttCallMode(mode);
 }

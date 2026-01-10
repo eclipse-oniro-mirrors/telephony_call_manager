@@ -120,8 +120,6 @@ public:
     int32_t GetVoNRState(int32_t slotId, int32_t &state);
     int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode);
 #ifdef SUPPORT_RTT_CALL
-    int32_t StartRtt(int32_t callId);
-    int32_t StopRtt(int32_t callId);
     int32_t SetRttCapability(int32_t slotId, bool isEnable);
     int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode);
     int32_t UnInitRttManager();

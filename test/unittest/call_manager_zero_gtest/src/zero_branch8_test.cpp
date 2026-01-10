@@ -643,17 +643,15 @@ HWTEST_F(ZeroBranch7Test, Telephony_IMSCall_001, Function | MediumTest | Level1)
     for (int16_t i = 0; i <= kMaxNumberLen + 1; i++) {
         call->accountNumber_ += "1";
     }
-    std::u16string msg = u"";
 #ifdef SUPPORT_RTT_CALL
-    EXPECT_EQ(call->StartRtt(call->GetCallID()), CALL_ERR_NUMBER_OUT_OF_RANGE);
-    EXPECT_EQ(call->StopRtt(call->GetCallID()), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_EQ(call->UpdateImsRttCallMode(ImsRTTCallMode::LOCAL_REQUEST_UPGRADE),
+        CALL_ERR_NUMBER_OUT_OF_RANGE);
 #endif
     EXPECT_EQ(call->SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY), CALL_ERR_NUMBER_OUT_OF_RANGE);
     EXPECT_EQ(call->SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY), CALL_ERR_NUMBER_OUT_OF_RANGE);
     call->accountNumber_ = "111";
 #ifdef SUPPORT_RTT_CALL
-    EXPECT_GT(call->StartRtt(call->GetCallID()), TELEPHONY_ERROR);
-    EXPECT_GT(call->StopRtt(call->GetCallID()), TELEPHONY_ERROR);
+    EXPECT_GT(call->UpdateImsRttCallMode(ImsRTTCallMode::LOCAL_REQUEST_UPGRADE), TELEPHONY_ERROR);
 #endif
     EXPECT_GT(call->SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERROR);
     EXPECT_GT(call->SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERROR);

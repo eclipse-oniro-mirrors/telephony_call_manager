@@ -2959,58 +2959,6 @@ napi_value NapiCallManager::SetCallPreferenceMode(napi_env env, napi_callback_in
         env, asyncContext.release(), "SetCallPreferenceMode", NativeSetCallPreferenceMode, NativeVoidCallBack);
 }
 
-#ifdef SUPPORT_RTT_CALL
-napi_value NapiCallManager::StartRtt(napi_env env, napi_callback_info info)
-{
-    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
-    if (!MatchTwoNumberParameters(env, argv, argc)) {
-        TELEPHONY_LOGE("NapiCallManager::StartRtt match parameters numbers failed.");
-        NapiUtil::ThrowParameterError(env);
-        return nullptr;
-    }
-    auto asyncContext = std::make_unique<SupplementAsyncContext>();
-    if (asyncContext == nullptr) {
-        std::string errorMessage = "StartRtt error at supplementAsyncContext is nullptr";
-        NapiUtil::ThrowParameterError(env);
-        return nullptr;
-    }
-
-    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-    napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->type);
-    if (argc == VALUE_MAXIMUM_LIMIT) {
-        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-    }
-    asyncContext->env = env;
-    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
-    return HandleAsyncWork(env, asyncContext.release(), "StartRtt", NativeStartRtt, NativeVoidCallBack);
-}
-
-napi_value NapiCallManager::StopRtt(napi_env env, napi_callback_info info)
-{
-    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
-    if (!MatchTwoNumberParameters(env, argv, argc)) {
-        TELEPHONY_LOGE("NapiCallManager::StopRtt match parameters numbers failed.");
-        NapiUtil::ThrowParameterError(env);
-        return nullptr;
-    }
-    auto asyncContext = std::make_unique<SupplementAsyncContext>();
-    if (asyncContext == nullptr) {
-        std::string errorMessage = "StopRtt error at supplementAsyncContext is nullptr";
-        NapiUtil::ThrowParameterError(env);
-        return nullptr;
-    }
-
-    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-    napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->type);
-    if (argc == VALUE_MAXIMUM_LIMIT) {
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-    }
-    asyncContext->env = env;
-    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
-    return HandleAsyncWork(env, asyncContext.release(), "StopRtt", NativeStopRtt, NativeVoidCallBack);
-}
-#endif
-
 napi_value NapiCallManager::JoinConference(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
@@ -5328,6 +5276,44 @@ void NapiCallManager::NativeSendUssdResponse(napi_env env, void *data)
 }
 
 #ifdef SUPPORT_RTT_CALL
+napi_value NapiCallManager::StartRtt(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
+    if (!MatchTwoNumberParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::StartRtt match parameters numbers failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<SupplementAsyncContext>();
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+    napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->type);
+    if (argc == VALUE_MAXIMUM_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    asyncContext->env = env;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
+    return HandleAsyncWork(env, asyncContext.release(), "StartRtt", NativeStartRtt, NativeVoidCallBack);
+}
+
+napi_value NapiCallManager::StopRtt(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
+    if (!MatchTwoNumberParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::StopRtt match parameters numbers failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<SupplementAsyncContext>();
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+    napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->type);
+    if (argc == VALUE_MAXIMUM_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    asyncContext->env = env;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
+    return HandleAsyncWork(env, asyncContext.release(), "StopRtt", NativeStopRtt, NativeVoidCallBack);
+}
+
 napi_value NapiCallManager::SetRttCapability(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);

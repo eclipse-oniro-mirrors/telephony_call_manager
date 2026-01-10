@@ -762,23 +762,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_007, TestSize.Level0)
     callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
     std::u16string msg;
 #ifdef SUPPORT_RTT_CALL
-    int32_t ret = callManagerService->StartRtt(0);
-    EXPECT_NE(ret, 0);
-#endif
-}
-
-/**
- * @tc.number   Telephony_CallManagerService_008
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_008, TestSize.Level0)
-{
-    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    ASSERT_TRUE(callManagerService != nullptr);
-    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
-#ifdef SUPPORT_RTT_CALL
-    int32_t ret = callManagerService->StopRtt(0);
+    int32_t ret = callManagerService->UpdateImsRttCallMode(0, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE);
     EXPECT_NE(ret, 0);
 #endif
 }

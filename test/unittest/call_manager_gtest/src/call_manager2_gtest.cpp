@@ -320,8 +320,7 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, TestSize.Level0
 HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_004, TestSize.Level0)
 {
     std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
-    ASSERT_EQ(client->StartRtt(g_newCallId), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->StopRtt(g_newCallId), TELEPHONY_ERR_UNINIT);
+    ASSERT_EQ(client->UpdateImsRttCallMode(g_newCallId, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE), TELEPHONY_ERR_UNINIT);
 }
 #endif
 

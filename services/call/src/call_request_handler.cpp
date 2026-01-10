@@ -108,28 +108,6 @@ int32_t CallRequestHandler::SwitchCall(int32_t callId)
 }
 
 #ifdef SUPPORT_RTT_CALL
-int32_t CallRequestHandler::StartRtt(int32_t callId)
-{
-    if (callRequestProcessPtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestProcessPtr_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    ffrt::submit([=]() {
-        callRequestProcessPtr_->StartRttRequest(callId);
-    });
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallRequestHandler::StopRtt(int32_t callId)
-{
-    if (callRequestProcessPtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestProcessPtr_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    ffrt::submit([=]() { callRequestProcessPtr_->StopRttRequest(callId); });
-    return TELEPHONY_SUCCESS;
-}
-
 int32_t CallRequestHandler::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
 {
     if (callRequestProcessPtr_ == nullptr) {

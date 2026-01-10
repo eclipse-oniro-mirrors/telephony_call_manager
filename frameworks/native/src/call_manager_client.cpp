@@ -639,38 +639,6 @@ int32_t CallManagerClient::GetVoNRState(int32_t slotId, int32_t &state)
     }
 }
 
-#ifdef SUPPORT_RTT_CALL
-int32_t CallManagerClient::StartRtt(int32_t callId)
-{
-    if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->StartRtt(callId);
-    } else {
-        TELEPHONY_LOGE("init first please!");
-        return TELEPHONY_ERR_UNINIT;
-    }
-}
-
-int32_t CallManagerClient::StopRtt(int32_t callId)
-{
-    if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->StopRtt(callId);
-    } else {
-        TELEPHONY_LOGE("init first please!");
-        return TELEPHONY_ERR_UNINIT;
-    }
-}
-
-int32_t CallManagerClient::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
-{
-    if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->UpdateImsRttCallMode(callId, mode);
-    } else {
-        TELEPHONY_LOGE("init first please!");
-        return TELEPHONY_ERR_UNINIT;
-    }
-}
-#endif
-
 int32_t CallManagerClient::JoinConference(int32_t callId, std::vector<std::u16string> &numberList)
 {
     if (g_callManagerProxy != nullptr) {
@@ -892,6 +860,16 @@ int32_t CallManagerClient::SetRttCapability(int32_t slotId, bool isEnable)
         return g_callManagerProxy->SetRttCapability(slotId, isEnable);
     } else {
         TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->UpdateImsRttCallMode(callId, mode);
+    } else {
+        TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
 }
