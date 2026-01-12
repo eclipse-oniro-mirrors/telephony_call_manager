@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Huawei Device Co., Ltd.
+ * Copyright (C) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,6 @@
  */
 
 #include "voip_call_manager_proxy.h"
-
 #include "message_option.h"
 #include "message_parcel.h"
 #include "telephony_errors.h"
@@ -28,6 +27,21 @@ VoipCallManagerProxy::VoipCallManagerProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IVoipCallManagerService>(impl)
 {}
 
+__attribute__((noinline)) int32_t VoipCallManagerProxy::SendRequest(const std::string &callId, int32_t msgId,
+    MessageParcel &in, MessageParcel &out, MessageOption &option)
+{
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("VoipCallManagerProxy Remote return nullptr!");
+        if (!callId.empty()) {
+            WriteVoipCallFaultEvent(callId,
+                static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
+        }
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return remote->SendRequest(msgId, in, out, option);
+}
+
 int32_t VoipCallManagerProxy::ReportIncomingCall(
     AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason)
 {
@@ -39,17 +53,12 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
     if (!WriteDataParcel(dataParcel, extras, userProfile)) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("ReportIncomingCall Remote is null");
-        WriteVoipCallFaultEvent(extras.GetStringValue("callId"),
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
+
+    std::string callId = extras.GetStringValue("callId");
     MessageOption option;
     MessageParcel replyParcel;
     int32_t error =
-        remote->SendRequest(static_cast<int32_t>(INTERFACE_REPORT_INCOMING_CALL), dataParcel, replyParcel, option);
+        SendRequest(callId, static_cast<int32_t>(INTERFACE_REPORT_INCOMING_CALL), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportIncomingCall call failed! errCode:%{public}d", error);
         WriteVoipCallFaultEvent(extras.GetStringValue("callId"),
@@ -77,17 +86,10 @@ int32_t VoipCallManagerProxy::ReportIncomingCallError(AppExecFwk::PacMap &extras
     dataParcel.WriteString(callId);
     dataParcel.WriteInt32(extras.GetIntValue("reportVoipCallFailedCause"));
     dataParcel.WriteInt64(extras.GetLongValue("startReportTime"));
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("ReportIncomingCallError Remote is null");
-        WriteVoipCallFaultEvent(callId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error = remote->SendRequest(
-        static_cast<int32_t>(INTERFACE_REPORT_INCOMING_CALL_ERROR), dataParcel, replyParcel, option);
+    int32_t error = SendRequest(callId, static_cast<int32_t>(INTERFACE_REPORT_INCOMING_CALL_ERROR),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportIncomingCallError call failed! errCode:%{public}d", error);
         WriteVoipCallFaultEvent(callId,
@@ -108,17 +110,10 @@ int32_t VoipCallManagerProxy::ReportCallStateChange(
     dataParcel.WriteString(callId);
     dataParcel.WriteInt32(static_cast<int32_t>(state));
     dataParcel.WriteInt32(static_cast<int32_t>(type));
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("ReportCallStateChange Remote is null");
-        WriteVoipCallFaultEvent(callId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
     MessageOption option;
     MessageParcel replyParcel;
     int32_t error =
-        remote->SendRequest(static_cast<int32_t>(INTERFACE_REPORT_CALL_STATE_CHANGE), dataParcel, replyParcel, option);
+        SendRequest(callId, static_cast<int32_t>(INTERFACE_REPORT_CALL_STATE_CHANGE), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportCallStateChange call failed! errCode:%{public}d", error);
         WriteVoipCallFaultEvent(callId,
@@ -151,17 +146,10 @@ int32_t VoipCallManagerProxy::ReportOutgoingCall(
         TELEPHONY_LOGE("ReportOutgoingCall userProfile write fail, size:%{public}u",
             static_cast<uint32_t>(userProfile.size()));
     }
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("ReportOutgoingCall Remote is null");
-        WriteVoipCallFaultEvent(callId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
     MessageOption option;
     MessageParcel replyParcel;
     int32_t error =
-        remote->SendRequest(static_cast<int32_t>(INTERFACE_REPORT_OUTGOING_CALL), dataParcel, replyParcel, option);
+        SendRequest(callId, static_cast<int32_t>(INTERFACE_REPORT_OUTGOING_CALL), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportOutgoingCall call failed! errCode:%{public}d", error);
         WriteVoipCallFaultEvent(callId,
@@ -181,15 +169,10 @@ int32_t VoipCallManagerProxy::RegisterCallBack(const sptr<IVoipCallManagerCallba
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataParcel.WriteRemoteObject(callback->AsObject().GetRefPtr());
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("RegisterCallBack Remote is null");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
     MessageOption option;
     MessageParcel replyParcel;
     int32_t error =
-        remote->SendRequest(static_cast<int32_t>(INTERFACE_REGISTER_CALLBACK), dataParcel, replyParcel, option);
+        SendRequest("", static_cast<int32_t>(INTERFACE_REGISTER_CALLBACK), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function RegisterCallBack call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -204,15 +187,10 @@ int32_t VoipCallManagerProxy::UnRegisterCallBack()
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("UnRegisterCallBack Remote is null");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
     MessageOption option;
     MessageParcel replyParcel;
     int32_t error =
-        remote->SendRequest(static_cast<int32_t>(INTERFACE_UN_REGISTER_CALLBACK), dataParcel, replyParcel, option);
+        SendRequest("", static_cast<int32_t>(INTERFACE_UN_REGISTER_CALLBACK), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function UnRegisterCallBack call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -232,17 +210,10 @@ int32_t VoipCallManagerProxy::ReportVoipIncomingCall(
     dataParcel.WriteString(bundleName);
     dataParcel.WriteString(processMode);
     dataParcel.WriteInt32(uid);
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("ReportVoipIncomingCall Remote is null");
-        WriteVoipCallFaultEvent(callId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
     MessageOption option;
     MessageParcel replyParcel;
     int32_t error =
-        remote->SendRequest(static_cast<int32_t>(INTERFACE_REPORT_VOIP_INCOMING_CALL), dataParcel, replyParcel, option);
+        SendRequest(callId, static_cast<int32_t>(INTERFACE_REPORT_VOIP_INCOMING_CALL), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportVoipIncomingCall call failed! errCode:%{public}d", error);
         WriteVoipCallFaultEvent(callId,
@@ -264,17 +235,10 @@ int32_t VoipCallManagerProxy::ReportVoipCallExtensionId(
     dataParcel.WriteString(bundleName);
     dataParcel.WriteString(extensionId);
     dataParcel.WriteInt32(uid);
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("ReportVoipCallExtensionId Remote is null");
-        WriteVoipCallFaultEvent(callId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error = remote->SendRequest(
-        static_cast<int32_t>(INTERFACE_REPORT_VOIP_CALL_EXTENSIONID), dataParcel, replyParcel, option);
+    int32_t error = SendRequest(callId, static_cast<int32_t>(INTERFACE_REPORT_VOIP_CALL_EXTENSIONID),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportVoipCallExtensionId call failed! errCode:%{public}d", error);
         WriteVoipCallFaultEvent(callId,
@@ -295,17 +259,11 @@ int32_t VoipCallManagerProxy::Answer(const VoipCallEventInfo &events, int32_t vi
     dataParcel.WriteString(events.bundleName);
     dataParcel.WriteInt32(events.uid);
     dataParcel.WriteInt32(videoState);
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("Answer voip Remote is null");
-        WriteVoipCallFaultEvent(events.voipCallId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
+
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error = remote->SendRequest(
-        static_cast<int32_t>(INTERFACE_ANSWER_VOIP_CALL), dataParcel, replyParcel, option);
+    int32_t error = SendRequest(events.voipCallId, static_cast<int32_t>(INTERFACE_ANSWER_VOIP_CALL),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function Answer voip call failed! errCode:%{public}d", error);
         WriteVoipCallFaultEvent(events.voipCallId,
@@ -326,17 +284,11 @@ int32_t VoipCallManagerProxy::HangUp(const VoipCallEventInfo &events)
     dataParcel.WriteString(events.bundleName);
     dataParcel.WriteInt32(events.uid);
     dataParcel.WriteInt32(static_cast<int32_t>(events.errorReason));
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("HangUp voip Remote is null");
-        WriteVoipCallFaultEvent(events.voipCallId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
+
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error = remote->SendRequest(
-        static_cast<int32_t>(INTERFACE_HANGUP_VOIP_CALL), dataParcel, replyParcel, option);
+    int32_t error = SendRequest(events.voipCallId, static_cast<int32_t>(INTERFACE_HANGUP_VOIP_CALL),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function HangUp voip call failed! errCode:%{public}d", error);
         WriteVoipCallFaultEvent(events.voipCallId,
@@ -356,17 +308,11 @@ int32_t VoipCallManagerProxy::Reject(const VoipCallEventInfo &events)
     dataParcel.WriteString(events.voipCallId);
     dataParcel.WriteString(events.bundleName);
     dataParcel.WriteInt32(events.uid);
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("Reject voip  Remote is null");
-        WriteVoipCallFaultEvent(events.voipCallId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
+
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error = remote->SendRequest(
-        static_cast<int32_t>(INTERFACE_REJECT_VOIP_CALL), dataParcel, replyParcel, option);
+    int32_t error = SendRequest(events.voipCallId, static_cast<int32_t>(INTERFACE_REJECT_VOIP_CALL),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function Reject voip call failed! errCode:%{public}d", error);
         WriteVoipCallFaultEvent(events.voipCallId,
@@ -389,15 +335,11 @@ int32_t VoipCallManagerProxy::RegisterCallManagerCallBack(const sptr<ICallStatus
     }
 
     dataParcel.WriteRemoteObject(callback->AsObject().GetRefPtr());
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("RegisterCallManagerCallBack Remote is null");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
+
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error = remote->SendRequest(
-        static_cast<int32_t>(INTERFACE_REGISTER_CALL_MANAGER_CALLBACK), dataParcel, replyParcel, option);
+    int32_t error = SendRequest("", static_cast<int32_t>(INTERFACE_REGISTER_CALL_MANAGER_CALLBACK),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function RegisterCallManagerCallBack call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -412,15 +354,10 @@ int32_t VoipCallManagerProxy::UnRegisterCallManagerCallBack()
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("UnRegisterCallManagerCallBack Remote is null");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error = remote->SendRequest(
-        static_cast<int32_t>(INTERFACE_UNREGISTER_CALL_MANAGER_CALLBACK), dataParcel, replyParcel, option);
+    int32_t error = SendRequest(
+        "", static_cast<int32_t>(INTERFACE_UNREGISTER_CALL_MANAGER_CALLBACK), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function UnRegisterCallManagerCallBack call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -435,16 +372,9 @@ int32_t VoipCallManagerProxy::UnloadVoipSa()
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("UnloadVoipSa Remote is null");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error =
-        remote->SendRequest(static_cast<int32_t>(INTERFACE_UNLOAD_VOIP_SA), dataParcel, replyParcel, option);
+    int32_t error = SendRequest("", static_cast<int32_t>(INTERFACE_UNLOAD_VOIP_SA), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function UnloadVoipSa failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -461,17 +391,11 @@ int32_t VoipCallManagerProxy::SendCallUiEvent(std::string voipCallId, const Call
     }
     dataParcel.WriteString(voipCallId);
     dataParcel.WriteInt32(static_cast<int32_t>(callAudioEvent));
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("SendCallUiEvent Remote is null");
-        WriteVoipCallFaultEvent(voipCallId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
+
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error =
-        remote->SendRequest(static_cast<int32_t>(INTERFACE_SEND_CALL_UI_EVENT), dataParcel, replyParcel, option);
+    int32_t error = SendRequest(voipCallId, static_cast<int32_t>(INTERFACE_SEND_CALL_UI_EVENT),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function SendCallUiEvent call failed! errCode:%{public}d", error);
         WriteVoipCallFaultEvent(voipCallId,
@@ -490,17 +414,11 @@ int32_t VoipCallManagerProxy::ReportCallAudioEventChange(std::string voipCallId,
     }
     dataParcel.WriteString(voipCallId);
     dataParcel.WriteInt32(static_cast<int32_t>(callAudioEvent));
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("ReportCallAudioEventChange Remote is null");
-        WriteVoipCallFaultEvent(voipCallId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
+
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error = remote->SendRequest(
-        static_cast<int32_t>(INTERFACE_REPORT_CALL_AUDIO_EVENT_CHANGE), dataParcel, replyParcel, option);
+    int32_t error = SendRequest(voipCallId, static_cast<int32_t>(INTERFACE_REPORT_CALL_AUDIO_EVENT_CHANGE),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportCallAudioEventChange call failed! errCode:%{public}d", error);
         WriteVoipCallFaultEvent(voipCallId,
@@ -522,16 +440,9 @@ int32_t VoipCallManagerProxy::SendCallUiEventForWindow(AppExecFwk::PacMap &extra
     dataParcel.WriteString(extras.GetStringValue("eventName"));
     dataParcel.WriteInt64(extras.GetLongValue("publishTime"));
 
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("SendCallUiEventForWindow Remote is null");
-        WriteVoipCallFaultEvent(callId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error = remote->SendRequest(static_cast<int32_t>(INTERFACE_SEND_CALL_UI_EVENT_FOR_WINDOW),
+    int32_t error = SendRequest(callId, static_cast<int32_t>(INTERFACE_SEND_CALL_UI_EVENT_FOR_WINDOW),
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function SendCallUiEventForWindow call failed! errCode:%{public}d", error);
@@ -583,15 +494,10 @@ int32_t VoipCallManagerProxy::NotifyVoIPAudioStreamStart(int32_t uid)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataParcel.WriteInt32(uid);
-    auto remote = Remote();
-    if (remote == nullptr) {
-        TELEPHONY_LOGE("NotifyVoIPAudioStreamStart Remote is null");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
+
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error =
-        remote->SendRequest(static_cast<int32_t>(INTERFACE_NOTIFY_VOIP_START), dataParcel, replyParcel, option);
+    int32_t error = SendRequest("", static_cast<int32_t>(INTERFACE_NOTIFY_VOIP_START), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function NotifyVoIPAudioStreamStart call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
