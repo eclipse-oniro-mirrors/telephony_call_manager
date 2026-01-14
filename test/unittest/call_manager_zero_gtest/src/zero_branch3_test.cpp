@@ -77,6 +77,7 @@
 #include "call_status_policy.h"
 #include "bluetooth_call.h"
 #include "datashare_helper.h"
+#include "incoming_flash_reminder.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1990,5 +1991,22 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_018, TestSize.Level0)
 }
 #endif
 #endif
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_ActiveHandle_StopTorch, TestSize.Level0)
+{
+    auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
+    bool stopped = false;
+    auto task = [&stopped]() {
+        stopped = true;
+    };
+    DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ =
+        std::make_shared<IncomingFlashReminder>(runner, task);
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    EXPECT_EQ(callStatusManager->ActiveHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    sleep(1);
+    EXPECT_EQ(stopped, true);
+    DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ = nullptr;
+}
 } // namespace Telephony
 } // namespace OHOS
