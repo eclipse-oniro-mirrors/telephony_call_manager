@@ -895,6 +895,7 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle active state");
     StopCallMotionRecognition(TelCallState::CALL_STATUS_ACTIVE);
+    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr && IsDcCallConneceted()) {
