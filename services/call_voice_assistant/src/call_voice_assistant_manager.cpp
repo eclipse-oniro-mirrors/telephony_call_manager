@@ -25,8 +25,7 @@ namespace {
 namespace OHOS {
 namespace Telephony {
 constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
-const char *SETTINGS_DATASHARE_URI =
-    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+const char *SETTINGS_DATASHARE_URI = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 const char *SETTINGS_DATASHARE_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 const std::string SETTINGS_DATASHARE_URI_KEY = std::string(SETTINGS_DATASHARE_URI) + std::string("&key=");
 const std::string CONTROL_SWITCH = "incoming_call_voice_control_switch";
@@ -40,8 +39,8 @@ const std::string DIALING = "dial";
 const std::string CONTROL_SWITCH_STATE_CHANGE_EVENT = "usual.event.CALL_UI_REPORT_SWITCH_STATE_CHANGE";
 const std::string IS_CONNECT_SERVICE = "isConnectVoiceAssistant";
 const std::string IS_PLAY_RING = "call_manager_play_ring";
-const std::string BUNDLE_NAME = "";
-const std::string HICAR_BUNDLE_NAME = "";
+const std::string BUNDLE_NAME = "com.huawei.hmos.vassistant";
+const std::string HICAR_BUNDLE_NAME = "com.huawei.hmos.hicar";
 const std::string ABILITY_NAME = "CallVoiceControlAbility";
 const std::string CONTROL_CHECK_RESULT = "incomingCallVoiceControlCheckResult";
 const std::string BROADCAST_CHECK_RESULT = "incomingCallVoiceBroadcastCheckResult";
