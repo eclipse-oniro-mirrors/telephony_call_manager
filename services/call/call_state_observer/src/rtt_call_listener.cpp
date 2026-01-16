@@ -47,6 +47,9 @@ void RttCallListener::CallStateUpdated(
 void RttCallListener::InitRttManager(sptr<IMSCall> &imsCall)
 {
     TELEPHONY_LOGI("Start to InitRttManager");
+    if (imsCall == nullptr) {
+        return;
+    }
     if (imsCall->GetRttState() != RttCallState::RTT_STATE_YES) {
         TELEPHONY_LOGI("cannot InitRttManager, rttState: %{public}d", imsCall->GetRttState());
         return;

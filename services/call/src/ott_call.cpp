@@ -85,6 +85,9 @@ int32_t OTTCall::RejectCall()
             INVALID_PARAMETER, INVALID_PARAMETER, ret, "Reject PackOttCallRequestInfo failed");
         return CALL_ERR_REJECT_FAILED;
     }
+    if (ottCallConnectionPtr_ == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     ret = ottCallConnectionPtr_->Reject(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("reject call failed!");
@@ -119,6 +122,9 @@ int32_t OTTCall::HoldCall()
         TELEPHONY_LOGE("PackOttCallRequestInfo failed, error%{public}d", ret);
         return CALL_ERR_HOLD_FAILED;
     }
+    if (ottCallConnectionPtr_ == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     ret = ottCallConnectionPtr_->HoldCall(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("holdCall call failed!");
@@ -135,6 +141,9 @@ int32_t OTTCall::UnHoldCall()
         TELEPHONY_LOGE("PackOttCallRequestInfo failed, error%{public}d", ret);
         return CALL_ERR_UNHOLD_FAILED;
     }
+    if (ottCallConnectionPtr_ == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     ret = ottCallConnectionPtr_->UnHoldCall(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("unHoldCall call failed!");
@@ -150,6 +159,9 @@ int32_t OTTCall::SwitchCall()
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("PackOttCallRequestInfo failed, error%{public}d", ret);
         return CALL_ERR_UNHOLD_FAILED;
+    }
+    if (ottCallConnectionPtr_ == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     ret = ottCallConnectionPtr_->SwitchCall(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
