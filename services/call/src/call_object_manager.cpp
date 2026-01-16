@@ -999,7 +999,7 @@ sptr<CallBase> CallObjectManager::GetAudioLiveCall()
         call = GetIncomingCall(false);
     }
     if (call == nullptr) {
-        call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
+        call = GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
     }
     if (call == nullptr) {
         call = GetForegroundLiveCall(true);
