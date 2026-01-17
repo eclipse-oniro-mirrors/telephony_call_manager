@@ -888,7 +888,6 @@ public:
      */
     int32_t HangUpCall() override;
 
-
 private:
     std::string GetBundleInfo();
     int32_t dealCeliaCallEvent(int32_t callId);
