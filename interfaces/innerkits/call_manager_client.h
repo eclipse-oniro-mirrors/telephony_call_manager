@@ -718,6 +718,27 @@ public:
      */
     int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode);
 #endif
+
+    /**
+     * @brief Answer a phone call by callManager
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t AnswerCall();
+
+    /**
+     * @brief Reject a phone call by callManager
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t RejectCall();
+
+    /**
+     * @brief Hang up the phone by callManager
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t HangUpCall();
 };
 } // namespace Telephony
 } // namespace OHOS

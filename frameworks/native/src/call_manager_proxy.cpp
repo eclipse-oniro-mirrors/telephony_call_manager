@@ -1842,5 +1842,62 @@ int32_t CallManagerProxy::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mo
     return TELEPHONY_SUCCESS;
 }
 #endif
+
+int32_t CallManagerProxy::AnswerCall()
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::shared_lock<ffrt::shared_mutex> lock(clientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t errCode = callManagerServicePtr_->AnswerCall();
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("AnswerCall failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerProxy::RejectCall()
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::shared_lock<ffrt::shared_mutex> lock(clientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t errCode = callManagerServicePtr_->RejectCall();
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("RejectCall failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerProxy::HangUpCall()
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::shared_lock<ffrt::shared_mutex> lock(clientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t errCode = callManagerServicePtr_->HangUpCall();
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("HangUpCall failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

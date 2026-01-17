@@ -816,6 +816,30 @@ public:
     int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode) override;
 #endif
 
+    /**
+     * AnswerCall
+     *
+     * @brief Answer a phone call by call manager
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t AnswerCall() override;
+
+    /**
+     * RejectCall
+     *
+     * @brief Reject a phone call by call manager
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t RejectCall() override;
+
+    /**
+     * HangUpCall
+     *
+     * @brief Hang up the phone by call manager
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t HangUpCall() override;
+
 private:
     int32_t SendRequest(CallManagerInterfaceCode code);
     int32_t SendRequest(CallManagerInterfaceCode code, MessageParcel &dataParcel, MessageParcel &replyParcel);

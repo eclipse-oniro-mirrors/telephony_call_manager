@@ -128,6 +128,9 @@ public:
     virtual int32_t SetRttCapability(int32_t slotId, bool enabled) = 0;
     virtual int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode) = 0;
 #endif
+    virtual int32_t AnswerCall() = 0;
+    virtual int32_t RejectCall() = 0;
+    virtual int32_t HangUpCall() = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallManagerService");

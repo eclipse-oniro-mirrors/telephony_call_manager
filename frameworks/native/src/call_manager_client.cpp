@@ -874,5 +874,35 @@ int32_t CallManagerClient::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode m
     }
 }
 #endif
+
+int32_t CallManagerClient::AnswerCall()
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->AnswerCall();
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::RejectCall()
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->RejectCall();
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::HangUpCall()
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->HangUpCall();
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

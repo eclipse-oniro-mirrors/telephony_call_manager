@@ -89,6 +89,12 @@ void CallManagerServiceStub::InitCallBasicRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnEndCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_NOTIFY_VOIP_AUDIO_STREAM_START)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnNotifyVoIPAudioStreamStart(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_ANSWER_CALL_NO_PARAM)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnAcceptCallNoParam(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REJECT_CALL_NO_PARAM)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRejectCallNoParam(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_DISCONNECT_CALL_NO_PARAM)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnHangUpCallNoParam(data, reply); };
 }
 
 void CallManagerServiceStub::InitCallUtilsRequest()
@@ -1582,5 +1588,38 @@ int32_t CallManagerServiceStub::OnUpdateImsRttCallMode(MessageParcel &data, Mess
     return result;
 }
 #endif
+
+int32_t CallManagerServiceStub::OnAcceptCallNoParam(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = AnswerCall();
+    TELEPHONY_LOGI("OnAcceptCallNoParam::result = %{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CallManagerServiceStub::OnRejectCallNoParam(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = RejectCall();
+    TELEPHONY_LOGI("OnRejectCallNoParam:result = %{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CallManagerServiceStub::OnHangUpCallNoParam(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = HangUpCall();
+    TELEPHONY_LOGI("OnHangUpCallNoParam:result = %{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
 } // namespace Telephony
 } // namespace OHOS
