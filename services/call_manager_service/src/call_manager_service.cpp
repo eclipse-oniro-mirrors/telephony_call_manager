@@ -65,6 +65,7 @@ static constexpr const char *OHOS_PERMISSION_PLACE_CALL = "ohos.permission.PLACE
 static constexpr const char *OHOS_PERMISSION_ANSWER_CALL = "ohos.permission.ANSWER_CALL";
 static constexpr const char *OHOS_PERMISSION_READ_CALL_LOG = "ohos.permission.READ_CALL_LOG";
 static constexpr const char *OHOS_PERMISSION_WRITE_CALL_LOG = "ohos.permission.WRITE_CALL_LOG";
+static constexpr const char *OHOS_PERMISSION_MANAGE_CALL_FOR_DEVICES = "ohos.permission.MANAGE_CALL_FOR_DEVICES";
 static constexpr const char *SLOT_ID = "accountId";
 static constexpr const char *CALL_TYPE = "callType";
 static constexpr const char *VIDEO_STATE = "videoState";
@@ -1927,5 +1928,53 @@ int32_t CallManagerService::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode 
     }
 }
 #endif
+
+int32_t CallManagerService::AnswerCall()
+{
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL) &&
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_MANAGE_CALL_FOR_DEVICES)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    DelayedSingleton<CallManagerHisysevent>::GetInstance()->SetAnswerStartTime();
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->AnswerCall(INVALID_ID, static_cast<int32_t>(VideoStateType::TYPE_VOICE));
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::RejectCall()
+{
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL) &&
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE) &&
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_MANAGE_CALL_FOR_DEVICES)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->RejectCall(INVALID_ID, false, u"");
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::HangUpCall()
+{
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL) &&
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE) &&
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_MANAGE_CALL_FOR_DEVICES)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->HangUpCall(INVALID_ID);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

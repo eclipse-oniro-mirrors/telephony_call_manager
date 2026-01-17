@@ -1291,6 +1291,8 @@ napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
             TELEPHONY_LOGI("undefined or null param is detected, treating as no param input.");
         } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_function)) {
             napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(answerAsyncContext->callbackRef));
+            return HandleAsyncWork(env, answerAsyncContext.release(), "AnswerCall",
+                NativeAnswerCallNoParam, NativeVoidCallBackWithErrorCode);
         } else {
             napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &answerAsyncContext->callId);
         }
@@ -1359,12 +1361,15 @@ napi_value NapiCallManager::RejectCall(napi_env env, napi_callback_info info)
         return nullptr;
     }
     asyncContext->isSendSms = false;
-    HandleRejectCall(env, *asyncContext, argv, argc);
+    if (HandleRejectCall(env, *asyncContext, argv, argc)) {
+        return HandleAsyncWork(
+            env, asyncContext.release(), "RejectCall", NativeRejectCallNoParam, NativeVoidCallBackWithErrorCode);
+    }
     return HandleAsyncWork(
         env, asyncContext.release(), "RejectCall", NativeRejectCall, NativeVoidCallBackWithErrorCode);
 }
 
-void NapiCallManager::HandleRejectCall(napi_env env, RejectAsyncContext &asyncContext,
+bool NapiCallManager::HandleRejectCall(napi_env env, RejectAsyncContext &asyncContext,
     const napi_value parameters[], const size_t parameterCount)
 {
     if (parameterCount == ZERO_VALUE) {
@@ -1374,6 +1379,7 @@ void NapiCallManager::HandleRejectCall(napi_env env, RejectAsyncContext &asyncCo
             TELEPHONY_LOGI("undefined or null param is detected, treating as no param input.");
         } else if (NapiCallManagerUtils::MatchValueType(env, parameters[ARRAY_INDEX_FIRST], napi_function)) {
             napi_create_reference(env, parameters[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext.callbackRef));
+            return true;
         } else if (NapiCallManagerUtils::MatchValueType(env, parameters[ARRAY_INDEX_FIRST], napi_number)) {
             napi_get_value_int32(env, parameters[ARRAY_INDEX_FIRST], &asyncContext.callId);
         } else {
@@ -1405,6 +1411,7 @@ void NapiCallManager::HandleRejectCall(napi_env env, RejectAsyncContext &asyncCo
         GetSmsInfo(env, parameters[ARRAY_INDEX_SECOND], asyncContext);
         napi_create_reference(env, parameters[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext.callbackRef));
     }
+    return false;
 }
 
 napi_value NapiCallManager::HangUpCall(napi_env env, napi_callback_info info)
@@ -1430,6 +1437,8 @@ napi_value NapiCallManager::HangUpCall(napi_env env, napi_callback_info info)
             TELEPHONY_LOGI("undefined or null param is detected, treating as no param input.");
         } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_function)) {
             napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+            return HandleAsyncWork(
+                env, asyncContext.release(), "HangUpCall", NativeHangUpCallNoParam, NativeVoidCallBackWithErrorCode);
         } else {
             napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
         }
@@ -5407,5 +5416,54 @@ void NapiCallManager::NativeSendRttMessage(napi_env env, void *data)
     }
 }
 #endif
+
+void NapiCallManager::NativeAnswerCallNoParam(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeAnswerCallNoParam data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    TELEPHONY_LOGI("NativeAnswerCallNoParam enter");
+    auto asyncContext = (AnswerAsyncContext *)data;
+    asyncContext->errorCode =
+        DelayedSingleton<CallManagerClient>::GetInstance()->AnswerCall();
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
+    asyncContext->eventId = CALL_MANAGER_ANSWER_CALL;
+}
+
+void NapiCallManager::NativeRejectCallNoParam(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeRejectCallNoParam data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    TELEPHONY_LOGI("NativeRejectCallNoParam enter");
+    auto asyncContext = (RejectAsyncContext *)data;
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->RejectCall();
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
+    asyncContext->eventId = CALL_MANAGER_REJECT_CALL;
+}
+
+void NapiCallManager::NativeHangUpCallNoParam(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeHangUpCallNoParam data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    TELEPHONY_LOGI("NativeHangUpCallNoParam enter");
+    auto asyncContext = (AsyncContext *)data;
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->HangUpCall();
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
+    asyncContext->eventId = CALL_MANAGER_DISCONNECT_CALL;
+}
 } // namespace Telephony
 } // namespace OHOS

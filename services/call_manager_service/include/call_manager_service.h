@@ -864,6 +864,32 @@ public:
     int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode) override;
 #endif
 
+    /**
+     * AnswerCall
+     *
+     * @brief Answer a phone call by call manager
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t AnswerCall() override;
+
+    /**
+     * RejectCall
+     *
+     * @brief Reject a phone call by call manager
+
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t RejectCall() override;
+
+    /**
+     * HangUpCall
+     *
+     * @brief Hang up the phone by call manager
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t HangUpCall() override;
+
+
 private:
     std::string GetBundleInfo();
     int32_t dealCeliaCallEvent(int32_t callId);

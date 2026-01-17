@@ -269,13 +269,16 @@ private:
     static bool MatchTwoStringParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchCallRestrictionPasswordParameter(
         napi_env env, const napi_value parameters[], const size_t parameterCount);
-    static void HandleRejectCall(napi_env env, RejectAsyncContext &asyncContext,
+    static bool HandleRejectCall(napi_env env, RejectAsyncContext &asyncContext,
         const napi_value parameters[], const size_t parameterCount);
     static void NativeSendUssdResponse(napi_env env, void *data);
 #ifdef SUPPORT_RTT_CALL
     static void NativeSendRttMessage(napi_env env, void *data);
     static void NativeSetRttCapability(napi_env env, void *data);
 #endif
+    static void NativeAnswerCallNoParam(napi_env env, void *data);
+    static void NativeRejectCallNoParam(napi_env env, void *data);
+    static void NativeHangUpCallNoParam(napi_env env, void *data);
 private:
     static int32_t registerStatus_;
 };
