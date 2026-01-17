@@ -1938,7 +1938,7 @@ int32_t CallManagerService::AnswerCall()
     }
     DelayedSingleton<CallManagerHisysevent>::GetInstance()->SetAnswerStartTime();
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->AnswerCall(INVALID_ID, static_cast<int32_t>(VideoStateType::TYPE_VOICE));
+        return callControlManagerPtr_->AnswerCall(INVALID_CALLID, static_cast<int32_t>(VideoStateType::TYPE_VOICE));
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1954,7 +1954,7 @@ int32_t CallManagerService::RejectCall()
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->RejectCall(INVALID_ID, false, u"");
+        return callControlManagerPtr_->RejectCall(INVALID_CALLID, false, u"");
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1970,7 +1970,7 @@ int32_t CallManagerService::HangUpCall()
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->HangUpCall(INVALID_ID);
+        return callControlManagerPtr_->HangUpCall(INVALID_CALLID);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

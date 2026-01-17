@@ -876,7 +876,6 @@ public:
      * RejectCall
      *
      * @brief Reject a phone call by call manager
-
      * @return Returns 0 on success, others on failure.
      */
     int32_t RejectCall() override;
