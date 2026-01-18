@@ -89,7 +89,6 @@ std::shared_ptr<DataShare::DataShareHelper> CallVoiceAssistantManager::Initial()
 CallVoiceAssistantManager::~CallVoiceAssistantManager()
 {
     OnStopService(true);
-    callIdNeedSendToVoiceAssisant.clear();
 }
 
 void CallVoiceAssistantManager::Release()
