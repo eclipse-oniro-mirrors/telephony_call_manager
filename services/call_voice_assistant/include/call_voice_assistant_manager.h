@@ -61,11 +61,8 @@ public:
     bool GetIsPlayRing();
     void UpdateVoipCallState(int32_t state);
     bool IsStartVoiceBroadcast();
-    int32_t CheckTelCallState(TelCallState state);
     void UpdateNumberLocation(const std::string& location, int32_t callId);
-    void UpdateContactInfo(const ContactInfo &info, int32_t callId);
     static std::shared_ptr<CallVoiceAssistantManager> GetInstance();
-    void UpdateContactInfoIfNecessary(int32_t callId);
 
 private:
     int QueryValue(const std::string& key, std::string& value);
