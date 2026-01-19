@@ -72,8 +72,8 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001,
     voicePtr->CallStatusDisconnected(callId, accountId);
     voicePtr->ConnectAbility(accountId);
     voicePtr->OnStartService(incoming, accountId);
-    voicePtr->ProcessStartService(INCOMING, accountId);
-    voicePtr->ProcessStartService(INCOMING, 0);
+    voicePtr->ProcessStartService(incoming, accountId);
+    voicePtr->ProcessStartService(incoming, 0);
     voicePtr->RegisterListenSwitchState();
     voicePtr->PublishCommonEvent(true, incoming);
     voicePtr->DisconnectAbility();
@@ -119,8 +119,8 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002,
     voicePtr->IsStartVoiceBroadcast();
     voicePtr->IsSwitchOn(controlSwitch);
     voicePtr->OnStartService(dialing, accountId);
-    voicePtr->ProcessStartService(DIALING, accountId);
-    voicePtr->ProcessStartService(DIALING, 0);
+    voicePtr->ProcessStartService(dialing, accountId);
+    voicePtr->ProcessStartService(dialing, 0);
     voicePtr->MuteRinger();
     voicePtr->UpdateReplyData(value);
     voicePtr->GetSendString(infoptr);
