@@ -72,7 +72,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001,
     voicePtr->CallStatusDisconnected(callId, accountId);
     voicePtr->ConnectAbility(accountId);
     voicePtr->OnStartService(incoming, accountId);
-    voicePtr->ProcessStartService(INCOMING, ACCOUNT_ID);
+    voicePtr->ProcessStartService(INCOMING, accountId);
     voicePtr->ProcessStartService(INCOMING, 0);
     voicePtr->RegisterListenSwitchState();
     voicePtr->PublishCommonEvent(true, incoming);
@@ -110,7 +110,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002,
     voicePtr->UpdateVoipCallState(accountId);
     auto infoptr = voicePtr->GetContactInfo(accountId);
     voicePtr->UpdateNumberLocation(value, accountId);
-    voicePtr->UpdateContactInfo(ACCOUNT_ID);
+    voicePtr->UpdateContactInfo(accountId);
     voicePtr->UpdateContactInfo(0);
     voicePtr->UpdateRemoteObject(remoteObject, accountId, nullptr);
     voicePtr->OnStopService();
@@ -119,7 +119,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002,
     voicePtr->IsStartVoiceBroadcast();
     voicePtr->IsSwitchOn(controlSwitch);
     voicePtr->OnStartService(dialing, accountId);
-    voicePtr->ProcessStartService(DIALING, ACCOUNT_ID);
+    voicePtr->ProcessStartService(DIALING, accountId);
     voicePtr->ProcessStartService(DIALING, 0);
     voicePtr->MuteRinger();
     voicePtr->UpdateReplyData(value);
@@ -198,9 +198,9 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantRingSubscriber_0
     want.SetParam(key1, value2);
     eventData.SetWant(want);
     ASSERT_NO_THROW(subscriber->OnReceiveEvent(eventData));
-    std::string IS_PLAY_RING = "call_manager_play_ring";
-    std::string SWITCH_TURN_ON = "1";
-    want.SetParam(IS_PLAY_RING, SWITCH_TURN_ON);
+    std::string isPlayRing = "call_manager_play_ring";
+    std::string switchTurnOn = "1";
+    want.SetParam(isPlayRing, switchTurnOn);
     eventData.SetWant(want);
     ASSERT_NO_THROW(subscriber->OnReceiveEvent(eventData));
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
