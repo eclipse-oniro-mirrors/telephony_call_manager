@@ -1050,5 +1050,19 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_026, TestSize.Level0)
     int32_t ret = callManagerService->SetAudioDevice(audioDevice);
     EXPECT_NE(ret, 0);
 }
+
+/**
+ * @tc.number   Telephony_SpamCallAdapter_DetectSpamCal
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_DetectSpamCall, Function | MediumTest | Level1)
+{
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter_ = std::make_shared<SpamCallAdapter>();
+    const std::string phoneNumber = "12345678900";
+    const int32_t slotId = 0;
+    ASSERT_TRUE(spamCallAdapter_->DetectSpamCall(phoneNumber, slotId));
+}
+
 } // namespace Telephony
 } // namespace OHOS
