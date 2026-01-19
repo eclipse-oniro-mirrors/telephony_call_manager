@@ -67,10 +67,12 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
         [this](AppExecFwk::PacMap &resultInfo) { return ReportGetTransferInfo(resultInfo); };
     memberFuncMap_[CallResultReportId::SET_CALL_TRANSFER_REPORT_ID] =
         [this](AppExecFwk::PacMap &resultInfo) { return ReportSetTransferInfo(resultInfo); };
+#ifdef SUPPORT_RTT_CALL
     memberFuncMap_[CallResultReportId::START_RTT_REPORT_ID] =
         [this](AppExecFwk::PacMap &resultInfo) { return ReportStartRttInfo(resultInfo); };
     memberFuncMap_[CallResultReportId::STOP_RTT_REPORT_ID] =
         [this](AppExecFwk::PacMap &resultInfo) { return ReportStopRttInfo(resultInfo); };
+#endif
     memberFuncMap_[CallResultReportId::CLOSE_UNFINISHED_USSD_REPORT_ID] =
         [this](AppExecFwk::PacMap &resultInfo) { return ReportCloseUnFinishedUssdInfo(resultInfo); };
     UnRegisterGetWaitingCallback();
@@ -368,38 +370,10 @@ void NapiCallAbilityCallback::UnRegisterSetTransferCallback()
     (void)memset_s(&setTransferCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
-int32_t NapiCallAbilityCallback::RegisterStartRttCallback(EventCallback callback)
-{
-    if (startRttCallback_.thisVar) {
-        TELEPHONY_LOGE("callback already exist!");
-        return CALL_ERR_CALLBACK_ALREADY_EXIST;
-    }
-    startRttCallback_ = callback;
-    return TELEPHONY_SUCCESS;
-}
-
-void NapiCallAbilityCallback::UnRegisterStartRttCallback()
-{
-    (void)memset_s(&startRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-}
-
-int32_t NapiCallAbilityCallback::RegisterStopRttCallback(EventCallback callback)
-{
-    if (stopRttCallback_.thisVar) {
-        TELEPHONY_LOGE("callback already exist!");
-        return CALL_ERR_CALLBACK_ALREADY_EXIST;
-    }
-    stopRttCallback_ = callback;
-    return TELEPHONY_SUCCESS;
-}
-
-void NapiCallAbilityCallback::UnRegisterStopRttCallback()
-{
-    (void)memset_s(&stopRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-}
-
+#ifdef SUPPORT_RTT_CALL
 int32_t NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultInfo)
 {
+    std::lock_guard<ffrt::mutex> lock(startRttCallbackMutex_);
     if (startRttCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("startRttCallback_ is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
@@ -446,6 +420,7 @@ int32_t NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultIn
 
 int32_t NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInfo)
 {
+    std::lock_guard<ffrt::mutex> lock(stopRttCallbackMutex_);
     if (stopRttCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("stopRttCallback_ is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
@@ -490,34 +465,63 @@ int32_t NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInf
     return TELEPHONY_SUCCESS;
 }
 
-#ifdef SUPPORT_RTT_CALL
+void NapiCallAbilityCallback::RegisterStartRttCallback(EventCallback callback)
+{
+    std::lock_guard<ffrt::mutex> lock(startRttCallbackMutex_);
+    startRttCallback_ = callback;
+}
+
+void NapiCallAbilityCallback::UnRegisterStartRttCallback()
+{
+    std::lock_guard<ffrt::mutex> lock(startRttCallbackMutex_);
+    (void)memset_s(&startRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+}
+
+void NapiCallAbilityCallback::RegisterStopRttCallback(EventCallback callback)
+{
+    std::lock_guard<ffrt::mutex> lock(stopRttCallbackMutex_);
+    stopRttCallback_ = callback;
+}
+
+void NapiCallAbilityCallback::UnRegisterStopRttCallback()
+{
+    std::lock_guard<ffrt::mutex> lock(stopRttCallbackMutex_);
+    (void)memset_s(&stopRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+}
+
 void NapiCallAbilityCallback::RegisterRttModifyIndCallback(EventCallback eventCallback)
 {
+    std::lock_guard<ffrt::mutex> lock(rttCallEvtChangeCallbackMutex_);
     rttModifyIndCallback_ = eventCallback;
 }
 
 void NapiCallAbilityCallback::UnRegisterRttModifyIndCallback()
 {
+    std::lock_guard<ffrt::mutex> lock(rttCallEvtChangeCallbackMutex_);
     (void)memset_s(&rttModifyIndCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
 void NapiCallAbilityCallback::RegisterRttErrCauseCallback(EventCallback eventCallback)
 {
+    std::lock_guard<ffrt::mutex> lock(rttCallErrCauseCallbackMutex_);
     rttErrCauseCallback_ = eventCallback;
 }
 
 void NapiCallAbilityCallback::UnRegisterRttErrCauseCallback()
 {
+    std::lock_guard<ffrt::mutex> lock(rttCallErrCauseCallbackMutex_);
     (void)memset_s(&rttErrCauseCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
 void NapiCallAbilityCallback::RegisterRttCallMessageCallback(EventCallback eventCallback)
 {
+    std::lock_guard<ffrt::mutex> lock(rttCallMessageCallbackMutex_);
     rttCallMessageCallback_ = eventCallback;
 }
 
 void NapiCallAbilityCallback::UnRegisterRttCallMessageCallback()
 {
+    std::lock_guard<ffrt::mutex> lock(rttCallMessageCallbackMutex_);
     (void)memset_s(&rttCallMessageCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 #endif
@@ -1699,6 +1703,7 @@ void NapiCallAbilityCallback::ReportExecutionResult(EventCallback &settingInfo, 
     napi_close_handle_scope(env, executionScope);
 }
 
+#ifdef SUPPORT_RTT_CALL
 void NapiCallAbilityCallback::ReportStartRttInfoWork(uv_work_t *work, int32_t status)
 {
     CallSupplementWorker *dataWorkerData = (CallSupplementWorker *)work->data;
@@ -1808,6 +1813,7 @@ void NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInfo, 
     }
     napi_close_handle_scope(env, stopRttScope);
 }
+#endif
 
 void NapiCallAbilityCallback::ReportCallOttWork(uv_work_t *work, int32_t status)
 {
@@ -2419,7 +2425,7 @@ int32_t NapiCallAbilityCallback::ReportCameraCapabilitiesInfo(
 #ifdef SUPPORT_RTT_CALL
 int32_t NapiCallAbilityCallback::ReportRttCallEventInfo(const RttEvent &info)
 {
-    std::lock_guard<std::mutex> lock(rttCallEvtChangeCallbackMutex_);
+    std::lock_guard<ffrt::mutex> lock(rttCallEvtChangeCallbackMutex_);
     if (rttModifyIndCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("rttCallEvtChangeCallback is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
@@ -2514,7 +2520,7 @@ int32_t NapiCallAbilityCallback::ReportRttCallEventInfo(
 
 int32_t NapiCallAbilityCallback::ReportRttCallErrorInfo(const RttError &info)
 {
-    std::lock_guard<std::mutex> lock(rttCallErrCauseCallbackMutex_);
+    std::lock_guard<ffrt::mutex> lock(rttCallErrCauseCallbackMutex_);
     if (rttErrCauseCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("rttCallErrCauseCallback is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
@@ -2611,7 +2617,7 @@ int32_t NapiCallAbilityCallback::ReportRttCallErrorInfo(
 
 int32_t NapiCallAbilityCallback::ReportRttCallMessageInfo(AppExecFwk::PacMap &resultInfo)
 {
-    std::lock_guard<std::mutex> lock(rttCallMessageCallbackMutex_);
+    std::lock_guard<ffrt::mutex> lock(rttCallMessageCallbackMutex_);
     if (rttCallMessageCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("rttCallMessageCallback_ is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;

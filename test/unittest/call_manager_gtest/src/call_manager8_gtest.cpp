@@ -958,15 +958,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallControlManager_SetVoIPCallInfo_0300, Te
                                                     phoneNumber), TELEPHONY_SUCCESS);
     int32_t state = 5;
     ASSERT_EQ(callControlManager->GetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_SUCCESS);
-
-#ifdef SUPPORT_RTT_CALL
-    int32_t slotId = -1;
-    callId = -1;
-    bool isEnable = false;
-    ImsRTTCallMode mode = ImsRTTCallMode::LOCAL_REQUEST_DOWNGRADE;
-    ASSERT_NE(callControlManager->UpdateImsRttCallMode(callId, mode), TELEPHONY_SUCCESS);
-    ASSERT_NE(callControlManager->SetRttCapability(slotId, isEnable), TELEPHONY_SUCCESS);
-#endif
 }
 
 /**

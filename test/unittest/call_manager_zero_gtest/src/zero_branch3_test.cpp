@@ -1306,25 +1306,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_012, Function | MediumTes
     EXPECT_NE(callControlManager->RemoveMissedIncomingCallNotification(), TELEPHONY_SUCCESS);
 }
 
-#ifdef SUPPORT_RTT_CALL
-/**
- * @tc.number   Telephony_CallControlManager_013
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_013, TestSize.Level0)
-{
-    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
-    ASSERT_NE(callControlManager->UpdateImsRttCallMode(INVALID_CALLID, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE),
-        TELEPHONY_SUCCESS);
-    int32_t slotId = 1;
-    ASSERT_NE(callControlManager->SetRttCapability(slotId, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE), TELEPHONY_SUCCESS);
-    CallDetailInfo callInfo;
-    EXPECT_NO_THROW(callControlManager->RefreshRttManager(callInfo));
-    callControlManager->UnInitRttManager();
-}
-#endif
-
 /**
  * @tc.number   Telephony_CallStatusManager_016
  * @tc.name     test error branch

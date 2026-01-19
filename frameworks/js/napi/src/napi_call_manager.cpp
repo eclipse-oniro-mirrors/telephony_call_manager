@@ -5008,8 +5008,14 @@ void NapiCallManager::NativeSetCallPreferenceMode(napi_env env, void *data)
 #ifdef SUPPORT_RTT_CALL
 void NapiCallManager::NativeStartRtt(napi_env env, void *data)
 {
+    TELEPHONY_LOGI("NativeStartRtt enter");
     if (data == nullptr) {
         TELEPHONY_LOGE("data is nullptr");
+        return;
+    }
+    auto napiCallAbilityCallback = DelayedSingleton<NapiCallAbilityCallback>::GetInstance();
+    if (napiCallAbilityCallback == nullptr) {
+        TELEPHONY_LOGE("napiCallAbilityCallback is nullptr");
         return;
     }
     auto startRTTContext = (SupplementAsyncContext *)data;
@@ -5018,18 +5024,12 @@ void NapiCallManager::NativeStartRtt(napi_env env, void *data)
     infoListener.thisVar = startRTTContext->thisVar;
     infoListener.callbackRef = startRTTContext->callbackRef;
     infoListener.deferred = startRTTContext->deferred;
-    startRTTContext->resolved =
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterStartRttCallback(infoListener);
-    if (startRTTContext->resolved != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("RegisterStartRttCallback failed!");
-        return;
-    }
-    TELEPHONY_LOGI("NativeStartRtt enter");
+    napiCallAbilityCallback->RegisterStartRttCallback(infoListener);
     startRTTContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->UpdateImsRttCallMode(
             startRTTContext->callId, (ImsRTTCallMode)startRTTContext->type);
     if (startRTTContext->resolved != TELEPHONY_SUCCESS) {
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterStartRttCallback();
+        napiCallAbilityCallback->UnRegisterStartRttCallback();
         TELEPHONY_LOGE("StartRtt failed!");
         return;
     }
@@ -5044,22 +5044,23 @@ void NapiCallManager::NativeStopRtt(napi_env env, void *data)
         TELEPHONY_LOGE("data is nullptr");
         return;
     }
+    auto napiCallAbilityCallback = DelayedSingleton<NapiCallAbilityCallback>::GetInstance();
+    if (napiCallAbilityCallback == nullptr) {
+        TELEPHONY_LOGE("napiCallAbilityCallback is nullptr");
+        return;
+    }
     auto stopRTTContext = (SupplementAsyncContext *)data;
     EventCallback infoListener;
     infoListener.env = stopRTTContext->env;
     infoListener.thisVar = stopRTTContext->thisVar;
     infoListener.callbackRef = stopRTTContext->callbackRef;
     infoListener.deferred = stopRTTContext->deferred;
-    stopRTTContext->resolved =
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterStopRttCallback(infoListener);
-    if (stopRTTContext->resolved != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("RegisterStopRttCallback failed!");
-        return;
-    }
+    napiCallAbilityCallback->RegisterStopRttCallback(infoListener);
+
     stopRTTContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->UpdateImsRttCallMode(
         stopRTTContext->callId, (ImsRTTCallMode)stopRTTContext->type);
     if (stopRTTContext->resolved != TELEPHONY_SUCCESS) {
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterStopRttCallback();
+        napiCallAbilityCallback->UnRegisterStopRttCallback();
         TELEPHONY_LOGE("StopRtt failed!");
         return;
     }

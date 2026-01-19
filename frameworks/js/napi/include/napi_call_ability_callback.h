@@ -17,6 +17,7 @@
 #define NAPI_CALL_ABILITY_CALLBACK_H
 
 #include <uv.h>
+#include "ffrt.h"
 
 #include "pac_map.h"
 #include "singleton.h"
@@ -56,10 +57,6 @@ public:
     void UnRegisterGetTransferCallback();
     int32_t RegisterSetTransferCallback(EventCallback callback);
     void UnRegisterSetTransferCallback();
-    int32_t RegisterStartRttCallback(EventCallback callback);
-    void UnRegisterStartRttCallback();
-    int32_t RegisterStopRttCallback(EventCallback callback);
-    void UnRegisterStopRttCallback();
     void RegisterMmiCodeCallback(EventCallback eventCallback);
     void UnRegisterMmiCodeCallback();
     int32_t RegisterCloseUnFinishedUssdCallback(EventCallback callback);
@@ -94,6 +91,10 @@ public:
     int32_t CallDataUsageChange(const int64_t dataUsage);
     int32_t UpdateCameraCapabilities(const CameraCapabilities &cameraCapabilities);
 #ifdef SUPPORT_RTT_CALL
+    void RegisterStartRttCallback(EventCallback callback);
+    void UnRegisterStartRttCallback();
+    void RegisterStopRttCallback(EventCallback callback);
+    void UnRegisterStopRttCallback();
     void RegisterRttModifyIndCallback(EventCallback eventCallback);
     void UnRegisterRttModifyIndCallback();
     void RegisterRttErrCauseCallback(EventCallback eventCallback);
@@ -130,12 +131,14 @@ private:
     static void ReportSupplementInfo(AppExecFwk::PacMap &resultInfo, EventCallback supplementInfo);
     static void ReportExecutionResultWork(uv_work_t *work, int32_t status);
     static void ReportExecutionResult(EventCallback &settingInfo, AppExecFwk::PacMap &resultInfo);
+#ifdef SUPPORT_RTT_CALL
     static void ReportStartRttInfoWork(uv_work_t *work, int32_t status);
     static void ReportStartRttInfo(AppExecFwk::PacMap &resultInfo, EventCallback supplementInfo);
     static void ReportStopRttInfoWork(uv_work_t *work, int32_t status);
     static void ReportStopRttInfo(AppExecFwk::PacMap &resultInfo, EventCallback supplementInfo);
     int32_t ReportStartRttInfo(AppExecFwk::PacMap &resultInfo);
     int32_t ReportStopRttInfo(AppExecFwk::PacMap &resultInfo);
+#endif
     static void ReportCallOttWork(uv_work_t *work, int32_t status);
     static int32_t ReportCallOtt(
         EventCallback &settingInfo, AppExecFwk::PacMap &resultInfo, OttCallRequestId requestId);
@@ -206,9 +209,11 @@ private:
     std::mutex setWaitingCallbackMutex_;
     std::mutex getWaitingCallbackMutex_;
 #ifdef SUPPORT_RTT_CALL
-    std::mutex rttCallEvtChangeCallbackMutex_;
-    std::mutex rttCallErrCauseCallbackMutex_;
-    std::mutex rttCallMessageCallbackMutex_;
+    ffrt::mutex rttCallEvtChangeCallbackMutex_;
+    ffrt::mutex rttCallErrCauseCallbackMutex_;
+    ffrt::mutex rttCallMessageCallbackMutex_;
+    ffrt::mutex startRttCallbackMutex_;
+    ffrt::mutex stopRttCallbackMutex_;
 #endif
     static std::mutex audioDeviceCallbackMutex_;
 };
