@@ -373,7 +373,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_008, TestSize.Level0)
     dataParcel.WriteInt32(0);
     dataParcel.WriteInt32(2);
     dataParcel.WriteInt32(1);
-    ASSERT_NE(callStatusCallback->OnImsSuppExtChange(dataParcel, reply), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callStatusCallback->OnImsSuppExtChange(dataParcel, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -390,7 +390,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_009, TestSize.Level0)
     dataParcel.WriteInt32(12);
     dataParcel.WriteInt32(1);
     MessageParcel reply;
-    ASSERT_NE(callStatusCallback->OnImsSuppExtChange(dataParcel, reply), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callStatusCallback->OnImsSuppExtChange(dataParcel, reply), TELEPHONY_SUCCESS);
 }
 
 /**

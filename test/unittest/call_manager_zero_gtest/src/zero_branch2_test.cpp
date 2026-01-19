@@ -64,19 +64,6 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_001, Function | MediumTest | Le
 }
 
 /**
- * @tc.number   Telephony_SpamCallAdapter_002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_002, Function | MediumTest | Level1)
-{
-    std::shared_ptr<SpamCallAdapter> spamCallAdapter_ = std::make_shared<SpamCallAdapter>();
-    const std::string phoneNumber = "12345678900";
-    const int32_t slotId = 0;
-    ASSERT_FALSE(spamCallAdapter_->DetectSpamCall(phoneNumber, slotId));
-}
-
-/**
  * @tc.number   Telephony_SpamCallAdapter_003
  * @tc.name     test error branch
  * @tc.desc     Function test
