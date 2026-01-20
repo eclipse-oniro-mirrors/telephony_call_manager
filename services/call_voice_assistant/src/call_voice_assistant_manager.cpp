@@ -101,7 +101,7 @@ void CallVoiceAssistantManager::Release()
     isQueryedBroadcastSwitch = false;
     isConnectService = false;
     broadcastCheck = DEFAULT_STRING;
-    isplay = SWITCH_TURN_OFF;
+    isPlay = SWITCH_TURN_OFF;
 };
 
 bool CallVoiceAssistantManager::IsSwitchOn(const std::string& switchState)
@@ -185,7 +185,7 @@ bool CallVoiceAssistantManager::ConnectAbility(int32_t callId)
     auto ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, connectCallback_, userId);
     if (ret != TELEPHONY_SUCCESS && isBroadcastSwitchOn) {
         VoiceAssistantRingSubscriber::Initial();
-        isplay = SWITCH_TURN_ON;
+        isPlay = SWITCH_TURN_ON;
         isConnectService = false;
         PublishCommonEvent(false, std::string("connect_voice_assistant_ability_failed"));
     }
@@ -218,7 +218,7 @@ void CallVoiceAssistantManager::PublishCommonEvent(bool isConnect, std::string p
     want.SetParam(IS_CONNECT_SERVICE, startService);
     want.SetParam(CONTROL_SWITCH.c_str(), controlCheck);
     want.SetParam(BROADCAST_SWITCH.c_str(), broadcastCheck);
-    want.SetParam(IS_PLAY_RING, isplay);
+    want.SetParam(IS_PLAY_RING, isPlay);
     want.SetParam("publisher_name", publisher);
     EventFwk::CommonEventData data;
     data.SetWant(want);
@@ -391,7 +391,7 @@ void CallVoiceAssistantManager::MuteRinger()
         TELEPHONY_LOGI("stop broadcast event and SetRingToneVolume");
         DelayedSingleton<AudioControlManager>::GetInstance()->SetRingToneVolume(0.0f);
         VoiceAssistantRingSubscriber::Release();
-        isplay = SWITCH_TURN_OFF;
+        isPlay = SWITCH_TURN_OFF;
         if (nowCallId == FAIL_CODE) {
             TELEPHONY_LOGE("nowCallId is invalid");
             return;
@@ -434,7 +434,7 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
         return;
     }
     isConnectService = false;
-    isplay = SWITCH_TURN_OFF;
+    isPlay = SWITCH_TURN_OFF;
     UpdateReplyData(Str16ToStr8(reply.ReadString16()));
     if (controlCheck == SWITCH_TURN_ON && isControlSwitchOn) {
         isConnectService = true;
@@ -443,7 +443,7 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
     bool isShouldRing = (broadcastCheck == SWITCH_TURN_ON || retCode != TELEPHONY_SUCCESS);
     if (isShouldRing && isBroadcastSwitchOn && info->stopBroadcasting == 0 && info->dialOrCome != DIALING) {
         VoiceAssistantRingSubscriber::Initial();
-        isplay = SWITCH_TURN_ON;
+        isPlay = SWITCH_TURN_ON;
     }
     PublishCommonEvent(isConnectService, std::string("remote_object_send_request"));
 }
@@ -510,7 +510,6 @@ void VoiceAssistantSwitchObserver::OnChange()
         TELEPHONY_LOGE("voicePtr is nullptr");
         return;
     }
-    std::string switch_off = SWITCH_TURN_OFF;
     auto lastControlVal = voicePtr->GetIsControlSwitchOn();
     if (!lastControlVal) {
         TELEPHONY_LOGI("the controlswitch already close");
@@ -765,9 +764,9 @@ void VoiceAssistantRingSubscriber::OnReceiveEvent(const EventFwk::CommonEventDat
             TELEPHONY_LOGE("publisher name, [%{public}s]", publisher.c_str());
             return;
         }
-        std::string isplay = want.GetStringParam(IS_PLAY_RING);
+        std::string isPlay = want.GetStringParam(IS_PLAY_RING);
         bool isPlayRing = voicePtr->GetIsPlayRing();
-        if (isplay == SWITCH_TURN_ON && isPlayRing) {
+        if (isPlay == SWITCH_TURN_ON && isPlayRing) {
             PlayRing();
         }
     });
@@ -775,7 +774,7 @@ void VoiceAssistantRingSubscriber::OnReceiveEvent(const EventFwk::CommonEventDat
 
 bool CallVoiceAssistantManager::GetIsPlayRing()
 {
-    return (isplay == SWITCH_TURN_ON) ? true : false;
+    return (isPlay == SWITCH_TURN_ON) ? true : false;
 }
 
 void CallVoiceAssistantManager::SetIsControlSwitchOn(bool state)
