@@ -86,7 +86,7 @@ private:
     std::string broadcastCheck = "0";
     std::string controlCheck = "0";
     bool isConnectService = false;
-    std::string isplay = "0";
+    std::string isPlay = "0";
     bool isControlSwitchOn = false;
     bool isBroadcastSwitchOn = false;
     bool isQueryedBroadcastSwitch = false;
