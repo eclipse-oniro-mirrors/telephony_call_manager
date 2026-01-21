@@ -473,6 +473,21 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_014, TestSize.L
 }
 
 /**
+ * @tc.number   Telephony_CallVoiceAssistantManager_CallStatusIncoming
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_CallStatusIncoming, TestSize.Level0)
+{
+    std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
+    voicePtr->nowCallId = 0;
+    voicePtr->nowAccountId = 0;
+    voicePtr->nowVoipCallState = static_cast<int32_t>(CallStateToApp::CALL_STATE_RINGING);
+    voicePtr->CallStatusIncoming(1, 1);
+    ASSERT_TRUE(voicePtr->GetInstance() != nullptr);
+}
+
+/**
  * @tc.number   Telephony_SpamCallAdapter_001
  * @tc.name     test branch
  * @tc.desc     Function test

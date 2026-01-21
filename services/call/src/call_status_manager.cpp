@@ -591,7 +591,6 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
             callObjectPtr->SetExtraParams(params);
         }
         callObjectPtr->SetCallerInfo(contactInfoTemp);
-        CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfoTemp, callObjectPtr->GetCallID());
 #ifdef SUPPORT_DSOFTBUS
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
             DistributedDataType::NAME);

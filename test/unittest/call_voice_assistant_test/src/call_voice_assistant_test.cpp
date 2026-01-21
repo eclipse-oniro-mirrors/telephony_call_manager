@@ -72,6 +72,8 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001,
     voicePtr->CallStatusDisconnected(callId, accountId);
     voicePtr->ConnectAbility(accountId);
     voicePtr->OnStartService(incoming, accountId);
+    voicePtr->ProcessStartService(incoming, accountId);
+    voicePtr->ProcessStartService(incoming, 0);
     voicePtr->RegisterListenSwitchState();
     voicePtr->PublishCommonEvent(true, incoming);
     voicePtr->DisconnectAbility();
@@ -82,7 +84,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001,
     ASSERT_TRUE(voicePtr->GetInstance() != nullptr);
     ASSERT_TRUE(voicePtr->settingsCallback_  == nullptr);
     ASSERT_TRUE(voicePtr->connectCallback_  == nullptr);
-    ASSERT_TRUE(voicePtr->mRemoteObject == nullptr);
+    ASSERT_TRUE(voicePtr->remoteObject_ == nullptr);
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
@@ -108,7 +110,8 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002,
     voicePtr->UpdateVoipCallState(accountId);
     auto infoptr = voicePtr->GetContactInfo(accountId);
     voicePtr->UpdateNumberLocation(value, accountId);
-    voicePtr->UpdateContactInfo(contactInfo, accountId);
+    voicePtr->UpdateContactInfo(accountId);
+    voicePtr->UpdateContactInfo(0);
     voicePtr->UpdateRemoteObject(remoteObject, accountId, nullptr);
     voicePtr->OnStopService();
     voicePtr->Initial();
@@ -116,6 +119,8 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002,
     voicePtr->IsStartVoiceBroadcast();
     voicePtr->IsSwitchOn(controlSwitch);
     voicePtr->OnStartService(dialing, accountId);
+    voicePtr->ProcessStartService(dialing, accountId);
+    voicePtr->ProcessStartService(dialing, 0);
     voicePtr->MuteRinger();
     voicePtr->UpdateReplyData(value);
     voicePtr->GetSendString(infoptr);
@@ -125,7 +130,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002,
     ASSERT_TRUE(voicePtr->GetInstance() != nullptr);
     ASSERT_TRUE(voicePtr->settingsCallback_  == nullptr);
     ASSERT_TRUE(voicePtr->connectCallback_  == nullptr);
-    ASSERT_TRUE(voicePtr->mRemoteObject == nullptr);
+    ASSERT_TRUE(voicePtr->remoteObject_ == nullptr);
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
@@ -179,7 +184,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantRingSubscriber_0
     subscriber->Initial();
     subscriber->Release();
     ASSERT_TRUE(subscriber->subscriber_ == nullptr);
-    event = voicePtr->CONTROL_SWITCH_STATE_CHANGE_EVENT;
+    event = "usual.event.CALL_UI_REPORT_SWITCH_STATE_CHANGE";
     want.SetAction(event);
     want.SetParam(event, event);
     eventData.SetWant(want);
@@ -193,7 +198,9 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantRingSubscriber_0
     want.SetParam(key1, value2);
     eventData.SetWant(want);
     ASSERT_NO_THROW(subscriber->OnReceiveEvent(eventData));
-    want.SetParam(voicePtr->IS_PLAY_RING, voicePtr->SWITCH_TURN_ON);
+    std::string isPlayRing = "call_manager_play_ring";
+    std::string switchTurnOn = "1";
+    want.SetParam(isPlayRing, switchTurnOn);
     eventData.SetWant(want);
     ASSERT_NO_THROW(subscriber->OnReceiveEvent(eventData));
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();

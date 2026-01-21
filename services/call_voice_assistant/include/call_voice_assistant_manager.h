@@ -29,7 +29,6 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr uint16_t EMPTY_SIZE = 0;
 
 struct IncomingContactInformation {
     std::string dialOrCome = "";
@@ -51,43 +50,43 @@ public:
     virtual ~CallVoiceAssistantManager();
     std::shared_ptr<DataShare::DataShareHelper> Initial();
     void Release();
-    int QueryValue(const std::string& key, std::string& value);
     bool IsSwitchOn(const std::string& switchState);
-    bool RegisterListenSwitchState();
-    bool UnRegisterListenSwitchState();
-    bool ConnectAbility(int32_t callId);
-    bool DisconnectAbility();
     void PublishCommonEvent(bool isConnect, std::string publisher);
-    void OnStartService(const std::string& isDial, const int32_t& callId);
-    void OnStopService(bool isDestructor = false);
-    void UpdateReplyData(const std::string& str);
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
-    void CallStatusIncoming(const int32_t& callId, const int32_t& accountId);
-    void CallStatusDialing(const int32_t& callId, const int32_t& accountId);
-    void CallStatusActive(const int32_t& callId, const int32_t& accountId);
-    void CallStatusDisconnected(const int32_t& callId, const int32_t& accountId);
     void MuteRinger();
-    std::shared_ptr<IncomingContactInformation> GetContactInfo(int32_t callId);
-    void SendRequest(const std::shared_ptr<IncomingContactInformation> info, bool isNeed);
     void UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId,
         const sptr<AAFwk::IAbilityConnection> callback);
-    std::u16string GetSendString(const std::shared_ptr<IncomingContactInformation> nowInfo);
     void SetIsControlSwitchOn(bool state);
     bool GetIsControlSwitchOn();
     bool GetIsPlayRing();
     void UpdateVoipCallState(int32_t state);
     bool IsStartVoiceBroadcast();
-    int32_t CheckTelCallState(TelCallState state);
     void UpdateNumberLocation(const std::string& location, int32_t callId);
-    void UpdateContactInfo(const ContactInfo &info, int32_t callId);
     static std::shared_ptr<CallVoiceAssistantManager> GetInstance();
-    void UpdateContactInfoIfNecessary(int32_t callId);
 
 private:
+    int QueryValue(const std::string& key, std::string& value);
+    bool RegisterListenSwitchState();
+    bool UnRegisterListenSwitchState();
+    bool ConnectAbility(int32_t callId);
+    bool DisconnectAbility();
+    void OnStartService(const std::string& isDial, const int32_t& callId);
+    void OnStopService(bool isDestructor = false);
+    void UpdateReplyData(const std::string& str);
+    void CallStatusIncoming(const int32_t& callId, const int32_t& accountId);
+    void CallStatusDialing(const int32_t& callId, const int32_t& accountId);
+    void CallStatusActive(const int32_t& callId, const int32_t& accountId);
+    void CallStatusDisconnected(const int32_t& callId, const int32_t& accountId);
+    std::shared_ptr<IncomingContactInformation> GetContactInfo(int32_t callId);
+    void SendRequest(const std::shared_ptr<IncomingContactInformation> info, bool isNeed);
+    std::u16string GetSendString(const std::shared_ptr<IncomingContactInformation> nowInfo);
+    int32_t CheckTelCallState(TelCallState state);
+    void UpdateContactInfo(int32_t callId);
+    void ProcessStartService(const std::string& isDial, const int32_t& callId);
     std::string broadcastCheck = "0";
     std::string controlCheck = "0";
     bool isConnectService = false;
-    std::string isplay = "0";
+    std::string isPlay = "0";
     bool isControlSwitchOn = false;
     bool isBroadcastSwitchOn = false;
     bool isQueryedBroadcastSwitch = false;
@@ -96,34 +95,9 @@ private:
     int32_t nowCallId = -1;
     int32_t nowAccountId = -1;
     int32_t nowVoipCallState = -1;
-    sptr<IRemoteObject> mRemoteObject = nullptr;
+    sptr<IRemoteObject> remoteObject_ = nullptr;
     std::map<int32_t, std::shared_ptr<IncomingContactInformation>> accountIds = {};
     static std::shared_ptr<CallVoiceAssistantManager> mInstance_;
-    std::set<int32_t> callIdNeedSendToVoiceAssisant;
-
-public:
-    const char *SETTINGS_DATASHARE_URI =
-        "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
-    const char *SETTINGS_DATASHARE_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
-    const std::string SETTINGS_DATASHARE_URI_KEY = std::string(SETTINGS_DATASHARE_URI) + std::string("&key=");
-    const std::string CONTROL_SWITCH = "incoming_call_voice_control_switch";
-    const std::string BROADCAST_SWITCH = "incoming_call_voice_broadcast_switch";
-    const std::string DEFAULT_STRING = "";
-    const std::u16string DEFAULT_U16STRING = u"";
-    const std::string SWITCH_TURN_OFF = "0";
-    const std::string SWITCH_TURN_ON = "1";
-    const std::string INCOMING = "come";
-    const std::string DIALING = "dial";
-    const std::string CONTROL_SWITCH_STATE_CHANGE_EVENT = "usual.event.CALL_UI_REPORT_SWITCH_STATE_CHANGE";
-    const std::string IS_CONNECT_SERVICE = "isConnectVoiceAssistant";
-    const std::string IS_PLAY_RING = "call_manager_play_ring";
-    const std::string BUNDLE_NAME = "";
-    const std::string HICAR_BUNDLE_NAME = "";
-    const std::string ABILITY_NAME = "CallVoiceControlAbility";
-    const std::string CONTROL_CHECK_RESULT = "incomingCallVoiceControlCheckResult";
-    const std::string BROADCAST_CHECK_RESULT = "incomingCallVoiceBroadcastCheckResult";
-    const int CHECK_CODE = 1006;
-    const int FAIL_CODE = -1;
 };
 
 class VoiceAssistantConnectCallback : public IRemoteStub<AAFwk::IAbilityConnection> {
