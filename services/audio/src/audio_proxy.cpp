@@ -451,6 +451,10 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         TELEPHONY_LOGE("desc size is zero");
         return;
     }
+    if (!desc[0]->modemCallSupported_) {
+        TELEPHONY_LOGE("OnPreferredOutputDeviceUpdated::not support call");
+        return;
+    }
 #ifdef SUPPORT_DSOFTBUS
     if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink() &&
         !DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole()) {
