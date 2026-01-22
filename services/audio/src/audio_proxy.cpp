@@ -462,7 +462,8 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         return;
     }
 #endif
-    TELEPHONY_LOGI("OnPreferredOutputDeviceUpdated type: %{public}d", desc[0]->deviceType_);
+    TELEPHONY_LOGI("OnPreferredOutputDeviceUpdated deviceType_: %{public}d, modemCallSupported_: %{public}d",
+        desc[0]->deviceType_, desc[0]->modemCallSupported_);
 
     if (IsDistributedDeviceSelected(desc)) {
         return;
@@ -493,6 +494,9 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         case AudioStandard::DEVICE_TYPE_WIRED_HEADSET:
         case AudioStandard::DEVICE_TYPE_WIRED_HEADPHONES:
         case AudioStandard::DEVICE_TYPE_USB_HEADSET:
+            if (!desc[0]->modemCallSupported_) {
+                return;
+            }
             device.deviceType = AudioDeviceType::DEVICE_WIRED_HEADSET;
             DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(
                 "", AudioDeviceType::DEVICE_WIRED_HEADSET, "");
