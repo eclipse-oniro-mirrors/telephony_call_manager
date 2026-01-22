@@ -423,6 +423,22 @@ void AudioControlManager::UnmuteSoundTone()
         }, {}, {}, ffrt::task_attr().delay(UNMUTE_SOUNDTONE_DELAY_TIME));
 }
 
+void AudioControlManager::StopVibrator()
+{
+    {
+        std::lock_guard<ffrt::mutex> lock(crsMutex_);
+        if (!isCrsVibrating_ && !isVideoRingVibrating_) {
+            return;
+        }
+        isCrsVibrating_ = false;
+        isVideoRingVibrating_ = false;
+    }
+    auto proxy = DelayedSingleton<AudioProxy>::GetInstance();
+    if (proxy != nullptr) {
+        proxy->StopVibrator();
+    }
+}
+
 void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState)
 {
     TELEPHONY_LOGI("handle next state.");
@@ -449,12 +465,9 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
             break;
         case TelCallState::CALL_STATUS_DISCONNECTING:
         case TelCallState::CALL_STATUS_DISCONNECTED:
-            if (!CallObjectManager::HasIncomingCallCrsType() && !CallObjectManager::HasIncomingCallVideoRingType()) {
-                if (isCrsVibrating_ || isVideoRingVibrating_) {
-                    DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
-                    isCrsVibrating_ = false;
-                    isVideoRingVibrating_ = false;
-                }
+            if (!CallObjectManager::HasIncomingCallCrsType() &&
+                !CallObjectManager::HasIncomingCallVideoRingType()) {
+                StopVibrator();
             }
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
             break;
@@ -530,11 +543,7 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
     auto callRunningState = callObjectPtr->GetCallRunningState();
     if (callRunningState == CallRunningState::CALL_RUNNING_STATE_ACTIVE ||
         callRunningState == CallRunningState::CALL_RUNNING_STATE_RINGING) {
-        if (isCrsVibrating_ || isVideoRingVibrating_) {
-            DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
-            isCrsVibrating_ = false;
-            isVideoRingVibrating_ = false;
-        }
+        StopVibrator();
         ProcessSoundtone(callObjectPtr);
         UpdateDeviceTypeForVideoOrSatelliteCall();
     }

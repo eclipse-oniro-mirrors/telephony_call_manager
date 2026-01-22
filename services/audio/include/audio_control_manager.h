@@ -84,6 +84,7 @@ public:
     void UpdateDeviceTypeForVideoDialing();
     void MuteNetWorkRingTone(bool isMute = true);
     bool IsVideoCall(VideoStateType videoState);
+    void StopVibrator();
     bool IsSoundPlaying();
     bool StopSoundtone();
     bool PlaySoundtone();
