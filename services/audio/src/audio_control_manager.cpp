@@ -425,11 +425,20 @@ void AudioControlManager::UnmuteSoundTone()
 
 void AudioControlManager::StopVibrator()
 {
-    std::lock_guard<ffrt::mutex> lock(crsMutex_);
-    if (isCrsVibrating_ || isVideoRingVibrating_) {
-        DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
-        isCrsVibrating_ = false;
-        isVideoRingVibrating_ = false;
+    bool needStop = false;
+    {
+        std::lock_guard<ffrt::mutex> lock(crsMutex_);
+        if (isCrsVibrating_ || isVideoRingVibrating_) {
+            isCrsVibrating_ = false;
+            isVideoRingVibrating_ = false;
+            needStop = true;
+        }
+    }
+    if (needStop) {
+        auto proxy = DelayedSingleton<AudioProxy>::GetInstance();
+        if (proxy != nullptr) {
+            proxy->StopVibrator();
+        }
     }
 }
 
