@@ -459,7 +459,8 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
             break;
         case TelCallState::CALL_STATUS_DISCONNECTING:
         case TelCallState::CALL_STATUS_DISCONNECTED:
-            if (!CallObjectManager::HasIncomingCallCrsType() && !CallObjectManager::HasIncomingCallVideoRingType()) {
+            if (!CallObjectManager::HasIncomingCallCrsType() &&
+                !CallObjectManager::HasIncomingCallVideoRingType()) {
                 StopVibrator();
             }
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
