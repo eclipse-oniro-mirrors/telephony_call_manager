@@ -2235,6 +2235,9 @@ void CallControlManager::EnqueueAnsweredCall(int32_t callId, int32_t videoState)
 int32_t CallControlManager::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
 {
     int32_t ret = CallPolicy::RttCallModifyPolicy(callId);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    }
     if (CallRequestHandlerPtr_ == nullptr) {
         TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

@@ -86,6 +86,7 @@ ohos_shared_library("call") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "libuv:uv",
+    "ffrt:libffrt",
     "napi:ace_napi",
   ]
 
