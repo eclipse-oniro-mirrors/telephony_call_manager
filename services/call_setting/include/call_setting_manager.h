@@ -62,13 +62,7 @@ private:
     int32_t SetCallTransferInfoPolicy(int32_t slotId, CallTransferInfo &info);
     int32_t CloseUnFinishedUssdPolicy(int32_t slotId);
 
-    inline bool IsCellularCallConnectionValid() {
-        if (cellularCallConnectionPtr_ == nullptr) {
-            TELEPHONY_LOGE("cellularCallConnectionPtr_ invalid!");
-            return false;
-        }
-        return true;
-    }
+    __attribute__((noinline)) bool IsCellularCallConnectionValid();
 
 private:
     std::shared_ptr<CellularCallConnection> cellularCallConnectionPtr_;
