@@ -78,10 +78,7 @@ CallStatusManager::CallStatusManager()
     }
 }
 
-CallStatusManager::~CallStatusManager()
-{
-    UnInit();
-}
+CallStatusManager::~CallStatusManager() {}
 
 int32_t CallStatusManager::Init()
 {
@@ -110,17 +107,6 @@ void CallStatusManager::InitCallBaseEvent()
         CallAbilityEventId::EVENT_COMBINE_CALL_FAILED;
     mEventIdTransferMap_[RequestResultEventId::RESULT_SPLIT_SEND_FAILED] =
         CallAbilityEventId::EVENT_SPLIT_CALL_FAILED;
-}
-
-int32_t CallStatusManager::UnInit()
-{
-    for (int32_t i = 0; i < SLOT_NUM; i++) {
-        callDetailsInfo_[i].callVec.clear();
-        tmpCallDetailsInfo_[i].callVec.clear();
-    }
-    mEventIdTransferMap_.clear();
-    mOttEventIdTransferMap_.clear();
-    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)

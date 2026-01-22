@@ -57,7 +57,6 @@ public:
     CallStatusManager();
     ~CallStatusManager();
     int32_t Init();
-    int32_t UnInit();
     int32_t HandleCallReportInfo(const CallDetailInfo &info);
     void HandleDsdaInfo(int32_t slotId);
     void SetImsDomainInfo(const sptr<CallBase> call, int32_t imsDomain);
