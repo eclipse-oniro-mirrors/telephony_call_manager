@@ -341,8 +341,6 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
         return;
     }
     StopWaitingTone();
-    StopRingtone();
-    StopVibrator();
 }
 
 bool AudioControlManager::PreHandleAnswerdState(
