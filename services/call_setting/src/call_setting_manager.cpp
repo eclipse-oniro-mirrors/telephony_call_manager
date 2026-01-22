@@ -28,6 +28,14 @@ CallSettingManager::CallSettingManager()
 
 CallSettingManager::~CallSettingManager() {}
 
+bool IsCellularCallConnectionValid() {
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ invalid!");
+        return false;
+    }
+    return true;
+}
+
 int32_t CallSettingManager::GetCallWaiting(int32_t slotId)
 {
     int32_t ret = CallWaitingPolicy(slotId);
