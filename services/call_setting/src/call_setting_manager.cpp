@@ -28,7 +28,8 @@ CallSettingManager::CallSettingManager()
 
 CallSettingManager::~CallSettingManager() {}
 
-bool IsCellularCallConnectionValid() {
+bool CallSettingManager::IsCellularCallConnectionValid()
+{
     if (cellularCallConnectionPtr_ == nullptr) {
         TELEPHONY_LOGE("cellularCallConnectionPtr_ invalid!");
         return false;
