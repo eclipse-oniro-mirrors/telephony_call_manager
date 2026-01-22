@@ -379,7 +379,9 @@ int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device, bool isNe
         case AudioStandard::DEVICE_TYPE_WIRED_HEADSET:
         case AudioStandard::DEVICE_TYPE_WIRED_HEADPHONES:
         case AudioStandard::DEVICE_TYPE_USB_HEADSET:
-            device.deviceType = AudioDeviceType::DEVICE_WIRED_HEADSET;
+            if (desc[0]->modemCallSupported_) {
+                device.deviceType = AudioDeviceType::DEVICE_WIRED_HEADSET;
+            }
             break;
         default:
             break;
@@ -449,10 +451,6 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
     AudioDevice device;
     if (desc.size() == NO_DEVICE_VALID) {
         TELEPHONY_LOGE("desc size is zero");
-        return;
-    }
-    if (!desc[0]->modemCallSupported_) {
-        TELEPHONY_LOGE("OnPreferredOutputDeviceUpdated::not support call");
         return;
     }
 #ifdef SUPPORT_DSOFTBUS
