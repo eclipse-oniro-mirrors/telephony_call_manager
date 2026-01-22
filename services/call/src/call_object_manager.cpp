@@ -49,15 +49,7 @@ CallObjectManager::CallObjectManager()
 {
 }
 
-CallObjectManager::~CallObjectManager()
-{
-    std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
-    while (it != callObjectPtrList_.end()) {
-        (*it) = nullptr;
-        callObjectPtrList_.erase(it++);
-    }
-    voipCallObjectList_.clear();
-}
+CallObjectManager::~CallObjectManager() {}
 
 int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
 {
