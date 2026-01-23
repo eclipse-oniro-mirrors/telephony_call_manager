@@ -648,6 +648,10 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioProxy_002, TestSize.Level0)
     EXPECT_EQ(DelayedSingleton<AudioDeviceManager>::GetInstance()->audioDeviceType_,
         AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID);
     descs.clear();
+    desc->modemCallSupported_ = false;
+    descs.push_back(desc);
+    std::make_shared<AudioPreferDeviceChangeCallback>()->OnPreferredOutputDeviceUpdated(descs);
+    descs.clear();
     auto dcallDesc = std::make_shared<AudioStandard::AudioDeviceDescriptor>();
     dcallDesc->networkId_ = "RemoteId";
     dcallDesc->deviceType_ = AudioStandard::DEVICE_TYPE_SPEAKER;
