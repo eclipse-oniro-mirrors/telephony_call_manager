@@ -24,6 +24,7 @@
 #include "voip_call.h"
 #include "int_wrapper.h"
 #include "call_manager_connect.h"
+#include "alerting_state.h"
 
 namespace OHOS::Telephony {
 using namespace testing::ext;

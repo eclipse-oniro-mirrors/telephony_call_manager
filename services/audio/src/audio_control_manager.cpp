@@ -1482,7 +1482,7 @@ bool AudioControlManager::ShouldPlayRingback()
 
 int32_t AudioControlManager::PlayRingback()
 {
-    if (!ShouldPlayRingback) {
+    if (!ShouldPlayRingback()) {
         return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
     }
     return PlayCallTone(ToneDescriptor::TONE_RINGBACK);
