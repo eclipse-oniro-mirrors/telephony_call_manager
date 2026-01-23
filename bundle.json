@@ -28,7 +28,8 @@
             "call_manager_feature_not_support_multicall",
             "call_manager_feature_support_dsoftbus",
             "call_manager_feature_support_hearing_aid",
-            "call_manager_feature_support_rtt"
+            "call_manager_feature_support_rtt",
+            "call_manager_feature_sos_no_ringback_tone"
         ],
         "adapted_system_type": [
             "standard"

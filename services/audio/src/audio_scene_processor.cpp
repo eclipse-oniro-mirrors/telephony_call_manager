@@ -93,6 +93,11 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
                 DelayedSingleton<AudioControlManager>::GetInstance()->
                     PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);
             }
+#ifdef SOS_NO_RINGBACK_TONE
+            else {
+                PlaySosSoundTone(event);
+            }
+#endif
             currentState_->ProcessEvent(event);
             break;
         case AudioEvent::NO_MORE_DIALING_CALL:
@@ -101,6 +106,11 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
                 DelayedSingleton<AudioControlManager>::GetInstance()->
                     PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);
             }
+#ifdef SOS_NO_RINGBACK_TONE
+            else {
+                PlaySosSoundTone(event);
+            }
+#endif
             currentState_->ProcessEvent(event);
             break;
         case AudioEvent::NEW_ACTIVE_CS_CALL:
@@ -297,5 +307,17 @@ bool AudioSceneProcessor::SwitchOTT()
 {
     return true;
 }
+
+#ifdef SOS_NO_RINGBACK_TONE
+void AudioSceneProcessor::PlaySosSoundTone(AudioEvent event)
+{
+    if (event == AudioEvent::NO_MORE_ALERTING_CALL || event == AudioEvent::NO_MORE_DIALING_CALL) {
+        int32_t activeCallId = DelayedSingleton<CallStateProcessor>::GetInstance()->GetCurrentActiveCall();
+        if (activeCallId != INVALID_CALLID) {
+            DelayedSingleton<AudioControlManager>::GetInstance()->PlaySoundtone();
+        }
+    }
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS
