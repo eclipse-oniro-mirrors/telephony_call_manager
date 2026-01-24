@@ -91,24 +91,24 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
             DelayedSingleton<AudioControlManager>::GetInstance()->StopRingback();
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
                 DelayedSingleton<AudioControlManager>::GetInstance()->
-                    PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);}
+                    PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);
+            } else {
 #ifdef SOS_NO_RINGBACK_TONE
-            else {
                 PlaySosSoundTone(event);
-            }
 #endif
+            }
             currentState_->ProcessEvent(event);
             break;
         case AudioEvent::NO_MORE_DIALING_CALL:
         case AudioEvent::NO_MORE_HOLDING_CALL:
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
                 DelayedSingleton<AudioControlManager>::GetInstance()->
-                    PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);}
+                    PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);
+            } else {
 #ifdef SOS_NO_RINGBACK_TONE
-            else {
                 PlaySosSoundTone(event);
-            }
 #endif
+            }
             currentState_->ProcessEvent(event);
             break;
         case AudioEvent::NEW_ACTIVE_CS_CALL:
