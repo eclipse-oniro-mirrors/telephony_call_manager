@@ -99,6 +99,11 @@ public:
     bool StopForNoRing();
     bool NeedPlayVideoRing(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr);
     bool IsSystemVideoRing(sptr<CallBase> &callObjectPtr);
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
+    bool IsSosNoRingbackToneEnable();
+#endif
+    bool ShouldPlaySoundTone();
+    bool ShouldPlayRingback();
 private:
     RingState ringState_ = RingState::STOPPED;
     void HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState);

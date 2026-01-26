@@ -24,6 +24,7 @@
 #include "voip_call.h"
 #include "int_wrapper.h"
 #include "call_manager_connect.h"
+#include "alerting_state.h"
 
 namespace OHOS::Telephony {
 using namespace testing::ext;
@@ -466,6 +467,44 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
     EXPECT_FALSE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_WAITING,
         TelCallState::CALL_STATUS_ACTIVE));
 }
+
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
+/**
+ * @tc.number Telephony_AudioControlManager_sos_noringback_tone
+ * @tc.name   test error branch
+ * @tc.desc   Function test
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_sos_noringback_tone, TestSize.Level3)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    auto audioScene = DelayedSingleton<AudioSceneProcessor>::GetInstance();
+    auto callControl = DelayedSingleton<CallControlManager>::GetInstance();
+    auto callState = DelayedSingleton<CallStateProcessor>::GetInstance();
+    AppExecFwk::PacMap extras;
+    DialParaInfo dialInfo;
+    sptr<CallBase> call = new IMSCall(dialInfo);
+    call->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
+    CallObjectManager::AddOneCallObject(call);
+    audioControl->HandleNextState(call, TelCallState::CALL_STATUS_DIALING);
+    extras.PutIntValue("dialScene", (int32_t)DialScene::CALL_EMERGENCY);
+    callControl->extras_ = extras;
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    EXPECT_FALSE(audioControl->ShouldPlaySoundTone());
+    callControl->NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ALERTING);
+    audioControl->HandleNextState(call, TelCallState::CALL_STATUS_ALERTING);
+    EXPECT_FALSE(audioControl->ShouldPlayRingback());
+    callControl->NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_ALERTING, TelCallState::CALL_STATUS_ACTIVE);
+    std::unique_ptr<AudioBase> currentState_ = std::make_unique<AlertingState>();
+    audioScene->currentState_ = std::make_unique<AlertingState>();
+    audioScene->ProcessEventInner(AudioEvent::NO_MORE_ALERTING_CALL);
+    callState->AddCall(3, TelCallState::CALL_STATUS_ACTIVE);
+    audioScene->PlaySosSoundTone(AudioEvent::NO_MORE_ALERTING_CALL);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    EXPECT_TRUE(audioControl->ShouldPlaySoundTone());
+    CallObjectManager::DeleteOneCallObject(call);
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
+}
+#endif
 
 /**
  * @tc.number   Telephony_DealVideoRingPath_001

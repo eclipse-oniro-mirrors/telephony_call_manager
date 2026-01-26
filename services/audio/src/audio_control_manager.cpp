@@ -970,11 +970,42 @@ bool AudioControlManager::IsDistributeCallSinkStatus()
     return true;
 }
 
-bool AudioControlManager::PlaySoundtone()
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
+bool AudioControlManager::IsSosNoRingbackToneEnable()
+{
+    AppExecFwk::PacMap extras;
+    DialParaInfo paraInfo;
+    auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    if (callControlManager == nullptr) {
+        TELEPHONY_LOGE("callControlManager is nullptr");
+        return false;
+    }
+    callControlManager->GetDialParaInfo(paraInfo, extras);
+    DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
+    return dialScene == DialScene::CALL_EMERGENCY;
+}
+#endif
+ 
+bool AudioControlManager::ShouldPlaySoundTone()
 {
     if (IsDistributeCallSinkStatus()) {
         TELEPHONY_LOGI("distribute call sink status, no need to play sound tone");
-        return true;
+        return false;
+    }
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
+    if (IsSosNoRingbackToneEnable() &&
+        CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING) != nullptr) {
+        TELEPHONY_LOGI("Current dialScene is sos call, no need to play sound tone");
+        return false;
+    }
+#endif
+    return true;
+}
+
+bool AudioControlManager::PlaySoundtone()
+{
+    if (!ShouldPlaySoundTone()) {
+        return false;
     }
     if (soundState_ == SoundState::SOUNDING) {
         TELEPHONY_LOGE("should not play soundTone");
@@ -1440,9 +1471,23 @@ bool AudioControlManager::IsCurrentRinging() const
     return ringState_ == RingState::RINGING;
 }
 
+bool AudioControlManager::ShouldPlayRingback()
+{
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
+    if (IsSosNoRingbackToneEnable()) {
+        TELEPHONY_LOGI("Current dialScene is sos call, no need to play Ring back");
+        return false;
+    }
+#endif
+    if (!isLocalRingbackNeeded_) {
+        return false;
+    }
+    return true;
+}
+
 int32_t AudioControlManager::PlayRingback()
 {
-    if (!isLocalRingbackNeeded_) {
+    if (!ShouldPlayRingback()) {
         return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
     }
     return PlayCallTone(ToneDescriptor::TONE_RINGBACK);

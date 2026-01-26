@@ -92,6 +92,10 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
                 DelayedSingleton<AudioControlManager>::GetInstance()->
                     PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);
+            } else {
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
+                PlaySosSoundTone(event);
+#endif
             }
             currentState_->ProcessEvent(event);
             break;
@@ -100,6 +104,10 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
                 DelayedSingleton<AudioControlManager>::GetInstance()->
                     PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);
+            } else {
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
+                PlaySosSoundTone(event);
+#endif
             }
             currentState_->ProcessEvent(event);
             break;
@@ -297,5 +305,27 @@ bool AudioSceneProcessor::SwitchOTT()
 {
     return true;
 }
+
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
+void AudioSceneProcessor::PlaySosSoundTone(AudioEvent event)
+{
+    if (event == AudioEvent::NO_MORE_ALERTING_CALL || event == AudioEvent::NO_MORE_DIALING_CALL) {
+        auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+        if (callStateProcessor == nullptr) {
+            TELEPHONY_LOGE("callStateProcessor is nullptr");
+            return;
+        }
+        int32_t activeCallId = callStateProcessor->GetCurrentActiveCall();
+        if (activeCallId != INVALID_CALLID) {
+            auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+            if (audioControlManager == nullptr) {
+                TELEPHONY_LOGE("audioControlManager is nullptr");
+                return;
+            }
+            audioControlManager->PlaySoundtone();
+        }
+    }
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS
