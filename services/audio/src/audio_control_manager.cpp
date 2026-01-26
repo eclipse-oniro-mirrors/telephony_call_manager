@@ -970,12 +970,17 @@ bool AudioControlManager::IsDistributeCallSinkStatus()
     return true;
 }
 
-#ifdef SOS_NO_RINGBACK_TONE
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
 bool AudioControlManager::IsSosNoRingbackToneEnable()
 {
     AppExecFwk::PacMap extras;
     DialParaInfo paraInfo;
-    DelayedSingleton<CallControlManager>::GetInstance()->GetDialParaInfo(paraInfo, extras);
+    auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    if (callControlManager == nullptr) {
+        TELEPHONY_LOGE("callControlManager is nullptr");
+        return false;
+    }
+    callControlManager->GetDialParaInfo(paraInfo, extras);
     DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
     return dialScene == DialScene::CALL_EMERGENCY;
 }
@@ -987,7 +992,7 @@ bool AudioControlManager::ShouldPlaySoundTone()
         TELEPHONY_LOGI("distribute call sink status, no need to play sound tone");
         return false;
     }
-#ifdef SOS_NO_RINGBACK_TONE
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
     if (IsSosNoRingbackToneEnable() &&
         CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING) != nullptr) {
         TELEPHONY_LOGI("Current dialScene is sos call, no need to play sound tone");
@@ -1468,7 +1473,7 @@ bool AudioControlManager::IsCurrentRinging() const
 
 bool AudioControlManager::ShouldPlayRingback()
 {
-#ifdef SOS_NO_RINGBACK_TONE
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
     if (IsSosNoRingbackToneEnable()) {
         TELEPHONY_LOGI("Current dialScene is sos call, no need to play Ring back");
         return false;

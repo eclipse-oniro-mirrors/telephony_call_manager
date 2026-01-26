@@ -468,7 +468,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
         TelCallState::CALL_STATUS_ACTIVE));
 }
 
-#ifdef SOS_NO_RINGBACK_TONE
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
 /**
  * @tc.number Telephony_AudioControlManager_sos_noringback_tone
  * @tc.name   test error branch

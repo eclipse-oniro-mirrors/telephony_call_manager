@@ -93,7 +93,7 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
                 DelayedSingleton<AudioControlManager>::GetInstance()->
                     PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);
             } else {
-#ifdef SOS_NO_RINGBACK_TONE
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
                 PlaySosSoundTone(event);
 #endif
             }
@@ -105,7 +105,7 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
                 DelayedSingleton<AudioControlManager>::GetInstance()->
                     PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);
             } else {
-#ifdef SOS_NO_RINGBACK_TONE
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
                 PlaySosSoundTone(event);
 #endif
             }
@@ -306,13 +306,23 @@ bool AudioSceneProcessor::SwitchOTT()
     return true;
 }
 
-#ifdef SOS_NO_RINGBACK_TONE
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
 void AudioSceneProcessor::PlaySosSoundTone(AudioEvent event)
 {
     if (event == AudioEvent::NO_MORE_ALERTING_CALL || event == AudioEvent::NO_MORE_DIALING_CALL) {
-        int32_t activeCallId = DelayedSingleton<CallStateProcessor>::GetInstance()->GetCurrentActiveCall();
+        auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+        if (callStateProcessor == nullptr) {
+            TELEPHONY_LOGE("callStateProcessor is nullptr");
+            return;
+        }
+        int32_t activeCallId = callStateProcessor->GetCurrentActiveCall();
         if (activeCallId != INVALID_CALLID) {
-            DelayedSingleton<AudioControlManager>::GetInstance()->PlaySoundtone();
+            auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+            if (audioControlManager == nullptr) {
+                TELEPHONY_LOGE("audioControlManager is nullptr");
+                return;
+            }
+            audioControlManager->PlaySoundtone();
         }
     }
 }

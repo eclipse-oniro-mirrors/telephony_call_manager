@@ -17,7 +17,7 @@ declare_args() {
   call_manager_feature_support_dsoftbus = true
   call_manager_feature_support_rtt = false
   call_manager_feature_support_hearing_aid = true
-  call_manager_feature_sos_no_ringback_tone = false
+  call_manager_sos_no_ringback_tone = false
 }
 
 call_manager_path = "//base/telephony/call_manager"
@@ -365,7 +365,7 @@ if (call_manager_feature_support_hearing_aid) {
   call_manager_defines += [ "SUPPORT_HEARING_AID" ]
 }
 
-if (call_manager_feature_sos_no_ringback_tone) {
-  print("sos no ringback tone")
-  call_manager_defines += [ "SOS_NO_RINGBACK_TONE" ]
+if (call_manager_sos_no_ringback_tone) {
+  print("callmanager sos no ringback tone")
+  call_manager_defines += [ "CALL_MANAGER_SOS_NO_RINGBACK_TONE" ]
 }
