@@ -34,7 +34,7 @@ ReminderCallbackStubHelper::~ReminderCallbackStubHelper()
 int32_t ReminderCallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
 {
     TELEPHONY_LOGI("OnResult errCode: %{public}d", errCode);
-    if (errCode == 0) {
+    if (errCode == 0 && spamCallAdapter_ != nullptr) {
         spamCallAdapter_->ParseNeedNotifyResult(result);
     }
     return TELEPHONY_SUCCESS;

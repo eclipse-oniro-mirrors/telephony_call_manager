@@ -77,6 +77,9 @@ void InteroperableClientManager::OnConnected()
 void InteroperableClientManager::CallCreated(const sptr<CallBase> &call, const std::string &networkId)
 {
     TELEPHONY_LOGI("client mgr call created");
+    if (call == nullptr) {
+        return;
+    }
     std::unique_lock<ffrt::mutex> lock(mutex_);
     phoneNum_ = call->GetAccountNumber();
     lock.unlock();

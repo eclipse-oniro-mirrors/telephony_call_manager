@@ -860,6 +860,10 @@ bool AudioControlManager::PlayRingtone()
         return true;
     }
     std::lock_guard<ffrt::recursive_mutex> lock(ringMutex_);
+    if (ring_ == nullptr) {
+        TELEPHONY_LOGE("PlayRingtone error, ring_ is null");
+        return false;
+    }
     if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
         ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST);
     } else {
