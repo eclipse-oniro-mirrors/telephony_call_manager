@@ -19,6 +19,7 @@
 #include <cstdint>
 #define private public
 #include "addcalltoken_fuzzer.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -29,9 +30,10 @@ int32_t FormatPhoneNumberToE164(const uint8_t *data, size_t size)
         return TELEPHONY_ERROR;
     }
     MessageParcel messageParcel;
-    std::string number(reinterpret_cast<const char *>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string number = fdp.ConsumeRandomLengthString();
     auto numberU16 = Str8ToStr16(number);
-    std::string countryCode(reinterpret_cast<const char *>(data), size);
+    std::string countryCode = fdp.ConsumeRandomLengthString();
     auto countryCodeU16 = Str8ToStr16(countryCode);
     messageParcel.WriteString16(numberU16);
     messageParcel.WriteString16(countryCodeU16);
