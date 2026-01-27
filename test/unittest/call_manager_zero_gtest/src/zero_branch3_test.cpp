@@ -474,6 +474,8 @@ std::string GetTestNumber()
  */
 HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallPolicy_001, TestSize.Level0)
 {
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::voipCallObjectList_.clear();
     BluetoothCallPolicy callPolicy;
     DialParaInfo dialParaInfo;
     sptr<OHOS::Telephony::CallBase> callBase1 = new OTTCall(dialParaInfo);
@@ -774,6 +776,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_001, TestSize.Level0)
  */
 HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_002, TestSize.Level0)
 {
+    CallObjectManager::callObjectPtrList_.clear();
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     ASSERT_NE(callControlManager->StartDtmf(INVALID_CALLID, 'a'), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->StopDtmf(INVALID_CALLID), TELEPHONY_SUCCESS);
@@ -1010,6 +1013,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_006, Function | MediumTes
     EXPECT_NE(callControlManager->DialCall(normalNum, extras), TELEPHONY_SUCCESS);
     callControlManager->CallRequestHandlerPtr_ = nullptr;
     EXPECT_NE(callControlManager->DialCall(normalNum, extras), TELEPHONY_SUCCESS);
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::voipCallObjectList_.clear();
 }
 
 /**
@@ -1534,6 +1539,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_004, TestSize.Level0)
 
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_005, TestSize.Level0)
 {
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::voipCallObjectList_.clear();
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
 
     // init
@@ -1975,6 +1982,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_018, TestSize.Level0)
 
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_ActiveHandle_StopTorch, TestSize.Level0)
 {
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::voipCallObjectList_.clear();
     auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
     bool stopped = false;
     auto task = [&stopped]() {

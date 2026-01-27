@@ -957,6 +957,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_003, Function | MediumTest | Leve
  */
 HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_004, Function | MediumTest | Level1)
 {
+    CallObjectManager::callObjectPtrList_.clear();
     CallPolicy callPolicy;
     DialParaInfo info;
     sptr<CallBase> call = new CSCall(info);
@@ -1120,6 +1121,8 @@ HWTEST_F(ZeroBranch2Test, Telephony_ReportCallInfoHandler_002, Function | Medium
     callDetailInfo.callType = CallType::TYPE_BLUETOOTH;
     callDetailInfo.state = TelCallState::CALL_STATUS_ACTIVE;
     DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(callDetailInfo);
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::voipCallObjectList_.clear();
 }
 
 /**
@@ -1186,6 +1189,8 @@ HWTEST_F(ZeroBranch2Test, Telephony_VideoControlManager_001, Function | MediumTe
  */
 HWTEST_F(ZeroBranch2Test, Telephony_VideoControlManager_002, Function | MediumTest | Level1)
 {
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::voipCallObjectList_.clear();
     int32_t callId = 1;
     std::u16string testStr = u"123";
     ASSERT_NE(DelayedSingleton<VideoControlManager>::GetInstance()->OpenCamera(callId, testStr, 0, 0),
