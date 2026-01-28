@@ -36,6 +36,7 @@
 #include "antifraud_adapter.h"
 #include "call_manager_service.h"
 #include "call_manager_utils.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -500,15 +501,16 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
     auto antiFraudService = DelayedSingleton<Telephony::AntiFraudService>::GetInstance();
     int32_t slotId = GetInt<int32_t>(data, size, index++);
     int32_t count = GetInt<int32_t>(data, size, index++);
-    antiFraudService->CheckAntiFraudService(std::string(reinterpret_cast<const char *>(data), size), slotId, count);
-    antiFraudService->StartAntiFraudService(std::string(reinterpret_cast<const char *>(data), size), slotId, count);
+    FuzzedDataProvider fdp(data, size);
+    antiFraudService->CheckAntiFraudService(fdp.ConsumeRandomLengthString(), slotId, count);
+    antiFraudService->StartAntiFraudService(fdp.ConsumeRandomLengthString(), slotId, count);
     char temp[size + 1];
     for (size_t i = 0; i < size; ++i) {
         temp[i] = static_cast<char>(data[i]);
     }
     temp[size] = '\0';
     antiFraudService->CreateDataShareHelper(slotId, temp);
-    antiFraudService->IsSwitchOn(std::string(reinterpret_cast<const char *>(data), size));
+    antiFraudService->IsSwitchOn(fdp.ConsumeRandomLengthString());
     antiFraudService->IsAntiFraudSwitchOn();
     antiFraudService->IsUserImprovementPlanSwitchOn();
     antiFraudService->InitParams();
@@ -518,14 +520,13 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
     OHOS::AntiFraudService::AntiFraudResult antiFraudResult;
     antiFraudResult.modelVersion = GetInt<int32_t>(data, size, index++);
     antiFraudResult.fraudType = GetInt<int32_t>(data, size, index++);
-    antiFraudService->RecordDetectResult(antiFraudResult, std::string(reinterpret_cast<const char*>(data), size),
-        slotId, count);
+    antiFraudService->RecordDetectResult(antiFraudResult, fdp.ConsumeRandomLengthString(), slotId, count);
     antiFraudService->StopAntiFraudService(slotId, count);
     antiFraudService->SetStoppedSlotId(slotId);
     antiFraudService->SetStoppedIndex(count);
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
     antiFraudAdapter->ReleaseAntiFraud();
-    std::string phoneNum = std::string(reinterpret_cast<const char*>(data), size);
+    std::string phoneNum = fdp.ConsumeRandomLengthString();
     auto listener = std::make_shared<Telephony::AntiFraudService::AntiFraudDetectResListenerImpl>(
         phoneNum, slotId, index);
     listener->HandleAntiFraudDetectRes(antiFraudResult);
@@ -599,9 +600,10 @@ void CallMangerServiceFunc(const uint8_t *data, size_t size)
     auto callManagerService = DelayedSingleton<CallManagerService>::GetInstance();
     int index = 0;
     int32_t systemAbilityId = GetInt<int32_t>(data, size, index++);
-    callManagerService->OnAddSystemAbility(systemAbilityId, std::string(reinterpret_cast<const char*>(data), size));
+    FuzzedDataProvider fdp(data, size);
+    callManagerService->OnAddSystemAbility(systemAbilityId, fdp.ConsumeRandomLengthString());
     std::vector<std::u16string> args;
-    std::u16string arg = Str8ToStr16(std::string(reinterpret_cast<const char*>(data), size));
+    std::u16string arg = Str8ToStr16(fdp.ConsumeRandomLengthString());
     args.push_back(arg);
     std::int32_t fd = GetInt<int32_t>(data, size, index++);
     callManagerService->Dump(fd, args);
@@ -616,11 +618,11 @@ void CallMangerServiceFunc(const uint8_t *data, size_t size)
     callManagerService->EnableImsSwitch(callId);
     callManagerService->GetBundleInfo();
     callManagerService->dealCeliaCallEvent(callId);
-    std::string eventName = std::string(reinterpret_cast<const char*>(data), size);
+    std::string eventName = fdp.ConsumeRandomLengthString();
     callManagerService->HandleVoIPCallEvent(callId, eventName);
     callManagerService->HandleDisplaySpecifiedCallPage(callId);
     callManagerService->HandleCeliaAutoAnswerCall(callId, GetInt<bool>(data, size, index++));
-    callManagerService->SendUssdResponse(callId, std::string(reinterpret_cast<const char*>(data), size));
+    callManagerService->SendUssdResponse(callId, fdp.ConsumeRandomLengthString());
     callManagerService->OnStop();
     callManagerService->UnRegisterCallBack();
     callManagerService->UnInit();
@@ -629,7 +631,7 @@ void CallMangerServiceFunc(const uint8_t *data, size_t size)
     info.accountId = GetInt<int32_t>(data, size, index);
     info.callType = CallType::TYPE_VOIP;
     CallManagerUtils::WriteCallAttributeInfo(info, messageParcel);
-    CallManagerUtils::IsBundleInstalled(std::string(reinterpret_cast<const char*>(data), size), callId);
+    CallManagerUtils::IsBundleInstalled(fdp.ConsumeRandomLengthString(), callId);
 }
 
 void CallMangerServiceStubFunc(const uint8_t *data, size_t size)
