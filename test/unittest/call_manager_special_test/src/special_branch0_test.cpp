@@ -527,6 +527,57 @@ HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_003, TestSize.Level0)
     ASSERT_FALSE(spamCallAdapter->WaitForDetectResult());
 }
 
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+/**
+ * @tc.number   SpamCallAdapter_ParseCallerResultTest
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch0Test, SpamCallAdapter_ParseCallerResultTest, TestSize.Level0)
+{
+    CallDisposition callDisposition = CallDisposition::NORMAL_PROCESS;
+    SpamCallAdapter spamCallAdapter;
+    NumberMarkInfo info;
+    EXPECT_NE(spamCallAdapter.GetCurrentTimeMs(), 0);
+
+    spamCallAdapter.info_ = info;
+    EXPECT_FALSE(spamCallAdapter.GetNumberMarkInfo().isCloud);
+
+    spamCallAdapter.callDisposition_ = callDisposition;
+    EXPECT_FALSE(spamCallAdapter.IsRefreshMarkInfo());
+    EXPECT_EQ(spamCallAdapter.GetCallDisposition(), CallDisposition::NORMAL_PROCESS);
+    std::string dispositionJson = "";
+    callDisposition = CallDisposition::NORMAL_PROCESS;
+    NumberMarkInfo numberMarkInfo;
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo)); // invalid json
+    dispositionJson = "{\"callerResult\":\"0\"}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+    dispositionJson = "{\"callerResult\":0}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+    dispositionJson = "{\"callerResult\":1}"; // normal process
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+    cJSON *root = nullptr;
+    EXPECT_FALSE(spamCallAdapter.ParseNumberMarkInfo(root, numberMarkInfo));
+    dispositionJson = "{\"callerResult\":1,\"markerId\":\"100\"}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+    dispositionJson = "{\"callerResult\":1,\"markerId\":100}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+    dispositionJson = "{\"callerResult\":1,\"markerId\":100,\"markerType\":123}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+    dispositionJson = "{\"callerResult\":1,\"markerId\":100,\"markerType\":\"unknown\"}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+
+    dispositionJson = "{\"callerResult\":1,\"markerId\":100,\"markerType\":\"unknown\",\"markerCnt\":\"12\"}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+
+    dispositionJson = "{\"callerResult\":1,\"markerId\":2,\"markerType\":\"unknown\",\"markerCnt\":12}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+
+    dispositionJson = "{\"callerResult\":1,\"markerId\":100,\"markerType\":\"unknown\",\"markerCnt\":12}";
+    EXPECT_TRUE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+}
+#endif
+
 /**
  * @tc.number   Telephony_CallManagerServiceStub_001
  * @tc.name     test branch

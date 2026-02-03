@@ -39,6 +39,7 @@
  */
 namespace OHOS {
 namespace Telephony {
+class SpamCallAdapter;
 const int32_t SLOT_NUM = 2;
 const std::string ANTIFRAUD_FEATURE = "const.telephony.antifraud.supported";
 constexpr int32_t DEVICE_PROVISION_UNDEF = -1;
@@ -157,6 +158,9 @@ private:
     void ClearPendingState(sptr<CallBase> &call);
     void RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason, const std::string &message);
     bool AutoAnswerVideoCallForNotDsda(const sptr<CallBase> disconnectedCall, int32_t activeCallNum);
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    bool HandleWatchCallDisposition(std::shared_ptr<SpamCallAdapter> &spamCallAdapterPtr, const sptr<CallBase> &call);
+#endif
 
 #ifdef NOT_SUPPORT_MULTICALL
     void AutoAnswerSecondCall();

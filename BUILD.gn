@@ -38,6 +38,10 @@ ohos_shared_library("tel_call_manager") {
 
   external_deps += call_manager_external_deps
 
+  if (call_manager_watch_call_blocking) {
+    external_deps += [ "watch_system_service:watch_system_native" ]
+  }
+
   cflags_cc = [
     "-Wunused",
     "-Wunreachable-code",
