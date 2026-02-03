@@ -591,6 +591,8 @@ private:
 
 private:
     static inline BrokerDelegator<CellularCallProxy> delegator_;
+    __attribute__((noinline)) int32_t SendRequest(int32_t msgId, MessageParcel &dataParcel, MessageParcel &replyParcel,
+        MessageOption &option);
 };
 } // namespace Telephony
 } // namespace OHOS

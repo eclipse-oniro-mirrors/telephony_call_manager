@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,25 +26,29 @@ CallAbilityCallbackProxy::CallAbilityCallbackProxy(const sptr<IRemoteObject> &im
     : IRemoteProxy<ICallAbilityCallback>(impl)
 {}
 
+__attribute__((noinline)) int32_t CallAbilityCallbackProxy::SendRequest(int32_t msgId, MessageParcel &dataParcel,
+    MessageParcel &replyParcel, MessageOption &option)
+{
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("CallAbilityCallbackProxy Remote return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return remote->SendRequest(msgId, dataParcel, replyParcel, option);
+}
+
 int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &info)
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     CallManagerUtils::WriteCallAttributeInfo(info, dataParcel);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error =
-        Remote()->SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_STATE_INFO),
+    int32_t error = SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_STATE_INFO),
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGD("update call state info errcode: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -56,19 +60,12 @@ int32_t CallAbilityCallbackProxy::OnMeeTimeDetailsChange(const CallAttributeInfo
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     CallManagerUtils::WriteCallAttributeInfo(info, dataParcel);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error =
-        Remote()->SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_MEETIME_STATE_INFO),
+    int32_t error = SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_MEETIME_STATE_INFO),
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("update meeTime state info errcode: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -80,20 +77,14 @@ int32_t CallAbilityCallbackProxy::OnCallEventChange(const CallEventInfo &info)
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     int32_t length = sizeof(CallEventInfo);
     dataParcel.WriteInt32(length);
     dataParcel.WriteRawData((const void *)&info, length);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_EVENT),
+    int32_t error = SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_EVENT),
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("update call event failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -105,26 +96,18 @@ int32_t CallAbilityCallbackProxy::OnCallDisconnectedCause(const DisconnectedDeta
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     if (!dataParcel.WriteInt32(static_cast<int32_t>(details.reason))) {
-        TELEPHONY_LOGE("write reason fail");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!dataParcel.WriteString(details.message)) {
-        TELEPHONY_LOGE("write message fail");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(
+    int32_t error = SendRequest(
         static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_DISCONNECTED_CAUSE), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGD("report call disconnected cause errcode: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -136,19 +119,13 @@ int32_t CallAbilityCallbackProxy::OnReportAsyncResults(CallResultReportId report
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     PackDataParcel(reportId, resultInfo, dataParcel);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(
+    int32_t error = SendRequest(
         static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_ASYNC_RESULT_REQUEST), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -160,21 +137,15 @@ int32_t CallAbilityCallbackProxy::OnReportMmiCodeResult(const MmiCodeInfo &info)
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     int32_t length = sizeof(MmiCodeInfo);
     dataParcel.WriteInt32(length);
     dataParcel.WriteRawData((const void *)&info, length);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(
+    int32_t error = SendRequest(static_cast<uint32_t>(
         CallManagerCallAbilityInterfaceCode::UPDATE_MMI_CODE_RESULT_REQUEST), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -221,7 +192,6 @@ int32_t CallAbilityCallbackProxy::OnOttCallRequest(OttCallRequestId requestId, A
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataParcel.WriteInt32(static_cast<int32_t>(requestId));
@@ -240,15 +210,9 @@ int32_t CallAbilityCallbackProxy::OnOttCallRequest(OttCallRequestId requestId, A
         default:
             break;
     }
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error =
-        Remote()->SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::REPORT_OTT_CALL_REQUEST),
+    int32_t error = SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::REPORT_OTT_CALL_REQUEST),
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report ott call request failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -260,7 +224,6 @@ int32_t CallAbilityCallbackProxy::OnReportAudioDeviceChange(const AudioDeviceInf
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     size_t audioDeviceListLength = info.audioDeviceList.size();
@@ -272,16 +235,10 @@ int32_t CallAbilityCallbackProxy::OnReportAudioDeviceChange(const AudioDeviceInf
     dataParcel.WriteBool(info.isMuted);
     dataParcel.WriteInt32(info.callId);
 
-    TELEPHONY_LOGD("audioDeviceListLength=%{public}zu", audioDeviceListLength);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(
+    int32_t error = SendRequest(
         static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST),
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGD("report audio device info errcode: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -293,19 +250,13 @@ int32_t CallAbilityCallbackProxy::OnReportPostDialDelay(const std::string &str)
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("WriteInterfaceToken fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataParcel.WriteString(str);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(
+    int32_t error = SendRequest(
         static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::REPORT_POST_DIAL_DELAY),
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report post-dial wait failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -317,21 +268,15 @@ int32_t CallAbilityCallbackProxy::OnReportImsCallModeChange(const CallMediaModeI
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     int32_t length = sizeof(CallMediaModeInfo);
     dataParcel.WriteInt32(length);
     dataParcel.WriteRawData((const void *)&imsCallModeInfo, length);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(
+    int32_t error = SendRequest(static_cast<uint32_t>(
         CallManagerCallAbilityInterfaceCode::UPDATE_IMS_CALL_MODE_RECEIVE), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGD("report async results errcode: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -344,21 +289,15 @@ int32_t CallAbilityCallbackProxy::OnReportCallSessionEventChange(
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     int32_t length = sizeof(CallSessionEvent);
     dataParcel.WriteInt32(length);
     dataParcel.WriteRawData((const void *)&callSessionEventOptions, length);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(
+    int32_t error = SendRequest(static_cast<uint32_t>(
         CallManagerCallAbilityInterfaceCode::CALL_SESSION_EVENT_CHANGE), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGD("report async results errcode: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -370,21 +309,15 @@ int32_t CallAbilityCallbackProxy::OnReportPeerDimensionsChange(const PeerDimensi
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     int32_t length = sizeof(PeerDimensionsDetail);
     dataParcel.WriteInt32(length);
     dataParcel.WriteRawData((const void *)&peerDimensionsDetail, length);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(
+    int32_t error = SendRequest(static_cast<uint32_t>(
         CallManagerCallAbilityInterfaceCode::PEERD_DIMENSIONS_CHANGE), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -396,19 +329,13 @@ int32_t CallAbilityCallbackProxy::OnReportCallDataUsageChange(const int64_t data
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataParcel.WriteInt64(dataUsage);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(
+    int32_t error = SendRequest(static_cast<uint32_t>(
         CallManagerCallAbilityInterfaceCode::CALL_DATA_USAGE_CHANGE), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -420,21 +347,15 @@ int32_t CallAbilityCallbackProxy::OnReportCameraCapabilities(const CameraCapabil
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     int32_t length = sizeof(CameraCapabilities);
     dataParcel.WriteInt32(length);
     dataParcel.WriteRawData((const void *)&cameraCapabilities, length);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(
+    int32_t error = SendRequest(static_cast<uint32_t>(
         CallManagerCallAbilityInterfaceCode::CAMERA_CAPABILITIES_CHANGE), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -447,22 +368,16 @@ int32_t CallAbilityCallbackProxy::OnPhoneStateChange(int32_t numActive, int32_t 
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataParcel.WriteInt32(numActive);
     dataParcel.WriteInt32(numHeld);
     dataParcel.WriteInt32(callState);
     dataParcel.WriteString(number);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(
+    int32_t error = SendRequest(static_cast<uint32_t>(
         CallManagerCallAbilityInterfaceCode::UPDATE_PHONE_STATE), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -475,30 +390,21 @@ int32_t CallAbilityCallbackProxy::OnReportRttCallEvtChanged(const RttEvent &info
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     if (!dataParcel.WriteInt32(info.callId)) {
-        TELEPHONY_LOGE("OnReportRttCallEvtChanged Write callId fail!");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!dataParcel.WriteInt32(info.eventType)) {
-        TELEPHONY_LOGE("OnReportRttCallEvtChanged Write eventType fail!");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!dataParcel.WriteInt32(info.reason)) {
-        TELEPHONY_LOGE("OnReportRttCallEvtChanged Write reason fail!");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(
+    int32_t error = SendRequest(static_cast<uint32_t>(
         CallManagerCallAbilityInterfaceCode::RTT_CALL_EVENT_CHANGE), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -510,34 +416,24 @@ int32_t CallAbilityCallbackProxy::OnReportRttCallError(const RttError &info)
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     if (!dataParcel.WriteInt32(info.callId)) {
-        TELEPHONY_LOGE("OnReportRttCallError Write callId fail!");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!dataParcel.WriteInt32(info.causeCode)) {
-        TELEPHONY_LOGE("OnReportRttCallError Write causeCode fail!");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!dataParcel.WriteInt32(info.operationType)) {
-        TELEPHONY_LOGE("OnReportRttCallError Write operationType fail!");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!dataParcel.WriteString(info.reasonText)) {
-        TELEPHONY_LOGE("OnReportRttCallError Write reasonText fail!");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(
+    int32_t error = SendRequest(static_cast<uint32_t>(
         CallManagerCallAbilityInterfaceCode::RTT_CALL_ERROR_REPORT), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -549,21 +445,15 @@ int32_t CallAbilityCallbackProxy::OnReportRttCallMessage(AppExecFwk::PacMap &msg
     MessageParcel replyParcel;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
 
     dataParcel.WriteInt32(msgResult.GetIntValue("callId"));
     dataParcel.WriteString(msgResult.GetStringValue("rttMessage"));
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(
+    int32_t error = SendRequest(static_cast<uint32_t>(
         CallManagerCallAbilityInterfaceCode::RTT_CALL_SEND_MESSAGE), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
