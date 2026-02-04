@@ -41,7 +41,6 @@ namespace OHOS {
 namespace Telephony {
 class SpamCallAdapter;
 const int32_t SLOT_NUM = 2;
-const std::string ANTIFRAUD_FEATURE = "const.telephony.antifraud.supported";
 constexpr int32_t DEVICE_PROVISION_UNDEF = -1;
 constexpr int32_t DEVICE_PROVISION_INVALID = 0;
 constexpr int32_t DEVICE_PROVISION_VALID = 1;

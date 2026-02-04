@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const std::string DCALL_LOADER_GET_DCALL_CLIENT_HANDLER = "GetDCallClientInstance";
+inline const std::string DCALL_LOADER_GET_DCALL_CLIENT_HANDLER = "GetDCallClientInstance";
 
 class IDCallClient {
 public:
