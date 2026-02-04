@@ -66,6 +66,7 @@ constexpr int32_t INIT_INDEX = 0;
 constexpr int32_t PRESENTATION_RESTRICTED = 3;
 constexpr int32_t MAIN_USER_SPACE = 100;
 const std::string ADVSECMODE_STATE = "ohos.boot.advsecmode.state";
+const std::string ANTIFRAUD_FEATURE = "const.telephony.antifraud.supported";
 constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
 int32_t CallStatusManager::deviceProvisioned_ = DEVICE_PROVISION_UNDEF;
 sptr<OOBEStatusObserver> CallStatusManager::oobeStatusObserver_ = nullptr;
