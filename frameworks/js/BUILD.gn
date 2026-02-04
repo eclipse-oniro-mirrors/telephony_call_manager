@@ -51,8 +51,9 @@ gen_js_obj("call_abc") {
 
 ohos_shared_library("call") {
   sanitize = {
-    cfi = false  # napi target, not required to enable cfi
-    cfi_cross_dso = false
+    cfi = true
+    cfi_cross_dso = true
+    cfi_no_nvcall = true
     debug = false
   }
   branch_protector_ret = "pac_ret"
