@@ -29,7 +29,8 @@
             "call_manager_feature_support_dsoftbus",
             "call_manager_feature_support_hearing_aid",
             "call_manager_feature_support_rtt",
-            "call_manager_sos_no_ringback_tone"
+            "call_manager_sos_no_ringback_tone",
+            "call_manager_watch_call_blocking"
         ],
         "adapted_system_type": [
             "standard"
@@ -77,7 +78,8 @@
                 "device_manager",
                 "openssl",
                 "libphonenumber",
-                "screenlock_mgr"
+                "screenlock_mgr",
+                "watch_system_service"
             ],
             "third_party": [
                 "libphonenumber",

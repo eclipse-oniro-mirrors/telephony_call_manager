@@ -355,6 +355,32 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     callStatusManager->RegisterObserver();
     callStatusManager->oobeStatusObserver_ = nullptr;
 }
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+/**
+ * @tc.number   CallStatusManager_HandleWatchCallDispositionTest
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+ HWTEST_F(ZeroBranch5Test, CallStatusManager_HandleWatchCallDispositionTest, TestSize.Level0)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    sptr<CallBase> call = nullptr;
+    std::shared_ptr<SpamCallAdapter> spamCallAdapterPtr = std::make_shared<SpamCallAdapter>();
+    EXPECT_FALSE(callStatusManager->HandleWatchCallDisposition(spamCallAdapterPtr, call));
+
+    DialParaInfo dialParaInfo;
+    call = new IMSCall(dialParaInfo);
+    spamCallAdapterPtr->callDisposition_ = CallDisposition::INTERCEPTED;
+    EXPECT_TRUE(callStatusManager->HandleWatchCallDisposition(spamCallAdapterPtr, call));
+
+    spamCallAdapterPtr->callDisposition_ = CallDisposition::AUTO_ANSWER;
+    EXPECT_FALSE(callStatusManager->HandleWatchCallDisposition(spamCallAdapterPtr, call));
+
+    spamCallAdapterPtr->isRefreshMarkInfo_ = true;
+    spamCallAdapterPtr->callDisposition_ = CallDisposition::NORMAL_PROCESS;
+    EXPECT_FALSE(callStatusManager->HandleWatchCallDisposition(spamCallAdapterPtr, call));
+}
+#endif
 /**
  * @tc.number   Telephony_IncomingCallWakeup_001
  * @tc.name     test error branch

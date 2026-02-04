@@ -705,6 +705,18 @@ enum class MarkType {
      * Indicates the mark is fraud risk.
      */
     MARK_TYPE_FRAUD_RISK,
+    /**
+     * Indicates the mark is education training.
+     */
+    MARK_TYPE_EDUCATION_TRAINING,
+    /**
+     * Indicates the mark is headhunting.
+     */
+    MARK_TYPE_HEADHUNTING,
+    /**
+     * Indicates the mark is loan.
+     */
+    MARK_TYPE_LOAN,
 };
 
 /**

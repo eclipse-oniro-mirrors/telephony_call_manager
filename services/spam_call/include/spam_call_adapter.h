@@ -28,6 +28,30 @@
 
 namespace OHOS {
 namespace Telephony {
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+enum class CallDisposition {
+    AUTO_ANSWER,
+    NORMAL_PROCESS,
+    INTERCEPTED,
+    INVALID_STATE
+};
+
+enum class CallMarkType {
+    UNKNOWN = 100,
+    EXPRESS_DELIVERY,
+    TAXI,
+    EDUCATION_TRAINING,
+    HEADHUNTING,
+    INSURANCE,
+    LOAN,
+    REAL_ESTATE,
+    ADVERTISEMENT,
+    HARASSMENT,
+    SCAM,
+    INVALID
+};
+#endif
+
 class SpamCallAdapter : public std::enable_shared_from_this<SpamCallAdapter> {
 public:
     SpamCallAdapter();
@@ -43,6 +67,11 @@ public:
     void ParseDetectResult(const std::string &jsonData, bool &isBlock, NumberMarkInfo &info,
         int32_t &blockReason, std::string &detectDetails);
     void ParseNeedNotifyResult(const std::string &jsonData);
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    bool IsRefreshMarkInfo();
+    NumberMarkInfo GetNumberMarkInfo();
+    CallDisposition GetCallDisposition();
+#endif
 
 private:
     bool ConnectSpamCallAbility(const AAFwk::Want &want, const std::string &phoneNumber, const int32_t &slotId);
@@ -51,8 +80,16 @@ private:
     bool JsonGetStringValue(cJSON *json, const std::string key, std::string &out);
     bool JsonGetBoolValue(cJSON *json, const std::string key);
     void ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::string &detectDetails, bool isBlock);
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    uint64_t GetCurrentTimeMs();
+    bool ParseNumberMarkInfo(cJSON *root, NumberMarkInfo &numberMarkInfo);
+    bool ParseCallerResult(const std::string &dispositionJson, CallDisposition &callDisposition,
+        NumberMarkInfo &numberMarkInfo);
+    void SubmitCallerStatusQuery(const std::string &phoneNumber);
+#endif
+
     int32_t errCode_ = -1;
-    std::string result_ = "";
+    std::string result_ = ""; // detect json
     std::string phoneNumber_ = "";
     NumberMarkInfo info_;
     bool isBlock_ = false;
@@ -60,6 +97,13 @@ private:
     std::string detectDetails_ = "";
     std::unique_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
     ffrt::mutex mutex_;
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    bool isQueryComplete_{false};
+    bool isRefreshMarkInfo_{false};
+    ffrt::mutex spamMutex_{};
+    ffrt::condition_variable spamCv_{};
+    CallDisposition callDisposition_{CallDisposition::NORMAL_PROCESS};
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

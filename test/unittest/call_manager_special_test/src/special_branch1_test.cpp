@@ -293,6 +293,44 @@ HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_011, TestSize.Level0)
 }
 
 /**
+ * @tc.number   CallManagerService_NormalFuncTest
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch1Test, CallManagerService_NormalFuncTest, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->OnStop();
+    callManagerService->state_ = CallManagerService::ServiceRunningState::STATE_STOPPED;
+    EXPECT_EQ(callManagerService->GetServiceRunningState(), 0);
+    AppExecFwk::PacMap dialInfo;
+    std::u16string number = u"333";
+    int32_t state = 1;
+    callManagerService->BtCallWaitSlotId(dialInfo, number);
+    callManagerService->RegisterVoipCallManagerCallback();
+    callManagerService->UnRegisterVoipCallManagerCallback();
+    callManagerService->GetVoIPCallState(state);
+    callManagerService->SetVoIPCallInfo(1, 1, "1234567890");
+    callManagerService->WriteVoipCallFaultEvent("1", 1);
+    callManagerService->AnswerCall();
+    callManagerService->RejectCall();
+    callManagerService->HangUpCall();
+    callManagerService->EndCall();
+    callManagerService->NotifyVoIPAudioStreamStart(222);
+    std::int32_t fd = 0;
+    std::vector<std::u16string> args;
+    args.push_back(u"123");
+    args.push_back(u"456");
+    callManagerService->Dump(fd, args);
+    fd = -1;
+    EXPECT_EQ(callManagerService->Dump(fd, args), TELEPHONY_ERR_ARGUMENT_INVALID);
+    EXPECT_NE(callManagerService->GetBindTime(), "");
+    callManagerService->spendTime_ = 123;
+    EXPECT_EQ(callManagerService->GetStartServiceSpent(), "123");
+}
+
+/**
  * @tc.number   Telephony_SatelliteCall_001
  * @tc.name     test branch
  * @tc.desc     Function test

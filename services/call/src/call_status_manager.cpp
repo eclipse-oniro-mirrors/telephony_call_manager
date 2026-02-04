@@ -1934,24 +1934,24 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
         TELEPHONY_LOGW("incoming phoneNumber is ecc.");
         return false;
     }
-    std::shared_ptr<SpamCallAdapter> spamCallAdapterPtr_ = std::make_shared<SpamCallAdapter>();
-    if (spamCallAdapterPtr_ == nullptr) {
-        TELEPHONY_LOGE("create SpamCallAdapter object failed!");
-        return false;
-    }
-    bool isDetectedSpamCall = spamCallAdapterPtr_->DetectSpamCall(std::string(info.phoneNum), info.accountId);
+    // make_shared no need to check nullptr.
+    std::shared_ptr<SpamCallAdapter> spamCallAdapterPtr = std::make_shared<SpamCallAdapter>();
+    bool isDetectedSpamCall = spamCallAdapterPtr->DetectSpamCall(std::string(info.phoneNum), info.accountId);
     if (!isDetectedSpamCall) {
         TELEPHONY_LOGE("DetectSpamCall failed!");
         return false;
     }
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    return HandleWatchCallDisposition(spamCallAdapterPtr, call);
+#else
     detectStartTime = std::chrono::system_clock::now();
-    if (spamCallAdapterPtr_->WaitForDetectResult()) {
+    if (spamCallAdapterPtr->WaitForDetectResult()) {
         TELEPHONY_LOGW("DetectSpamCall no time out");
         NumberMarkInfo numberMarkInfo;
         bool isBlock = false;
         int32_t blockReason;
         std::string detectDetails = "";
-        spamCallAdapterPtr_->GetParseResult(isBlock, numberMarkInfo, blockReason, detectDetails);
+        spamCallAdapterPtr->GetParseResult(isBlock, numberMarkInfo, blockReason, detectDetails);
         call->SetNumberMarkInfo(numberMarkInfo);
         call->SetBlockReason(blockReason);
         call->SetDetectDetails(detectDetails);
@@ -1963,7 +1963,40 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
         }
     }
     return false;
+#endif
 }
+
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+bool CallStatusManager::HandleWatchCallDisposition(std::shared_ptr<SpamCallAdapter> &spamCallAdapterPtr,
+    const sptr<CallBase> &call)
+{
+    if (spamCallAdapterPtr == nullptr || call == nullptr) {
+        TELEPHONY_LOGE("invalid param");
+        return false;
+    }
+
+    CallDisposition disposition = spamCallAdapterPtr->GetCallDisposition();
+    if (disposition == CallDisposition::INTERCEPTED) {
+        TELEPHONY_LOGI("reject call");
+        return true;
+    }
+
+    if (disposition == CallDisposition::AUTO_ANSWER) {
+        TELEPHONY_LOGI("antoAnswer call");
+        AAFwk::WantParams params = call->GetExtraParams();
+        params.SetParam("isAutoAnswerCall", AAFwk::Boolean::Box(true));
+        call->SetExtraParams(params);
+        return false;
+    }
+
+    if (spamCallAdapterPtr->IsRefreshMarkInfo()) {
+        NumberMarkInfo numberMarkInfo = spamCallAdapterPtr->GetNumberMarkInfo();
+        call->SetNumberMarkInfo(numberMarkInfo);
+        TELEPHONY_LOGI("refresh call mark info");
+    }
+    return false;
+}
+#endif
 
 bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDetailInfo &info)
 {
