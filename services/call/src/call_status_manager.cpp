@@ -408,7 +408,7 @@ int32_t CallStatusManager::HandleOttEventReportInfo(const OttCallEventInfo &info
     (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
     if (mOttEventIdTransferMap_.find(info.ottCallEventId) != mOttEventIdTransferMap_.end()) {
         eventInfo.eventId = mOttEventIdTransferMap_[info.ottCallEventId];
-        if (strlen(info.bundleName) > static_cast<size_t>(kMaxNumberLen)) {
+        if (strnlen(info.bundleName, kMaxNumberLen + 1) > static_cast<size_t>(kMaxNumberLen)) {
             TELEPHONY_LOGE("Number out of limit!");
             return CALL_ERR_NUMBER_OUT_OF_RANGE;
         }
