@@ -19,6 +19,9 @@
 
 #include "call_control_manager.h"
 #include "telephony_log_wrapper.h"
+#ifdef SUPPORT_DSOFTBUS
+#include "distributed_communication_manager.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -273,6 +276,17 @@ AudioStandard::StreamUsage Tone::GetStreamUsageByToneType(ToneDescriptor descrip
         default:
             break;
     }
+#ifdef SUPPORT_DSOFTBUS
+    bool isVoipCall = false;
+    auto dcMgrInstance = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    if (dcMgrInstance != nullptr) {
+        isVoipCall = dcMgrInstance->IsSinkRole() && dcMgrInstance->IsConnected();
+    }
+    if (isVoipCall && streamUsage == AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION) {
+        streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION;
+        TELEPHONY_LOGI("dc use voip");
+    }
+#endif
     return streamUsage;
 }
 
