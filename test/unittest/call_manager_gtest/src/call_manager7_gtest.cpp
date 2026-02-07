@@ -892,6 +892,29 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_011, TestSize.Level0
 #endif
 
 /**
+ * @tc.number   Telephony_CallManagerServiceStub_OnSetAudioDevice
+ * @tc.name     test invalid AudioDevice branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_OnSetAudioDevice, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel data;
+    MessageParcel reply;
+    AudioDevice audioDevice;
+    std::fill(std::begin(audioDevice.address), std::end(audioDevice.address), 'a');
+    data.WriteRawData(&audioDevice, sizeof(AudioDevice));
+    EXPECT_EQ(callManagerService->OnSetAudioDevice(data, reply), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    audioDevice.address[kMaxAddressLen] = '\0';
+    std::fill(std::begin(audioDevice.deviceName), std::end(audioDevice.deviceName), 'a');
+    data.WriteRawData(&audioDevice, sizeof(AudioDevice));
+    EXPECT_EQ(callManagerService->OnSetAudioDevice(data, reply), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    audioDevice.deviceName[kMaxDeviceNameLen] = '\0';
+    data.WriteRawData(&audioDevice, sizeof(AudioDevice));
+    EXPECT_NE(callManagerService->OnSetAudioDevice(data, reply), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
  * @tc.number   Telephony_VoipCall_001
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test

@@ -554,6 +554,11 @@ int32_t CallManagerServiceStub::OnSetAudioDevice(MessageParcel &data, MessagePar
         TELEPHONY_LOGE("audioDevice is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (strnlen(audioDevice->address, kMaxAddressLen + 1) == static_cast<size_t>(kMaxAddressLen + 1) ||
+        strnlen(audioDevice->deviceName, kMaxDeviceNameLen + 1) == static_cast<size_t>(kMaxDeviceNameLen + 1)) {
+        TELEPHONY_LOGE("audioDevice address or deviceName is invalid");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     int32_t result = SetAudioDevice(*audioDevice);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
