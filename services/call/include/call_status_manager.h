@@ -140,6 +140,7 @@ private:
     void SetVideoCallState(sptr<CallBase> &call, TelCallState nextState);
     bool IsFocusModeOpen();
     bool IsRejectCall(sptr<CallBase> &call, const CallDetailInfo &info, bool &block);
+    bool PublishIncomingCallBlockInfo(const sptr<CallBase> &callObjectPtr, bool block);
     void CreateAndSaveNewCall(const CallDetailInfo &info, CallDirection direction);
     int32_t UpdateCallStateAndHandleDsdsMode(const CallDetailInfo &info, sptr<CallBase> &call);
     bool IsDcCallConneceted();

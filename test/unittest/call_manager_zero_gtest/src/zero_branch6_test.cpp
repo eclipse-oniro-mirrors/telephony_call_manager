@@ -355,6 +355,27 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     callStatusManager->RegisterObserver();
     callStatusManager->oobeStatusObserver_ = nullptr;
 }
+
+/**
+ * @tc.number   Telephony_CallStatusManager_009
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_009, TestSize.Level0)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    ASSERT_TRUE(callStatusManager != nullptr);
+    callStatusManager->Init();
+    sptr<CallBase> callObjectPtr = nullptr;
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_CS;
+    dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
+    callObjectPtr = new CSCall(dialParaInfo);
+    callObjectPtr->SetCallId(1);
+    bool publishResult = callStatusManager->PublishIncomingCallBlockInfo(callObjectPtr, false);
+    EXPECT_TRUE(publishResult);
+}
+
 #ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
 /**
  * @tc.number   CallStatusManager_HandleWatchCallDispositionTest
