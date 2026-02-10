@@ -394,9 +394,9 @@ void AudioControlManager::HandleCallStateUpdated(
         return;
     }
     if (callObjectPtr->GetCallType() == CallType::TYPE_BLUETOOTH) {
-        if (!IsScoTemporarilyDisabled() && (priorState == TelCallState::CALL_STATUS_DIALING || priorState == 
+        if (!IsScoTemporarilyDisabled() && (priorState == TelCallState::CALL_STATUS_DIALING || priorState ==
             TelCallState::CALL_STATUS_INCOMING)) {
-                ExcludeBluetoothSco(); 
+                ExcludeBluetoothSco();
         }
         if (nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
             int32_t callId = callObjectPtr->GetCallID();
