@@ -537,6 +537,21 @@ bool CallObjectManager::HasVoipCallExist()
     return false;
 }
 
+bool CallObjectManager::HasOtherBtCallExist(int32_t callId)
+{
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallID() == callId) {
+            continue;
+        }
+        if ((*it)->GetCallType() == CallType::TYPE_BLUETOOTH) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CallObjectManager::HasIncomingCallCrsType()
 {
     std::lock_guard<ffrt::mutex> lock(listMutex_);

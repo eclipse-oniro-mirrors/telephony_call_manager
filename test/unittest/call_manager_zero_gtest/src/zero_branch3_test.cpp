@@ -15,6 +15,7 @@
 #define private public
 #define protected public
 #include "antifraud_service.h"
+#include "audio_control_manager.h"
 #include "bluetooth_call_client.h"
 #include "bluetooth_call_manager.h"
 #include "bluetooth_call_service.h"
@@ -1979,6 +1980,23 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_018, TestSize.Level0)
 }
 #endif
 #endif
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_019, TestSize.Level0)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo info1;
+    sptr<CallBase> call = new BluetoothCall(info1, "");
+    CallObjectManager::AddOneCallObject(call);
+    call->SetCallType(CallType::TYPE_BLUETOOTH);
+    audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_DIALING);
+    ASSERT_TRUE(audioControl->IsScoTemporarilyDisabled());
+    audioControl->HandleCallStateUpdated(
+        call, TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_DISCONNECTED);
+    ASSERT_FALSE(audioControl->IsScoTemporarilyDisabled());
+    CallObjectManager::callObjectPtrList_.clear();
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
+}
 
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_ActiveHandle_StopTorch, TestSize.Level0)
 {

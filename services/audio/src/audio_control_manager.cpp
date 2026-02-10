@@ -393,7 +393,18 @@ void AudioControlManager::HandleCallStateUpdated(
     if (!PreHandleAnswerdState(callObjectPtr, priorState, nextState)) {
         return;
     }
-
+    if (callObjectPtr->GetCallType() == CallType::TYPE_BLUETOOTH) {
+        if (!IsScoTemporarilyDisabled() && (priorState == TelCallState::CALL_STATUS_DIALING || priorState ==
+            TelCallState::CALL_STATUS_INCOMING)) {
+            ExcludeBluetoothSco();
+        }
+        if (nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
+            int32_t callId = callObjectPtr->GetCallID();
+            if (!CallObjectManager::HasOtherBtCallExist(callId) && IsScoTemporarilyDisabled()) {
+                UnexcludeBluetoothSco();
+            }
+        }
+    }
     HandleNextState(callObjectPtr, nextState);
     if (priorState == nextState) {
         TELEPHONY_LOGI("prior state equals next state");
