@@ -41,6 +41,9 @@
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
 #include "tone.h"
+#ifdef SUPPORT_DSOFTBUS
+#include "distributed_communication_manager.h"
+#endif
 #include "voip_call_connection.h"
 #include "voip_call.h"
 #include "wired_headset_device_state.h"
@@ -658,6 +661,35 @@ HWTEST_F(CallStateTest, Telephony_Tone_004, TestSize.Level0)
         AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION);
     tone->GetStreamUsageByToneType(ToneDescriptor::TONE_WAITING);
 }
+
+#ifdef SUPPORT_DSOFTBUS
+/**
+ * @tc.number   Telephony_Tone_GetStreamUsageByToneType_DC
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_Tone_GetStreamUsageByToneType_DC, TestSize.Level0)
+{
+    int32_t devRole = 0; // sink
+    std::string devId = "UnitTestDeviceId";
+    std::string devName = "UnitTestDeviceName";
+    AudioDeviceType deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    dcManager->devObserver_ = nullptr;
+    dcManager->Init();
+    dcManager->OnDeviceOnline(devId, devName, deviceType, devRole);
+    ASSERT_TRUE(dcManager->IsConnected());
+    ASSERT_TRUE(dcManager->IsSinkRole());
+    auto tone = std::make_shared<Tone>();
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_0),
+        AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_RINGBACK),
+        AudioStandard::StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_FINISHED),
+        AudioStandard::StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION);
+}
+#endif
 
 /**
  * @tc.number   Telephony_CallStatusCallbackProxy_001
