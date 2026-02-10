@@ -106,6 +106,7 @@ public:
     static bool IsTwoCallBtCall();
     static bool IsTwoCallESIMCall();
     static bool IsOneNumberDualTerminal();
+    static bool HasOtherBtCallExist(int32_t callId);
 #endif
 protected:
     static ffrt::condition_variable cv_;
