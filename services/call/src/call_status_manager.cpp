@@ -482,6 +482,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     if (IsRejectCall(call, info, block)) {
         return HandleRejectCall(call, block);
     }
+    PublishIncomingCallBlockInfo(call, block);
     if (info.callType != CallType::TYPE_VOIP && info.callType != CallType::TYPE_BLUETOOTH &&
         IsRingOnceCall(call, info)) {
         return HandleRingOnceCall(call);
@@ -620,6 +621,7 @@ int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call, bool isBlock)
         return ret;
     }
     if (isBlock) {
+        PublishIncomingCallBlockInfo(call, isBlock);
         return DelayedSingleton<CallControlManager>::GetInstance()->AddBlockLogAndNotification(call);
     }
     return DelayedSingleton<CallControlManager>::GetInstance()->AddCallLogAndNotification(call);
@@ -2152,6 +2154,24 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
         }
     }
     return false;
+}
+
+bool CallStatusManager::PublishIncomingCallBlockInfo(const sptr<CallBase> &callObjectPtr, bool block)
+{
+    AAFwk::Want want;
+    want.SetParam("callId", callObjectPtr->GetCallID());
+    want.SetParam("isBlocked", block);
+    want.SetAction("event.custom.callStatus.INCOMINGCALL_BLOCK_INFO");
+    EventFwk::CommonEventData data;
+    data.SetWant(want);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    publishInfo.SetOrdered(false);
+    std::vector<std::string> callPermissions;
+    callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
+    publishInfo.SetSubscriberPermissions(callPermissions);
+    bool result = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+    TELEPHONY_LOGI("publish incoming call block info result : %{public}d", result);
+    return result;
 }
 
 void CallStatusManager::CreateAndSaveNewCall(const CallDetailInfo &info, CallDirection direction)
