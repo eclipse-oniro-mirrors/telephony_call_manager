@@ -912,6 +912,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_004, TestSize.Level0)
     callControlManager->NumberLegalityCheck(number);
     number = "1234567";
     callControlManager->NumberLegalityCheck(number);
+    number = "1234567,,0556#";
+    callControlManager->NumberLegalityCheck(number);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = nullptr;
     CallControlManager::SystemAbilityListener listen;
     int32_t systemAbilityId = 1;
