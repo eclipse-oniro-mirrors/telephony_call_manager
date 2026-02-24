@@ -105,7 +105,7 @@ int32_t CallWiredHeadSet::RegistKeyEvent(int32_t keyCode, bool isFinalKeyDown, c
 
 void CallWiredHeadSet::UnRegistKeyEvent(int32_t &subscribeId)
 {
-    if (subscribeId > 0) {
+    if (subscribeId >= 0) {
         MMI::InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
         subscribeId = INVALID_VALUE;
     }
