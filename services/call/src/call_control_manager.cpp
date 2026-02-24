@@ -1656,6 +1656,10 @@ int32_t CallControlManager::NumberLegalityCheck(std::string &number)
             "the number length exceeds limit,len:%{public}zu,maxLen:%{public}d", number.length(), kMaxNumberLen);
         return CALL_ERR_NUMBER_OUT_OF_RANGE;
     }
+    size_t commaPos = number.find(',');
+    if (commaPos != std::string::npos) {
+        number = number.substr(0, commaPos);
+    }
     return TELEPHONY_SUCCESS;
 }
 
