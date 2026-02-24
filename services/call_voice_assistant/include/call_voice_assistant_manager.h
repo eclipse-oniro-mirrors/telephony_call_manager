@@ -100,7 +100,7 @@ private:
     static std::shared_ptr<CallVoiceAssistantManager> mInstance_;
 };
 
-class VoiceAssistantConnectCallback : public AbilityConnectionStub {
+class VoiceAssistantConnectCallback : public AAFwk::AbilityConnectionStub {
 public:
     VoiceAssistantConnectCallback(int32_t id) : startId(id) {};
     virtual ~VoiceAssistantConnectCallback() = default;
