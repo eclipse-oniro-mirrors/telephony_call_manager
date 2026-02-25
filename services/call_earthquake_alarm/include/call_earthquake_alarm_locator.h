@@ -127,7 +127,7 @@ public:
 };
 //class MyLocationCallBack
 
-class EmergencyCallConnectCallback : public IRemoteStub<AAFwk::IAbilityConnection> {
+class EmergencyCallConnectCallback : public AAFwk::AbilityConnectionStub {
 public:
     EmergencyCallConnectCallback() = default;
     ~EmergencyCallConnectCallback() = default;
