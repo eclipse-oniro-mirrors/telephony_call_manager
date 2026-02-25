@@ -369,7 +369,6 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_008, TestSize.Level0)
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     MessageParcel dataParcel;
     MessageParcel reply;
-    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
     dataParcel.WriteInt32(0);
     dataParcel.WriteInt32(2);
     dataParcel.WriteInt32(1);
@@ -385,12 +384,11 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_009, TestSize.Level0)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     MessageParcel dataParcel;
-    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    MessageParcel reply;
     dataParcel.WriteInt32(1);
     dataParcel.WriteInt32(12);
     dataParcel.WriteInt32(1);
-    MessageParcel reply;
-    ASSERT_EQ(callStatusCallback->OnImsSuppExtChange(dataParcel, reply), TELEPHONY_SUCCESS);
+    ASSERT_NE(callStatusCallback->OnImsSuppExtChange(dataParcel, reply), TELEPHONY_SUCCESS);
 }
 
 /**
