@@ -184,7 +184,7 @@ std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogR
     root["isFold"] = FoldStatusManager::IsSmallFoldDevice()
         && Rosen::DisplayManager::GetInstance().GetFoldStatus() == Rosen::FoldStatus::FOLDED;
     std::string startCommand = root.dump();
-    TELEPHONY_LOGI("startCommand is: %{public}s", startCommand.c_str());
+    TELEPHONY_LOGI("BuildStartPrivpacyModeCommand success startCommand is: xxx");
     return startCommand;
 }
 

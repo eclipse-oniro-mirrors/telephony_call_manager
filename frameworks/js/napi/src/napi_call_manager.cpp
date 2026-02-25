@@ -3008,7 +3008,7 @@ napi_value NapiCallManager::JoinConference(napi_env env, napi_callback_info info
         if (getStringStatus == napi_ok && len > 0) {
             str = std::string(chars, len);
             (asyncContext->listResult).push_back(Str8ToStr16(str));
-            TELEPHONY_LOGI("napi_string  %{public}s", str.c_str());
+            TELEPHONY_LOGI("JoinConference napi_string  xxx");
         }
     }
 
