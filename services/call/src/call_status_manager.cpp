@@ -67,6 +67,7 @@ constexpr int32_t PRESENTATION_RESTRICTED = 3;
 constexpr int32_t MAIN_USER_SPACE = 100;
 const std::string ADVSECMODE_STATE = "ohos.boot.advsecmode.state";
 const std::string ANTIFRAUD_FEATURE = "const.telephony.antifraud.supported";
+const std::string PRIMARY_CONTACT = "primary_contact";
 constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
 int32_t CallStatusManager::deviceProvisioned_ = DEVICE_PROVISION_UNDEF;
 sptr<OOBEStatusObserver> CallStatusManager::oobeStatusObserver_ = nullptr;
@@ -737,6 +738,8 @@ void CallStatusManager::QueryCallerInfo(ContactInfo &contactInfo, std::string ph
     predicates.EqualTo(TYPE_ID, 5); // type 5 means query number
     predicates.And();
     predicates.EqualTo(IS_DELETED, 0);
+    predicates.And();
+    predicates.NotEqualTo(PRIMARY_CONTACT, 1);
     predicates.And();
 #ifdef TELEPHONY_CUST_SUPPORT
     TELEPHONY_LOGI("telephony cust support.");
