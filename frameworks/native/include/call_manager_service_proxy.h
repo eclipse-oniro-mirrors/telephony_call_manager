@@ -817,6 +817,14 @@ public:
 #endif
 
     /**
+     * SetCallAudioMode
+     *
+     * @brief SetCallAudioMode for callManager
+     * @return Returns true on success, others on failure.
+     */
+    int32_t SetCallAudioMode(int32_t mode, int32_t scenarios) override;
+
+    /**
      * AnswerCall
      *
      * @brief Answer a phone call by call manager

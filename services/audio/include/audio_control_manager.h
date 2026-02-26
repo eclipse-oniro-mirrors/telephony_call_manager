@@ -104,6 +104,7 @@ public:
 #endif
     bool ShouldPlaySoundTone();
     bool ShouldPlayRingback();
+    void SetCallAudioMode(int32_t mode, int32_t scenarios);
 private:
     RingState ringState_ = RingState::STOPPED;
     void HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState);

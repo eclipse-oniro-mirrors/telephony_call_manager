@@ -1843,6 +1843,24 @@ int32_t CallManagerProxy::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mo
 }
 #endif
 
+int32_t CallManagerProxy::SetCallAudioMode(int32_t mode, int32_t scenarios)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::shared_lock<ffrt::shared_mutex> lock(clientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t errCode = callManagerServicePtr_->SetCallAudioMode(mode, scenarios);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SetCallAudioMode failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerProxy::AnswerCall()
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {

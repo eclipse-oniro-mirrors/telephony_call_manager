@@ -137,6 +137,7 @@ private:
     int32_t OnSendRttMessage(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetRttCapability(MessageParcel &data, MessageParcel &reply);
 #endif
+    int32_t OnSetCallAudioMode(MessageParcel &data, MessageParcel &reply);
     int32_t OnAcceptCallNoParam(MessageParcel &data, MessageParcel &reply);
     int32_t OnRejectCallNoParam(MessageParcel &data, MessageParcel &reply);
     int32_t OnHangUpCallNoParam(MessageParcel &data, MessageParcel &reply);

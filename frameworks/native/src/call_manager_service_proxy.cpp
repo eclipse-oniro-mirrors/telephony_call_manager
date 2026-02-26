@@ -1549,6 +1549,24 @@ int32_t CallManagerServiceProxy::SetRttCapability(int32_t slotId, bool enabled)
 }
 #endif
 
+int32_t CallManagerServiceProxy::SetCallAudioMode(int32_t mode, int32_t scenarios)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(mode);
+    dataParcel.WriteInt32(scenarios);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_SET_CALL_AUDIO_MODE, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function SetCallAudioMode failed! errCode:%{public}d", error);
+        return error;
+    }
+    return replyParcel.ReadInt32();
+}
+
 int32_t CallManagerServiceProxy::AnswerCall()
 {
     MessageParcel dataParcel;

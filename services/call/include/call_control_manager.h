@@ -179,6 +179,7 @@ public:
     void UnRegisterObserver();
     void HandleVideoRingPlayFail();
     bool EndCall();
+    int32_t SetCallAudioMode(int32_t mode, int32_t scenarios);
 
 private:
     void CallStateObserve();
@@ -205,6 +206,7 @@ private:
     void sendEventToVoip(CallAbilityEventId eventId);
     bool IsCallActivated(const TelCallState& priorState, const TelCallState& nextState);
     void EnqueueAnsweredCall(int32_t callId, int32_t videoState);
+    sptr<CallBase> GetRingCall(int32_t callId, int32_t videoState);
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
     public:
