@@ -89,6 +89,8 @@ void CallManagerServiceStub::InitCallBasicRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnEndCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_NOTIFY_VOIP_AUDIO_STREAM_START)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnNotifyVoIPAudioStreamStart(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_AUDIO_MODE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetCallAudioMode(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_ANSWER_CALL_NO_PARAM)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnAcceptCallNoParam(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REJECT_CALL_NO_PARAM)] =
@@ -1593,6 +1595,18 @@ int32_t CallManagerServiceStub::OnUpdateImsRttCallMode(MessageParcel &data, Mess
     return result;
 }
 #endif
+
+int32_t CallManagerServiceStub::OnSetCallAudioMode(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t mode = data.ReadInt32();
+    int32_t scenarios = data.ReadInt32();
+    int32_t result = SetCallAudioMode(mode, scenarios);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
 
 int32_t CallManagerServiceStub::OnAcceptCallNoParam(MessageParcel &data, MessageParcel &reply)
 {

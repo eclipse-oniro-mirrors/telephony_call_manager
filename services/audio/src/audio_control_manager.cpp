@@ -592,11 +592,19 @@ void AudioControlManager::ResumeCrsSoundTone()
         .deviceType = AudioDeviceType::DEVICE_EARPIECE,
         .address = { 0 },
     };
-    DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device);
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
+    if (audioDeviceManager == nullptr || audioProxy == nullptr) {
+        return;
+    }
+    audioProxy->GetPreferredOutputAudioDevice(device);
     TELEPHONY_LOGI("crs soundtone preferred deivce = %{public}d", device.deviceType);
-    if (device.deviceType == AudioDeviceType::DEVICE_SPEAKER) {
-        device.deviceType = initCrsDeviceType_;
-        SetAudioDevice(device);
+    if (!audioDeviceManager->IsSpeakerMode() || AudioDeviceManager::IsRemoteDevicesConnected()) {
+        if ((device.deviceType == AudioDeviceType::DEVICE_SPEAKER) &&
+            (initCrsDeviceType_ != AudioDeviceType::DEVICE_SPEAKER)) {
+            device.deviceType = initCrsDeviceType_;
+            SetAudioDevice(device);
+        }
     }
     isCrsStartSoundTone_ = false;
 }
@@ -1739,6 +1747,19 @@ void AudioControlManager::RestoreVoiceValumeIfNecessary()
             AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER);
         SaveVoiceVolume(-1);
     }
+}
+
+void AudioControlManager::SetCallAudioMode(int32_t mode, int32_t scenarios)
+{
+    CallAudioMode callAudioMode;
+    callAudioMode.audioMode = mode;
+    callAudioMode.audioScene = scenarios;
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    if (audioDeviceManager == nullptr) {
+        TELEPHONY_LOGE("audioDeviceManager is nullptr!");
+        return;
+    }
+    audioDeviceManager->SetCallAudioMode(callAudioMode);
 }
 } // namespace Telephony
 } // namespace OHOS

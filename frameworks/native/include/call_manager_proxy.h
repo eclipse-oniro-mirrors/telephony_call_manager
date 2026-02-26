@@ -134,6 +134,7 @@ public:
     int32_t SetRttCapability(int32_t slotId, bool isEnable);
     int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode);
 #endif
+    int32_t SetCallAudioMode(int32_t mode, int32_t scenarios);
     int32_t AnswerCall();
     int32_t RejectCall();
     int32_t HangUpCall();

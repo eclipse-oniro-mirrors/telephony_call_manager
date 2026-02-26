@@ -226,6 +226,22 @@ void CallControlManager::PackageDialInformation(AppExecFwk::PacMap &extras, std:
     extras_ = extras;
 }
 
+sptr<CallBase> CallControlManager::GetRingCall(int32_t callId, int32_t videoState)
+{
+    sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("call is nullptr");
+        CallManagerHisysevent::WriteAnswerCallFaultEvent(
+            INVALID_PARAMETER, callId, videoState, TELEPHONY_ERR_LOCAL_PTR_NULL, "call is nullptr");
+        return nullptr;
+    }
+    int32_t ringCallId = callId;
+    if (ringCallId == INVALID_CALLID) {
+        ringCallId = call->GetCallID();
+    }
+    return GetOneCallObject(ringCallId);
+}
+
 int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState, bool isRTT)
 {
     StopFlashRemind();
@@ -234,49 +250,43 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState, bool 
         return TELEPHONY_SUCCESS;
     }
 #endif
-    sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-    if (call == nullptr) {
-        TELEPHONY_LOGE("call is nullptr");
-        CallManagerHisysevent::WriteAnswerCallFaultEvent(
-            INVALID_PARAMETER, callId, videoState, TELEPHONY_ERR_LOCAL_PTR_NULL, "call is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (callId == INVALID_CALLID) {
-        callId = call->GetCallID();
-    }
-    call = GetOneCallObject(callId);
+    sptr<CallBase> call = GetRingCall(callId, videoState);
     if (call == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    auto ringCallId = call->GetCallID();
     call->SetAnsweredCall(true);
     if (call->GetCrsType() == CRS_TYPE && static_cast<VideoStateType>(videoState) != VideoStateType::TYPE_VIDEO) {
-        TELEPHONY_LOGI("answer call set speaker deactive");
-        DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(false);
+        auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+        if (audioDeviceManager == nullptr) {
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        audioDeviceManager->SetSpeakerDeactive();
     }
     ReportPhoneUEInSuperPrivacy(CALL_ANSWER_IN_SUPER_PRIVACY);
-    if (CurrentIsSuperPrivacyMode(callId, videoState)) {
+    if (CurrentIsSuperPrivacyMode(ringCallId, videoState)) {
         return TELEPHONY_SUCCESS;
     }
     AnswerHandlerForSatelliteOrVideoCall(call, videoState);
     TELEPHONY_LOGI("report answered state");
     NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
-    CarrierAndVoipConflictProcess(callId, TelCallState::CALL_STATUS_ANSWERED);
+    CarrierAndVoipConflictProcess(ringCallId, TelCallState::CALL_STATUS_ANSWERED);
     if (VoIPCallState_ != CallStateToApp::CALL_STATE_IDLE && call->GetCallType() != CallType::TYPE_VOIP) {
-        EnqueueAnsweredCall(callId, videoState);
+        EnqueueAnsweredCall(ringCallId, videoState);
         return TELEPHONY_SUCCESS;
     }
-    int32_t ret = AnswerCallPolicy(callId, videoState);
+    int32_t ret = AnswerCallPolicy(ringCallId, videoState);
     if (ret != TELEPHONY_SUCCESS) {
         if (IsVoipCallExist()) {
             sendEventToVoip(CallAbilityEventId::EVENT_ANSWER_VOIP_CALL);
             return TELEPHONY_SUCCESS;
         }
         CallManagerHisysevent::WriteAnswerCallFaultEvent(
-            INVALID_PARAMETER, callId, videoState, ret, "AnswerCallPolicy failed");
+            INVALID_PARAMETER, ringCallId, videoState, ret, "AnswerCallPolicy failed");
         return ret;
     }
-    CallManagerHisysevent::WriteVoipCallStatisticalEvent(callId, "MtBannerAnswer");
-    return HandlerAnswerCall(callId, videoState, isRTT);
+    CallManagerHisysevent::WriteVoipCallStatisticalEvent(ringCallId, "MtBannerAnswer");
+    return HandlerAnswerCall(ringCallId, videoState, isRTT);
 }
 
 int32_t CallControlManager::HandlerAnswerCall(int32_t callId, int32_t videoState, bool isRTT)
@@ -2255,5 +2265,16 @@ int32_t CallControlManager::SendRttMessage(const std::string &rttMessage)
     return TELEPHONY_SUCCESS;
 }
 #endif
+
+int32_t CallControlManager::SetCallAudioMode(int32_t mode, int32_t scenarios)
+{
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    if (audioControlManager == nullptr) {
+        TELEPHONY_LOGE("audioControlManager is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    audioControlManager->SetCallAudioMode(mode, scenarios);
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

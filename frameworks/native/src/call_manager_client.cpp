@@ -875,6 +875,16 @@ int32_t CallManagerClient::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode m
 }
 #endif
 
+int32_t CallManagerClient::SetCallAudioMode(int32_t mode, int32_t scenarios)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->SetCallAudioMode(mode, scenarios);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t CallManagerClient::AnswerCall()
 {
     if (g_callManagerProxy != nullptr) {

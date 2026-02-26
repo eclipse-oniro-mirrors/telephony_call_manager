@@ -41,6 +41,10 @@
 #endif
 #include "call_state_report_proxy.h"
 #include "distributed_call_manager.h"
+#include "call_manager_client.h"
+#include "call_manager_service_proxy.h"
+#include "call_manager_proxy.h"
+#include "call_manager_service.h"
 
 namespace OHOS::Telephony {
 using namespace testing::ext;
@@ -812,5 +816,141 @@ HWTEST_F(ZeroBranch10Test, CallStateReportProxy_CallStateUpdated_001, TestSize.L
     callStateProxy->CallStateUpdated(call1, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
     call1->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING);
     callStateProxy->CallStateUpdated(call1, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_DISCONNECTED);
+}
+
+/**
+ * @tc.number   CallManagerClient_SetCallAudioMode_ValidTest
+ * @tc.name     test CallManagerClient
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch10Test, CallManagerClient_SetCallAudioMode_ValidTest, TestSize.Level1)
+{
+    std::shared_ptr<CallManagerClient> callManagerClient = std::make_shared<CallManagerClient>();
+    int32_t mode = 1;
+    int32_t scenarios = 1;
+    EXPECT_EQ(callManagerClient->SetCallAudioMode(mode, scenarios), TELEPHONY_ERR_UNINIT);
+    callManagerClient->Init(1);
+    EXPECT_NE(callManagerClient->SetCallAudioMode(mode, scenarios), TELEPHONY_ERR_UNINIT);
+}
+ 
+/**
+ * @tc.number   CallManagerProxy_SetCallAudioMode_ValidTest
+ * @tc.name     test CallManagerProxy
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch10Test, CallManagerProxy_SetCallAudioMode_ValidTest, TestSize.Level1)
+{
+    sptr<IRemoteObject> impl;
+    auto callManagerProxy = DelayedSingleton<CallManagerProxy>::GetInstance();
+    ASSERT_NE(callManagerProxy, nullptr);
+    int32_t mode = 1;
+    int32_t scenarios = 1;
+    EXPECT_NE(callManagerProxy->SetCallAudioMode(mode, scenarios), TELEPHONY_SUCCESS);
+    callManagerProxy->Init(1);
+    EXPECT_NE(callManagerProxy->SetCallAudioMode(mode, scenarios), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    auto temp = callManagerProxy->callManagerServicePtr_;
+    callManagerProxy->callManagerServicePtr_ = new CallManagerServiceProxy(impl);
+    EXPECT_NE(callManagerProxy->SetCallAudioMode(mode, scenarios), TELEPHONY_SUCCESS);
+}
+ 
+/**
+ * @tc.number   CallManagerServiceProxy_SetCallAudioMode_ValidTest
+ * @tc.name     test CallManagerServiceProxy
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch10Test, CallManagerServiceProxy_SetCallAudioMode_ValidTest, TestSize.Level1)
+{
+    sptr<IRemoteObject> impl;
+    CallManagerServiceProxy proxy(impl);
+    int32_t mode = 1;
+    int32_t scenarios = 1;
+    EXPECT_NE(proxy.SetCallAudioMode(mode, scenarios), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   AudioControlManager_SetCallAudioMode_ValidTest
+ * @tc.name     test CallManagerClient
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch10Test, AudioControlManager_SetCallAudioMode_ValidTest, TestSize.Level1)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    int32_t mode = 1;
+    int32_t scenarios = 1;
+    audioControl->SetCallAudioMode(mode, scenarios);
+    auto audioDevice = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    ASSERT_NE(audioDevice, nullptr);
+    EXPECT_EQ(audioDevice->callAudioMode_.audioMode, mode);
+    EXPECT_EQ(audioDevice->callAudioMode_.audioScene, scenarios);
+}
+/**
+ * @tc.number   AudioDeviceManager_SetCallAudioMode_ValidTest
+ * @tc.name     test CallControlManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch10Test, AudioDeviceManager_SetCallAudioMode_ValidTest, TestSize.Level1)
+{
+    std::shared_ptr<AudioDeviceManager> audioDeviceManager = std::make_shared<AudioDeviceManager>();
+    audioDeviceManager->Init();
+    int32_t mode = 1;
+    int32_t scenarios = 1;
+    CallAudioMode callAudioMode;
+    callAudioMode.audioMode = mode;
+    callAudioMode.audioScene = scenarios;
+    audioDeviceManager->IsSpeakerMode();
+    EXPECT_EQ(audioDeviceManager->SetCallAudioMode(callAudioMode), TELEPHONY_SUCCESS);
+    callAudioMode.audioMode = 0;
+    audioDeviceManager->SetSpeakerDeactive();
+    audioDeviceManager->SetAudioDeviceByAudioMode(true, true);
+    EXPECT_NE(audioDeviceManager->audioDeviceType_, AudioDeviceType::DEVICE_SPEAKER);
+    audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
+    EXPECT_NE(audioDeviceManager->audioDeviceType_, AudioDeviceType::DEVICE_SPEAKER);
+}
+
+/**
+ * @tc.number   CallControlManager_SetCallAudioMode_ValidTest
+ * @tc.name     test CallManagerClient
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch10Test, CallControlManager_SetCallAudioMode_ValidTest, TestSize.Level1)
+{
+    auto callControl = DelayedSingleton<CallControlManager>::GetInstance();
+    ASSERT_NE(callControl, nullptr);
+    int32_t mode = 1;
+    int32_t scenarios = 1;
+    EXPECT_EQ(callControl->SetCallAudioMode(mode, scenarios), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   CallManagerService_SetCallAudioMode_ValidTest
+ * @tc.name     test CallManagerServiceStub
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch10Test, CallManagerService_SetCallAudioMode_ValidTest, TestSize.Level1)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_NE(callManagerService, nullptr);
+    int32_t mode = 1;
+    int32_t scenarios = 1;
+    EXPECT_NE(callManagerService->SetCallAudioMode(mode, scenarios), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+}
+
+/**
+ * @tc.number   CallManagerServiceStub_SetCallAudioMode_ValidTest
+ * @tc.name     test CallManagerServiceStub
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch10Test, CallManagerServiceStub_SetCallAudioMode_ValidTest, TestSize.Level1)
+{
+    std::shared_ptr<CallManagerServiceStub> serviceStub = std::make_shared<CallManagerService>();
+    ASSERT_NE(serviceStub, nullptr);
+    int32_t mode = 1;
+    int32_t scenarios = 1;
+    int32_t ret = -100;
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInt32(mode);
+    data.WriteInt32(scenarios);
+    EXPECT_NE(serviceStub->OnSetCallAudioMode(data, reply), ret);
 }
 }

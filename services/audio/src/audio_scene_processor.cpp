@@ -175,16 +175,22 @@ bool AudioSceneProcessor::SwitchState(CallStateType stateType)
 
 bool AudioSceneProcessor::SwitchDialing()
 {
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    if (audioDeviceManager == nullptr || audioControlManager == nullptr) {
+        return false;
+    }
     currentState_ = std::make_unique<DialingState>();
     if (currentState_ == nullptr) {
         TELEPHONY_LOGE("make_unique DialingState failed");
         return false;
     }
-    if (!DelayedSingleton<AudioControlManager>::GetInstance()->PlaySoundtone()) {
+    audioDeviceManager->SetAudioDeviceByAudioMode(false, false);
+    if (!audioControlManager->PlaySoundtone()) {
         TELEPHONY_LOGE("PlaySoundtone fail");
     }
-    DelayedSingleton<AudioControlManager>::GetInstance()->UpdateDeviceTypeForVideoDialing();
-    if (!DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_ACTIVATED)) {
+    audioControlManager->UpdateDeviceTypeForVideoDialing();
+    if (!audioDeviceManager->ProcessEvent(AudioEvent::AUDIO_ACTIVATED)) {
         TELEPHONY_LOGE("ProcessEvent AUDIO_ACTIVATED failed");
     }
     TELEPHONY_LOGI("current call state : dialing state");
@@ -206,37 +212,43 @@ bool AudioSceneProcessor::SwitchAlerting()
 
 bool AudioSceneProcessor::SwitchIncoming()
 {
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    if (audioDeviceManager == nullptr || audioControlManager == nullptr || callControlManager == nullptr) {
+        return false;
+    }
     currentState_ = std::make_unique<IncomingState>();
     if (currentState_ == nullptr) {
         TELEPHONY_LOGE("make_unique IncomingState failed");
         return false;
     }
     int32_t state;
-    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    callControlManager->GetVoIPCallState(state);
     int endCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_ENDED);
     if (state == (int32_t) CallStateToApp::CALL_STATE_OFFHOOK ||
         (CallObjectManager::GetCurrentCallNum() - endCallCount > ONE_CALL_EXIST &&
-            DelayedSingleton<AudioControlManager>::GetInstance()->IsSoundPlaying() &&
-            CallObjectManager::HasIncomingCallCrsType())) {
-        DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
+            audioControlManager->IsSoundPlaying() && CallObjectManager::HasIncomingCallCrsType())) {
+        audioControlManager->PlayWaitingTone();
     } else {
         bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
         bool isNeedSilent = CallObjectManager::IsNeedSilentInDoNotDisturbMode();
-        bool isNotWearWatch = DelayedSingleton<CallControlManager>::GetInstance()->IsNotWearOnWrist();
+        bool isNotWearWatch = callControlManager->IsNotWearOnWrist();
         if (!isStartBroadcast && !isNeedSilent && !isNotWearWatch) {
             TELEPHONY_LOGI("broadcast switch and doNotDisturbMode close, start play system ring");
-            DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
+            audioControlManager->StopRingtone();
             // play ringtone while incoming state
-            DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+            audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
+            audioControlManager->PlayRingtone();
         } else {
             TELEPHONY_LOGI("isStartBroadcast: %{public}d, isNeedSilent: %{public}d, isNotWearWatch: %{public}d",
                 isStartBroadcast, isNeedSilent, isNotWearWatch);
             if (system::GetParameter("const.product.devicetype", "") == "wearable") {
-                DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
-                DelayedSingleton<AudioControlManager>::GetInstance()->PlayForNoRing();
+                audioControlManager->StopRingtone();
+                audioControlManager->PlayForNoRing();
             }
         }
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_RINGING);
+        audioDeviceManager->ProcessEvent(AudioEvent::AUDIO_RINGING);
     }
     TELEPHONY_LOGI("current call state : incoming state");
     return true;

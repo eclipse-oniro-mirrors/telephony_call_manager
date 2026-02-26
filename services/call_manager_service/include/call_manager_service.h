@@ -865,6 +865,15 @@ public:
 #endif
 
     /**
+     * @brief Set Call Audio Mode
+     *
+     * @param slotId[in], The mode
+     * @param isEnable[in], The scenarios
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetCallAudioMode(int32_t mode, int32_t scenarios) override;
+
+    /**
      * AnswerCall
      *
      * @brief Answer a phone call by call manager
