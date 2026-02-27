@@ -490,7 +490,6 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_012, Function | MediumTe
     CallObjectManager::AddOneCallObject(call1);
     call1->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
     audioControl->HandleCallStateUpdated(call1, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ALERTING);
-
     audioControl->SetLocalRingbackNeeded(true);
     EXPECT_TRUE(audioControl->ShouldPlayRingback());
     audioControl->HandleCallStateUpdated(call1, TelCallState::CALL_STATUS_ALERTING,
