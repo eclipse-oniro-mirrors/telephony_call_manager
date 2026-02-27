@@ -287,6 +287,8 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallWiredHeadSet_002, Function | MediumTest 
     instance->DealKeyShortPressed();
     CallObjectManager::DeleteOneCallObject(holdCall);
     EXPECT_NE(holdCall, nullptr);
+    activeCall->SetCallType(CallType::TYPE_VOIP);
+    instance->DealKeyShortPressed();
     CallObjectManager::DeleteOneCallObject(activeCall);
     EXPECT_NE(activeCall, nullptr);
     EXPECT_EQ(ringingCall->answerType_, CallAnswerType::CALL_ANSWER_REJECT);

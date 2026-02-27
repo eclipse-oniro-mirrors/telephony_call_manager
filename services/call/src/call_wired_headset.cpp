@@ -161,7 +161,10 @@ void CallWiredHeadSet::DealKeyShortPressed()
         sptr<CallBase> call = CallObjectManager::GetAudioLiveCall();
         if (call != nullptr) {
             bool isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
-            TELEPHONY_LOGI("DealKeyShortPressed SetMuted isMuted((%{public}d))", (!isMuted));
+            if (call->GetCallType() == CallType::TYPE_VOIP) {
+                isMuted = call->IsMuted();
+            }
+            TELEPHONY_LOGI("DealKeyShortPressed SetMuted isMuted(%{public}d)", (!isMuted));
             DelayedSingleton<CallControlManager>::GetInstance()->SetMuted(!isMuted);
         }
     } else {
