@@ -483,7 +483,9 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_012, Function | MediumTe
     audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ALERTING);
     audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_ALERTING, TelCallState::CALL_STATUS_ACTIVE);
     EXPECT_EQ(audioControl->StopRingback(), 0);
-    audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_ACTIVE);
+    audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_ACTIVE,
+        TelCallState::CALL_STATUS_DISCONNECTED);
+    CallObjectManager::DeleteOneCallObject(call);
     DialParaInfo mDialParaInfo;
     sptr<CallBase> call1 = new BluetoothCall(mDialParaInfo, "");
     call1->SetCallType(CallType::TYPE_BLUETOOTH);
@@ -492,11 +494,12 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_012, Function | MediumTe
     audioControl->HandleCallStateUpdated(call1, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ALERTING);
     audioControl->SetLocalRingbackNeeded(true);
     EXPECT_TRUE(audioControl->ShouldPlayRingback());
-    audioControl->HandleCallStateUpdated(call1, TelCallState::CALL_STATUS_ALERTING,
+    audioControl->HandleCallStateUpdated(call1, TelCallState::CALL_STATUS_ALERTING, TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_EQ(audioControl->StopRingback(), 0);
+    audioControl->HandleCallStateUpdated(call1, TelCallState::CALL_STATUS_ACTIVE,
         TelCallState::CALL_STATUS_DISCONNECTED);
     EXPECT_FALSE(audioControl->ShouldPlayRingback());
     CallObjectManager::DeleteOneCallObject(call1);
-    CallObjectManager::DeleteOneCallObject(call);
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
