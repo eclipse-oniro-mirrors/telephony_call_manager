@@ -19,6 +19,7 @@
 #include "call_manager_base.h"
 #include "call_manager_disconnected_details.h"
 #include "call_manager_info.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -515,17 +516,17 @@ struct RttEvent {
     /**
      * Call ID, value can be 1~7
      */
-    int32_t callId;
+    int32_t callId = -1;
 
     /**
      * RTT事件类型
      */
-    int32_t eventType;
+    int32_t eventType = -1;
 
     /**
      * 0: 本地用户发起 1: 远端用户发起
      */
-    int32_t reason;
+    int32_t reason = -1;
 
     RttEvent() {}
 
@@ -547,19 +548,19 @@ struct RttEventInfo {
     /**
      * Call ID, value can be 1~7
      */
-    int32_t callId;
+    int32_t callId = -1;
 
     /**
      * RTT事件类型
      */
-    int32_t eventType;
+    int32_t eventType = -1;
 
     /**
      * 0: 本地用户发起 1: 远端用户发起
      */
-    int32_t reason;
+    int32_t reason = -1;
 
-    int32_t slotId;
+    int32_t slotId = -1;
 };
 
 /**
@@ -569,17 +570,17 @@ struct RttError {
     /**
      * Call ID, value can be 1~7
      */
-    int32_t callId;
+    int32_t callId = -1;
 
     /**
      * 0:Add Text; 1:Close Text
      */
-    int32_t operationType;
+    int32_t operationType = -1;
 
     /**
      * 错误码
      */
-    int32_t causeCode;
+    int32_t causeCode = -1;
 
     /**
      * 错误码字符串信息
@@ -607,12 +608,12 @@ struct RttErrorInfo {
     /**
      * Call ID, value can be 1~7
      */
-    int32_t callId;
+    int32_t callId = -1;
 
     /**
      * 0:Add Text; 1:Close Text
      */
-    int32_t operationType;
+    int32_t operationType = -1;
 
     /**
      * 错误码
@@ -624,7 +625,7 @@ struct RttErrorInfo {
      */
     std::string reasonText;
 
-    int32_t slotId;
+    int32_t slotId = -1;
 };
 
 /**
@@ -634,12 +635,12 @@ struct RttMessage {
     /**
      * Call ID, value can be 1~7
      */
-    int32_t callId;
+    int32_t callId = -1;
 
     /**
      * RTT消息
      */
-    char* rttMessage;
+    char* rttMessage = nullptr;
 
     RttMessage() {}
 
@@ -660,12 +661,12 @@ struct RttMessageInfo {
     /**
      * Call ID, value can be 1~7
      */
-    int32_t callId;
+    int32_t callId = -1;
 
     /**
      * RTT消息
      */
-    char* rttMessage;
+    char* rttMessage = nullptr;;
 };
 
 /**
