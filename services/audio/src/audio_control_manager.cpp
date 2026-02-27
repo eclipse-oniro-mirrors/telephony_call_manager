@@ -1518,6 +1518,7 @@ int32_t AudioControlManager::PlayRingback()
 
 int32_t AudioControlManager::StopRingback()
 {
+    isLocalRingbackNeeded_ = false;
     if (tone_ != nullptr && tone_->getCurrentToneType() == ToneDescriptor::TONE_RINGBACK) {
         return StopCallTone();
     }
