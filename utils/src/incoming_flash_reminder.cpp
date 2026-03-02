@@ -20,18 +20,20 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
-#include "input/camera_manager.h"
-#endif
-#ifdef ABILITY_SCREENLOCKMGR_SUPPORT
-#include "screenlock_manager.h"
+#include "adapter_type.h"
 #endif
 
 namespace OHOS {
 namespace Telephony {
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
 constexpr int64_t DELAY_SET_TORCH_MODE_TIME = 300;
+using IsTorchSupportedFunc = bool(*)();
+using GetTorchModeFunc = TelTorchMode (*)();
+using SetTorchModeFunc = int32_t (*)(TelTorchMode mode);
 #endif
-
+#ifdef ABILITY_SCREENLOCKMGR_SUPPORT
+    using IsScreenLockedFun = bool (*)();
+#endif
 constexpr uint32_t DELAY_SET_TORCH_EVENT = 1000000;
 constexpr uint32_t STOP_FLASH_REMIND_EVENT = 1000001;
 constexpr uint32_t START_FLASH_REMIND_EVENT = 1000002;
@@ -84,11 +86,17 @@ bool IncomingFlashReminder::IsFlashRemindNecessary()
 bool IncomingFlashReminder::IsScreenStatusSatisfied()
 {
 #ifdef ABILITY_SCREENLOCKMGR_SUPPORT
-    if (!OHOS::ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked()) {
-        TELEPHONY_LOGI("screen is unlocked");
+    if (libAdapterHandler_ == nullptr) {
+        TELEPHONY_LOGI("did not load adapter so");
         return false;
     }
-    return true;
+    IsScreenLockedFun isScreenLocked = reinterpret_cast<IsScreenLockedFun>(dlsym(libAdapterHandler_, "IsScreenLocked"));
+    if (isScreenLocked == nullptr) {
+        TELEPHONY_LOGE("fail to load func pointer");
+        return false;
+    }
+
+    return isScreenLocked();
 #else
     TELEPHONY_LOGI("screen manager not support");
     return false;
@@ -98,13 +106,21 @@ bool IncomingFlashReminder::IsScreenStatusSatisfied()
 bool IncomingFlashReminder::IsTorchReady()
 {
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
-    sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
-    if (!camMgr->IsTorchSupported()) {
-        TELEPHONY_LOGI("torch not support");
+    if (libAdapterHandler_ == nullptr) {
+        TELEPHONY_LOGE("did not load adapter so");
         return false;
     }
-    CameraStandard::TorchMode currentMode = camMgr->GetTorchMode();
-    if (currentMode == CameraStandard::TORCH_MODE_ON) {
+
+    IsTorchSupportedFunc isTorchSupported = reinterpret_cast<IsTorchSupportedFunc>
+        (dlsym(libAdapterHandler_, "IsTorchSupported"));
+    GetTorchModeFunc getTorchMode = reinterpret_cast<GetTorchModeFunc>
+        (dlsym(libAdapterHandler_, "GetTorchMode"));
+    if (isTorchSupported == nullptr || getTorchMode == nullptr || isTorchSupported() == false) {
+        TELEPHONY_LOGE("do not support torch");
+        return false;
+    }
+    TelTorchMode currentMode = getTorchMode();
+    if (currentMode == TelTorchMode::TORCH_MODE_ON) {
         TELEPHONY_LOGI("torch being used");
         return false;
     }
@@ -142,6 +158,9 @@ bool IncomingFlashReminder::IsFlashReminderSwitchOn()
 
 void IncomingFlashReminder::StartFlashRemind()
 {
+#ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
+    libAdapterHandler_ = dlopen("libtel_deps_adapter.so", RTLD_LAZY);
+#endif
     SendEvent(AppExecFwk::InnerEvent::Get(START_FLASH_REMIND_EVENT, 0));
 }
 
@@ -157,13 +176,26 @@ void IncomingFlashReminder::HandleStartFlashRemind()
 void IncomingFlashReminder::HandleSetTorchMode()
 {
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
-    sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
-    CameraStandard::TorchMode currentMode = camMgr->GetTorchMode();
-    CameraStandard::TorchMode nextMode = (currentMode == CameraStandard::TORCH_MODE_ON?
-        CameraStandard::TORCH_MODE_OFF : CameraStandard::TORCH_MODE_ON);
-    int32_t result = camMgr->SetTorchMode(nextMode);
-    TELEPHONY_LOGI("set torch mode result: %{public}d", result);
+    int32_t result = -1; // 正常调用只会从零开始
+    if (libAdapterHandler_ == nullptr) {
+        TELEPHONY_LOGI("did not load adapter so");
+        return;
+    }
+
+    GetTorchModeFunc getTorchMode = reinterpret_cast<GetTorchModeFunc>(dlsym(libAdapterHandler_, "GetTorchMode"));
+    SetTorchModeFunc setTorchMode = reinterpret_cast<SetTorchModeFunc>(dlsym(libAdapterHandler_, "SetTorchMode"));
+    if (getTorchMode == nullptr || setTorchMode == nullptr) {
+        TELEPHONY_LOGE("fail to load func pointer");
+        return;
+    }
+
+    TelTorchMode currentMode = getTorchMode();
+    TelTorchMode nextMode = (currentMode == TelTorchMode::TORCH_MODE_ON?
+        TelTorchMode::TORCH_MODE_OFF : TelTorchMode::TORCH_MODE_ON);
+    result = setTorchMode(nextMode);
+
     SendEvent(AppExecFwk::InnerEvent::Get(DELAY_SET_TORCH_EVENT, 0), DELAY_SET_TORCH_MODE_TIME);
+    TELEPHONY_LOGI("set torch mode result: %{public}d", result);
 #endif
 }
 
@@ -184,8 +216,18 @@ void IncomingFlashReminder::HandleStopFlashRemind()
     isFlashRemindUsed_ = false;
     RemoveEvent(DELAY_SET_TORCH_EVENT);
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
-    sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
-    int32_t result = camMgr->SetTorchMode(CameraStandard::TORCH_MODE_OFF);
+    if (libAdapterHandler_ == nullptr) {
+        TELEPHONY_LOGI("did not load adapter so");
+        return;
+    }
+
+    SetTorchModeFunc setTorchMode = reinterpret_cast<SetTorchModeFunc>(dlsym(libAdapterHandler_, "SetTorchMode"));
+    if (setTorchMode == nullptr) {
+        TELEPHONY_LOGE("fail to load func pointer");
+        return;
+    }
+
+    int32_t result = setTorchMode ? setTorchMode(TelTorchMode::TORCH_MODE_OFF) : -1;
     TELEPHONY_LOGI("set torch mode result: %{public}d", result);
 #endif
     if (stopFlashRemindDone_ != nullptr) {

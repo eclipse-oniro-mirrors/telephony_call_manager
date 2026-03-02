@@ -264,7 +264,6 @@ if (defined(global_parts_info) &&
 if (defined(global_parts_info) &&
     defined(global_parts_info.telephony_sms_mms) &&
     global_parts_info.telephony_sms_mms) {
-  call_manager_external_deps += [ "sms_mms:tel_sms_mms_api" ]
   call_manager_defines += [ "ABILITY_SMS_SUPPORT" ]
 }
 
@@ -328,14 +327,12 @@ if (defined(global_parts_info) &&
 if (defined(global_parts_info) &&
     defined(global_parts_info.theme_screenlock_mgr) &&
     global_parts_info.theme_screenlock_mgr) {
-  call_manager_external_deps += [ "screenlock_mgr:screenlock_client" ]
   call_manager_defines += [ "ABILITY_SCREENLOCKMGR_SUPPORT" ]
 }
 
 if (defined(global_parts_info) &&
     defined(global_parts_info.multimedia_camera_framework) &&
     global_parts_info.multimedia_camera_framework) {
-  call_manager_external_deps += [ "camera_framework:camera_framework" ]
 }
 
 if (call_manager_feature_hfp_async_enable) {

@@ -40,6 +40,7 @@ private:
     void HandleStartFlashRemind();
     bool isFlashRemindUsed_ = false;
     std::function<void()> stopFlashRemindDone_;
+    void* libAdapterHandler_;
 };
 } // namespace Telephony
 } // namespace OHOS
