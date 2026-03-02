@@ -47,8 +47,8 @@ int32_t TaiheCallManagerCallback::OnCallEventChange(const CallEventInfo &info)
 {
     int32_t ret = TaiheCallAbilityCallback::GetInstance().UpdateCallEventInfo(info);
     if (ret == TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("OnCallEventChange success! eventId:%{public}d, phoneNum:%{public}s, "
-            "bundleName:%{public}s", info.eventId, info.phoneNum, info.bundleName);
+        TELEPHONY_LOGI("OnCallEventChange success! eventId:%{public}d, bundleName:%{public}s",
+            info.eventId, info.bundleName);
     } else {
         TELEPHONY_LOGE("OnCallEventChange failed! ret:%{public}d", ret);
     }
@@ -193,7 +193,7 @@ int32_t TaiheCallManagerCallback::OnPhoneStateChange(int32_t numActive, int32_t 
     const std::string &number)
 {
     TELEPHONY_LOGI("OnPhoneStateChange numActive:%{public}d, numHeld:%{public}d, "
-        "callState:%{public}d, number:%{public}s", numActive, numHeld, callState, number.c_str());
+        "callState:%{public}d", numActive, numHeld, callState);
     // 这里可以根据具体需求处理电话状态变化
     // 目前暂时返回成功，后续可以根据业务需求进行扩展
     return TELEPHONY_SUCCESS;
