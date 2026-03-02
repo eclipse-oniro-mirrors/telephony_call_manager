@@ -45,7 +45,6 @@ ohos_shared_library("tel_call_manager_api") {
     "src/native_call_manager_hisysevent.cpp",
     "src/native_call_manager_utils.cpp",
     "src/nearlink_call_client.cpp",
-    "src/super_privacy_manager_client.cpp",
     "src/voip_call_manager_proxy.cpp",
   ]
 

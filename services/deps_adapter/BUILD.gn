@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 
 call_manager_path = "//base/telephony/call_manager"
 
-ohos_shared_library("deps_adapter") {
+ohos_shared_library("tel_cm_deps_adapter") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -24,7 +24,6 @@ ohos_shared_library("deps_adapter") {
   }
   branch_protector_ret = "pac_ret"
   sources = [
-    "${call_manager_path}/services/deps_adapter/src/fold_status_manager_adapter.cpp",
     "${call_manager_path}/services/deps_adapter/src/incoming_flash_reminder_adapter.cpp",
   ]
 

@@ -35,9 +35,30 @@ void RejectCallSms::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSen
 void RejectCallSms::SendMessage(int32_t slotId, const std::u16string &desAddr, const std::u16string &text)
 {
 #ifdef ABILITY_SMS_SUPPORT
-    Singleton<SmsServiceManagerClient>::GetInstance()
-        .SendMessage(slotId, desAddr, ConvertToUtf16(""), text, nullptr, nullptr);
+    typedef int (*SendMessageFunc)(int32_t slotId, const char* desAddr, const char* text)
+
+    void *adapterHandler = dlopen("libtel_cm_deps_adapter.so", RTLD_LAZY);
+    if (adapterHandler == nullptr) {
+        TELEPHONY_LOGE("fail to dlopen libtel_cm_deps_adapter.so");
+        return;
+    }
+
+    sendMsgFunc = reinterpret_cast<>(dlsym(adapterHandler, "SendMessage"));
+
+    if (sendMsgFunc == nullptr) {
+        TELEPHONY_LOGE("fail to dlsym SendMessage");
+        dlclose(adapterHandler);
+        adapterHandler = nullptr;
+        return;
+    }
+
+    sendMsgFunc(slotId, desAddr.c_str(), text.c_str());
     TELEPHONY_LOGI("reject call message sended");
+
+    dlclose(adapterHandler);
+    adapterHandler = nullptr;
+    // Singleton<SmsServiceManagerClient>::GetInstance()
+        // .SendMessage(slotId, desAddr, ConvertToUtf16(""), text, nullptr, nullptr);
 #endif
 }
 
