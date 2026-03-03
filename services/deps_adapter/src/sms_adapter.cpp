@@ -30,7 +30,7 @@ int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text)
         TELEPHONY_LOGE("get client null");
         return -1;
     }
-    Singleton<SmsServiceManagerClient>::GetInstance()	 
+    Singleton<SmsServiceManagerClient>::GetInstance()
         .SendMessage(slotId, u16string(desAddr), ConvertToUtf16(""), u16string(text), nullptr, nullptr);
 }
 

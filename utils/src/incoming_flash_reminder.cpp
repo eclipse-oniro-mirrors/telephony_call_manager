@@ -125,7 +125,7 @@ bool IncomingFlashReminder::IsTorchReady()
         (dlsym(libAdapterHandler_, "IsTorchSupported"));
     GetTorchModeFunc getTorchMode = reinterpret_cast<GetTorchModeFunc>
         (dlsym(libAdapterHandler_, "GetTorchMode"));
-    if (isTorchSupported == nullptr || getTorchMode == nullptr ) {
+    if (isTorchSupported == nullptr || getTorchMode == nullptr) {
         TELEPHONY_LOGE("dlsym SetTorchMode or GetTorchMode failed : %{public}s", dlerror());
         return false;
     }
@@ -175,7 +175,7 @@ void IncomingFlashReminder::StartFlashRemind()
 {
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
     libAdapterHandler_ = dlopen("libtel_deps_adapter.so", RTLD_LAZY);
-    if(libAdapterHandler_ == nullptr) {
+    if (libAdapterHandler_ == nullptr) {
         TELEPHONY_LOGE("deps adapter dlopen failed : %{public}s", dlerror());
         return;
     }

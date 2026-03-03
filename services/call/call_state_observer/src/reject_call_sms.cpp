@@ -59,8 +59,6 @@ void RejectCallSms::SendMessage(int32_t slotId, const std::u16string &desAddr, c
 
     dlclose(adapterHandler);
     adapterHandler = nullptr;
-    // Singleton<SmsServiceManagerClient>::GetInstance()
-        // .SendMessage(slotId, desAddr, ConvertToUtf16(""), text, nullptr, nullptr);
 #endif
 }
 
