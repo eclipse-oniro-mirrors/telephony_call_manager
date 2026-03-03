@@ -27,6 +27,7 @@ bool IsTorchSupported()
 {
     sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
     if (camMgr == nullptr) {
+        TELEPHONY_LOGE("get cameraMgr null");
         return false;
     }
     return camMgr->IsTorchSupported();
@@ -35,7 +36,8 @@ bool IsTorchSupported()
 TelTorchMode GetTorchMode()
 {
     sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
-    if (camMgr == nullptr) { // 类似的错误判断增加一些打印吧
+    if (camMgr == nullptr) {
+        TELEPHONY_LOGE("get cameraMgr null");
         return TelTorchMode::TORCH_MODE_UNKNOWN;
     }
     return static_cast<TelTorchMode>(camMgr->GetTorchMode());
@@ -45,6 +47,7 @@ int SetTorchMode(TelTorchMode mode)
 {
     sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
     if (camMgr == nullptr) {
+        TELEPHONY_LOGE("get cameraMgr null");
         return -1;
     }
     return camMgr->SetTorchMode(static_cast<CameraStandard::TorchMode>(mode));
@@ -54,6 +57,7 @@ bool IsScreenStatusSatisfied()
 {
     auto screenLockMgr = OHOS::ScreenLock::ScreenLockManager::GetInstance();
     if (screenLockMgr == nullptr) {
+        TELEPHONY_LOGE("get screenLockMgr null");
         return false;
     }
     return screenLockMgr->IsScreenLocked();
