@@ -15,6 +15,8 @@
 
 #include "reject_call_sms.h"
 
+#include "dlfcn.h"
+
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 

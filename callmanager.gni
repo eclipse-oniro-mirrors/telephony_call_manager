@@ -85,7 +85,6 @@ call_manager_sources = [
   "${call_manager_path}/services/call/src/call_status_manager.cpp",
   "${call_manager_path}/services/call/src/call_status_policy.cpp",
   "${call_manager_path}/services/call/src/call_superprivacy_control_manager.cpp",
-  "${call_manager_path}/services/call/src/super_privacy_manager_client.cpp",
   "${call_manager_path}/services/call/src/call_wired_headset.cpp",
   "${call_manager_path}/services/call/src/carrier_call.cpp",
   "${call_manager_path}/services/call/src/conference_base.cpp",
@@ -170,6 +169,8 @@ call_manager_include_dirs = [
   "${call_manager_path}/services/telephony_interaction/include",
   "${call_manager_path}/services/video/include",
   "${call_manager_path}/utils/include",
+  "${call_manager_path}/services/deps_adapter/adapter_type",
+
 ]
 
 if (call_manager_feature_support_dsoftbus) {

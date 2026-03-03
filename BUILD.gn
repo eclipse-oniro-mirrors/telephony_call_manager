@@ -26,7 +26,9 @@ ohos_shared_library("tel_call_manager") {
 
   include_dirs = call_manager_include_dirs
 
-  deps = []
+  deps = [	 
+    "frameworks/native:tel_call_manager_api", 
+  ]
 
   external_deps = [
     "cJSON:cjson",
