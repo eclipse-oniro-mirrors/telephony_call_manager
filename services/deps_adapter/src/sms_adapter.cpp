@@ -12,3 +12,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "sms_service_manager_client.h"
+#include "telephony_log_wrapper.h"
+
+namespace OHOS {
+namespace Telephony {
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text)
+{
+    auto client = Singleton<SmsServiceManagerClient>::GetInstance();
+    if (client == nullptr) {
+        TELEPHONY_LOGE("get client null");
+        return -1;
+    }
+    Singleton<SmsServiceManagerClient>::GetInstance()	 
+        .SendMessage(slotId, u16string(desAddr), ConvertToUtf16(""), u16string(text), nullptr, nullptr);
+}
+
+#ifdef __cplusplus
+}
+#endif
+} // TELEPHONY
+} // OHOS

@@ -12,3 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef INCOMING_FLASH_REMINDER_ADAPTER_H
+#define INCOMING_FLASH_REMINDER_ADAPTER_H
+
+#include <string>
+namespace OHOS {
+namespace Telephony {
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int SendMessage(int32_t slotId, const char16_t* desAddr, const char16_t* text);
+
+#ifdef __cplusplus
+}
+#endif
+} // TELEPHONY
+} // OHOS
+#endif
