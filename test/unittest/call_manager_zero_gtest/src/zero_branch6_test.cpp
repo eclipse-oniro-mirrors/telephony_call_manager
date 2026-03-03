@@ -806,7 +806,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, TestSize.Level0)
     std::string deviceId = "{ \"devIds\": \"101\" }";
     device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
     std::string restr = manager.GetDevIdFromAudioDevice(device);
-    EXPECT_FALSE(manager.IsSelectVirtualModem());
     EXPECT_TRUE(manager.SwitchOnDCallDeviceSync(device));
     device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
     std::string devId = "";
@@ -829,7 +828,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, TestSize.Level0)
     manager.GetConnectedDCallDevice(device);
     manager.SetConnectedDCallDevice(device);
     manager.ClearConnectedDCallDevice();
-    manager.IsSelectVirtualModem();
     manager.SwitchOnDCallDeviceSync(device);
     manager.OnDCallSystemAbilityAdded(TEST_STR);
     manager.IsDistributedCarDeviceOnline();
@@ -915,12 +913,9 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_003, TestSize.Level0)
     DistributedCallManager manager;
     auto listener = new (std::nothrow) DCallSystemAbilityListener();
     manager.onlineDCallDevices_.clear();
-    ASSERT_FALSE(manager.IsSelectVirtualModem());
     manager.onlineDCallDevices_["101"] = device;
     manager.dcallProxy_ = nullptr;
-    ASSERT_FALSE(manager.IsSelectVirtualModem());
     manager.dcallProxy_ = std::make_shared<DistributedCallProxy>();
-    manager.IsSelectVirtualModem();
     manager.onlineDCallDevices_.clear();
 
     manager.IsDCallDeviceSwitchedOn();
@@ -984,14 +979,12 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallProxy_001, TestSize.Level0)
     proxy->GetDCallClient();
     proxy->dcallClient_ = nullptr;
     int32_t res1 = proxy->UnInit();
-    bool res2 = proxy->IsSelectVirtualModem();
     int32_t res3 = proxy->SwitchDevice(TEST_STR, 1);
     std::vector<std::string> devList;
     int32_t res4 = proxy->GetOnlineDeviceList(devList);
     OHOS::DistributedHardware::DCallDeviceInfo devInfo;
     int32_t res5 = proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
     proxy->GetDCallClient();
-    proxy->IsSelectVirtualModem();
     int32_t res6 = proxy->SwitchDevice(TEST_STR, 1);
     int32_t res7 = proxy->GetOnlineDeviceList(devList);
     proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
@@ -1003,10 +996,8 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallProxy_001, TestSize.Level0)
     proxy->RegisterDeviceCallback(name, callback);
     proxy->UnRegisterDeviceCallback(name);
     proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
-    proxy->IsSelectVirtualModem();
     EXPECT_NE(res, TELEPHONY_SUCCESS);
     EXPECT_NE(res1, TELEPHONY_SUCCESS);
-    EXPECT_FALSE(res2);
     EXPECT_NE(res3, TELEPHONY_SUCCESS);
     EXPECT_NE(res4, TELEPHONY_SUCCESS);
     EXPECT_NE(res5, TELEPHONY_SUCCESS);

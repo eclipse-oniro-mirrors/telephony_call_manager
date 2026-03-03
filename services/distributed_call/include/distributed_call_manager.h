@@ -69,7 +69,6 @@ public:
     void OnDCallSystemAbilityRemoved(const std::string &deviceId);
 
     void GetConnectedDCallDevice(AudioDevice& device);
-    bool IsSelectVirtualModem();
     void ReportDistributedDeviceInfo(const AudioDevice& device);
     void ReportDistributedDeviceInfoForSwitchOff();
 

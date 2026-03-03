@@ -389,6 +389,32 @@ int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device, bool isNe
     return TELEPHONY_SUCCESS;
 }
 
+bool AudioProxy::IsDistributedPreferredOutputAudioDevice()
+{
+    AudioStandard::AudioRendererInfo rendererInfo;
+    rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_UNKNOWN;
+    rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+    rendererInfo.rendererFlags = RENDERER_FLAG;
+    std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> desc;
+    int32_t ret =
+        AudioStandard::AudioRoutingManager::GetInstance()->GetPreferredOutputDeviceForRendererInfo(rendererInfo, desc);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("GetPreferredOutputDeviceForRendererInfo fail");
+        return false;
+    }
+    if (desc.empty()) {
+        TELEPHONY_LOGE("desc is empty");
+        return false;
+    }
+    for (auto &device : desc) {
+        if (device->networkId_ != LOCAL_DEVICE && device->deviceType_ == AudioStandard::DEVICE_TYPE_SPEAKER) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
 int32_t AudioProxy::SetAudioPreferDeviceChangeCallback()
 {
     if (preferredDeviceCallback_ == nullptr) {

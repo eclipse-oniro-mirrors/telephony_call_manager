@@ -38,7 +38,6 @@ public:
         const std::shared_ptr<IDCallDeviceCallback>& callback) = 0;
     virtual int32_t UnRegisterDeviceCallback(const std::string& name) = 0;
     virtual int32_t GetDCallDeviceInfo(const std::string &devId, DCallDeviceInfo& devInfo) = 0;
-    virtual bool IsSelectVirtualModem() = 0;
 };
 
 extern "C" __attribute__((visibility("default"))) IDCallClient* GetDCallClientInstance();

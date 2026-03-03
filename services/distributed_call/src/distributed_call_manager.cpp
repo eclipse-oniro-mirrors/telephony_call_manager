@@ -214,7 +214,8 @@ int32_t DistributedCallManager::AddDCallDevice(const std::string& devId)
     onlineDCallDevices_.emplace(devId, device);
 
     if (!dCallDeviceSwitchedOn_.load() && isCallActived_.load()) {
-        if (device.deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE && IsSelectVirtualModem()) {
+        if (device.deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE
+            && AudioProxy::IsDistributedPreferredOutputAudioDevice()) {
             TELEPHONY_LOGI("switch call to auto motive as it is online");
             SwitchOnDCallDeviceAsync(device);
         }
@@ -441,20 +442,6 @@ void DistributedCallManager::SwitchOffDCallDeviceSync()
     } else {
         TELEPHONY_LOGE("switch dcall device off failed, %{public}d", ret);
     }
-}
-
-bool DistributedCallManager::IsSelectVirtualModem()
-{
-    if (onlineDCallDevices_.size() <= 0) {
-        TELEPHONY_LOGW("no dcall device");
-        return false;
-    }
-    std::lock_guard<ffrt::mutex> lock(dcallProxyMtx_);
-    if (dcallProxy_ == nullptr) {
-        TELEPHONY_LOGE("fail to create dcall proxy obj");
-        return false;
-    }
-    return dcallProxy_->IsSelectVirtualModem();
 }
 
 void DistributedCallManager::ReportDistributedDeviceInfo(const AudioDevice& device)

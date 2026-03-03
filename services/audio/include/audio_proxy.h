@@ -97,6 +97,7 @@ public:
     int32_t UnsetAudioMicStateChangeCallback();
     float GetSystemRingVolumeInDb(int32_t volumeLevel);
     bool SetDeviceActive(AudioStandard::DeviceType deviceType, bool flag, bool isSetAudioDeviceByUser = false);
+    static bool IsDistributedPreferredOutputAudioDevice();
 
 private:
     void PreventInterruption(VibrationType type);
