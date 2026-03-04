@@ -89,7 +89,13 @@ bool IncomingFlashReminder::IsFlashRemindNecessary()
         TELEPHONY_LOGI("flash remind switch off");
         return false;
     }
-
+#ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
+    libAdapterHandler_ = dlopen("libtel_cm_deps_adapter.so", RTLD_LAZY);
+    if (libAdapterHandler_ == nullptr) {
+        TELEPHONY_LOGE("deps adapter dlopen failed : %{public}s", dlerror());
+        return;
+    }
+#endif
     return IsScreenStatusSatisfied() && IsTorchReady();
 }
 
@@ -173,13 +179,6 @@ bool IncomingFlashReminder::IsFlashReminderSwitchOn()
 
 void IncomingFlashReminder::StartFlashRemind()
 {
-#ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
-    libAdapterHandler_ = dlopen("libtel_cm_deps_adapter.so", RTLD_LAZY);
-    if (libAdapterHandler_ == nullptr) {
-        TELEPHONY_LOGE("deps adapter dlopen failed : %{public}s", dlerror());
-        return;
-    }
-#endif
     SendEvent(AppExecFwk::InnerEvent::Get(START_FLASH_REMIND_EVENT, 0));
 }
 
