@@ -46,19 +46,17 @@ void RejectCallSms::SendMessage(int32_t slotId, const std::u16string &desAddr, c
     }
 
     sendMsgFunc = reinterpret_cast<>(dlsym(adapterHandler, "SendMessage"));
-
     if (sendMsgFunc == nullptr) {
         TELEPHONY_LOGE("fail to dlsym SendMessage");
         dlclose(adapterHandler);
         adapterHandler = nullptr;
         return;
     }
-
     sendMsgFunc(slotId, desAddr.c_str(), text.c_str());
-    TELEPHONY_LOGI("reject call message sended");
 
     dlclose(adapterHandler);
     adapterHandler = nullptr;
+    TELEPHONY_LOGI("reject call message sended");
 #endif
 }
 

@@ -53,7 +53,7 @@ int SetTorchMode(TelTorchMode mode)
     return camMgr->SetTorchMode(static_cast<CameraStandard::TorchMode>(mode));
 }
 
-bool IsScreenStatusSatisfied()
+bool IsScreenLocked()
 {
     auto screenLockMgr = OHOS::ScreenLock::ScreenLockManager::GetInstance();
     if (screenLockMgr == nullptr) {

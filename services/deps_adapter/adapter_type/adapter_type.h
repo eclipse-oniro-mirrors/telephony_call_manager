@@ -20,13 +20,6 @@
 namespace OHOS {
 namespace Telephony {
 
-enum class TelFoldStatus : uint32_t {
-    UNKNOWN = 0,
-    EXPAND = 1,
-    FOLDED = 2,
-    HALD_FOLD = 3,
-};
-
 enum class TelTorchMode {
     TORCH_MODE_UNKNOWN = 0,
     TORCH_MODE_OFF = 0,

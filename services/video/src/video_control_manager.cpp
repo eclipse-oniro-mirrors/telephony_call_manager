@@ -270,7 +270,7 @@ bool VideoControlManager::ContainCameraID(std::string id)
     bool bRet = false;
 #ifdef ABILITY_CAMERA_SUPPORT
     using ContainCameraIDFunc = bool (*)(const char *id);
-    auto adapterHandler = dlopen("libtel_adapter.so", RTLD_LAZY);
+    auto adapterHandler = dlopen("libtel_cm_deps_adapter.so", RTLD_LAZY);
     ContainCameraIDFunc containCameraID = (dlsym(adapterHandler, "ContainCameraID"));
     if (containCameraID != nullptr) {
         bRet = containCameraID(id);

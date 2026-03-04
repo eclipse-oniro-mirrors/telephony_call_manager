@@ -31,6 +31,8 @@ TelTorchMode GetTorchMode();
 
 int SetTorchMode(TelTorchMode mode);
 
+bool IsScreenStatusLocked();
+
 #ifdef __cplusplus
 }
 #endif
