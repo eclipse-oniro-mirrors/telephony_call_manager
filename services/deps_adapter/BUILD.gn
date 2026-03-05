@@ -28,7 +28,7 @@ ohos_shared_library("tel_cm_deps_adapter") {
   ]
 
   include_dirs = [
-    "${call_manager_path}/services/deps_adapter/adapter_type_include",
+    "${call_manager_path}/services/deps_adapter/adapter_type",
     "${call_manager_path}/services/deps_adapter/include",
   ]
 

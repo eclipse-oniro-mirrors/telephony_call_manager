@@ -37,7 +37,7 @@ void RejectCallSms::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSen
 void RejectCallSms::SendMessage(int32_t slotId, const std::u16string &desAddr, const std::u16string &text)
 {
 #ifdef ABILITY_SMS_SUPPORT
-    typedef int (*SendMessageFunc)(int32_t slotId, const char16_t* desAddr, const char16_t* text)
+    typedef int (*SendMessageFunc)(int32_t slotId, const char16_t* desAddr, const char16_t* text);
 
     void *adapterHandler = dlopen("libtel_cm_deps_adapter.so", RTLD_LAZY);
     if (adapterHandler == nullptr) {
