@@ -148,7 +148,9 @@ int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamTyp
         if (IsStop(playerType)) {
             break;
         } else if (feof(wavFile)) {
-            fseek(wavFile, 0, SEEK_SET); // jump back to the beginning of the file
+            if (fseek(wavFile, 0, SEEK_SET) != 0) {
+                break;
+            }
             fread(&wavHeader, READ_SIZE, sizeof(wav_hdr), wavFile); // skip the wav header
         }
         bytesToWrite = fread(buffer, READ_SIZE, bufferLen, wavFile);
