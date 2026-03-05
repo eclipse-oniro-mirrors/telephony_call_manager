@@ -16,6 +16,7 @@
 #include "incoming_flash_reminder_adapter.h"
 #include "input/camera_manager.h"
 #include "screenlock_manager.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {

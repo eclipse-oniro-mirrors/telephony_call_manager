@@ -93,7 +93,7 @@ bool IncomingFlashReminder::IsFlashRemindNecessary()
     libAdapterHandler_ = dlopen("libtel_cm_deps_adapter.so", RTLD_LAZY);
     if (libAdapterHandler_ == nullptr) {
         TELEPHONY_LOGE("deps adapter dlopen failed : %{public}s", dlerror());
-        return;
+        return false;
     }
 #endif
     return IsScreenStatusSatisfied() && IsTorchReady();
