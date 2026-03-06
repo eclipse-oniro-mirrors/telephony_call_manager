@@ -37,6 +37,8 @@ void ApplicationStateObserver::OnProcessDied(const AppExecFwk::ProcessData& proc
         TELEPHONY_LOGE("report voipcall state idle");
         DelayedSingleton<CallControlManager>::GetInstance()->SetVoIPCallState((int32_t)CallStateToApp::CALL_STATE_IDLE);
         DelayedSingleton<CallObjectManager>::GetInstance()->ClearVoipList();
+        DelayedSingleton<BluetoothCallManager>::GetInstance()->
+            SendBtCallState(0, 0, (int32_t)TelCallState::CALL_STATE_IDLE, "");
     }
 }
 
