@@ -116,40 +116,6 @@ bool AudioPlayer::InitCapturer()
     return true;
 }
 
-int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamType streamType, PlayerType playerType)
-{
-    wav_hdr wavHeader;
-    std::string realPath = "";
-    if (!GetRealPath(path, realPath) || realPath.empty()) {
-        TELEPHONY_LOGE("path or realPath is NULL");
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    FILE *wavFile = fopen(realPath.c_str(), "rb");
-    if (wavFile == nullptr) {
-        TELEPHONY_LOGE("open audio file failed");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    (void)fread(&wavHeader, READ_SIZE, sizeof(wav_hdr), wavFile);
-    SetStop(playerType, false);
-    if (!InitRenderer(wavHeader, streamType)) {
-        TELEPHONY_LOGE("audio renderer and capturer init failed");
-        (void)fclose(wavFile);
-        return TELEPHONY_ERR_UNINIT;
-    }
-    uint8_t *buffer = (uint8_t *)malloc(bufferLen + bufferLen);
-    if (buffer == nullptr) {
-        TELEPHONY_LOGE("audio malloc buffer failed");
-        (void)fclose(wavFile);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    TELEPHONY_LOGI("start audio rendering");
-    StartPlayLoop(wavFile, wavHeader, buffer, playerType);
-    free(buffer);
-    (void)fclose(wavFile);
-    TELEPHONY_LOGI("audio renderer playback done");
-    return TELEPHONY_SUCCESS;
-}
-
 void AudioPlayer::StartPlayLoop(FILE *wavFile, wav_hdr wavHeader, uint8_t *buffer, PlayerType playerType)
 {
     size_t bytesToWrite = 0;
