@@ -142,8 +142,17 @@ int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamTyp
         (void)fclose(wavFile);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    size_t bytesToWrite = 0, bytesWritten = 0;
     TELEPHONY_LOGI("start audio rendering");
+    StartPlayLoop(wavFile, wavHeader, buffer, playerType);
+    free(buffer);
+    (void)fclose(wavFile);
+    TELEPHONY_LOGI("audio renderer playback done");
+    return TELEPHONY_SUCCESS;
+}
+
+void AudioPlayer::StartPlayLoop(FILE *wavFile, wav_hdr wavHeader, uint8_t *buffer, PlayerType playerType)
+{
+    size_t bytesToWrite = 0, bytesWritten = 0;
     while (!isStop_) {
         if (IsStop(playerType)) {
             break;
@@ -163,10 +172,6 @@ int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamTyp
                     audioRenderer_->Write(buffer + bytesWritten, bytesToWrite - bytesWritten));
         }
     }
-    free(buffer);
-    (void)fclose(wavFile);
-    TELEPHONY_LOGI("audio renderer playback done");
-    return TELEPHONY_SUCCESS;
 }
 
 int32_t AudioPlayer::Play(PlayerType playerType)
