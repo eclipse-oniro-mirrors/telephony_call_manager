@@ -268,16 +268,17 @@ int32_t VideoControlManager::CloseCamera(
 bool VideoControlManager::ContainCameraID(std::string id)
 {
     bool bRet = false;
-#ifdef ABILITY_CAMERA_SUPPORT // 此代码貌似未使用，一会确认下。比如不修改这一段
-    using ContainCameraIDFunc = bool (*)(const char *id);
-    auto adapterHandler = dlopen("libtel_cm_deps_adapter.z.so", RTLD_LAZY);
-    if (adapterHandler == nullptr) {
-        dlclose(adapterHandler);
-    }
-    ContainCameraIDFunc containCameraID = (dlsym(adapterHandler, "ContainCameraID"));
-    if (containCameraID != nullptr) {
-        bRet = containCameraID(id);
-        dlclose(adapterHandler);
+#ifdef ABILITY_CAMERA_SUPPORT
+    using namespace OHOS::CameraStandard;
+    sptr<CameraManager> camManagerObj = CameraManager::GetInstance();
+    std::vector<sptr<CameraStandard::CameraDevice>> cameraObjList = camManagerObj->GetSupportedCameras();
+
+    for (auto &it : cameraObjList) {
+        if (id.compare(it->GetID()) == 0) {
+            bRet = true;
+            TELEPHONY_LOGI("Contain Camera ID:  : %{public}s", id.c_str());
+            break;
+        }
     }
 #endif
     return bRet;
