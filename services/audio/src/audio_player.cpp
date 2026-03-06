@@ -152,7 +152,8 @@ int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamTyp
 
 void AudioPlayer::StartPlayLoop(FILE *wavFile, wav_hdr wavHeader, uint8_t *buffer, PlayerType playerType)
 {
-    size_t bytesToWrite = 0, bytesWritten = 0;
+    size_t bytesToWrite = 0;
+    size_t bytesWritten = 0;
     while (!isStop_) {
         if (IsStop(playerType)) {
             break;
