@@ -16,8 +16,6 @@
 #ifndef INCOMING_FLASH_REMINDER_ADAPTER_H
 #define INCOMING_FLASH_REMINDER_ADAPTER_H
 
-#include "adapter_type.h"
-
 namespace OHOS {
 namespace Telephony {
 
