@@ -268,9 +268,12 @@ int32_t VideoControlManager::CloseCamera(
 bool VideoControlManager::ContainCameraID(std::string id)
 {
     bool bRet = false;
-#ifdef ABILITY_CAMERA_SUPPORT
+#ifdef ABILITY_CAMERA_SUPPORT // 此代码貌似未使用，一会确认下。比如不修改这一段
     using ContainCameraIDFunc = bool (*)(const char *id);
     auto adapterHandler = dlopen("libtel_cm_deps_adapter.z.so", RTLD_LAZY);
+    if (adapterHandler == nullptr) {
+        dlclose(adapterHandler);
+    }
     ContainCameraIDFunc containCameraID = (dlsym(adapterHandler, "ContainCameraID"));
     if (containCameraID != nullptr) {
         bRet = containCameraID(id);

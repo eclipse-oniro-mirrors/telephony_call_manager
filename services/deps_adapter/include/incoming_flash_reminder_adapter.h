@@ -36,6 +36,6 @@ bool IsScreenLocked();
 #ifdef __cplusplus
 }
 #endif
-} // TELEPHONY
+} // Telephony
 } // OHOS
 #endif
