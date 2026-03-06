@@ -111,7 +111,7 @@ private:
     std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_ = nullptr;
     std::unique_ptr<AudioStandard::AudioCapturer> audioCapturer_ = nullptr;
     bool GetRealPath(const std::string &profilePath, std::string &realPath);
-    void StartPlayLoop(FILE *wavFile, wav_hdr wavHeader, uint8_t *buffer, PlayerType playerType)
+    void StartPlayLoop(FILE *wavFile, wav_hdr wavHeader, uint8_t *buffer, PlayerType playerType);
 };
 } // namespace Telephony
 } // namespace OHOS
