@@ -26,7 +26,7 @@ extern "C" {
 int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text) // 此处是否需要调整接口，增加两个传入长度。
 {
     return Singleton<SmsServiceManagerClient>::GetInstance()
-        .SendMessage(slotId, std::u16string(desAddr), std::u16string(""), std::u16string(text), nullptr, nullptr);
+        .SendMessage(slotId, std::u16string(desAddr), std::u16string(u""), std::u16string(text), nullptr, nullptr);
 }
 
 #ifdef __cplusplus
