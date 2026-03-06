@@ -90,7 +90,7 @@ bool IncomingFlashReminder::IsFlashRemindNecessary()
         return false;
     }
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
-    libAdapterHandler_ = dlopen("libtel_cm_deps_adapter.so", RTLD_LAZY);
+    libAdapterHandler_ = dlopen("libtel_cm_deps_adapter.z.so", RTLD_LAZY);
     if (libAdapterHandler_ == nullptr) {
         TELEPHONY_LOGE("deps adapter dlopen failed : %{public}s", dlerror());
         return false;
