@@ -14,7 +14,7 @@
  */
 
 #include "app_state_observer.h"
-
+#include "buletooth_call_manager.h"
 #include "iservice_registry.h"
 #include "telephony_log_wrapper.h"
 #include "i_call_ability_callback.h"
