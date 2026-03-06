@@ -23,7 +23,7 @@ namespace Telephony {
 extern "C" {
 #endif
 
-int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text)
+int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text) // 此处是否需要调整接口，增加两个传入长度。
 {
     auto client = Singleton<SmsServiceManagerClient>::GetInstance();
     if (client == nullptr) {

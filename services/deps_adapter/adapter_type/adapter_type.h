@@ -23,8 +23,8 @@ namespace Telephony {
 enum class TelTorchMode {
     TORCH_MODE_UNKNOWN = -1,
     TORCH_MODE_OFF = 0,
-    TORCH_MODE_ON,
-    TORCH_MODE_AUTO
+    TORCH_MODE_ON = 1,
+    TORCH_MODE_AUTO = 2
 };
 
 } // namespace Telephony
