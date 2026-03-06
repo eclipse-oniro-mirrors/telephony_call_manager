@@ -27,9 +27,9 @@ extern "C" {
 
 bool IsTorchSupported();
 
-TelTorchMode GetTorchMode();
+int GetTorchMode();
 
-int SetTorchMode(TelTorchMode mode);
+int SetTorchMode(int mode);
 
 bool IsScreenLocked();
 

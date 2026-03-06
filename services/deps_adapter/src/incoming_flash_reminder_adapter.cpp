@@ -34,17 +34,17 @@ bool IsTorchSupported()
     return camMgr->IsTorchSupported();
 }
 
-TelTorchMode GetTorchMode()
+int GetTorchMode()
 {
     sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
     if (camMgr == nullptr) {
         TELEPHONY_LOGE("get cameraMgr null");
-        return TelTorchMode::TORCH_MODE_UNKNOWN;
+        return -1;
     }
-    return static_cast<TelTorchMode>(camMgr->GetTorchMode());
+    return static_cast<int>(camMgr->GetTorchMode());
 }
 
-int SetTorchMode(TelTorchMode mode)
+int SetTorchMode(int mode)
 {
     sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
     if (camMgr == nullptr) {
@@ -67,5 +67,5 @@ bool IsScreenLocked()
 #ifdef __cplusplus
 }
 #endif
-}
-}
+} // Telephony
+} // OHOS

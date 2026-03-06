@@ -28,8 +28,8 @@ namespace Telephony {
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
 constexpr int64_t DELAY_SET_TORCH_MODE_TIME = 300;
 using IsTorchSupportedFunc = bool(*)();
-using GetTorchModeFunc = TelTorchMode (*)();
-using SetTorchModeFunc = int32_t (*)(TelTorchMode mode);
+using GetTorchModeFunc = int (*)();
+using SetTorchModeFunc = int32_t (*)(int mode);
 #endif
 #ifdef ABILITY_SCREENLOCKMGR_SUPPORT
     using IsScreenLockedFun = bool (*)();
@@ -61,7 +61,7 @@ IncomingFlashReminder::~IncomingFlashReminder()
         TELEPHONY_LOGE("dlsym SetTorchMode failed : %{public}s", dlerror());
         return;
     }
-    int32_t result = setTorchMode(TelTorchMode::TORCH_MODE_OFF);
+    int32_t result = setTorchMode(static_cast<int>(TelTorchMode::TORCH_MODE_OFF));
     dlclose(libAdapterHandler_);
     libAdapterHandler_ = nullptr;
     TELEPHONY_LOGI("set torch mode result: %{public}d", result);
@@ -143,7 +143,7 @@ bool IncomingFlashReminder::IsTorchReady()
         return false;
     }
     
-    TelTorchMode currentMode = getTorchMode();
+    TelTorchMode currentMode = static_cast<TelTorchMode>(getTorchMode());
     if (currentMode == TelTorchMode::TORCH_MODE_ON) {
         TELEPHONY_LOGI("torch being used");
         return false;
@@ -197,7 +197,7 @@ void IncomingFlashReminder::HandleStartFlashRemind()
 void IncomingFlashReminder::HandleSetTorchMode()
 {
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
-    int32_t result = -1; // 正常调用只会从零开始
+    int32_t result = TelTorchMode::TORCH_MODE_UNKNOWN;
     if (libAdapterHandler_ == nullptr) {
         TELEPHONY_LOGE("deps adapter is nullptr");
         return;
@@ -210,10 +210,10 @@ void IncomingFlashReminder::HandleSetTorchMode()
         return;
     }
 
-    TelTorchMode currentMode = getTorchMode();
+    TelTorchMode currentMode = static_cast<TelTorchMode>(getTorchMode());
     TelTorchMode nextMode = (currentMode == TelTorchMode::TORCH_MODE_ON?
         TelTorchMode::TORCH_MODE_OFF : TelTorchMode::TORCH_MODE_ON);
-    result = setTorchMode(nextMode);
+    result = setTorchMode(static_cast<int>(nextMode));
 
     SendEvent(AppExecFwk::InnerEvent::Get(DELAY_SET_TORCH_EVENT, 0), DELAY_SET_TORCH_MODE_TIME);
     TELEPHONY_LOGI("set torch mode result: %{public}d", result);
@@ -248,7 +248,7 @@ void IncomingFlashReminder::HandleStopFlashRemind()
         return;
     }
 
-    int32_t result = setTorchMode ? setTorchMode(TelTorchMode::TORCH_MODE_OFF) : -1;
+    int32_t result = setTorchMode ? setTorchMode(TelTorchMode::TORCH_MODE_OFF) : TelTorchMode::TORCH_MODE_UNKNOWN;
     TELEPHONY_LOGI("set torch mode result: %{public}d", result);
 #endif
     if (stopFlashRemindDone_ != nullptr) {

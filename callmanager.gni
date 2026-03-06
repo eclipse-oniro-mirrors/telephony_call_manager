@@ -170,7 +170,6 @@ call_manager_include_dirs = [
   "${call_manager_path}/services/video/include",
   "${call_manager_path}/utils/include",
   "${call_manager_path}/services/deps_adapter/adapter_type",
-
 ]
 
 if (call_manager_feature_support_dsoftbus) {
