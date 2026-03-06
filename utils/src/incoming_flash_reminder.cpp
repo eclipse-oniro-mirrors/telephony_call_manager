@@ -248,7 +248,7 @@ void IncomingFlashReminder::HandleStopFlashRemind()
         return;
     }
 
-    int32_t result = static_cast<int32_t>(setTorchMode(TelTorchMode::TORCH_MODE_OFF));
+    int32_t result = static_cast<int32_t>(setTorchMode(static_cast<int>(TelTorchMode::TORCH_MODE_OFF)));
     TELEPHONY_LOGI("set torch mode result: %{public}d", result);
 #endif
     if (stopFlashRemindDone_ != nullptr) {
