@@ -25,6 +25,7 @@ ohos_shared_library("tel_cm_deps_adapter") {
   branch_protector_ret = "pac_ret"
   sources = [
     "${call_manager_path}/services/deps_adapter/src/incoming_flash_reminder_adapter.cpp",
+    "${call_manager_path}/services/deps_adapter/src/sms_adapter.cpp",
   ]
 
   include_dirs = [
@@ -35,6 +36,7 @@ ohos_shared_library("tel_cm_deps_adapter") {
   external_deps = [
     "screenlock_mgr:screenlock_client",
     "camera_framework:camera_framework",
+    "sms_mms:tel_sms_mms_api",
     "ability_runtime:abilitykit_native",
     "graphic_surface:surface", # 被动引入头文件导致不得不依赖
     "core_service:libtel_common", # 日志需要
@@ -46,7 +48,6 @@ ohos_shared_library("tel_cm_deps_adapter") {
   ]
 
   cflags_cc = [
-    "-flto",
     # 看看是否需要添加什么
   ]
 
