@@ -336,6 +336,7 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_002, TestSize.Level0)
     EXPECT_TRUE(CallObjectManager::GetAudioLiveCall() != nullptr);
     audioProxy->SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, true, true);
     audioProxy->SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, true, false);
+    EXPECT_FALSE(AudioProxy::IsDistributedPreferredOutputAudioDevice());
 }
 
 /**
