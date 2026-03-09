@@ -188,11 +188,11 @@ void IncomingFlashReminder::HandleStartFlashRemind()
     libAdapterHandler_ = dlopen("libtel_cm_deps_adapter.z.so", RTLD_LAZY);
     if (libAdapterHandler_ == nullptr) {
         TELEPHONY_LOGE("deps adapter dlopen failed : %{public}s", dlerror());
-        return false;
+        return;
     }
 #endif
-    if (!IsFlashRemindNecessary(libAdapterHandler_)) {
-        TELEPHONY_LOGR("no need to StartFlashRemind");
+    if (!IsFlashRemindNecessary()) {
+        TELEPHONY_LOGE("no need to StartFlashRemind");
         dlclose(libAdapterHandler_);
         libAdapterHandler_ = nullptr;
         return;
