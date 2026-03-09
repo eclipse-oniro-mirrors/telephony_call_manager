@@ -1385,6 +1385,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallSettingAbilityConnection_0001, TestSize
 
 
 /**
+ * @tc.number   Telephony_CallSettingAbilityConnection_0001
+ * @tc.name     Test branch
+ * @tc.desc     Function test
+ */
+/**
  * @tc.number   AudioPlayerTest
  * @tc.name     Test normal play ring 
  * @tc.desc     Function test
