@@ -37,13 +37,13 @@ ohos_shared_library("tel_cm_deps_adapter") {
     "camera_framework:camera_framework",
     "sms_mms:tel_sms_mms_api",
     "ability_runtime:abilitykit_native",
-    "graphic_surface:surface", # 被动引入头文件导致不得不依赖
-    "core_service:libtel_common", # 日志需要
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "hitrace:libhitracechain",
-    "c_utils:utils", # rebase要求引入
+    "c_utils:utils", # 以下为头文件依赖引入
+    "graphic_surface:surface",
+    "core_service:libtel_common",
   ]
 
   cflags_cc = [

@@ -19,9 +19,6 @@
 #include "settings_datashare_helper.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
-#ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
-#include "adapter_type.h"
-#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -30,6 +27,12 @@ constexpr int64_t DELAY_SET_TORCH_MODE_TIME = 300;
 using IsTorchSupportedFunc = bool(*)();
 using GetTorchModeFunc = int (*)();
 using SetTorchModeFunc = int32_t (*)(int mode);
+enum class TelTorchMode {
+    TORCH_MODE_UNKNOWN = -1,
+    TORCH_MODE_OFF = 0,
+    TORCH_MODE_ON = 1,
+    TORCH_MODE_AUTO = 2
+};
 #endif
 #ifdef ABILITY_SCREENLOCKMGR_SUPPORT
     using IsScreenLockedFun = bool (*)();
