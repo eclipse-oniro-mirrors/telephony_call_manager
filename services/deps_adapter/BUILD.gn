@@ -29,7 +29,6 @@ ohos_shared_library("tel_cm_deps_adapter") {
   ]
 
   include_dirs = [
-    "${call_manager_path}/services/deps_adapter/adapter_type",
     "${call_manager_path}/services/deps_adapter/include",
   ]
 
@@ -48,11 +47,23 @@ ohos_shared_library("tel_cm_deps_adapter") {
   ]
 
   cflags_cc = [
-    # 看看是否需要添加什么
+    "-Wunused",
+    "-Wunreachable-code",
+    "-fno-exceptions",
+    "-fno-rtti",
+    "-fstack-protector-all",
+    "-Os",
+    "-D_FORTIFY_SOURCE=2",
+    "-Wno-unused-but-set-variable",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
+
   ]
 
   ldflags = [
-    # 看看是否需要添加什么
+    "-Wl,--gc-sections",
   ]
 
   defines = [

@@ -14,7 +14,6 @@
  */
 
 #include "sms_service_manager_client.h"
-#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
