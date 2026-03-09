@@ -28,10 +28,10 @@ public:
         std::function<void()> stopFlashRemindDone);
     ~IncomingFlashReminder();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
-    bool IsFlashRemindNecessary();
     void StartFlashRemind();
     void StopFlashRemind();
 private:
+    bool IsFlashRemindNecessary();
     bool IsFlashReminderSwitchOn();
     bool IsScreenStatusSatisfied();
     bool IsTorchReady();
@@ -40,7 +40,7 @@ private:
     void HandleStartFlashRemind();
     bool isFlashRemindUsed_ = false;
     std::function<void()> stopFlashRemindDone_;
-    void* libAdapterHandler_;
+    void* libAdapterHandler_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
