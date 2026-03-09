@@ -160,7 +160,6 @@ void GetCallerInfo(const uint8_t *data, size_t size)
     bool speakerphoneOn = static_cast<bool>(size % BOOL_NUM);
     std::string phoneNumber(reinterpret_cast<const char *>(data), size);
     int32_t callId = static_cast<int32_t>(size);
-    CallEndedType callEndedType = static_cast<CallEndedType>(size % CALL_ENDED_TYPE_NUM);
     CallAnswerType answerType = static_cast<CallAnswerType>(size % CALL_ANSWER_TYPE_NUM);
     int64_t startTime = static_cast<int64_t>(size);
     time_t callBeginTime = static_cast<time_t>(size);
@@ -178,8 +177,6 @@ void GetCallerInfo(const uint8_t *data, size_t size)
     callObjectPtr->SetRingBeginTime(ringBeginTime);
     callObjectPtr->SetRingEndTime(ringEndTime);
     callObjectPtr->SetAnswerType(answerType);
-    callObjectPtr->GetCallEndedType();
-    callObjectPtr->SetCallEndedType(callEndedType);
     callObjectPtr->SetCallId(callId);
     callObjectPtr->IsSpeakerphoneEnabled();
     callObjectPtr->IsCurrentRinging();

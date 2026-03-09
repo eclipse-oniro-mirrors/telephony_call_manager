@@ -296,16 +296,6 @@ void AudioDeviceChangeCallback::OnDeviceChange(const AudioStandard::DeviceChange
     }
 }
 
-std::string AudioProxy::GetDefaultTonePath() const
-{
-    return defaultTonePath_;
-}
-
-std::string AudioProxy::GetDefaultDtmfPath() const
-{
-    return defaultDtmfPath_;
-}
-
 void AudioProxy::SetWiredHeadsetState(bool isConnected)
 {
     isWiredHeadsetConnected_ = isConnected;

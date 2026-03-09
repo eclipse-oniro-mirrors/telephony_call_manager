@@ -86,8 +86,6 @@ public:
     int32_t GetMaxVolume(AudioStandard::AudioVolumeType audioVolumeType);
     int32_t GetMinVolume(AudioStandard::AudioVolumeType audioVolumeType);
     int32_t SetAudioDeviceChangeCallback();
-    std::string GetDefaultTonePath() const;
-    std::string GetDefaultDtmfPath() const;
     int32_t UnsetDeviceChangeCallback();
     void SetWiredHeadsetState(bool isConnected);
     int32_t GetPreferredOutputAudioDevice(AudioDevice &device, bool isNeedCurrentDevice = false);
@@ -100,8 +98,6 @@ public:
 
 private:
     void PreventInterruption(VibrationType type);
-    const std::string defaultTonePath_ = "/system/etc/telephony/tones/tone.wav";
-    const std::string defaultDtmfPath_ = "/system/etc/telephony/dtmfs/dtmf.wav";
     std::shared_ptr<AudioStandard::AudioManagerDeviceChangeCallback> deviceCallback_;
     std::shared_ptr<AudioStandard::AudioPreferredOutputDeviceChangeCallback> preferredDeviceCallback_;
     std::shared_ptr<AudioStandard::AudioManagerMicStateChangeCallback> audioMicStateChangeCallback_;

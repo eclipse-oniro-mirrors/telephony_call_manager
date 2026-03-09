@@ -39,7 +39,7 @@ CallBase::CallBase(DialParaInfo &info)
       conferenceState_(TelConferenceState::TEL_CONFERENCE_IDLE), startTime_(0),
       direction_(CallDirection::CALL_DIRECTION_IN), policyFlag_(0), callState_(info.callState), autoAnswerState_(false),
       canUnHoldState_(true), canSwitchCallState_(true), answerVideoState_(0), isSpeakerphoneOn_(false),
-      callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callCreateTime_(0), callEndTime_(0), ringBeginTime_(0),
+      callBeginTime_(0), callCreateTime_(0), callEndTime_(0), ringBeginTime_(0),
       ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
       blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams), isAnswered_(false),
@@ -57,7 +57,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       conferenceState_(TelConferenceState::TEL_CONFERENCE_IDLE), startTime_(0),
       direction_(CallDirection::CALL_DIRECTION_OUT), policyFlag_(0), callState_(info.callState),
       autoAnswerState_(false), canUnHoldState_(true), canSwitchCallState_(true), answerVideoState_(0),
-      isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callCreateTime_(0),
+      isSpeakerphoneOn_(false), callBeginTime_(0), callCreateTime_(0),
       callEndTime_(0), ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED),
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
       numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1),
@@ -605,19 +605,6 @@ CallAnswerType CallBase::GetAnswerType()
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
     return answerType_;
-}
-
-CallEndedType CallBase::GetCallEndedType()
-{
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    return callEndedType_;
-}
-
-int32_t CallBase::SetCallEndedType(CallEndedType callEndedType)
-{
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    callEndedType_ = callEndedType;
-    return TELEPHONY_SUCCESS;
 }
 
 void CallBase::SetCallId(int32_t callId)

@@ -68,16 +68,6 @@ int32_t Tone::Play()
             tonePlayerPtr->StartTone();
         });
         play.detach();
-    } else {
-        AudioPlay audioPlay = &AudioPlayer::Play;
-        if (audioPlayer_ == nullptr) {
-            TELEPHONY_LOGE("audioPlayer_ is nullptr");
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
-        std::thread play(audioPlay, audioPlayer_, GetToneDescriptorPath(currentToneDescriptor_),
-            AudioStandard::AudioStreamType::STREAM_MUSIC, PlayerType::TYPE_TONE);
-        pthread_setname_np(play.native_handle(), TONE_PLAY_THREAD);
-        play.detach();
     }
     return TELEPHONY_SUCCESS;
 }
@@ -317,14 +307,6 @@ bool Tone::IsUseTonePlayer(ToneDescriptor tone)
             break;
     }
     return ret;
-}
-
-std::string Tone::GetToneDescriptorPath(ToneDescriptor tone)
-{
-#ifdef ABILITY_AUDIO_SUPPORT
-    return DelayedSingleton<AudioProxy>::GetInstance()->GetToneDescriptorPath(tone);
-#endif
-    return DelayedSingleton<AudioProxy>::GetInstance()->GetDefaultTonePath();
 }
 
 void Tone::ReleaseRenderer()
