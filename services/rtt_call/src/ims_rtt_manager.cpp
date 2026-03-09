@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <cerrno>
 #include <fcntl.h>
+#include <unicode/regex.h>
 
 #include "telephony_log_wrapper.h"
 #include "call_manager_base.h"
@@ -147,13 +148,14 @@ void ImsRttManager::SendThreadLoop()
 
 void ImsRttManager::ReadStreamData(const int32_t msgSendLength, std::string &sendMessage)
 {
-    int32_t numToSend = std::min(static_cast<int32_t>(sendStream_.length()), msgSendLength);
+    icu::UnicodeString uStr(sendStream_.c_str(), "UTF-8");
+    int32_t numToSend = std::min(uStr.length(), msgSendLength);
     if (numToSend == 0) {
         return;
     }
-
-    sendMessage = sendStream_.substr(0, numToSend);
-    sendStream_.erase(0, numToSend);
+    icu::UnicodeString uSubStr = uStr.tempSubString(0, numToSend);
+    uSubStr.toUTF8String(sendMessage);
+    sendStream_.erase(0, sendMessage.length());
 }
 
 int32_t ImsRttManager::SendDataToProxy(const std::string &sendMessage)
@@ -237,7 +239,7 @@ void ImsRttManager::RecvDataFromProxy(std::string &recvMessage)
         TELEPHONY_LOGE("readSize is error %{public}d", readSize);
         return;
     }
-    if (rxInd->dataLen == 0 || rxInd->dataLen > MAX_RTT_DATA_LEN) {
+    if (rxInd->dataLen <= 0 || rxInd->dataLen > MAX_RTT_DATA_LEN) {
         TELEPHONY_LOGE("readSize error: datalen is invalidate");
         return;
     }
@@ -245,7 +247,7 @@ void ImsRttManager::RecvDataFromProxy(std::string &recvMessage)
         TELEPHONY_LOGE("readSize error: readSize is not equeal message len");
         return;
     }
-    recvMessage = RttDataStreamToString(rxInd->data, rxInd->dataLen);
+    recvMessage = RttDataStreamToString(rxInd->data, static_cast<int32_t>(rxInd->dataLen));
 }
 
 void ImsRttManager::DestroyRtt()
@@ -281,6 +283,9 @@ int32_t ImsRttManager::SendRttMessage(const std::string &rttMessage)
 
 std::string ImsRttManager::RttDataStreamToString(const uint8_t* rttStreamData, int32_t dataLen)
 {
+    if (dataLen <= 0 || dataLen > MAX_RTT_DATA_LEN) {
+        return "";
+    }
     std::vector<uint8_t> output;
     int32_t i = 0;
     while (i < dataLen) {
