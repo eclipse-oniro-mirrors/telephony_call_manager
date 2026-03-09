@@ -38,11 +38,6 @@ struct RejectCallPara {
     char content[REJECT_CALL_MSG_MAX_LEN + 1] = { 0 };
 };
 
-struct StartRttPara {
-    int32_t callId = 0;
-    std::u16string msg = u"";
-};
-
 struct CallMediaUpdatePara {
     int32_t callId = 0;
     ImsCallMode mode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
@@ -74,8 +69,6 @@ public:
     int32_t SeparateConference(int32_t callId);
     int32_t KickOutFromConference(int32_t callId);
 #ifdef SUPPORT_RTT_CALL
-    int32_t StartRtt(int32_t callId);
-    int32_t StopRtt(int32_t callId);
     int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode);
 #endif
     int32_t JoinConference(int32_t callId, std::vector<std::string> &numberList);

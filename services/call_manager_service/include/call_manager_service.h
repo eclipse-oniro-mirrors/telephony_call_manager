@@ -620,37 +620,6 @@ public:
      */
     int32_t GetVoNRState(int32_t slotId, int32_t &state) override;
 
-#ifdef SUPPORT_RTT_CALL
-    /**
-     * StartRtt
-     *
-     * @brief Enable and send RTT information
-     * @param callId[in], The call id
-     * @param msg[in], RTT information
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t StartRtt(int32_t callId) override;
-
-    /**
-     * StopRtt
-     *
-     * @brief Close the RTT
-     * @param callId[in], The call id
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t StopRtt(int32_t callId) override;
-
-    /**
-     * UpdateImsRttCallMode
-     *
-     * @brief rtt upgrade or downgrade
-     * @param callId[in], call id
-     * @param mode[in], rtt modify mode
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode) override;
-#endif
-
     /**
      * JoinConference
      *
@@ -883,7 +852,50 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t SetRttCapability(int32_t slotId, bool isEnable) override;
+
+    /**
+     * UpdateImsRttCallMode
+     *
+     * @brief rtt upgrade or downgrade
+     * @param callId[in], call id
+     * @param mode[in], rtt modify mode
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode) override;
 #endif
+
+    /**
+     * @brief Set Call Audio Mode
+     *
+     * @param slotId[in], The mode
+     * @param isEnable[in], The scenarios
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetCallAudioMode(int32_t mode, int32_t scenarios) override;
+
+    /**
+     * AnswerCall
+     *
+     * @brief Answer a phone call by call manager
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t AnswerCall() override;
+
+    /**
+     * RejectCall
+     *
+     * @brief Reject a phone call by call manager
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t RejectCall() override;
+
+    /**
+     * HangUpCall
+     *
+     * @brief Hang up the phone by call manager
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t HangUpCall() override;
 
 private:
     std::string GetBundleInfo();
@@ -917,7 +929,7 @@ private:
     int64_t bindTime_ = 0L;
     int32_t spendTime_ = 0;
     sptr<ICallStatusCallback> bluetoothCallCallbackPtr_ = nullptr;
-    std::shared_ptr<BluetoothCallState> bluetoothCallObserver_  = nullptr;
+    std::shared_ptr<BluetoothCallState> bluetoothCallObserver_ = nullptr;
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_ = nullptr;
 };
 } // namespace Telephony

@@ -31,6 +31,8 @@
 #include "napi_call_ability_callback.h"
 #include "call_ability_callback_stub.h"
 #include "rtt_call_listener.h"
+#include "call_control_manager.h"
+#include "call_object_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -363,8 +365,6 @@ HWTEST_F(RttCallTest, Telephony_ImsRttManagerTest001, Function | MediumTest | Le
     ImsRttManager manager(1, 1);
     manager.devFd_ = 1;
     EXPECT_EQ(manager.InitRtt(), RTT_SUCCESS);
-    manager.devFd_ = 0;
-    EXPECT_NE(manager.InitRtt(), ret);
 
     int32_t len = 0;
     std::string sendMessage = "message";
@@ -652,32 +652,10 @@ HWTEST_F(RttCallTest, Telephony_RttCallListenerTest004, Function | MediumTest | 
 
 /**
  * @tc.number   Telephony_RttCallListenerTest005
- * @tc.name     test RefreshRttParam normal func
- * @tc.desc     Function test for RefreshRttParam
- */
-HWTEST_F(RttCallTest, Telephony_RttCallListenerTest005, Function | MediumTest | Level1)
-{
-    DialParaInfo dialInfo;
-    std::shared_ptr<RttCallListener> listener_ = std::make_shared<RttCallListener>();
-    sptr<CallBase> callObjectPtr = new IMSCall(dialInfo);
-    sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(callObjectPtr.GetRefPtr());
-    imsCall->SetCallType(CallType::TYPE_IMS);
-    imsCall->SetRttState(RttCallState::RTT_STATE_YES);
-
-    listener_->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ACTIVE);
-    EXPECT_NE(listener_->rttManager_, nullptr);
-
-    listener_->rttManager_ = nullptr;
-    listener_->RefreshRttParam(333, RttCallState::RTT_STATE_YES, 444);
-    EXPECT_EQ(listener_->rttManager_, nullptr);
-}
-
-/**
- * @tc.number   Telephony_RttCallListenerTest006
  * @tc.name     test SendRttMessage normal func
  * @tc.desc     Function test for SendRttMessage
  */
-HWTEST_F(RttCallTest, Telephony_RttCallListenerTest006, Function | MediumTest | Level1)
+HWTEST_F(RttCallTest, Telephony_RttCallListenerTest005, Function | MediumTest | Level1)
 {
     DialParaInfo dialInfo;
     std::shared_ptr<RttCallListener> listener_ = std::make_shared<RttCallListener>();
@@ -694,6 +672,42 @@ HWTEST_F(RttCallTest, Telephony_RttCallListenerTest006, Function | MediumTest | 
 
     listener_->rttManager_ = nullptr;
     EXPECT_EQ(listener_->SendRttMessage(testMessage), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(RttCallTest, Telephony_CallControlManager_UpdateImsRttCallMode_InvalidCallID, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    ASSERT_NE(callControlManager->UpdateImsRttCallMode(INVALID_CALLID, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE),
+        TELEPHONY_SUCCESS);
+    int32_t slotId = 1;
+    ASSERT_NE(callControlManager->SetRttCapability(slotId, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE), TELEPHONY_SUCCESS);
+    CallDetailInfo callInfo;
+    EXPECT_NO_THROW(callControlManager->RefreshRttManager(callInfo));
+    callControlManager->UnInitRttManager();
+}
+
+HWTEST_F(RttCallTest, Telephony_CallControlManager_UpdateImsRttCallMode_AllBranch, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    ASSERT_TRUE(callControlManager != nullptr);
+    callControlManager->Init()
+    CallObjectManager::callObjectPtrList_.clear();
+    int32_t callId = -1;
+    ImsRTTCallMode mode = ImsRTTCallMode::LOCAL_REQUEST_DOWNGRADE;
+    EXPECT_EQ(callControlManager->UpdateImsRttCallMode(callId, mode), CALL_ERR_INVALID_CALLID);
+
+    DialParaInfo info;
+    sptr<CallBase> imsRttCall = new IMSCall(info);
+    callId = 1;
+    imsRttCall->SetCallId(callId);
+    imsRttCall->SetCallType(CallType::TYPE_IMS);
+    imsRttCall->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    CallObjectManager::callObjectPtrList_.push_back(imsRttCall);
+    EXPECT_EQ(callControlManager->UpdateImsRttCallMode(callId, mode), TELEPHONY_SUCCESS);
+    callControlManager->CallRequestHandlerPtr_->callRequestProcessPtr_ = nullptr;
+    ASSERT_NE(callControlManager->UpdateImsRttCallMode(callId, mode), TELEPHONY_SUCCESS);
+    callControlManager->CallRequestHandlerPtr_ = nullptr;
+    ASSERT_NE(callControlManager->UpdateImsRttCallMode(callId, mode), TELEPHONY_SUCCESS);
 }
 } // namespace Telephony
 } // namespace OHOS

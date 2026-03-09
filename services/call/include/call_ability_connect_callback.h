@@ -17,11 +17,11 @@
 #define CALL_ABILITY_CONNECT_CALLBACK_H
 
 #include "ability_connect_callback_interface.h"
-#include "iremote_stub.h"
+#include "ability_connect_callback_stub.h"
 
 namespace OHOS {
 namespace Telephony {
-class CallAbilityConnectCallback : public IRemoteStub<AAFwk::IAbilityConnection> {
+class CallAbilityConnectCallback : public AAFwk::AbilityConnectionStub {
 public:
     CallAbilityConnectCallback() = default;
     ~CallAbilityConnectCallback() = default;

@@ -23,6 +23,7 @@
 #include "call_ability_callback_proxy.h"
 #include "call_manager_callback.h"
 #include "call_manager_utils.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -175,8 +176,9 @@ int32_t UpdateOttCallRequest(const uint8_t *data, size_t size)
     }
     int32_t requestId = static_cast<uint32_t>(size % OTT_ID_NUM);
     int32_t videoState = static_cast<uint32_t>(size % VEDIO_STATE_NUM);
-    std::string phoneNumber(reinterpret_cast<const char *>(data), size);
-    std::string bundleName(reinterpret_cast<const char *>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string phoneNumber = fdp.ConsumeRandomLengthString();
+    std::string bundleName = fdp.ConsumeRandomLengthString();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(requestId);
     messageParcel.WriteInt32(videoState);

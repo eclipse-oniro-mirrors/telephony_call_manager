@@ -65,6 +65,7 @@ static constexpr const char *OHOS_PERMISSION_PLACE_CALL = "ohos.permission.PLACE
 static constexpr const char *OHOS_PERMISSION_ANSWER_CALL = "ohos.permission.ANSWER_CALL";
 static constexpr const char *OHOS_PERMISSION_READ_CALL_LOG = "ohos.permission.READ_CALL_LOG";
 static constexpr const char *OHOS_PERMISSION_WRITE_CALL_LOG = "ohos.permission.WRITE_CALL_LOG";
+static constexpr const char *OHOS_PERMISSION_MANAGE_CALL_FOR_DEVICES = "ohos.permission.MANAGE_CALL_FOR_DEVICES";
 static constexpr const char *SLOT_ID = "accountId";
 static constexpr const char *CALL_TYPE = "callType";
 static constexpr const char *VIDEO_STATE = "videoState";
@@ -139,6 +140,7 @@ void CallManagerService::UnInit()
 {
     DelayedSingleton<CellularCallConnection>::GetInstance()->UnInit();
     DelayedSingleton<CallControlManager>::GetInstance()->UnInit();
+    DelayedSingleton<CallRecordsManager>::GetInstance()->UnInit();
     callControlManagerPtr_ = nullptr;
     std::lock_guard<ffrt::mutex> guard(bluetoothCallCallbackLock_);
     if (bluetoothCallCallbackPtr_ != nullptr) {
@@ -823,60 +825,6 @@ int32_t CallManagerService::SetCallPreferenceMode(int32_t slotId, int32_t mode)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
-
-#ifdef SUPPORT_RTT_CALL
-int32_t CallManagerService::StartRtt(int32_t callId)
-{
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        TELEPHONY_LOGE("Non-system applications use system APIs!");
-        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
-    }
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("Permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
-    if (callControlManagerPtr_ == nullptr) {
-        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return callControlManagerPtr_->StartRtt(callId);
-}
-
-int32_t CallManagerService::StopRtt(int32_t callId)
-{
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        TELEPHONY_LOGE("Non-system applications use system APIs!");
-        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
-    }
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("Permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
-    if (callControlManagerPtr_ == nullptr) {
-        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return callControlManagerPtr_->StopRtt(callId);
-}
-
-int32_t CallManagerService::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
-{
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        TELEPHONY_LOGE("Non-system applications use system APIs!");
-        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
-    }
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("Permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
-    }
-    if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->UpdateImsRttCallMode(callId, mode);
-    } else {
-        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-}
-#endif
 
 int32_t CallManagerService::CombineConference(int32_t mainCallId)
 {
@@ -1961,6 +1909,91 @@ int32_t CallManagerService::SendRttMessage(int32_t callId, const std::string &rt
     }
     return callControlManagerPtr_->SendRttMessage(rttMessage);
 }
+
+int32_t CallManagerService::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->UpdateImsRttCallMode(callId, mode);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
 #endif
+
+int32_t CallManagerService::SetCallAudioMode(int32_t mode, int32_t scenarios)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (callControlManagerPtr_ != nullptr) {
+        TELEPHONY_LOGI("SetCallAudioMode mode is %{public}d, scenarios is %{public}d", mode, scenarios);
+        return callControlManagerPtr_->SetCallAudioMode(mode, scenarios);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::AnswerCall()
+{
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL) &&
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_MANAGE_CALL_FOR_DEVICES)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    DelayedSingleton<CallManagerHisysevent>::GetInstance()->SetAnswerStartTime();
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->AnswerCall(INVALID_CALLID, static_cast<int32_t>(VideoStateType::TYPE_VOICE));
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::RejectCall()
+{
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL) &&
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE) &&
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_MANAGE_CALL_FOR_DEVICES)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->RejectCall(INVALID_CALLID, false, u"");
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::HangUpCall()
+{
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL) &&
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE) &&
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_MANAGE_CALL_FOR_DEVICES)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->HangUpCall(INVALID_CALLID);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

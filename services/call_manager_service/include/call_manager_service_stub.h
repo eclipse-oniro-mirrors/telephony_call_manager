@@ -108,8 +108,6 @@ private:
     int32_t OnSetVoNRState(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetVoNRState(MessageParcel &data, MessageParcel &reply);
 #ifdef SUPPORT_RTT_CALL
-    int32_t OnStartRtt(MessageParcel &data, MessageParcel &reply);
-    int32_t OnStopRtt(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateImsRttCallMode(MessageParcel &data, MessageParcel &reply);
 #endif
     int32_t OnReportOttCallDetailsInfo(MessageParcel &data, MessageParcel &reply);
@@ -139,6 +137,11 @@ private:
     int32_t OnSendRttMessage(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetRttCapability(MessageParcel &data, MessageParcel &reply);
 #endif
+    int32_t OnSetCallAudioMode(MessageParcel &data, MessageParcel &reply);
+    int32_t OnAcceptCallNoParam(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRejectCallNoParam(MessageParcel &data, MessageParcel &reply);
+    int32_t OnHangUpCallNoParam(MessageParcel &data, MessageParcel &reply);
+
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
     std::map<uint32_t, std::string> collieCodeStringMap_ = {
         { uint32_t(CallManagerInterfaceCode::INTERFACE_REGISTER_CALLBACK), "INTERFACE_REGISTER_CALLBACK" },

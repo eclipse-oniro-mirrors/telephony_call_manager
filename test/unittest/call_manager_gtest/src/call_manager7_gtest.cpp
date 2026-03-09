@@ -343,8 +343,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_004, TestSize.Level1)
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    ASSERT_NE(callManagerService->StartRtt(0), TELEPHONY_SUCCESS);
-    ASSERT_NE(callManagerService->StopRtt(0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->UpdateImsRttCallMode(0, LOCAL_REQUEST_UPGRADE), TELEPHONY_SUCCESS);
 }
 #endif
 
@@ -591,7 +590,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_005, TestSize.Level0
     callManagerService->OnIsVoLteEnabled(data, reply);
     callManagerService->OnGetVoNRState(data, reply);
 #ifdef SUPPORT_RTT_CALL
-    callManagerService->OnStopRtt(data, reply);
+    callManagerService->OnUpdateImsRttCallMode(data, reply);
 #endif
     callManagerService->OnCloseUnFinishedUssd(data, reply);
     callManagerService->OnInputDialerSpecialCode(data, reply);
@@ -718,9 +717,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_007, TestSize.Level0
     data4.RewindRead(0);
     callManagerService->OnControlCamera(data4, reply);
     callManagerService->OnSetPausePicture(data4, reply);
-#ifdef SUPPORT_RTT_CALL
-    callManagerService->OnStartRtt(data4, reply);
-#endif
 
     MessageParcel data5;
     float fnum = 0.0;
@@ -894,6 +890,29 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_011, TestSize.Level0
     EXPECT_NE(callManagerService, nullptr);
 }
 #endif
+
+/**
+ * @tc.number   Telephony_CallManagerServiceStub_OnSetAudioDevice
+ * @tc.name     test invalid AudioDevice branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_OnSetAudioDevice, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel data;
+    MessageParcel reply;
+    AudioDevice audioDevice;
+    std::fill(std::begin(audioDevice.address), std::end(audioDevice.address), 'a');
+    data.WriteRawData(&audioDevice, sizeof(AudioDevice));
+    EXPECT_EQ(callManagerService->OnSetAudioDevice(data, reply), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    audioDevice.address[kMaxAddressLen] = '\0';
+    std::fill(std::begin(audioDevice.deviceName), std::end(audioDevice.deviceName), 'a');
+    data.WriteRawData(&audioDevice, sizeof(AudioDevice));
+    EXPECT_EQ(callManagerService->OnSetAudioDevice(data, reply), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    audioDevice.deviceName[kMaxDeviceNameLen] = '\0';
+    data.WriteRawData(&audioDevice, sizeof(AudioDevice));
+    EXPECT_NE(callManagerService->OnSetAudioDevice(data, reply), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
 
 /**
  * @tc.number   Telephony_VoipCall_001

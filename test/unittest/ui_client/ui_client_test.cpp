@@ -1336,21 +1336,14 @@ void GetVoNRState()
 void StartRtt()
 {
     int32_t callId = DEFAULT_CALL_ID;
-    std::u16string msg;
-    std::string tmpMsg;
     std::cout << "------StartRtt------" << std::endl;
     std::cout << "please input call id:" << std::endl;
     std::cin >> callId;
-    std::cout << "please input Rtt msg:" << std::endl;
-    msg.clear();
-    tmpMsg.clear();
-    std::cin >> tmpMsg;
-    msg = Str8ToStr16(tmpMsg);
     if (g_clientPtr == nullptr) {
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    int32_t ret = g_clientPtr->StartRtt(callId);
+    int32_t ret = g_clientPtr->UpdateImsRttCallMode(callId, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE);
     std::cout << "return value:" << ret << std::endl;
 }
 
@@ -1364,7 +1357,7 @@ void StopRtt()
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    int32_t ret = g_clientPtr->StopRtt(callId);
+    int32_t ret = g_clientPtr->UpdateImsRttCallMode(callId, ImsRTTCallMode::LOCAL_REQUEST_DOWNGRADE);
     std::cout << "return value:" << ret << std::endl;
 }
 #endif

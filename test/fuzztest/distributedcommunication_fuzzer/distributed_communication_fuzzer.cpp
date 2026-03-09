@@ -21,13 +21,15 @@
 #include "ims_call.h"
 #include "distributed_data_sink_controller.h"
 #include "distributed_data_source_controller.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
 void TestCommonController(const std::shared_ptr<DistributedDataController> &controller, const uint8_t *data,
     size_t size)
 {
-    std::string stringValue(reinterpret_cast<const char *>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string stringValue = fdp.ConsumeRandomLengthString();
     int32_t intValue = static_cast<int32_t>(size);
     AudioDeviceType audioDevType = static_cast<AudioDeviceType>(
         size % static_cast<uint32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_PC));

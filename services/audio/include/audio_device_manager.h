@@ -26,6 +26,10 @@
 
 namespace OHOS {
 namespace Telephony {
+struct CallAudioMode {
+    int32_t audioMode;
+    int32_t audioScene;
+};
 /**
  * @class AudioDeviceManager
  * describes the available devices of a call.
@@ -76,6 +80,10 @@ public:
     void UpdateNearlinkDeviceName(const std::string &macAddress, const std::string &deviceName);
     AudioDeviceType GetCurrentAudioDevice();
     void UpdateCurrentAudioDevice();
+    int32_t SetCallAudioMode(const CallAudioMode &audioMode);
+    void SetAudioDeviceByAudioMode(bool isVoipCall, bool isIncomingCall);
+    void SetSpeakerDeactive();
+    bool IsSpeakerMode();
 private:
     bool EnableBtSco();
     bool EnableNearlink();
@@ -117,6 +125,8 @@ private:
     static bool isDCallDevConnected_;
     bool isAudioActivated_;
     AudioDeviceInfo info_;
+    CallAudioMode callAudioMode_;
+    ffrt::mutex audioModeMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

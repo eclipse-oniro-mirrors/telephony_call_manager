@@ -35,6 +35,8 @@ constexpr int CALLMANAGER_HSDR_ERR_WRITE_DATA_FAIL = -2;
 constexpr int CALLMANAGER_HSDR_ERR_READ_DATA_FAIL = -3;
 constexpr int CALLMANAGER_HSDR_ERR_PERMISSION_ERR = -4;
 constexpr int UNEXPECT_DISCONNECT_CODE = -1;
+const std::string HSDR_BUNDLE_NAME = "com.hmos.hsdr";
+const std::string HSDR_ABILITY_NAME = "HSDRService";
 
 static bool ReadStr16(MessageParcel &parcel, std::string &str8)
 {

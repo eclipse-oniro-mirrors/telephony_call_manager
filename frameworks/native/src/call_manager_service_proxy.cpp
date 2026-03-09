@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,7 +75,7 @@ int32_t CallManagerServiceProxy::DialCall(std::u16string number, AppExecFwk::Pac
     dataParcel.WriteInt32(extras.GetIntValue("dialScene"));
     dataParcel.WriteInt32(extras.GetIntValue("dialType"));
     dataParcel.WriteInt32(extras.GetIntValue("callType"));
-    dataParcel.WriteBool(extras.GetBooleanValue("isRTT"));
+    dataParcel.WriteBool(extras.GetBooleanValue("isRTT", false));
     dataParcel.WriteString(extras.GetStringValue("extraParams"));
     dataParcel.WriteBool(extras.GetBooleanValue("btSlotIdUnknown", false));
     TELEPHONY_LOGI("DialCall isRTT: %{public}d", extras.GetBooleanValue("isRTT"));
@@ -581,40 +581,6 @@ int32_t CallManagerServiceProxy::SetCallPreferenceMode(int32_t slotId, int32_t m
 }
 
 #ifdef SUPPORT_RTT_CALL
-int32_t CallManagerServiceProxy::StartRtt(int32_t callId)
-{
-    MessageParcel dataParcel;
-    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    dataParcel.WriteInt32(callId);
-    MessageParcel replyParcel;
-    int32_t error = SendRequest(CallManagerInterfaceCode::INTERFACE_START_RTT, dataParcel, replyParcel);
-    if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("Function StartRtt errCode:%{public}d", error);
-        return error;
-    }
-    return replyParcel.ReadInt32();
-}
-
-int32_t CallManagerServiceProxy::StopRtt(int32_t callId)
-{
-    MessageParcel dataParcel;
-    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    dataParcel.WriteInt32(callId);
-    MessageParcel replyParcel;
-    int32_t error = SendRequest(CallManagerInterfaceCode::INTERFACE_STOP_RTT, dataParcel, replyParcel);
-    if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("Function StopRtt errCode:%{public}d", error);
-        return error;
-    }
-    return replyParcel.ReadInt32();
-}
-
 int32_t CallManagerServiceProxy::UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode)
 {
     MessageParcel dataParcel;
@@ -1582,5 +1548,71 @@ int32_t CallManagerServiceProxy::SetRttCapability(int32_t slotId, bool enabled)
     return replyParcel.ReadInt32();
 }
 #endif
+
+int32_t CallManagerServiceProxy::SetCallAudioMode(int32_t mode, int32_t scenarios)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(mode);
+    dataParcel.WriteInt32(scenarios);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_SET_CALL_AUDIO_MODE, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function SetCallAudioMode failed! errCode:%{public}d", error);
+        return error;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallManagerServiceProxy::AnswerCall()
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_ANSWER_CALL_NO_PARAM, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function AnswerCall call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallManagerServiceProxy::RejectCall()
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_REJECT_CALL_NO_PARAM, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function RejectCall call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallManagerServiceProxy::HangUpCall()
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_DISCONNECT_CALL_NO_PARAM, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function HangUpCall call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS

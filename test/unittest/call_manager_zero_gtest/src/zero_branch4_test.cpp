@@ -794,18 +794,6 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_003, TestSize.Level0)
     EXPECT_NE(callManagerClient->SendRttMessage(callId, rttMessage), TELEPHONY_ERR_UNINIT);
     EXPECT_NE(callManagerClient->SetRttCapability(slotId, isEnable), TELEPHONY_ERR_UNINIT);
 }
-
-/**
- * @tc.number   Telephony_CallManagerClient_004
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_004, TestSize.Level0)
-{
-    std::shared_ptr<CallManagerClient> callManagerClient = std::make_shared<CallManagerClient>();
-    EXPECT_NE(callManagerClient->StartRtt(0), -100);
-    EXPECT_NE(callManagerClient->StopRtt(0), -100);
-}
 #endif
 
 /**

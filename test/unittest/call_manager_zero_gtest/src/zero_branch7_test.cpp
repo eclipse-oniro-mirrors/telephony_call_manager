@@ -526,10 +526,6 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallRequestHandler_001, Function | MediumTes
     EXPECT_NE(callRequestHandler->CombineConference(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callRequestHandler->SeparateConference(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callRequestHandler->KickOutFromConference(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
-#ifdef SUPPORT_RTT_CALL
-    EXPECT_NE(callRequestHandler->StartRtt(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_NE(callRequestHandler->StopRtt(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
-#endif
     std::vector<std::string> emptyRecords = {};
     EXPECT_NE(callRequestHandler->JoinConference(1, emptyRecords), TELEPHONY_ERR_LOCAL_PTR_NULL);
 
@@ -571,8 +567,8 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerClient_001, Function | MediumTest
         TELEPHONY_ERR_UNINIT);
     EXPECT_NE(callManagerClient->UpdateImsCallMode(callId, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_UNINIT);
 #ifdef SUPPORT_RTT_CALL
-    EXPECT_NE(callManagerClient->StartRtt(callId), TELEPHONY_ERR_UNINIT);
-    EXPECT_NE(callManagerClient->StopRtt(callId), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->UpdateImsRttCallMode(callId, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE),
+        TELEPHONY_ERR_UNINIT);
 #endif
     EXPECT_NE(callManagerClient->CancelCallUpgrade(callId), TELEPHONY_ERR_UNINIT);
     EXPECT_NE(callManagerClient->RequestCameraCapabilities(callId), TELEPHONY_ERR_UNINIT);

@@ -31,8 +31,8 @@
 namespace OHOS {
 namespace Telephony {
 const int32_t MCC_LEN = 3;
-const std::string CHN_MCC = "460";
-const std::string MC_MCC = "455";
+inline const std::string CHN_MCC = "460";
+inline const std::string MC_MCC = "455";
 
 class CallPolicy : public CallObjectManager {
 public:

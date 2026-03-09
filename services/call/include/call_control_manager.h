@@ -120,12 +120,10 @@ public:
     int32_t GetVoNRState(int32_t slotId, int32_t &state);
     int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode);
 #ifdef SUPPORT_RTT_CALL
-    int32_t StartRtt(int32_t callId);
-    int32_t StopRtt(int32_t callId);
     int32_t SetRttCapability(int32_t slotId, bool isEnable);
     int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode);
     int32_t UnInitRttManager();
-    void RefreshRttParam(const CallDetailInfo &callInfo);
+    void RefreshRttManager(const CallDetailInfo &callInfo);
     int32_t SendRttMessage(const std::string &rttMessage);
 #endif
     // invite calls to participate conference
@@ -181,6 +179,7 @@ public:
     void UnRegisterObserver();
     void HandleVideoRingPlayFail();
     bool EndCall();
+    int32_t SetCallAudioMode(int32_t mode, int32_t scenarios);
 
 private:
     void CallStateObserve();
@@ -207,6 +206,7 @@ private:
     void sendEventToVoip(CallAbilityEventId eventId);
     bool IsCallActivated(const TelCallState& priorState, const TelCallState& nextState);
     void EnqueueAnsweredCall(int32_t callId, int32_t videoState);
+    sptr<CallBase> GetRingCall(int32_t callId, int32_t videoState);
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
     public:

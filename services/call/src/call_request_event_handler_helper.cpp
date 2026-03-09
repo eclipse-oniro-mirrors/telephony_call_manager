@@ -40,7 +40,7 @@ CallRequestEventHandlerHelper::~CallRequestEventHandlerHelper() {}
 int32_t CallRequestEventHandlerHelper::SetDialingCallProcessing()
 {
     TELEPHONY_LOGI("start restore dialing flag task");
-    if (IsDialingCallProcessing()) {
+    if (callRequestEventHandler_ != nullptr && IsDialingCallProcessing()) {
         auto task = [this]() {
             RestoreDialingFlag(false);
         };

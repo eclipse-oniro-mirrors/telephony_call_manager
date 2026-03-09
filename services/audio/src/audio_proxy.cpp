@@ -285,6 +285,13 @@ void AudioDeviceChangeCallback::OnDeviceChange(const AudioStandard::DeviceChange
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
                     AudioEvent::WIRED_HEADSET_DISCONNECTED);
             }
+        } else if (audioDeviceDescriptor->deviceType_ == AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO ||
+            audioDeviceDescriptor->deviceType_ == AudioStandard::DEVICE_TYPE_NEARLINK) {
+            if (deviceChangeAction.type == AudioStandard::DISCONNECT) {
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->RemoveAudioDeviceList(
+                    audioDeviceDescriptor->macAddress_,
+                    static_cast<OHOS::Telephony::AudioDeviceType>(audioDeviceDescriptor->deviceType_));
+            }
         }
     }
 }
@@ -362,7 +369,9 @@ int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device, bool isNe
         case AudioStandard::DEVICE_TYPE_WIRED_HEADSET:
         case AudioStandard::DEVICE_TYPE_WIRED_HEADPHONES:
         case AudioStandard::DEVICE_TYPE_USB_HEADSET:
-            device.deviceType = AudioDeviceType::DEVICE_WIRED_HEADSET;
+            if (desc[0]->modemCallSupported_) {
+                device.deviceType = AudioDeviceType::DEVICE_WIRED_HEADSET;
+            }
             break;
         default:
             break;
@@ -441,7 +450,8 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         return;
     }
 #endif
-    TELEPHONY_LOGI("OnPreferredOutputDeviceUpdated type: %{public}d", desc[0]->deviceType_);
+    TELEPHONY_LOGI("OnPreferredOutputDeviceUpdated deviceType_: %{public}d, modemCallSupported_: %{public}d",
+        desc[0]->deviceType_, desc[0]->modemCallSupported_);
 
     if (IsDistributedDeviceSelected(desc)) {
         return;
@@ -472,6 +482,9 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         case AudioStandard::DEVICE_TYPE_WIRED_HEADSET:
         case AudioStandard::DEVICE_TYPE_WIRED_HEADPHONES:
         case AudioStandard::DEVICE_TYPE_USB_HEADSET:
+            if (!desc[0]->modemCallSupported_) {
+                return;
+            }
             device.deviceType = AudioDeviceType::DEVICE_WIRED_HEADSET;
             DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(
                 "", AudioDeviceType::DEVICE_WIRED_HEADSET, "");

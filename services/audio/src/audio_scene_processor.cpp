@@ -92,6 +92,10 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
                 DelayedSingleton<AudioControlManager>::GetInstance()->
                     PlayCallEndedTone();
+            } else {
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
+                PlaySosSoundTone(event);
+#endif
             }
             currentState_->ProcessEvent(event);
             break;
@@ -100,6 +104,10 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
                 DelayedSingleton<AudioControlManager>::GetInstance()->
                     PlayCallEndedTone();
+            } else {
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
+                PlaySosSoundTone(event);
+#endif
             }
             currentState_->ProcessEvent(event);
             break;
@@ -167,21 +175,22 @@ bool AudioSceneProcessor::SwitchState(CallStateType stateType)
 
 bool AudioSceneProcessor::SwitchDialing()
 {
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    if (audioDeviceManager == nullptr || audioControlManager == nullptr) {
+        return false;
+    }
     currentState_ = std::make_unique<DialingState>();
     if (currentState_ == nullptr) {
         TELEPHONY_LOGE("make_unique DialingState failed");
         return false;
     }
-    sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
-    if (call != nullptr && call->GetCallType() == CallType::TYPE_BLUETOOTH &&
-        !DelayedSingleton<AudioControlManager>::GetInstance()->IsScoTemporarilyDisabled()) {
-            DelayedSingleton<AudioControlManager>::GetInstance()->ExcludeBluetoothSco();
-    }
-    if (!DelayedSingleton<AudioControlManager>::GetInstance()->PlaySoundtone()) {
+    audioDeviceManager->SetAudioDeviceByAudioMode(false, false);
+    if (!audioControlManager->PlaySoundtone()) {
         TELEPHONY_LOGE("PlaySoundtone fail");
     }
-    DelayedSingleton<AudioControlManager>::GetInstance()->UpdateDeviceTypeForVideoDialing();
-    if (!DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_ACTIVATED)) {
+    audioControlManager->UpdateDeviceTypeForVideoDialing();
+    if (!audioDeviceManager->ProcessEvent(AudioEvent::AUDIO_ACTIVATED)) {
         TELEPHONY_LOGE("ProcessEvent AUDIO_ACTIVATED failed");
     }
     TELEPHONY_LOGI("current call state : dialing state");
@@ -203,42 +212,43 @@ bool AudioSceneProcessor::SwitchAlerting()
 
 bool AudioSceneProcessor::SwitchIncoming()
 {
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    if (audioDeviceManager == nullptr || audioControlManager == nullptr || callControlManager == nullptr) {
+        return false;
+    }
     currentState_ = std::make_unique<IncomingState>();
     if (currentState_ == nullptr) {
         TELEPHONY_LOGE("make_unique IncomingState failed");
         return false;
     }
-    sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-    if (call != nullptr && call->GetCallType() == CallType::TYPE_BLUETOOTH &&
-        !DelayedSingleton<AudioControlManager>::GetInstance()->IsScoTemporarilyDisabled()) {
-        DelayedSingleton<AudioControlManager>::GetInstance()->ExcludeBluetoothSco();
-    }
     int32_t state;
-    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    callControlManager->GetVoIPCallState(state);
     int endCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_ENDED);
     if (state == (int32_t) CallStateToApp::CALL_STATE_OFFHOOK ||
         (CallObjectManager::GetCurrentCallNum() - endCallCount > ONE_CALL_EXIST &&
-            DelayedSingleton<AudioControlManager>::GetInstance()->IsSoundPlaying() &&
-            CallObjectManager::HasIncomingCallCrsType())) {
-        DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
+            audioControlManager->IsSoundPlaying() && CallObjectManager::HasIncomingCallCrsType())) {
+        audioControlManager->PlayWaitingTone();
     } else {
         bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
         bool isNeedSilent = CallObjectManager::IsNeedSilentInDoNotDisturbMode();
-        bool isNotWearWatch = DelayedSingleton<CallControlManager>::GetInstance()->IsNotWearOnWrist();
+        bool isNotWearWatch = callControlManager->IsNotWearOnWrist();
         if (!isStartBroadcast && !isNeedSilent && !isNotWearWatch) {
             TELEPHONY_LOGI("broadcast switch and doNotDisturbMode close, start play system ring");
-            DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
+            audioControlManager->StopRingtone();
             // play ringtone while incoming state
-            DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+            audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
+            audioControlManager->PlayRingtone();
         } else {
             TELEPHONY_LOGI("isStartBroadcast: %{public}d, isNeedSilent: %{public}d, isNotWearWatch: %{public}d",
                 isStartBroadcast, isNeedSilent, isNotWearWatch);
             if (system::GetParameter("const.product.devicetype", "") == "wearable") {
-                DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
-                DelayedSingleton<AudioControlManager>::GetInstance()->PlayForNoRing();
+                audioControlManager->StopRingtone();
+                audioControlManager->PlayForNoRing();
             }
         }
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_RINGING);
+        audioDeviceManager->ProcessEvent(AudioEvent::AUDIO_RINGING);
     }
     TELEPHONY_LOGI("current call state : incoming state");
     return true;
@@ -285,10 +295,6 @@ bool AudioSceneProcessor::SwitchInactive()
         TELEPHONY_LOGE("make_unique InActiveState failed");
         return false;
     }
-    if (DelayedSingleton<AudioControlManager>::GetInstance()->IsScoTemporarilyDisabled()) {
-        TELEPHONY_LOGI("handle UnexcludeBluetoothSco start");
-        DelayedSingleton<AudioControlManager>::GetInstance()->UnexcludeBluetoothSco();
-    }
     TELEPHONY_LOGI("current call state : inactive state");
     return true;
 }
@@ -297,5 +303,27 @@ bool AudioSceneProcessor::SwitchOTT()
 {
     return true;
 }
+
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
+void AudioSceneProcessor::PlaySosSoundTone(AudioEvent event)
+{
+    if (event == AudioEvent::NO_MORE_ALERTING_CALL || event == AudioEvent::NO_MORE_DIALING_CALL) {
+        auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+        if (callStateProcessor == nullptr) {
+            TELEPHONY_LOGE("callStateProcessor is nullptr");
+            return;
+        }
+        int32_t activeCallId = callStateProcessor->GetCurrentActiveCall();
+        if (activeCallId != INVALID_CALLID) {
+            auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+            if (audioControlManager == nullptr) {
+                TELEPHONY_LOGE("audioControlManager is nullptr");
+                return;
+            }
+            audioControlManager->PlaySoundtone();
+        }
+    }
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

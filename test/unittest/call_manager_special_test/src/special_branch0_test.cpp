@@ -473,6 +473,21 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_014, TestSize.L
 }
 
 /**
+ * @tc.number   Telephony_CallVoiceAssistantManager_CallStatusIncoming
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_CallStatusIncoming, TestSize.Level0)
+{
+    std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
+    voicePtr->nowCallId = 0;
+    voicePtr->nowAccountId = 0;
+    voicePtr->nowVoipCallState = static_cast<int32_t>(CallStateToApp::CALL_STATE_RINGING);
+    voicePtr->CallStatusIncoming(1, 1);
+    ASSERT_TRUE(voicePtr->GetInstance() != nullptr);
+}
+
+/**
  * @tc.number   Telephony_SpamCallAdapter_001
  * @tc.name     test branch
  * @tc.desc     Function test
@@ -511,6 +526,57 @@ HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_003, TestSize.Level0)
     spamCallAdapter->timeWaitHelper_ = nullptr;
     ASSERT_FALSE(spamCallAdapter->WaitForDetectResult());
 }
+
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+/**
+ * @tc.number   SpamCallAdapter_ParseCallerResultTest
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch0Test, SpamCallAdapter_ParseCallerResultTest, TestSize.Level0)
+{
+    CallDisposition callDisposition = CallDisposition::NORMAL_PROCESS;
+    SpamCallAdapter spamCallAdapter;
+    NumberMarkInfo info;
+    EXPECT_NE(spamCallAdapter.GetCurrentTimeMs(), 0);
+
+    spamCallAdapter.info_ = info;
+    EXPECT_FALSE(spamCallAdapter.GetNumberMarkInfo().isCloud);
+
+    spamCallAdapter.callDisposition_ = callDisposition;
+    EXPECT_FALSE(spamCallAdapter.IsRefreshMarkInfo());
+    EXPECT_EQ(spamCallAdapter.GetCallDisposition(), CallDisposition::NORMAL_PROCESS);
+    std::string dispositionJson = "";
+    callDisposition = CallDisposition::NORMAL_PROCESS;
+    NumberMarkInfo numberMarkInfo;
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo)); // invalid json
+    dispositionJson = "{\"callerResult\":\"0\"}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+    dispositionJson = "{\"callerResult\":0}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+    dispositionJson = "{\"callerResult\":1}"; // normal process
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+    cJSON *root = nullptr;
+    EXPECT_FALSE(spamCallAdapter.ParseNumberMarkInfo(root, numberMarkInfo));
+    dispositionJson = "{\"callerResult\":1,\"markerId\":\"100\"}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+    dispositionJson = "{\"callerResult\":1,\"markerId\":100}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+    dispositionJson = "{\"callerResult\":1,\"markerId\":100,\"markerType\":123}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+    dispositionJson = "{\"callerResult\":1,\"markerId\":100,\"markerType\":\"unknown\"}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+
+    dispositionJson = "{\"callerResult\":1,\"markerId\":100,\"markerType\":\"unknown\",\"markerCnt\":\"12\"}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+
+    dispositionJson = "{\"callerResult\":1,\"markerId\":2,\"markerType\":\"unknown\",\"markerCnt\":12}";
+    EXPECT_FALSE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+
+    dispositionJson = "{\"callerResult\":1,\"markerId\":100,\"markerType\":\"unknown\",\"markerCnt\":12}";
+    EXPECT_TRUE(spamCallAdapter.ParseCallerResult(dispositionJson, callDisposition, numberMarkInfo));
+}
+#endif
 
 /**
  * @tc.number   Telephony_CallManagerServiceStub_001
@@ -762,23 +828,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_007, TestSize.Level0)
     callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
     std::u16string msg;
 #ifdef SUPPORT_RTT_CALL
-    int32_t ret = callManagerService->StartRtt(0);
-    EXPECT_NE(ret, 0);
-#endif
-}
-
-/**
- * @tc.number   Telephony_CallManagerService_008
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_008, TestSize.Level0)
-{
-    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    ASSERT_TRUE(callManagerService != nullptr);
-    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
-#ifdef SUPPORT_RTT_CALL
-    int32_t ret = callManagerService->StopRtt(0);
+    int32_t ret = callManagerService->UpdateImsRttCallMode(0, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE);
     EXPECT_NE(ret, 0);
 #endif
 }
@@ -1066,5 +1116,19 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_026, TestSize.Level0)
     int32_t ret = callManagerService->SetAudioDevice(audioDevice);
     EXPECT_NE(ret, 0);
 }
+
+/**
+ * @tc.number   Telephony_SpamCallAdapter_DetectSpamCal
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_DetectSpamCall, Function | MediumTest | Level1)
+{
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter_ = std::make_shared<SpamCallAdapter>();
+    const std::string phoneNumber = "12345678900";
+    const int32_t slotId = 0;
+    ASSERT_TRUE(spamCallAdapter_->DetectSpamCall(phoneNumber, slotId));
+}
+
 } // namespace Telephony
 } // namespace OHOS

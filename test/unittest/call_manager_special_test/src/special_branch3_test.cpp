@@ -117,10 +117,6 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_002, TestSize.Lev
     CallManagerServiceProxy proxy(impl);
     EXPECT_EQ(proxy.SetCallPreferenceMode(0, 0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     std::u16string msg = u"";
-#ifdef SUPPORT_RTT_CALL
-    EXPECT_EQ(proxy.StartRtt(0), TELEPHONY_ERR_ARGUMENT_INVALID);
-    EXPECT_EQ(proxy.StopRtt(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-#endif
     EXPECT_EQ(proxy.CombineConference(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.SeparateConference(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.KickOutFromConference(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -328,9 +324,6 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_001, TestSize.Level1)
     EXPECT_NE(cellularCallProxy->KickOutFromConference(callInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->HangUpAllConnection(), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->StopDtmf(callInfo), TELEPHONY_SUCCESS);
-#ifdef SUPPORT_RTT_CALL
-    EXPECT_NE(cellularCallProxy->StopRtt(slotId, callInfo.callId), TELEPHONY_SUCCESS);
-#endif
     EXPECT_NE(cellularCallProxy->GetDomainPreferenceMode(slotId), TELEPHONY_SUCCESS);
     std::string value = "";
     EXPECT_NE(cellularCallProxy->SetImsConfig(slotId, ImsConfigItem::ITEM_VIDEO_QUALITY, value), TELEPHONY_SUCCESS);
@@ -379,7 +372,8 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_002, TestSize.Level1)
     EXPECT_NE(Proxy->PostDialProceed(callInfo, 0), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->SendDtmf(cDtmfCode, callInfo), TELEPHONY_SUCCESS);
 #ifdef SUPPORT_RTT_CALL
-    EXPECT_NE(Proxy->StartRtt(slotId, callInfo.callId), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->UpdateImsRttCallMode(slotId, callInfo.callId, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE),
+        TELEPHONY_SUCCESS);
 #endif
     EXPECT_NE(Proxy->SetCallTransferInfo(slotId, ctInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->CanSetCallTransferTime(slotId, result), TELEPHONY_SUCCESS);

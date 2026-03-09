@@ -283,7 +283,6 @@ int32_t VoipCallConnection::WriteVoipCallFaultEvent(std::string voipCallId, int3
 int32_t VoipCallConnection::NotifyVoIPAudioStreamStart(int32_t uid)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    GetCallManagerProxy();
     if (voipCallManagerInterfacePtr_ == nullptr) {
         TELEPHONY_LOGE("voipCallManagerInterfacePtr_ is nullptr");
         return TELEPHONY_ERROR;

@@ -286,34 +286,6 @@ public:
      */
     int SetCallPreferenceMode(int32_t slotId, int32_t mode);
 
-#ifdef SUPPORT_RTT_CALL
-    /**
-     * StartRtt
-     *
-     * @brief Enable and send RTT information
-     * @param callInfo[in], Call information.
-     * @return Returns 0 on success, others on failure.
-     */
-    int StartRtt(const CellularCallInfo &callInfo);
-
-    /**
-     * StopRtt
-     *
-     * @brief Close the RTT
-     * @param callInfo[in], Call information.
-     * @return Returns 0 on success, others on failure.
-     */
-    int StopRtt(const CellularCallInfo &callInfo);
-
-    /**
-     * @brief rtt upgrade or downgrade
-     * @param callInfo[in], Call information.
-     * @param mode[in], rtt modify mode.
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t UpdateImsRttCallMode(const CellularCallInfo &callInfo, ImsRTTCallMode mode);
-#endif
-
     /**
      * RegisterCallBack
      *
@@ -599,6 +571,14 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t SetRttCapability(int32_t slotId, bool isEnable);
+
+    /**
+     * @brief rtt upgrade or downgrade
+     * @param callInfo[in], Call information.
+     * @param mode[in], rtt modify mode.
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UpdateImsRttCallMode(const CellularCallInfo &callInfo, ImsRTTCallMode mode);
 #endif
 
 private:

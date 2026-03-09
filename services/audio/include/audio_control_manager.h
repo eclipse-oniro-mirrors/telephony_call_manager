@@ -84,6 +84,7 @@ public:
     void UpdateDeviceTypeForVideoDialing();
     void MuteNetWorkRingTone(bool isMute = true);
     bool IsVideoCall(VideoStateType videoState);
+    void StopVibrator();
     bool IsSoundPlaying();
     bool StopSoundtone();
     bool PlaySoundtone();
@@ -98,6 +99,12 @@ public:
     bool StopForNoRing();
     bool NeedPlayVideoRing(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr);
     bool IsSystemVideoRing(sptr<CallBase> &callObjectPtr);
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
+    bool IsSosNoRingbackToneEnable();
+#endif
+    bool ShouldPlaySoundTone();
+    bool ShouldPlayRingback();
+    void SetCallAudioMode(int32_t mode, int32_t scenarios);
 private:
     RingState ringState_ = RingState::STOPPED;
     void HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState);

@@ -28,6 +28,9 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "telephony_permission.h"
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+#include "watch_lite_impl.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -45,6 +48,22 @@ constexpr char MARK_DETAILS[] = "markDetails";
 constexpr char DETECT_DETAILS[] = "detectDetails";
 sptr<SpamCallConnection> connection_ = nullptr;
 
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+const std::unordered_map<CallMarkType, MarkType> CALL_MARK_MAP = {
+    {CallMarkType::UNKNOWN, MarkType::MARK_TYPE_NONE},
+    {CallMarkType::EXPRESS_DELIVERY, MarkType::MARK_TYPE_EXPRESS},
+    {CallMarkType::TAXI, MarkType::MARK_TYPE_TAXI},
+    {CallMarkType::EDUCATION_TRAINING, MarkType::MARK_TYPE_EDUCATION_TRAINING},
+    {CallMarkType::HEADHUNTING, MarkType::MARK_TYPE_HEADHUNTING},
+    {CallMarkType::INSURANCE, MarkType::MARK_TYPE_INSURANCE},
+    {CallMarkType::LOAN, MarkType::MARK_TYPE_LOAN},
+    {CallMarkType::REAL_ESTATE, MarkType::MARK_TYPE_HOUSE_AGENT},
+    {CallMarkType::ADVERTISEMENT, MarkType::MARK_TYPE_PROMOTE_SALES},
+    {CallMarkType::HARASSMENT, MarkType::MARK_TYPE_CRANK},
+    {CallMarkType::SCAM, MarkType::MARK_TYPE_FRAUD}
+};
+#endif
+
 SpamCallAdapter::SpamCallAdapter()
 {
     timeWaitHelper_ = std::make_unique<TimeWaitHelper>(WAIT_TIME_FIVE_SECOND);
@@ -59,6 +78,26 @@ bool SpamCallAdapter::DetectSpamCall(const std::string &phoneNumber, const int32
 {
     TELEPHONY_LOGW("DetectSpamCall start");
     phoneNumber_ = phoneNumber;
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    uint64_t startCallerStatusTime = GetCurrentTimeMs();
+    std::unique_lock<ffrt::mutex> lock(spamMutex_);
+    result_ = "";
+    isQueryComplete_ = false;
+    lock.unlock();
+    SubmitCallerStatusQuery(phoneNumber);
+    std::unique_lock<ffrt::mutex> lockForWait(spamMutex_);
+    if (!spamCv_.wait_for(lockForWait, std::chrono::milliseconds(WAIT_TIME_FIVE_SECOND),
+        [this]() { return isQueryComplete_; })) {
+        TELEPHONY_LOGE("wait caller status timeout");
+        return false;
+    }
+    std::string dispositionJson = result_;
+    result_.clear();
+    lockForWait.unlock();
+    TELEPHONY_LOGI("resultMap[%{public}s], cost time[%{public}lu]", dispositionJson.c_str(),
+        GetCurrentTimeMs() - startCallerStatusTime);
+    isRefreshMarkInfo_ = ParseCallerResult(dispositionJson, callDisposition_, info_);
+#else
     AAFwk::Want want;
     std::string bundleName = "com.spamshield";
     std::string abilityName = "SpamShieldServiceExtAbility";
@@ -68,8 +107,119 @@ bool SpamCallAdapter::DetectSpamCall(const std::string &phoneNumber, const int32
         TELEPHONY_LOGE("DetectSpamCall failed!");
         return false;
     }
+#endif
     return true;
 }
+
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+bool SpamCallAdapter::IsRefreshMarkInfo()
+{
+    return isRefreshMarkInfo_;
+}
+
+NumberMarkInfo SpamCallAdapter::GetNumberMarkInfo()
+{
+    return info_;
+}
+
+CallDisposition SpamCallAdapter::GetCallDisposition()
+{
+    return callDisposition_;
+}
+
+bool SpamCallAdapter::ParseCallerResult(const std::string &dispositionJson, CallDisposition &callDisposition,
+    NumberMarkInfo &numberMarkInfo)
+{
+    cJSON *root = cJSON_Parse(dispositionJson.c_str());
+    if (root == nullptr) {
+        TELEPHONY_LOGE("json string invalid");
+        return false;
+    }
+
+    int32_t numberValue = static_cast<int32_t>(CallDisposition::NORMAL_PROCESS);
+    if (!JsonGetNumberValue(root, "callerResult", numberValue)) {
+        cJSON_Delete(root);
+        return false;
+    }
+
+    callDisposition = static_cast<CallDisposition>(numberValue);
+    if (callDisposition != CallDisposition::NORMAL_PROCESS) {
+        TELEPHONY_LOGW("not normal process, don't parse mark info");
+        cJSON_Delete(root);
+        return false;
+    }
+
+    auto res = ParseNumberMarkInfo(root, numberMarkInfo);
+    cJSON_Delete(root);
+    return res;
+}
+
+bool SpamCallAdapter::ParseNumberMarkInfo(cJSON *root, NumberMarkInfo &numberMarkInfo)
+{
+    if (root == nullptr) {
+        TELEPHONY_LOGE("invalid param");
+        return false;
+    }
+    int32_t markType = static_cast<int32_t>(CallMarkType::UNKNOWN);
+    if (!JsonGetNumberValue(root, "markerId", markType)) {
+        TELEPHONY_LOGE("parse markType failed");
+        return false;
+    }
+
+    std::string markStr = "";
+    if (!JsonGetStringValue(root, "markerType", markStr)) {
+        TELEPHONY_LOGE("parse markStr failed");
+        return false;
+    }
+
+    int32_t markCnt = 0;
+    if (!JsonGetNumberValue(root, "markerCnt", markCnt)) {
+        TELEPHONY_LOGE("parse markCnt failed");
+        return false;
+    }
+
+    auto it = CALL_MARK_MAP.find(static_cast<CallMarkType>(markType));
+    if (it == CALL_MARK_MAP.end()) {
+        TELEPHONY_LOGW("invalid markType[%{public}d]", markType);
+        return false;
+    }
+
+    if (memcpy_s(numberMarkInfo.markContent, kMaxNumberLen, markStr.c_str(), markStr.size()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s failed!");
+        return false;
+    }
+    numberMarkInfo.isCloud = true; // query from cloud
+    numberMarkInfo.markCount = markCnt;
+    numberMarkInfo.markType = it->second;
+    TELEPHONY_LOGI("parse markInfo success markType[%{public}d], markCnt[%{public}d], markstr[%{public}s]",
+        markType, markCnt, markStr.c_str());
+    return true;
+}
+
+uint64_t SpamCallAdapter::GetCurrentTimeMs()
+{
+    auto timeNow = std::chrono::system_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(timeNow.time_since_epoch()).count();
+}
+
+void SpamCallAdapter::SubmitCallerStatusQuery(const std::string &phoneNumber)
+{
+    auto weak = weak_from_this();
+    ffrt::submit_h([weak, phoneNumber] {
+        auto strong = weak.lock();
+        if (strong == nullptr) {
+            return;
+        }
+        std::string dispositionJson = "";
+        int32_t res = WatchSystemService::WatchLiteImpl::GetInstance().GetCallerStatus(phoneNumber, dispositionJson);
+        TELEPHONY_LOGI("query result[%{public}d]", res);
+        std::unique_lock<ffrt::mutex> lock(strong->spamMutex_);
+        strong->isQueryComplete_ = true;
+        strong->result_ = dispositionJson;
+        strong->spamCv_.notify_all(); // query completed
+        });
+}
+#endif
 
 bool SpamCallAdapter::ConnectSpamCallAbility(const AAFwk::Want &want, const std::string &phoneNumber,
     const int32_t &slotId)

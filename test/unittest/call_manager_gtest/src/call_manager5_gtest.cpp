@@ -812,13 +812,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UpdateImsCallMode_0600, TestSiz
     EXPECT_EQ(CallManagerGtest::clientPtr_->UpdateImsCallMode(callId, mode), RETURN_VALUE_IS_ZERO);
 }
 
-/********************************************* Test StartRtt() ************************************************/
+/*********************************** Test UpdateImsRttCallMode() ****************************************/
 /**
- * @tc.number   Telephony_CallManager_StartRtt_0100
+ * @tc.number   Telephony_CallManager_UpdateImsRttCallMode_0100
  * @tc.name     test start rtt
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_StartRtt_0100, TestSize.Level0)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_UpdateImsRttCallMode_0100, TestSize.Level0)
 {
     AccessToken token;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
@@ -826,25 +826,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_StartRtt_0100, TestSize.Level0)
 
 #ifdef SUPPORT_RTT_CALL
     int32_t callId = 1;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->StartRtt(callId), RETURN_VALUE_IS_ZERO);
-#endif
-}
-
-/********************************************* Test StopRtt() ************************************************/
-/**
- * @tc.number   Telephony_CallManager_StopRtt_0100
- * @tc.name     test stop rtt
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_StopRtt_0100, TestSize.Level0)
-{
-    AccessToken token;
-    sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
-    EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
-
-#ifdef SUPPORT_RTT_CALL
-    int32_t callId = 1;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->StopRtt(callId), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->UpdateImsRttCallMode(callId, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE),
+        RETURN_VALUE_IS_ZERO);
 #endif
 }
 

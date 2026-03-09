@@ -39,8 +39,8 @@
  */
 namespace OHOS {
 namespace Telephony {
+class SpamCallAdapter;
 const int32_t SLOT_NUM = 2;
-const std::string ANTIFRAUD_FEATURE = "const.telephony.antifraud.supported";
 constexpr int32_t DEVICE_PROVISION_UNDEF = -1;
 constexpr int32_t DEVICE_PROVISION_INVALID = 0;
 constexpr int32_t DEVICE_PROVISION_VALID = 1;
@@ -57,7 +57,6 @@ public:
     CallStatusManager();
     ~CallStatusManager();
     int32_t Init();
-    int32_t UnInit();
     int32_t HandleCallReportInfo(const CallDetailInfo &info);
     void HandleDsdaInfo(int32_t slotId);
     void SetImsDomainInfo(const sptr<CallBase> call, int32_t imsDomain);
@@ -141,6 +140,7 @@ private:
     void SetVideoCallState(sptr<CallBase> &call, TelCallState nextState);
     bool IsFocusModeOpen();
     bool IsRejectCall(sptr<CallBase> &call, const CallDetailInfo &info, bool &block);
+    bool PublishIncomingCallBlockInfo(const sptr<CallBase> &callObjectPtr, bool block);
     void CreateAndSaveNewCall(const CallDetailInfo &info, CallDirection direction);
     int32_t UpdateCallStateAndHandleDsdsMode(const CallDetailInfo &info, sptr<CallBase> &call);
     bool IsDcCallConneceted();
@@ -158,6 +158,9 @@ private:
     void ClearPendingState(sptr<CallBase> &call);
     void RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason, const std::string &message);
     bool AutoAnswerVideoCallForNotDsda(const sptr<CallBase> disconnectedCall, int32_t activeCallNum);
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    bool HandleWatchCallDisposition(std::shared_ptr<SpamCallAdapter> &spamCallAdapterPtr, const sptr<CallBase> &call);
+#endif
 
 #ifdef NOT_SUPPORT_MULTICALL
     void AutoAnswerSecondCall();

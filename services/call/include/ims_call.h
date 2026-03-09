@@ -52,8 +52,6 @@ public:
     int32_t GetCallIdListForConference(std::vector<std::u16string> &callIdList) override;
     int32_t IsSupportConferenceable() override;
 #ifdef SUPPORT_RTT_CALL
-    int32_t StartRtt(int32_t callId);
-    int32_t StopRtt(int32_t callId);
     int32_t UpdateImsRttCallMode(ImsRTTCallMode mode);
 #endif
     int32_t SetMute(int32_t mute, int32_t slotId) override;
@@ -79,8 +77,8 @@ public:
     RttCallState GetRttState();
     void SetRttChannelId(int32_t rttChannelId);
     int32_t GetRttChannelId();
-    void SetIsPrevRtt(bool isPrevRtt);
-    bool GetIsPrevRtt();
+    void SetPrevRtt(bool isPrevRtt);
+    bool IsPrevRtt();
 #endif
 
 private:

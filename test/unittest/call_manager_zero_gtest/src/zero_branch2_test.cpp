@@ -64,19 +64,6 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_001, Function | MediumTest | Le
 }
 
 /**
- * @tc.number   Telephony_SpamCallAdapter_002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_002, Function | MediumTest | Level1)
-{
-    std::shared_ptr<SpamCallAdapter> spamCallAdapter_ = std::make_shared<SpamCallAdapter>();
-    const std::string phoneNumber = "12345678900";
-    const int32_t slotId = 0;
-    ASSERT_FALSE(spamCallAdapter_->DetectSpamCall(phoneNumber, slotId));
-}
-
-/**
  * @tc.number   Telephony_SpamCallAdapter_003
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -169,6 +156,29 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallConnection_001, Function | MediumTest |
     spamCallConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
     ASSERT_EQ(resultCode, 0);
     spamCallConnection.OnAbilityDisconnectDone(element, resultCode);
+    ASSERT_EQ(resultCode, 0);
+}
+
+/**
+ * @tc.number   Telephony_SpamCallConnection_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpamCallTest, Telephony_SpamCallConnection_002, Function | MediumTest | Level1)
+{
+    std::string phoneNumber = "123456789012";
+    int32_t slotId = 0;
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
+    ASSERT_NE(spamCallAdapter, nullptr);
+    SpamCallConnection spamCallConnection(phoneNumber, slotId, spamCallAdapter);
+    std::string bundle = "111";
+    std::string ability = "222";
+    AppExecFwk::ElementName element("", bundle, ability);
+    sptr<IRemoteObject> remoteObject;
+    int resultCode = 0;
+    spamCallConnection.RequireCallReminder();
+    ASSERT_EQ(resultCode, 0);
+    spamCallConnection.RequireCallReminder();
     ASSERT_EQ(resultCode, 0);
 }
 

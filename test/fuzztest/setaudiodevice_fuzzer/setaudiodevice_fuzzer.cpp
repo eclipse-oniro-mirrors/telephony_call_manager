@@ -61,6 +61,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
     SetAudioDevice(data, size);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
 }
 } // namespace OHOS
 

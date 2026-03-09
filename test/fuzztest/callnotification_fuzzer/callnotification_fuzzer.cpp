@@ -29,6 +29,7 @@
 #include "reject_call_sms.h"
 #include "status_bar.h"
 #include "wired_headset.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -209,8 +210,9 @@ void RejectCallSmsFunc(const uint8_t *data, size_t size)
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
     TelCallState priorState = static_cast<TelCallState>(size % CALL_STATE_NUM);
     TelCallState nextState = static_cast<TelCallState>(size % CALL_STATE_NUM);
-    std::string message(reinterpret_cast<const char *>(data), size);
-    std::string desAddr(reinterpret_cast<const char *>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string message = fdp.ConsumeRandomLengthString();
+    std::string desAddr = fdp.ConsumeRandomLengthString();
     std::u16string desAddrU16 = Str8ToStr16(desAddr);
     std::u16string messageU16 = Str8ToStr16(message);
     DisconnectedDetails details;

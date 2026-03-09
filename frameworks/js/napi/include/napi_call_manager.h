@@ -129,10 +129,6 @@ public:
     static napi_value IsImsSwitchEnabledSync(napi_env env, napi_callback_info info);
     static napi_value SetVoNRState(napi_env env, napi_callback_info info);
     static napi_value GetVoNRState(napi_env env, napi_callback_info info);
-#ifdef SUPPORT_RTT_CALL
-    static napi_value StartRtt(napi_env env, napi_callback_info info);
-    static napi_value StopRtt(napi_env env, napi_callback_info info);
-#endif
     static napi_value JoinConference(napi_env env, napi_callback_info info);
     static napi_value UpdateImsCallMode(napi_env env, napi_callback_info info);
     static napi_value ReportOttCallDetailsInfo(napi_env env, napi_callback_info info);
@@ -147,6 +143,8 @@ public:
     static napi_value SendCallUiEvent(napi_env env, napi_callback_info info);
     static napi_value SendUssdResponse(napi_env env, napi_callback_info info);
 #ifdef SUPPORT_RTT_CALL
+    static napi_value StartRtt(napi_env env, napi_callback_info info);
+    static napi_value StopRtt(napi_env env, napi_callback_info info);
     static napi_value SendRttMessage(napi_env env, napi_callback_info info);
     static napi_value SetRttCapability(napi_env env, napi_callback_info info);
     static napi_value OffRttModifyInd(napi_env env, napi_callback_info info);
@@ -271,13 +269,16 @@ private:
     static bool MatchTwoStringParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchCallRestrictionPasswordParameter(
         napi_env env, const napi_value parameters[], const size_t parameterCount);
-    static void HandleRejectCall(napi_env env, RejectAsyncContext &asyncContext,
+    static bool HandleRejectCall(napi_env env, RejectAsyncContext &asyncContext,
         const napi_value parameters[], const size_t parameterCount);
     static void NativeSendUssdResponse(napi_env env, void *data);
 #ifdef SUPPORT_RTT_CALL
     static void NativeSendRttMessage(napi_env env, void *data);
     static void NativeSetRttCapability(napi_env env, void *data);
 #endif
+    static void NativeAnswerCallNoParam(napi_env env, void *data);
+    static void NativeRejectCallNoParam(napi_env env, void *data);
+    static void NativeHangUpCallNoParam(napi_env env, void *data);
 private:
     static int32_t registerStatus_;
 };

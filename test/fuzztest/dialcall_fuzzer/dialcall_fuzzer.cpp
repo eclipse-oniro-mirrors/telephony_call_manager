@@ -237,13 +237,12 @@ int32_t StartRtt(const uint8_t *data, size_t size)
     }
 
     int32_t callId = static_cast<int32_t>(size % CALL_ID_NUM);
-    std::string msg(reinterpret_cast<const char *>(data), size);
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
-    messageParcel.WriteString(msg);
+    messageParcel.WriteInt32(0);
     messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnStartRtt(messageParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnUpdateImsRttCallMode(messageParcel, reply);
 }
 #endif
 

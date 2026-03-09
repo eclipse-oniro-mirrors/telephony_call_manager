@@ -49,15 +49,7 @@ CallObjectManager::CallObjectManager()
 {
 }
 
-CallObjectManager::~CallObjectManager()
-{
-    std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
-    while (it != callObjectPtrList_.end()) {
-        (*it) = nullptr;
-        callObjectPtrList_.erase(it++);
-    }
-    voipCallObjectList_.clear();
-}
+CallObjectManager::~CallObjectManager() {}
 
 int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
 {
@@ -545,6 +537,21 @@ bool CallObjectManager::HasVoipCallExist()
     return false;
 }
 
+bool CallObjectManager::HasOtherBtCallExist(int32_t callId)
+{
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallID() == callId) {
+            continue;
+        }
+        if ((*it)->GetCallType() == CallType::TYPE_BLUETOOTH) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CallObjectManager::HasIncomingCallCrsType()
 {
     std::lock_guard<ffrt::mutex> lock(listMutex_);
@@ -996,10 +1003,13 @@ sptr<CallBase> CallObjectManager::GetAudioLiveCall()
 {
     sptr<CallBase> call = GetForegroundLiveCall(false);
     if (call == nullptr) {
-        call = GetForegroundLiveCall();
+        call = GetIncomingCall(false);
     }
     if (call == nullptr) {
-        call = GetIncomingCall(false);
+        call = GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    }
+    if (call == nullptr) {
+        call = GetForegroundLiveCall(true);
     }
     return call;
 }
@@ -1012,6 +1022,9 @@ CellularCallInfo CallObjectManager::GetDialCallInfo()
 int32_t CallObjectManager::DealFailDial(sptr<CallBase> call)
 {
     TELEPHONY_LOGI("DealFailDial");
+    if (call == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallDetailInfo callDetatilInfo;
     if (memset_s(&callDetatilInfo, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo)) != EOK) {
         TELEPHONY_LOGE("memset_s callDetatilInfo fail");

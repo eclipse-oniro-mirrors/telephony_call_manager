@@ -15,6 +15,7 @@
 #define private public
 #define protected public
 #include "antifraud_service.h"
+#include "audio_control_manager.h"
 #include "bluetooth_call_client.h"
 #include "bluetooth_call_manager.h"
 #include "bluetooth_call_service.h"
@@ -77,6 +78,7 @@
 #include "call_status_policy.h"
 #include "bluetooth_call.h"
 #include "datashare_helper.h"
+#include "incoming_flash_reminder.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -473,6 +475,8 @@ std::string GetTestNumber()
  */
 HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallPolicy_001, TestSize.Level0)
 {
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::voipCallObjectList_.clear();
     BluetoothCallPolicy callPolicy;
     DialParaInfo dialParaInfo;
     sptr<OHOS::Telephony::CallBase> callBase1 = new OTTCall(dialParaInfo);
@@ -773,6 +777,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_001, TestSize.Level0)
  */
 HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_002, TestSize.Level0)
 {
+    CallObjectManager::callObjectPtrList_.clear();
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     ASSERT_NE(callControlManager->StartDtmf(INVALID_CALLID, 'a'), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->StopDtmf(INVALID_CALLID), TELEPHONY_SUCCESS);
@@ -907,6 +912,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_004, TestSize.Level0)
     callControlManager->NumberLegalityCheck(number);
     number = "1234567";
     callControlManager->NumberLegalityCheck(number);
+    number = "1234567,,0556#";
+    callControlManager->NumberLegalityCheck(number);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = nullptr;
     CallControlManager::SystemAbilityListener listen;
     int32_t systemAbilityId = 1;
@@ -1009,6 +1016,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_006, Function | MediumTes
     EXPECT_NE(callControlManager->DialCall(normalNum, extras), TELEPHONY_SUCCESS);
     callControlManager->CallRequestHandlerPtr_ = nullptr;
     EXPECT_NE(callControlManager->DialCall(normalNum, extras), TELEPHONY_SUCCESS);
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::voipCallObjectList_.clear();
 }
 
 /**
@@ -1305,27 +1314,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_012, Function | MediumTes
     EXPECT_NE(callControlManager->RemoveMissedIncomingCallNotification(), TELEPHONY_SUCCESS);
 }
 
-#ifdef SUPPORT_RTT_CALL
-/**
- * @tc.number   Telephony_CallControlManager_013
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_013, TestSize.Level0)
-{
-    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
-    ASSERT_NE(callControlManager->StartRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
-    ASSERT_NE(callControlManager->StopRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
-    ASSERT_NE(callControlManager->UpdateImsRttCallMode(INVALID_CALLID, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE),
-        TELEPHONY_SUCCESS);
-    int32_t slotId = 1;
-    ASSERT_NE(callControlManager->SetRttCapability(slotId, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE), TELEPHONY_SUCCESS);
-    CallDetailInfo callInfo;
-    EXPECT_NO_THROW(callControlManager->RefreshRttParam(callInfo));
-    callControlManager->UnInitRttManager();
-}
-#endif
-
 /**
  * @tc.number   Telephony_CallStatusManager_016
  * @tc.name     test error branch
@@ -1554,6 +1542,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_004, TestSize.Level0)
 
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_005, TestSize.Level0)
 {
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::voipCallObjectList_.clear();
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
 
     // init
@@ -1961,6 +1951,72 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_017, TestSize.Level0)
     std::string rttMessage = "message";
     EXPECT_NE(rttCallListener->SendRttMessage(rttMessage), ret);
 #endif
+}
+
+#ifdef NOT_SUPPORT_MULTICALL
+#ifdef SUPPORT_RTT_CALL
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_018, TestSize.Level0)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.callType = CallType::TYPE_IMS;
+    sptr<CallBase> imsCallActive = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    ASSERT_TRUE(imsCallActive != nullptr);
+    imsCallActive->autoAnswerState_ = false;
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::AddOneCallObject(imsCallActive);
+    EXPECT_NO_THROW(callStatusManager->AutoAnswerSecondCall());
+
+    info.state = TelCallState::CALL_STATUS_INCOMING;
+    info.callType = CallType::TYPE_IMS;
+    sptr<CallBase> imsCallIncoming = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    ASSERT_TRUE(imsCallIncoming != nullptr);
+    imsCallIncoming->autoAnswerState_ = false;
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::AddOneCallObject(imsCallIncoming);
+    EXPECT_NO_THROW(callStatusManager->AutoAnswerSecondCall());
+
+    imsCallIncoming->autoAnswerState_ = true;
+    EXPECT_NO_THROW(callStatusManager->AutoAnswerSecondCall());
+}
+#endif
+#endif
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_019, TestSize.Level0)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo info1;
+    sptr<CallBase> call = new BluetoothCall(info1, "");
+    CallObjectManager::AddOneCallObject(call);
+    call->SetCallType(CallType::TYPE_BLUETOOTH);
+    audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_DIALING);
+    ASSERT_TRUE(audioControl->IsScoTemporarilyDisabled());
+    audioControl->HandleCallStateUpdated(
+        call, TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_DISCONNECTED);
+    ASSERT_FALSE(audioControl->IsScoTemporarilyDisabled());
+    CallObjectManager::callObjectPtrList_.clear();
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_ActiveHandle_StopTorch, TestSize.Level0)
+{
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::voipCallObjectList_.clear();
+    auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
+    bool stopped = false;
+    auto task = [&stopped]() {
+        stopped = true;
+    };
+    DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ =
+        std::make_shared<IncomingFlashReminder>(runner, task);
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    EXPECT_EQ(callStatusManager->ActiveHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    sleep(1);
+    EXPECT_EQ(stopped, true);
+    DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ = nullptr;
 }
 } // namespace Telephony
 } // namespace OHOS

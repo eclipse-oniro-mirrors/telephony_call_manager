@@ -64,6 +64,9 @@ private:
     std::unique_ptr<AudioBase> currentState_;
     using AudioSceneProcessorFunc = std::function<bool()>;
     std::map<uint32_t, AudioSceneProcessorFunc> memberFuncMap_;
+#ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
+    void PlaySosSoundTone(AudioEvent event);
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

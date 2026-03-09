@@ -53,6 +53,8 @@ public:
 
 private:
     void PackDataParcel(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo, MessageParcel &dataParcel);
+    __attribute__((noinline)) int32_t SendRequest(int32_t msgId, MessageParcel &dataParcel, MessageParcel &replyParcel,
+        MessageOption &option);
 
 private:
     static inline BrokerDelegator<CallAbilityCallbackProxy> delegator_;

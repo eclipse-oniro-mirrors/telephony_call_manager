@@ -29,7 +29,9 @@ void SpamCallConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &ele
         TELEPHONY_LOGE("Connected service is invalid!");
         return;
     }
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     remoteObject_ = remoteObject;
+    lock.unlock();
     SpamCallProxy service(remoteObject);
     int32_t ret = service.DetectSpamCall(phoneNumber_, slotId_, spamCallAdapter_);
     TELEPHONY_LOGI("SpamCallProxy DetectSpamCall ret = %{public}d", ret);
@@ -38,6 +40,7 @@ void SpamCallConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &ele
 void SpamCallConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element,
     int32_t resultCode)
 {
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     remoteObject_ = nullptr;
     TELEPHONY_LOGI("OnAbilityDisconnectDone, resultCode = %{public}d", resultCode);
 }
@@ -45,6 +48,7 @@ void SpamCallConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &
 void SpamCallConnection::RequireCallReminder()
 {
     TELEPHONY_LOGI("DetectNeedNotify start.");
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     if (remoteObject_ == nullptr) {
         TELEPHONY_LOGE("remoteObject_ is nullptr");
         return;

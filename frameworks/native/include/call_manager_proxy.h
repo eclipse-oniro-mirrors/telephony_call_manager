@@ -105,11 +105,6 @@ public:
     int32_t IsImsSwitchEnabled(int32_t slotId, bool &enabled);
     int32_t SetVoNRState(int32_t slotId, int32_t state);
     int32_t GetVoNRState(int32_t slotId, int32_t &state);
-#ifdef SUPPORT_RTT_CALL
-    int32_t StartRtt(int32_t callId);
-    int32_t StopRtt(int32_t callId);
-    int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode);
-#endif
     int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList);
     int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec);
     int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo);
@@ -137,7 +132,12 @@ public:
 #ifdef SUPPORT_RTT_CALL
     int32_t SendRttMessage(int32_t callId, const std::string &rttMessage);
     int32_t SetRttCapability(int32_t slotId, bool isEnable);
+    int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode);
 #endif
+    int32_t SetCallAudioMode(int32_t mode, int32_t scenarios);
+    int32_t AnswerCall();
+    int32_t RejectCall();
+    int32_t HangUpCall();
 
 private:
     int32_t ConnectService();

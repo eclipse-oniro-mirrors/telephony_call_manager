@@ -134,56 +134,6 @@ int32_t IMSCall::SwitchCall()
     return CarrierSwitchCall();
 }
 
-#ifdef SUPPORT_RTT_CALL
-int32_t IMSCall::StartRtt(int32_t callId)
-{
-    CellularCallInfo callInfo;
-    int32_t ret = PackCellularCallInfo(callInfo);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGW("PackCellularCallInfo failed!");
-        return ret;
-    }
-    ret = DelayedSingleton<CellularCallConnection>::GetInstance()->StartRtt(callInfo);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("StartRtt failed!");
-        return CALL_ERR_STARTRTT_FAILED;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t IMSCall::StopRtt(int32_t callId)
-{
-    CellularCallInfo callInfo;
-    int32_t ret = PackCellularCallInfo(callInfo);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGW("PackCellularCallInfo failed!");
-        return ret;
-    }
-    ret = DelayedSingleton<CellularCallConnection>::GetInstance()->StopRtt(callInfo);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("StopRtt failed!");
-        return CALL_ERR_STOPRTT_FAILED;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t IMSCall::UpdateImsRttCallMode(ImsRTTCallMode mode)
-{
-    CellularCallInfo callInfo;
-    int32_t ret = PackCellularCallInfo(callInfo);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGW("PackCellularCallInfo failed!");
-        return ret;
-    }
-    ret = DelayedSingleton<CellularCallConnection>::GetInstance()->UpdateImsRttCallMode(callInfo, mode);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateImsRttCallMode failed!");
-        return CALL_ERR_STOPRTT_FAILED;
-    }
-    return TELEPHONY_SUCCESS;
-}
-#endif
-
 int32_t IMSCall::SetMute(int32_t mute, int32_t slotId)
 {
     return CarrierSetMute(mute, slotId);
@@ -541,6 +491,26 @@ bool IMSCall::IsVoiceModifyToVideo()
 }
 
 #ifdef SUPPORT_RTT_CALL
+int32_t IMSCall::UpdateImsRttCallMode(ImsRTTCallMode mode)
+{
+    CellularCallInfo callInfo;
+    int32_t ret = PackCellularCallInfo(callInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGW("PackCellularCallInfo failed!");
+        return ret;
+    }
+    auto cellularCallConnection = DelayedSingleton<CellularCallConnection>::GetInstance();
+    if (cellularCallConnection == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    ret = cellularCallConnection->UpdateImsRttCallMode(callInfo, mode);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateImsRttCallMode failed!");
+        return CALL_ERR_STOPRTT_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 void IMSCall::SetRttState(RttCallState rttState)
 {
     rttState_ = rttState;
@@ -561,12 +531,12 @@ int32_t IMSCall::GetRttChannelId()
     return rttChannelId_;
 }
 
-void IMSCall::SetIsPrevRtt(bool isPrevRtt)
+void IMSCall::SetPrevRtt(bool isPrevRtt)
 {
     isPrevRtt_ = isPrevRtt;
 }
 
-bool IMSCall::GetIsPrevRtt()
+bool IMSCall::IsPrevRtt()
 {
     return isPrevRtt_;
 }

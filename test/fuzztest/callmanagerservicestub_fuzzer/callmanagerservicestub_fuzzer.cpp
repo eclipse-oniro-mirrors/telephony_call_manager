@@ -254,6 +254,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     OnUnRegisterVoipCallManagerCallback(data, size);
     DoFuzzCallManagerService(data, size);
     RegisterBluetoothCallManagerCallbackPtr(data, size);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
 }
 } // namespace OHOS
 

@@ -40,6 +40,16 @@ using namespace AudioStandard;
 constexpr int32_t DEVICE_ADDR_LEN = 7;
 constexpr int32_t ADDR_HEAD_VALID_LEN = 5;
 constexpr int32_t ADDR_TAIL_VALID_LEN = 2;
+enum class AudioMode {
+    AUDIO_MODE_DEFAULT = 0,
+    AUDIO_MODE_SPEAKER = 1,
+};
+enum class AudioScene {
+    AUDIO_MODE_SCEN_CELLULAR_CALL_INCOMING = 0,
+    AUDIO_MODE_SCEN_CELLULAR_CALL_ALL = 1,
+    AUDIO_MODE_SCEN_CELLULAR_VOIP_CALL_INCOMING = 2, // Not supported yet
+    AUDIO_MODE_SCEN_CELLULAR_VOIP_CALL_ALL = 3, // Not supported yet
+};
 bool AudioDeviceManager::isBtScoDevEnable_ = false;
 bool AudioDeviceManager::isDCallDevEnable_ = false;
 bool AudioDeviceManager::isSpeakerAvailable_ = true; // default available
@@ -50,7 +60,8 @@ bool AudioDeviceManager::isBtScoConnected_ = false;
 bool AudioDeviceManager::isDCallDevConnected_ = false;
 
 AudioDeviceManager::AudioDeviceManager()
-    : audioDeviceType_(AudioDeviceType::DEVICE_UNKNOWN), currentAudioDevice_(nullptr), isAudioActivated_(false)
+    : audioDeviceType_(AudioDeviceType::DEVICE_UNKNOWN), currentAudioDevice_(nullptr), isAudioActivated_(false),
+    callAudioMode_{0, 0}
 {}
 
 AudioDeviceManager::~AudioDeviceManager()
@@ -76,6 +87,8 @@ void AudioDeviceManager::Init()
         .address = { 0 },
     };
     info_.audioDeviceList.push_back(earpiece);
+    callAudioMode_.audioMode = static_cast<int32_t>(AudioMode::AUDIO_MODE_DEFAULT);
+    callAudioMode_.audioScene = static_cast<int32_t>(AudioScene::AUDIO_MODE_SCEN_CELLULAR_CALL_INCOMING);
 }
 
 bool AudioDeviceManager::IsSupportEarpiece()
@@ -898,6 +911,59 @@ void AudioDeviceManager::UpdateCurrentAudioDevice()
     if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device) == TELEPHONY_SUCCESS) {
         SetCurrentAudioDevice(device);
     }
+}
+
+int32_t AudioDeviceManager::SetCallAudioMode(const CallAudioMode &callAudioMode)
+{
+    std::lock_guard<ffrt::mutex> lock(audioModeMutex_);
+    callAudioMode_ = callAudioMode;
+    TELEPHONY_LOGI("audioMode is %{public}d, audioScene  is %{public}d",
+        callAudioMode_.audioMode, callAudioMode_.audioScene);
+    return TELEPHONY_SUCCESS;
+}
+ 
+void AudioDeviceManager::SetAudioDeviceByAudioMode(bool isVoipCall, bool isIncomingCall)
+{
+    if (isVoipCall) {
+        return;
+    }
+    std::lock_guard<ffrt::mutex> lock(audioModeMutex_);
+    TELEPHONY_LOGI("audioMode is %{public}d, audioScene  is %{public}d",
+        callAudioMode_.audioMode, callAudioMode_.audioScene);
+    if (!isIncomingCall && ((callAudioMode_.audioScene ==
+        (int32_t)AudioScene::AUDIO_MODE_SCEN_CELLULAR_CALL_INCOMING) ||
+        (callAudioMode_.audioScene == static_cast<int32_t>(AudioScene::AUDIO_MODE_SCEN_CELLULAR_VOIP_CALL_INCOMING)))) {
+        return;
+    }
+    if (callAudioMode_.audioMode == static_cast<int32_t>(AudioMode::AUDIO_MODE_SPEAKER)
+        && !IsRemoteDevicesConnected()) {
+        AudioDevice device = {
+            .deviceType = AudioDeviceType::DEVICE_SPEAKER,
+            .address = { 0 },
+        };
+        auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+        if (audioControlManager != nullptr) {
+            audioControlManager->SetAudioDevice(device);
+        }
+    }
+}
+ 
+void AudioDeviceManager::SetSpeakerDeactive()
+{
+    std::lock_guard<ffrt::mutex> lock(audioModeMutex_);
+    if (callAudioMode_.audioMode != static_cast<int32_t>(AudioMode::AUDIO_MODE_SPEAKER)) {
+        TELEPHONY_LOGI("answer call set speaker deactive");
+        auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
+        if (audioProxy != nullptr) {
+            audioProxy->SetSpeakerDevActive(false);
+        }
+    }
+}
+ 
+bool AudioDeviceManager::IsSpeakerMode()
+{
+    std::lock_guard<ffrt::mutex> lock(audioModeMutex_);
+    return callAudioMode_.audioMode == static_cast<int32_t>(AudioMode::AUDIO_MODE_SPEAKER);
 }
 } // namespace Telephony
 } // namespace OHOS

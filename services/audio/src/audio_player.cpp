@@ -230,7 +230,7 @@ bool AudioPlayer::IsStop(PlayerType playerType)
 
 void AudioPlayer::ReleaseRenderer()
 {
-    if (!isRenderInitialized_) {
+    if (!isRenderInitialized_ || audioRenderer_ == nullptr) {
         return;
     }
     audioRenderer_->Flush();
@@ -242,7 +242,7 @@ void AudioPlayer::ReleaseRenderer()
 
 void AudioPlayer::ReleaseCapturer()
 {
-    if (!isCapturerInitialized_) {
+    if (!isCapturerInitialized_ || audioCapturer_ == nullptr) {
         return;
     }
     audioCapturer_->Flush();

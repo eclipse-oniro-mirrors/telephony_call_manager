@@ -61,8 +61,10 @@ void InteroperableCommunicationManager::OnDeviceOnline(const DistributedHardware
             }
         }
     }
-    devObserver_->RegisterDevStatusCallback(dataController_);
-    devObserver_->OnDeviceOnline(networkId, devName, devType);
+    if (devObserver_ != nullptr) {
+        devObserver_->RegisterDevStatusCallback(dataController_);
+        devObserver_->OnDeviceOnline(networkId, devName, devType);
+    }
 }
  
 void InteroperableCommunicationManager::OnDeviceOffline(const DistributedHardware::DmDeviceInfo &deviceInfo)

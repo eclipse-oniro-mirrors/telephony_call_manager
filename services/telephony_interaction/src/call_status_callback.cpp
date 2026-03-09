@@ -568,11 +568,10 @@ int32_t CallStatusCallback::HandleRttEvtChanged(const RttEventInfo &rttEventInfo
     sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndexAndSlotId(
         rttEventInfo.callId, rttEventInfo.slotId);
     rttEvent.callId = (callPtr == nullptr) ? ERR_CALL_ID : callPtr->GetCallID();
-    rttEvent.callId = rttEventInfo.callId;
     rttEvent.eventType = rttEventInfo.eventType;
     rttEvent.reason = rttEventInfo.reason;
     TELEPHONY_LOGI("HandleRttEvtChanged callId:%{public}d, indexId:%{public}d, eventType:%{public}d, "
-        "info:%{public}d", rttEvent.callId, rttEventInfo.callId, rttEvent.eventType, rttEvent.reason);
+        "reason:%{public}d", rttEvent.callId, rttEventInfo.callId, rttEvent.eventType, rttEvent.reason);
 
     DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateRttEventInfo(
         static_cast<ImsRTTEventType>(rttEvent.eventType));

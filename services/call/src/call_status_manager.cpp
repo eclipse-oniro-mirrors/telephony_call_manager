@@ -66,6 +66,8 @@ constexpr int32_t INIT_INDEX = 0;
 constexpr int32_t PRESENTATION_RESTRICTED = 3;
 constexpr int32_t MAIN_USER_SPACE = 100;
 const std::string ADVSECMODE_STATE = "ohos.boot.advsecmode.state";
+const std::string ANTIFRAUD_FEATURE = "const.telephony.antifraud.supported";
+const std::string PRIMARY_CONTACT = "primary_contact";
 constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
 int32_t CallStatusManager::deviceProvisioned_ = DEVICE_PROVISION_UNDEF;
 sptr<OOBEStatusObserver> CallStatusManager::oobeStatusObserver_ = nullptr;
@@ -78,10 +80,7 @@ CallStatusManager::CallStatusManager()
     }
 }
 
-CallStatusManager::~CallStatusManager()
-{
-    UnInit();
-}
+CallStatusManager::~CallStatusManager() {}
 
 int32_t CallStatusManager::Init()
 {
@@ -110,17 +109,6 @@ void CallStatusManager::InitCallBaseEvent()
         CallAbilityEventId::EVENT_COMBINE_CALL_FAILED;
     mEventIdTransferMap_[RequestResultEventId::RESULT_SPLIT_SEND_FAILED] =
         CallAbilityEventId::EVENT_SPLIT_CALL_FAILED;
-}
-
-int32_t CallStatusManager::UnInit()
-{
-    for (int32_t i = 0; i < SLOT_NUM; i++) {
-        callDetailsInfo_[i].callVec.clear();
-        tmpCallDetailsInfo_[i].callVec.clear();
-    }
-    mEventIdTransferMap_.clear();
-    mOttEventIdTransferMap_.clear();
-    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
@@ -281,7 +269,10 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
             if (it2.index == it3.index) {
                 TELEPHONY_LOGI("state:%{public}d", it2.state);
 #ifdef SUPPORT_RTT_CALL
-                DelayedSingleton<CallControlManager>::GetInstance()->RefreshRttParam(it3);
+                auto controlManager = DelayedSingleton<CallControlManager>::GetInstance();
+                if (controlManager != nullptr) {
+                    controlManager->RefreshRttManager(it3);
+                }
 #endif
                 flag = true;
                 break;
@@ -418,7 +409,7 @@ int32_t CallStatusManager::HandleOttEventReportInfo(const OttCallEventInfo &info
     (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
     if (mOttEventIdTransferMap_.find(info.ottCallEventId) != mOttEventIdTransferMap_.end()) {
         eventInfo.eventId = mOttEventIdTransferMap_[info.ottCallEventId];
-        if (strlen(info.bundleName) > static_cast<size_t>(kMaxNumberLen)) {
+        if (strnlen(info.bundleName, kMaxNumberLen + 1) > static_cast<size_t>(kMaxNumberLen)) {
             TELEPHONY_LOGE("Number out of limit!");
             return CALL_ERR_NUMBER_OUT_OF_RANGE;
         }
@@ -492,6 +483,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     if (IsRejectCall(call, info, block)) {
         return HandleRejectCall(call, block);
     }
+    PublishIncomingCallBlockInfo(call, block);
     if (info.callType != CallType::TYPE_VOIP && info.callType != CallType::TYPE_BLUETOOTH &&
         IsRingOnceCall(call, info)) {
         return HandleRingOnceCall(call);
@@ -588,7 +580,6 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
             callObjectPtr->SetExtraParams(params);
         }
         callObjectPtr->SetCallerInfo(contactInfoTemp);
-        CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfoTemp, callObjectPtr->GetCallID());
 #ifdef SUPPORT_DSOFTBUS
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
             DistributedDataType::NAME);
@@ -631,6 +622,7 @@ int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call, bool isBlock)
         return ret;
     }
     if (isBlock) {
+        PublishIncomingCallBlockInfo(call, isBlock);
         return DelayedSingleton<CallControlManager>::GetInstance()->AddBlockLogAndNotification(call);
     }
     return DelayedSingleton<CallControlManager>::GetInstance()->AddCallLogAndNotification(call);
@@ -746,6 +738,8 @@ void CallStatusManager::QueryCallerInfo(ContactInfo &contactInfo, std::string ph
     predicates.EqualTo(TYPE_ID, 5); // type 5 means query number
     predicates.And();
     predicates.EqualTo(IS_DELETED, 0);
+    predicates.And();
+    predicates.NotEqualTo(PRIMARY_CONTACT, 1);
     predicates.And();
 #ifdef TELEPHONY_CUST_SUPPORT
     TELEPHONY_LOGI("telephony cust support.");
@@ -892,6 +886,7 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle active state");
     StopCallMotionRecognition(TelCallState::CALL_STATUS_ACTIVE);
+    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr && IsDcCallConneceted()) {
@@ -1562,7 +1557,7 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
         TELEPHONY_LOGE("SetTelCallState failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (nextState == TelCallState::CALL_STATUS_INCOMING || nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
+    if (nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
         time_t createTime = call->GetCallCreateTime();
         AAFwk::WantParams params = call->GetExtraParams();
         params.SetParam("createTime", AAFwk::Integer::Box(static_cast<int64_t>(createTime)));
@@ -1944,24 +1939,24 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
         TELEPHONY_LOGW("incoming phoneNumber is ecc.");
         return false;
     }
-    std::shared_ptr<SpamCallAdapter> spamCallAdapterPtr_ = std::make_shared<SpamCallAdapter>();
-    if (spamCallAdapterPtr_ == nullptr) {
-        TELEPHONY_LOGE("create SpamCallAdapter object failed!");
-        return false;
-    }
-    bool isDetectedSpamCall = spamCallAdapterPtr_->DetectSpamCall(std::string(info.phoneNum), info.accountId);
+    // make_shared no need to check nullptr.
+    std::shared_ptr<SpamCallAdapter> spamCallAdapterPtr = std::make_shared<SpamCallAdapter>();
+    bool isDetectedSpamCall = spamCallAdapterPtr->DetectSpamCall(std::string(info.phoneNum), info.accountId);
     if (!isDetectedSpamCall) {
         TELEPHONY_LOGE("DetectSpamCall failed!");
         return false;
     }
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    return HandleWatchCallDisposition(spamCallAdapterPtr, call);
+#else
     detectStartTime = std::chrono::system_clock::now();
-    if (spamCallAdapterPtr_->WaitForDetectResult()) {
+    if (spamCallAdapterPtr->WaitForDetectResult()) {
         TELEPHONY_LOGW("DetectSpamCall no time out");
         NumberMarkInfo numberMarkInfo;
         bool isBlock = false;
         int32_t blockReason;
         std::string detectDetails = "";
-        spamCallAdapterPtr_->GetParseResult(isBlock, numberMarkInfo, blockReason, detectDetails);
+        spamCallAdapterPtr->GetParseResult(isBlock, numberMarkInfo, blockReason, detectDetails);
         call->SetNumberMarkInfo(numberMarkInfo);
         call->SetBlockReason(blockReason);
         call->SetDetectDetails(detectDetails);
@@ -1973,7 +1968,40 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
         }
     }
     return false;
+#endif
 }
+
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+bool CallStatusManager::HandleWatchCallDisposition(std::shared_ptr<SpamCallAdapter> &spamCallAdapterPtr,
+    const sptr<CallBase> &call)
+{
+    if (spamCallAdapterPtr == nullptr || call == nullptr) {
+        TELEPHONY_LOGE("invalid param");
+        return false;
+    }
+
+    CallDisposition disposition = spamCallAdapterPtr->GetCallDisposition();
+    if (disposition == CallDisposition::INTERCEPTED) {
+        TELEPHONY_LOGI("reject call");
+        return true;
+    }
+
+    if (disposition == CallDisposition::AUTO_ANSWER) {
+        TELEPHONY_LOGI("antoAnswer call");
+        AAFwk::WantParams params = call->GetExtraParams();
+        params.SetParam("isAutoAnswerCall", AAFwk::Boolean::Box(true));
+        call->SetExtraParams(params);
+        return false;
+    }
+
+    if (spamCallAdapterPtr->IsRefreshMarkInfo()) {
+        NumberMarkInfo numberMarkInfo = spamCallAdapterPtr->GetNumberMarkInfo();
+        call->SetNumberMarkInfo(numberMarkInfo);
+        TELEPHONY_LOGI("refresh call mark info");
+    }
+    return false;
+}
+#endif
 
 bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDetailInfo &info)
 {
@@ -2128,6 +2156,24 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
         }
     }
     return false;
+}
+
+bool CallStatusManager::PublishIncomingCallBlockInfo(const sptr<CallBase> &callObjectPtr, bool block)
+{
+    AAFwk::Want want;
+    want.SetParam("callId", callObjectPtr->GetCallID());
+    want.SetParam("isBlocked", block);
+    want.SetAction("event.custom.callStatus.INCOMINGCALL_BLOCK_INFO");
+    EventFwk::CommonEventData data;
+    data.SetWant(want);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    publishInfo.SetOrdered(false);
+    std::vector<std::string> callPermissions;
+    callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
+    publishInfo.SetSubscriberPermissions(callPermissions);
+    bool result = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+    TELEPHONY_LOGI("publish incoming call block info result : %{public}d", result);
+    return result;
 }
 
 void CallStatusManager::CreateAndSaveNewCall(const CallDetailInfo &info, CallDirection direction)
@@ -2371,10 +2417,17 @@ void CallStatusManager::AutoAnswerSecondCall()
             call->GetTelCallState() != TelCallState::CALL_STATUS_WAITING) {
             continue;
         }
+        bool isRtt = false;
+#ifdef SUPPORT_RTT_CALL
+        if (call->GetCallType() == CallType::TYPE_IMS) {
+            sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+            isRtt = (imsCall->GetRttState() == RttCallState::RTT_STATE_YES);
+        }
+#endif
         if (call->GetAutoAnswerState()) {
             TELEPHONY_LOGI("Auto AnswerCall callid=%{public}d", call->GetCallID());
             int ret = DelayedSingleton<CallControlManager>::GetInstance()->AnswerCall(call->GetCallID(),
-                static_cast<int32_t>(call->GetVideoStateType()));
+                static_cast<int32_t>(call->GetVideoStateType()), isRtt);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("Auto AnswerCall failed callid=%{public}d", call->GetCallID());
             }
@@ -2640,9 +2693,14 @@ void CallStatusManager::PackVoipCallInfo(DialParaInfo &paraInfo, const CallDetai
 #ifdef SUPPORT_RTT_CALL
 void CallStatusManager::HandleRttEventInfo(const ImsRTTEventType &eventType)
 {
+    auto controlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    if (controlManager == nullptr) {
+        TELEPHONY_LOGE("CallControlManager is null");
+        return;
+    }
     switch (eventType) {
         case ImsRTTEventType::EVENT_RTT_CLOSED:
-            DelayedSingleton<CallControlManager>::GetInstance()->UnInitRttManager();
+            controlManager->UnInitRttManager();
             break;
         default:
             break;
