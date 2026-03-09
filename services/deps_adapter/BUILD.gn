@@ -59,7 +59,6 @@ ohos_shared_library("tel_cm_deps_adapter") {
     "-ffunction-sections",
     "-fno-asynchronous-unwind-tables",
     "-fno-unwind-tables",
-
   ]
 
   ldflags = [
