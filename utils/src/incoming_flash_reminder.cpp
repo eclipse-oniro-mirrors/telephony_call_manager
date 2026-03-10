@@ -40,6 +40,7 @@ enum class TelTorchMode {
 constexpr uint32_t DELAY_SET_TORCH_EVENT = 1000000;
 constexpr uint32_t STOP_FLASH_REMIND_EVENT = 1000001;
 constexpr uint32_t START_FLASH_REMIND_EVENT = 1000002;
+constexpr uint32_t END_FLASH_REMIND_EVENT = 1000003;
 const std::string FLASH_REMINDER_SWITCH_SUBSTRING = "INCOMING_CALL";
 IncomingFlashReminder::IncomingFlashReminder(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     std::function<void()> stopFlashRemindDone)
@@ -80,6 +81,9 @@ void IncomingFlashReminder::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &
             break;
         case START_FLASH_REMIND_EVENT:
             HandleStartFlashRemind();
+            break;
+        case END_FLASH_REMIND_EVENT:
+            HandleEndFlashRemind();
             break;
         default:
             TELEPHONY_LOGE("receive unknown event %{public}u", event->GetInnerEventId());
@@ -264,7 +268,7 @@ void IncomingFlashReminder::HandleStopFlashRemind()
         return;
     }
 #endif
-    SendEvent(AppExecFwk::InnerEvent::Get(CLOSE_FLASH_REMIND_EVENT, 0), 500);
+    SendEvent(AppExecFwk::InnerEvent::Get(END_FLASH_REMIND_EVENT, 0), 500);
 }
 
 void HandleEndFlashRemind()
