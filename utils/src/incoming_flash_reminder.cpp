@@ -269,7 +269,8 @@ void IncomingFlashReminder::HandleStopFlashRemind()
         return;
     }
 #endif
-    SendEvent(AppExecFwk::InnerEvent::Get(END_FLASH_REMIND_EVENT, 0), 500);
+    const int32_t WAIT_RELEASE_TIME_IN_MS = 500;
+    SendEvent(AppExecFwk::InnerEvent::Get(END_FLASH_REMIND_EVENT, 0), WAIT_RELEASE_TIME_IN_MS);
 }
 
 void IncomingFlashReminder::HandleEndFlashRemind()
