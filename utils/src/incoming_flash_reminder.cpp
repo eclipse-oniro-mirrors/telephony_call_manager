@@ -264,10 +264,11 @@ void IncomingFlashReminder::HandleStopFlashRemind()
     TELEPHONY_LOGI("set torch mode result: %{public}d", result);
 
     FreeCameraFunc freeCameraFunc = reinterpret_cast<FreeCameraFunc>(dlsym(libAdapterHandler_, "FreeCamera"));
-    if (setTorchMode == nullptr) {
+    if (freeCameraFunc == nullptr) {
         TELEPHONY_LOGE("dlsym FreeCamera failed : %{public}s", dlerror());
         return;
     }
+    freeCameraFunc();
 #endif
     const int32_t WAIT_RELEASE_TIME_IN_MS = 500;
     SendEvent(AppExecFwk::InnerEvent::Get(END_FLASH_REMIND_EVENT, 0), WAIT_RELEASE_TIME_IN_MS);
