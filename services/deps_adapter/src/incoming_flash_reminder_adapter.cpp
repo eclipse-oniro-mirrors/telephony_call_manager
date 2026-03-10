@@ -64,6 +64,18 @@ bool IsScreenLocked()
     return screenLockMgr->IsScreenLocked();
 }
 
+void FreeCamera()
+{
+    sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
+    if (camMgr == nullptr) {
+        TELEPHONY_LOGE("get cameraMgr null");
+        return;
+    }
+    
+    camMgr->DestroyStubObj();
+    camMgr->SetCameraManagerNull();
+}
+
 #ifdef __cplusplus
 }
 #endif

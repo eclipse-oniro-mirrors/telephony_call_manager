@@ -31,6 +31,8 @@ int SetTorchMode(int mode);
 
 bool IsScreenLocked();
 
+void FreeCamera();
+
 #ifdef __cplusplus
 }
 #endif

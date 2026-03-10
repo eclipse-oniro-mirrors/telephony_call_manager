@@ -190,13 +190,13 @@ void IncomingFlashReminder::HandleStartFlashRemind()
         TELEPHONY_LOGE("deps adapter dlopen failed : %{public}s", dlerror());
         return;
     }
-#endif
     if (!IsFlashRemindNecessary()) {
         TELEPHONY_LOGE("no need to StartFlashRemind");
         dlclose(libAdapterHandler_);
         libAdapterHandler_ = nullptr;
         return;
     }
+#endif
     isFlashRemindUsed_ = true;
     SendEvent(AppExecFwk::InnerEvent::Get(DELAY_SET_TORCH_EVENT, 0));
 }
@@ -257,10 +257,29 @@ void IncomingFlashReminder::HandleStopFlashRemind()
 
     int32_t result = static_cast<int32_t>(setTorchMode(static_cast<int>(TelTorchMode::TORCH_MODE_OFF)));
     TELEPHONY_LOGI("set torch mode result: %{public}d", result);
+
+    FreeCameraFunc freeCameraFunc = reinterpret_cast<FreeCameraFunc>(dlsym(libAdapterHandler_, "FreeCamera"));
+    if (setTorchMode == nullptr) {
+        TELEPHONY_LOGE("dlsym FreeCamera failed : %{public}s", dlerror());
+        return;
+    }
+#endif
+    SendEvent(AppExecFwk::InnerEvent::Get(CLOSE_FLASH_REMIND_EVENT, 0), 500);
+}
+
+void HandleEndFlashRemind()
+{
+    isFlashRemindUsed_ = false;
+#ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
+    if (libAdapterHandler_ == nullptr) {
+        TELEPHONY_LOGE("deps adapter is nullptr");
+        return;
+    }
+
     dlclose(libAdapterHandler_);
     libAdapterHandler_ = nullptr;
 #endif
-    if (stopFlashRemindDone_ != nullptr) {
+if (stopFlashRemindDone_ != nullptr) {
         stopFlashRemindDone_();
     }
 }
