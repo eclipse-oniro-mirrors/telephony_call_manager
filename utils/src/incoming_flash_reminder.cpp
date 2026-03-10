@@ -27,6 +27,7 @@ constexpr int64_t DELAY_SET_TORCH_MODE_TIME = 300;
 using IsTorchSupportedFunc = bool(*)();
 using GetTorchModeFunc = int (*)();
 using SetTorchModeFunc = int32_t (*)(int mode);
+using FreeCameraFunc = void (*)();
 enum class TelTorchMode {
     TORCH_MODE_UNKNOWN = -1,
     TORCH_MODE_OFF = 0,
@@ -271,7 +272,7 @@ void IncomingFlashReminder::HandleStopFlashRemind()
     SendEvent(AppExecFwk::InnerEvent::Get(END_FLASH_REMIND_EVENT, 0), 500);
 }
 
-void HandleEndFlashRemind()
+void IncomingFlashReminder::HandleEndFlashRemind()
 {
     isFlashRemindUsed_ = false;
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT

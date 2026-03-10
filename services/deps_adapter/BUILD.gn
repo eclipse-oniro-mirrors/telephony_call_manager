@@ -62,11 +62,11 @@ ohos_shared_library("tel_cm_deps_adapter") {
   isNeedFlashReminder = defined(global_parts_info) &&
     defined(global_parts_info.theme_screenlock_mgr) &&
     global_parts_info.theme_screenlock_mgr &&
-    defined(global_parts_info.multimedia_camera_framework) &&	 
+    defined(global_parts_info.multimedia_camera_framework) &&
     global_parts_info.multimedia_camera_framework
 
   if (isNeedFlashReminder) {
-    external_deps += [ 
+    external_deps += [
       "screenlock_mgr:screenlock_client",
       "camera_framework:camera_framework",
     ]
