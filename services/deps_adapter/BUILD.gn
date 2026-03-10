@@ -59,13 +59,16 @@ ohos_shared_library("tel_cm_deps_adapter") {
     "-Wl,--gc-sections",
   ]
 
-  if (defined(global_parts_info) &&
+  isNeedFlashReminder = defined(global_parts_info) &&
     defined(global_parts_info.theme_screenlock_mgr) &&
     global_parts_info.theme_screenlock_mgr &&
-    global_parts_info.multimedia_camera_framework) {
+    defined(global_parts_info.multimedia_camera_framework) &&	 
+    global_parts_info.multimedia_camera_framework
+
+  if (isNeedFlashReminder) {
     external_deps += [ 
       "screenlock_mgr:screenlock_client",
-      "camera_framework:camera_framework"
+      "camera_framework:camera_framework",
     ]
     sources += [
       "${call_manager_path}/services/deps_adapter/src/incoming_flash_reminder_adapter.cpp",
@@ -75,7 +78,9 @@ ohos_shared_library("tel_cm_deps_adapter") {
   if (defined(global_parts_info) &&
     defined(global_parts_info.telephony_sms_mms) &&
     global_parts_info.telephony_sms_mms) {
-    external_deps += [ "sms_mms:tel_sms_mms_api" ]
+    external_deps += [
+      "sms_mms:tel_sms_mms_api",
+    ]
     sources += [
       "${call_manager_path}/services/deps_adapter/src/sms_adapter.cpp",
     ]
