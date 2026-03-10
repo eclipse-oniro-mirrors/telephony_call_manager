@@ -226,8 +226,7 @@ bool SpamCallAdapter::ConnectSpamCallAbility(const AAFwk::Want &want, const std:
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
     TELEPHONY_LOGW("ConnectSpamCallAbility start");
-    connection_ = new (std::nothrow) SpamCallConnection(phoneNumber, slotId,
-        shared_from_this());
+    connection_ = sptr<SpamCallConnection>::MakeSptr(phoneNumber, slotId, shared_from_this());
     if (connection_ == nullptr) {
         TELEPHONY_LOGE("connection_ is nullptr");
         return false;

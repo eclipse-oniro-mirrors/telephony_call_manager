@@ -93,7 +93,7 @@ void CallDataBaseHelper::RegisterObserver(std::vector<std::string> *phones)
         TELEPHONY_LOGE("phones is nullptr");
         return;
     }
-    callDataRdbObserverPtr_ = new (std::nothrow) CallDataRdbObserver(phones);
+    callDataRdbObserverPtr_ = sptr<CallDataRdbObserver>::MakeSptr(phones);
     if (callDataRdbObserverPtr_ == nullptr) {
         TELEPHONY_LOGE("callDataRdbObserverPtr_ is null");
         return;

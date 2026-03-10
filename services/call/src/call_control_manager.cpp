@@ -1891,7 +1891,7 @@ int32_t CallControlManager::SubscriberSaStateChange()
     if (samgrProxy == nullptr) {
         return TELEPHONY_ERROR;
     }
-    statusChangeListener_ = new (std::nothrow) SystemAbilityListener();
+    statusChangeListener_ = sptr<SystemAbilityListener>::MakeSptr();
     if (statusChangeListener_ == nullptr) {
         TELEPHONY_LOGE("statusChangeListener_ is nullptr");
         return TELEPHONY_ERROR;

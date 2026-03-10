@@ -33,6 +33,7 @@
 #include "antifraud_service.h"
 #include "number_identity_service.h"
 #include "call_setting_ability_connection.h"
+#include "audio_player.h"
 
 using namespace OHOS::Bluetooth;
 namespace OHOS {
@@ -1380,6 +1381,21 @@ HWTEST_F(CallManagerGtest, Telephony_CallSettingAbilityConnection_0001, TestSize
     sptr<OHOS::IRemoteObject> remoteObj = new MockRemoteObject(0);
     connection->OnAbilityConnectDone(element, remoteObj, 0);
     EXPECT_TRUE(connection != nullptr);
+}
+
+/**
+ * @tc.number   AudioPlayerTest
+ * @tc.name     Test normal play ring
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, AudioPlayerTest, TestSize.Level1)
+{
+    std::unique_ptr<AudioPlayer> audioPlayer = std::make_unique<AudioPlayer>();
+    audioPlayer->isStop_ = false;
+    const std::string path = "/tmp/test_file.txt";
+    AudioStandard::AudioStreamType streamType = AudioStandard::AudioStreamType::STREAM_VOICE_RING;
+    PlayerType playerType = PlayerType::TYPE_RING;
+    EXPECT_NE(audioPlayer->Play(path, streamType, playerType), 0);
 }
 } // namespace Telephony
 } // namespace OHOS
