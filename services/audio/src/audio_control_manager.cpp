@@ -1775,5 +1775,11 @@ void AudioControlManager::SetCallAudioMode(int32_t mode, int32_t scenarios)
     }
     audioDeviceManager->SetCallAudioMode(callAudioMode);
 }
+
+void AudioControlManager::SetIncomingConflict(bool isConflict)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    isIncomingConflict_ = isConflict;
+}
 } // namespace Telephony
 } // namespace OHOS
