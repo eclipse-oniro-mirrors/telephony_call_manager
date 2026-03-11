@@ -36,6 +36,7 @@ void IncomingCallWakeup::NewCallCreated(sptr<CallBase> &callObjectPtr)
 void IncomingCallWakeup::AcquireIncomingLock()
 {
 #ifdef ABILITY_POWER_SUPPORT
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (incomingRunningLock_ == nullptr) {
         incomingRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
             CreateRunningLock("incomingrunninglock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
@@ -50,6 +51,7 @@ void IncomingCallWakeup::AcquireIncomingLock()
 void IncomingCallWakeup::ReleaseIncomingLock()
 {
 #ifdef ABILITY_POWER_SUPPORT
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (incomingRunningLock_ == nullptr || !incomingRunningLock_->IsUsed()) {
         return;
     }
@@ -61,6 +63,7 @@ void IncomingCallWakeup::ReleaseIncomingLock()
 void IncomingCallWakeup::WakeupDevice(sptr<CallBase> &callObjectPtr)
 {
 #ifdef ABILITY_POWER_SUPPORT
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (phoneRunningLock_ == nullptr) {
         phoneRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
             CreateRunningLock("phonerunninglock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
@@ -119,6 +122,7 @@ void IncomingCallWakeup::CallStateUpdated(
     CallObjectManager::HasRingingCall(hasRingCall);
     if (!hasRingCall) {
     #ifdef ABILITY_POWER_SUPPORT
+        std::lock_guard<ffrt::mutex> lock(mutex_);
         if (screenRunningLock_ != nullptr && isScreenOnLocked) {
             screenRunningLock_->UnLock();
             isScreenOnLocked = false;
