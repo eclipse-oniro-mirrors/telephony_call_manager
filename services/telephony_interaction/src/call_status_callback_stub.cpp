@@ -167,7 +167,7 @@ int32_t CallStatusCallbackStub::OnReportCallProcedureEvents(MessageParcel &data,
     std::string callId = data.ReadString();
     std::string procedureJsonStr = data.ReadString();
     if (procedureJsonStr.length() > MAX_PROCEDURE_JSON_SIZE) {
-        TELEPHONY_LOGE("the procedureJsonStr is too long %{public}lu", procedureJsonStr.length());
+        TELEPHONY_LOGE("the procedureJsonStr is too long %{public}zu", procedureJsonStr.length());
         return TELEPHONY_ERR_FAIL;
     }
     result = ReportCallProcedureEvents(callId, procedureJsonStr);
