@@ -486,26 +486,32 @@ void CallManagerHisysevent::ReportCallProcedureEvents(const std::string &callId,
     procedures["cnt"] = procedures.value("cnt", 0) + proceduresc.value("cnt", 0);
     procedureJson["Procedures"] = procedures;
     auto callAttribute = procedureJson["CallAttribute"];
-    std::string bundleName = callAttribute.value("bundleName", "");
-    int32_t voipCallType = callAttribute.value("voipCallType", -1);
-    bool isConferenceCall = callAttribute.value("isConferenceCall", false);
-    bool showBannerForIncomingCall = callAttribute.value("showBannerForIncomingCall", false);
-    int32_t direction = callAttribute.value("direction", -1);
-    int32_t appIndex = callAttribute.value("appIndex", -1);
-    callAttribute.erase("bundleName");
-    callAttribute.erase("voipCallType");
-    callAttribute.erase("isConferenceCall");
-    callAttribute.erase("showBannerForIncomingCall");
-    callAttribute.erase("direction");
-    callAttribute.erase("appIndex");
-    procedureJson["CallAttribute"] = callAttribute;
-    time_t beginTime = newProcedure[0]["T"];
-    HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_PERFORMANCE", EventType::FAULT, CALL_ID_KEY, callId, "BUNDLE_NAME",
-        bundleName, "APP_INDEX", appIndex, "PROCEDURE_FAULTS", procedureJson.dump(), "CALL_DIRECTION", direction,
-        "CALL_TYPE", voipCallType, "INCOMING_CALL_BANNER", showBannerForIncomingCall, "IS_CONFERENCE_CALL",
-        isConferenceCall, "BEGIN_TIME", beginTime);
-    std::lock_guard<ffrt::shared_mutex> lock(voipProcedureCallInfoLock_);
-    voipProcedureCallInfo_.erase(callId);
-}
+     ReportCallProcedureEventsInternal(callId, callAttribute, procedureJson);
+ 	 }
+ 	 
+ 	 void CallManagerHisysevent::ReportCallProcedureEventsInternal(const std::string &callId, nlohmann::json &callAttribute,
+ 	     nlohmann::json &procedureJson)
+ 	 {
+ 	     std::string bundleName = callAttribute.value("bundleName", "");
+ 	     int32_t voipCallType = callAttribute.value("voipCallType", -1);
+ 	     bool isConferenceCall = callAttribute.value("isConferenceCall", false);
+ 	     bool showBannerForIncomingCall = callAttribute.value("showBannerForIncomingCall", false);
+ 	     int32_t direction = callAttribute.value("direction", -1);
+ 	     int32_t appIndex = callAttribute.value("appIndex", -1);
+ 	     callAttribute.erase("bundleName");
+ 	     callAttribute.erase("voipCallType");
+ 	     callAttribute.erase("isConferenceCall");
+ 	     callAttribute.erase("showBannerForIncomingCall");
+ 	     callAttribute.erase("direction");
+ 	     callAttribute.erase("appIndex");
+ 	     procedureJson["CallAttribute"] = callAttribute;
+ 	     time_t beginTime = procedureJson["Procedures"]["P"][0]["T"];
+ 	     HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_PERFORMANCE", EventType::FAULT, CALL_ID_KEY, callId, "BUNDLE_NAME",
+ 	         bundleName, "APP_INDEX", appIndex, "PROCEDURE_FAULTS", procedureJson.dump(), "CALL_DIRECTION", direction,
+ 	         "CALL_TYPE", voipCallType, "INCOMING_CALL_BANNER", showBannerForIncomingCall, "IS_CONFERENCE_CALL",
+ 	         isConferenceCall, "BEGIN_TIME", beginTime);
+ 	     std::lock_guard<ffrt::shared_mutex> lock(voipProcedureCallInfoLock_);
+ 	     voipProcedureCallInfo_.erase(callId);
+ 	 }
 } // namespace Telephony
 } // namespace OHOS
