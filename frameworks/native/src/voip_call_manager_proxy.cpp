@@ -33,10 +33,6 @@ __attribute__((noinline)) int32_t VoipCallManagerProxy::SendRequest(const std::s
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("VoipCallManagerProxy Remote return nullptr!");
-        if (!callId.empty()) {
-            WriteVoipCallFaultEvent(callId,
-                static_cast<int32_t>(VoIPCallErrorCodeEnum::TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL));
-        }
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return remote->SendRequest(msgId, in, out, option);
@@ -96,7 +92,7 @@ int32_t VoipCallManagerProxy::ReportIncomingCallError(AppExecFwk::PacMap &extras
 }
 
 int32_t VoipCallManagerProxy::ReportCallStateChange(
-    std::string callId, const VoipCallState &state, const VoipCallType &type)
+    std::string callId, const VoipCallState &state, const VoipCallType &type, int32_t &errCode)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
@@ -106,6 +102,7 @@ int32_t VoipCallManagerProxy::ReportCallStateChange(
     dataParcel.WriteString(callId);
     dataParcel.WriteInt32(static_cast<int32_t>(state));
     dataParcel.WriteInt32(static_cast<int32_t>(type));
+    dataParcel.WriteInt32(errCode);
     MessageOption option;
     MessageParcel replyParcel;
     int32_t error =
