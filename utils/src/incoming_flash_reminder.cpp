@@ -36,7 +36,7 @@ enum class TelTorchMode {
 };
 #endif
 #ifdef ABILITY_SCREENLOCKMGR_SUPPORT
-    using IsScreenLockedFun = bool (*)();
+    using IsScreenLockedFunc = bool (*)();
 #endif
 constexpr uint32_t DELAY_SET_TORCH_EVENT = 1000000;
 constexpr uint32_t STOP_FLASH_REMIND_EVENT = 1000001;
@@ -108,7 +108,7 @@ bool IncomingFlashReminder::IsScreenStatusSatisfied()
         TELEPHONY_LOGE("deps adapter is nullptr");
         return false;
     }
-    IsScreenLockedFun isScreenLocked = reinterpret_cast<IsScreenLockedFun>(dlsym(libAdapterHandler_, "IsScreenLocked"));
+    IsScreenLockedFunc isScreenLocked = reinterpret_cast<IsScreenLockedFunc>(dlsym(libAdapterHandler_, "IsScreenLocked"));
     if (isScreenLocked == nullptr) {
         TELEPHONY_LOGE("dlsym IsScreenLocked failed : %{public}s", dlerror());
         return false;
@@ -246,7 +246,6 @@ void IncomingFlashReminder::HandleStopFlashRemind()
         }
         return;
     }
-    isFlashRemindUsed_ = false;
     RemoveEvent(DELAY_SET_TORCH_EVENT);
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
     if (libAdapterHandler_ == nullptr) {
@@ -276,7 +275,6 @@ void IncomingFlashReminder::HandleStopFlashRemind()
 
 void IncomingFlashReminder::HandleEndFlashRemind()
 {
-    isFlashRemindUsed_ = false;
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
     if (libAdapterHandler_ == nullptr) {
         TELEPHONY_LOGE("deps adapter is nullptr");
@@ -286,7 +284,8 @@ void IncomingFlashReminder::HandleEndFlashRemind()
     dlclose(libAdapterHandler_);
     libAdapterHandler_ = nullptr;
 #endif
-if (stopFlashRemindDone_ != nullptr) {
+    isFlashRemindUsed_ = false;
+    if (stopFlashRemindDone_ != nullptr) {
         stopFlashRemindDone_();
     }
 }
