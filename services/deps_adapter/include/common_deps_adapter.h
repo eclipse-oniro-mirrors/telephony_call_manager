@@ -35,7 +35,8 @@ void FreeCamera();
 bool IsScreenLocked();
 
 // deps for Sms
-int SendMessage(int32_t slotId, const char16_t* desAddr, const char16_t* text);
+int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text,
+    unsigned int addrLen, unsigned int textLen);
 #ifdef __cplusplus
 }
 #endif

@@ -78,8 +78,12 @@ bool IsScreenLocked()
 }
 
 // deps for Sms
-int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text) // 此处是否需要调整接口，增加两个传入长度。
+int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text,
+    unsigned int addrLen, unsigned int textLen)
 {
+    if (desAddr == nullptr || text == nullptr) {
+        TELEPHONY_LOGE("input error");
+    }
     return Singleton<SmsServiceManagerClient>::GetInstance()
         .SendMessage(slotId, std::u16string(desAddr), std::u16string(u""), std::u16string(text), nullptr, nullptr);
 }

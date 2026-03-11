@@ -53,7 +53,7 @@ void RejectCallSms::SendMessage(int32_t slotId, const std::u16string &desAddr, c
         adapterHandler = nullptr;
         return;
     }
-    int ret = sendMsgFunc(slotId, desAddr.c_str(), text.c_str());
+    int ret = sendMsgFunc(slotId, desAddr.c_str(), text.c_str(), desAddr.size(), text.size());
     if (ret != 0) {
         TELEPHONY_LOGE("fail to Send Message");
     }
