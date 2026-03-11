@@ -31,6 +31,7 @@ public:
 
     int32_t UpdateCallReportInfo(const CallReportInfo &info) override;
     int32_t UpdateCallsReportInfo(const CallsReportInfo &info) override;
+    int32_t ReportCallProcedureEvents(const std::string &callId, const std::string &procedureJsonStr) override;
     int32_t UpdateDisconnectedCause(const DisconnectedDetails &details) override;
     int32_t UpdateEventResultInfo(const CellularCallEventInfo &info) override;
     int32_t UpdateRBTPlayInfo(const RBTPlayInfo info) override;

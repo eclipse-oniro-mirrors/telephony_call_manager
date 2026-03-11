@@ -111,6 +111,12 @@ void CallStatusManager::InitCallBaseEvent()
         CallAbilityEventId::EVENT_SPLIT_CALL_FAILED;
 }
 
+int32_t CallStatusManager::ReportCallProcedureEvents(const std::string &callId, const std::string &procedureJsonStr)
+{
+    CallManagerHisysevent::ReportCallProcedureEvents(callId, procedureJsonStr);
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
@@ -347,6 +353,8 @@ int32_t CallStatusManager::HandleVoipCallReportInfo(const CallDetailInfo &info)
             break;
     }
     DelayedSingleton<BluetoothCallService>::GetInstance()->GetCallState();
+    CallManagerHisysevent::RecordVoipProcedure(info.voipCallInfo.voipCallId,
+        VoipProcedureEvent::CALLMANAGER_HANDLE_CALL_STATE_CHANGE, static_cast<int32_t>(info.state));
     return ret;
 }
 
@@ -450,6 +458,8 @@ int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &in
         }
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo(call);
+    CallManagerHisysevent::RecordVoipProcedure(info.voipCallId,
+        VoipProcedureEvent::REPORT_AUDIO_EVENT_TO_CALLUI, static_cast<int32_t>(info.voipCallEvent));
     return TELEPHONY_SUCCESS;
 }
 
@@ -643,10 +653,6 @@ int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
     }
     
     call->SetNonVirtualCall(!DelayedSingleton<AudioDeviceManager>::GetInstance()->GetVirtualCall());
-    if (!call->isNonVirtualCall()) {
-        CallManagerHisysevent::WriteVoipCallFaultEvent(info.voipCallInfo.voipCallId, info.voipCallInfo.uid,
-            static_cast<int32_t>(VoIPCallErrorCode::VIRTUAL_CALL_SET_FAILED));
-    }
     AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
@@ -681,10 +687,6 @@ int32_t CallStatusManager::OutgoingVoipCallHandle(const CallDetailInfo &info)
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
     call->SetNonVirtualCall(!DelayedSingleton<AudioDeviceManager>::GetInstance()->GetVirtualCall());
-    if (!call->isNonVirtualCall()) {
-        CallManagerHisysevent::WriteVoipCallFaultEvent(info.voipCallInfo.voipCallId, info.voipCallInfo.uid,
-            static_cast<int32_t>(VoIPCallErrorCode::VIRTUAL_CALL_SET_FAILED));
-    }
     AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);

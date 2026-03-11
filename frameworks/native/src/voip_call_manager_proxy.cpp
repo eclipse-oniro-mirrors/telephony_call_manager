@@ -61,8 +61,6 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
         SendRequest(callId, static_cast<int32_t>(INTERFACE_REPORT_INCOMING_CALL), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportIncomingCall call failed! errCode:%{public}d", error);
-        WriteVoipCallFaultEvent(extras.GetStringValue("callId"),
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_INCOMINGCALL_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = replyParcel.ReadInt32();
@@ -92,8 +90,6 @@ int32_t VoipCallManagerProxy::ReportIncomingCallError(AppExecFwk::PacMap &extras
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportIncomingCallError call failed! errCode:%{public}d", error);
-        WriteVoipCallFaultEvent(callId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_REPORTINCOMINGCALLERROR_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -116,8 +112,6 @@ int32_t VoipCallManagerProxy::ReportCallStateChange(
         SendRequest(callId, static_cast<int32_t>(INTERFACE_REPORT_CALL_STATE_CHANGE), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportCallStateChange call failed! errCode:%{public}d", error);
-        WriteVoipCallFaultEvent(callId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_REPORTCALLSTATECHANGE_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -152,8 +146,6 @@ int32_t VoipCallManagerProxy::ReportOutgoingCall(
         SendRequest(callId, static_cast<int32_t>(INTERFACE_REPORT_OUTGOING_CALL), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportOutgoingCall call failed! errCode:%{public}d", error);
-        WriteVoipCallFaultEvent(callId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_REPORTOUTGOINGCALL_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t result = replyParcel.ReadInt32();
@@ -216,8 +208,6 @@ int32_t VoipCallManagerProxy::ReportVoipIncomingCall(
         SendRequest(callId, static_cast<int32_t>(INTERFACE_REPORT_VOIP_INCOMING_CALL), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportVoipIncomingCall call failed! errCode:%{public}d", error);
-        WriteVoipCallFaultEvent(callId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_REPORTVOIPINCOMINGCALL_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -241,8 +231,6 @@ int32_t VoipCallManagerProxy::ReportVoipCallExtensionId(
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportVoipCallExtensionId call failed! errCode:%{public}d", error);
-        WriteVoipCallFaultEvent(callId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_REPORTVOIPCALLEXTENSIONID_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -266,8 +254,6 @@ int32_t VoipCallManagerProxy::Answer(const VoipCallEventInfo &events, int32_t vi
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function Answer voip call failed! errCode:%{public}d", error);
-        WriteVoipCallFaultEvent(events.voipCallId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_ANSWER_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -291,8 +277,6 @@ int32_t VoipCallManagerProxy::HangUp(const VoipCallEventInfo &events)
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function HangUp voip call failed! errCode:%{public}d", error);
-        WriteVoipCallFaultEvent(events.voipCallId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_HANGUP_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -315,8 +299,6 @@ int32_t VoipCallManagerProxy::Reject(const VoipCallEventInfo &events)
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function Reject voip call failed! errCode:%{public}d", error);
-        WriteVoipCallFaultEvent(events.voipCallId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_REJECT_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -398,8 +380,6 @@ int32_t VoipCallManagerProxy::SendCallUiEvent(std::string voipCallId, const Call
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function SendCallUiEvent call failed! errCode:%{public}d", error);
-        WriteVoipCallFaultEvent(voipCallId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_SENDCALLUIEVENT_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -421,8 +401,6 @@ int32_t VoipCallManagerProxy::ReportCallAudioEventChange(std::string voipCallId,
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportCallAudioEventChange call failed! errCode:%{public}d", error);
-        WriteVoipCallFaultEvent(voipCallId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_REPORTCALLAUDIOEVENTCHANGE_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -446,8 +424,6 @@ int32_t VoipCallManagerProxy::SendCallUiEventForWindow(AppExecFwk::PacMap &extra
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function SendCallUiEventForWindow call failed! errCode:%{public}d", error);
-        WriteVoipCallFaultEvent(callId,
-            static_cast<int32_t>(VoIPCallErrorCodeEnum::SEND_SENDCALLUIEVENTFORWINDOW_CALL_FAILED));
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -479,11 +455,6 @@ bool VoipCallManagerProxy::WriteDataParcel(MessageParcel &dataParcel, AppExecFwk
     }
 
     return true;
-}
-
-void VoipCallManagerProxy::WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId)
-{
-    DelayedSingleton<CallManagerProxy>::GetInstance()->WriteVoipCallFaultEvent(voipCallId, faultId);
 }
 
 int32_t VoipCallManagerProxy::NotifyVoIPAudioStreamStart(int32_t uid)

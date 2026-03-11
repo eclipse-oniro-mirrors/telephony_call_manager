@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
+const int32_t MAX_PROCEDURE_JSON_SIZE = 2000;
 CallStatusCallbackProxy::CallStatusCallbackProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<ICallStatusCallback>(impl)
 {}
@@ -73,6 +74,30 @@ int32_t CallStatusCallbackProxy::UpdateCallReportInfo(const CallReportInfo &info
         dataParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
     }
     error = SendRequest(static_cast<int32_t>(UPDATE_CALL_INFO), dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallStatusCallbackProxy::ReportCallProcedureEvents(const std::string &callId,
+    const std::string &procedureJsonStr)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (procedureJsonStr.length() > MAX_PROCEDURE_JSON_SIZE) {
+        TELEPHONY_LOGE("the procedureJsonStr is too long %{public}lu", procedureJsonStr.length());
+        return TELEPHONY_ERR_FAIL;
+    }
+    dataParcel.WriteString(callId);
+    dataParcel.WriteString(procedureJsonStr);
+    
+    error = SendRequest(static_cast<int32_t>(VOIP_REPORT_CALL_PROCEDURE_EVENTS), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }

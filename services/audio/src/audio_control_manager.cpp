@@ -19,6 +19,7 @@
 #include "call_control_manager.h"
 #include "call_dialog.h"
 #include "call_state_processor.h"
+#include "call_manager_hisysevent.h"
 #include "common_type.h"
 #include "distributed_call_manager.h"
 #include "telephony_log_wrapper.h"
@@ -1223,6 +1224,9 @@ int32_t AudioControlManager::MuteRinger()
         if (incomingCall != nullptr && incomingCall->GetCallType() == CallType::TYPE_VOIP &&
             !DelayedSingleton<CallControlManager>::GetInstance()->HasCall()) {
             auto voipCall = static_cast<VoIPCall *>(incomingCall.GetRefPtr());
+            CallManagerHisysevent::RecordVoipProcedure(voipCall->GetVoipCallId(),
+                VoipProcedureEvent::CALLUI_SEND_UI_EVENT,
+                static_cast<int32_t>(CalluiSendUiEventDetail::CALLUI_MUTE_VOIP_RINGER));
             if (voipCall->GetUserMuteRingToneAllowed()) {
                 voipCall->SetMute(AUDIO_EVENT_MUTED_RINGTONE, voipCall->GetSlotId());
             } else {

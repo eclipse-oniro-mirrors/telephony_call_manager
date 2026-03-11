@@ -58,6 +58,7 @@ public:
     ~CallStatusManager();
     int32_t Init();
     int32_t HandleCallReportInfo(const CallDetailInfo &info);
+    int32_t ReportCallProcedureEvents(const std::string &callId, const std::string &procedureJsonStr);
     void HandleDsdaInfo(int32_t slotId);
     void SetImsDomainInfo(const sptr<CallBase> call, int32_t imsDomain);
     int32_t HandleCallsReportInfo(const CallDetailsInfo &info);

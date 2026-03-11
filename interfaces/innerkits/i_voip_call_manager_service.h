@@ -55,7 +55,7 @@ public:
         AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason) = 0;
     virtual int32_t ReportIncomingCallError(AppExecFwk::PacMap &extras) = 0;
     virtual int32_t ReportCallStateChange(
-        std::string callId, const VoipCallState &state, const VoipCallType &type) = 0;
+        std::string callId, const VoipCallState &state, const VoipCallType &type, int32_t &errorCode) = 0;
     virtual int32_t RegisterCallBack(const sptr<IVoipCallManagerCallback> &callback) = 0;
     virtual int32_t UnRegisterCallBack() = 0;
 

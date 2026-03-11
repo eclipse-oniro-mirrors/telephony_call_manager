@@ -40,6 +40,15 @@ public:
     /**
      * @brief update the call details info list
      *
+     * @param callId call of id
+     * @param procedureJsonStr josn type of tracking str
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t ReportCallProcedureEvents(const std::string &callId, const std::string &procedureJsonStr) = 0;
+
+    /**
+     * @brief update the call details info list
+     *
      * @param info[in] calls info, contains slot id and a CallReportInfo vector
      * @return Returns 0 on success, others on failure.
      */

@@ -84,6 +84,20 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
     return ret;
 }
 
+int32_t CallStatusCallback::ReportCallProcedureEvents(const std::string &callId, const std::string &procedureJsonStr)
+{
+    auto reportCallInfoHandler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    if (reportCallInfoHandler == nullptr) {
+        TELEPHONY_LOGE("reportCallInfoHandler is nullptr!");
+        return TELEPHONY_ERROR;
+    }
+    int32_t ret = reportCallInfoHandler->ReportCallProcedureEvents(callId, procedureJsonStr);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ReportCallProcedureEvents failed! errCode:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
 {
     CallDetailsInfo detailsInfo;

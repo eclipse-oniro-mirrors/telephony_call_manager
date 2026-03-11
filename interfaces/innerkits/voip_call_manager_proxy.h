@@ -61,7 +61,8 @@ public:
      * @param VoipCallType[in], The voip call type
      * @return Returns 0 on success, others on failure.
      */
-    int32_t ReportCallStateChange(std::string callId, const VoipCallState &state, const VoipCallType &type) override;
+    int32_t ReportCallStateChange(std::string callId, const VoipCallState &state, const VoipCallType &type,
+        int32_t &errorCode) override;
     /**
      * @brief thrid-party applications report a outgoing call.
      *
@@ -192,7 +193,6 @@ public:
 
 private:
     bool WriteDataParcel(MessageParcel &dataParcel, AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile);
-    void WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId);
     __attribute__((noinline)) int32_t SendRequest(const std::string &callId, int32_t msgId, MessageParcel &in,
         MessageParcel &out, MessageOption &option);
 

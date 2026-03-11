@@ -17,6 +17,7 @@
 
 #include "call_control_manager.h"
 #include "call_manager_errors.h"
+#include "call_manager_hisysevent.h"
 #include "call_object_manager.h"
 #include "telephony_log_wrapper.h"
 #include "voip_call_connection.h"
@@ -61,6 +62,8 @@ int32_t VoIPCall::AnswerCall(int32_t videoState, bool isRTT)
         TELEPHONY_LOGW("PackVoipCallInfo failed!");
     }
     DelayedSingleton<VoipCallConnection>::GetInstance()->AnswerCall(voipcallInfo, videoState);
+    CallManagerHisysevent::RecordVoipProcedure(voipcallInfo.voipCallId,
+        VoipProcedureEvent::CALLMANAGER_ANSWER_VOIP, static_cast<int32_t>(videoState));
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("answer call failed!");
         return CALL_ERR_ANSWER_FAILED;
@@ -86,6 +89,8 @@ int32_t VoIPCall::RejectCall()
         TELEPHONY_LOGW("PackVoipCallInfo failed!");
     }
     DelayedSingleton<VoipCallConnection>::GetInstance()->RejectCall(voipcallInfo);
+    CallManagerHisysevent::RecordVoipProcedure(voipcallInfo.voipCallId,
+        VoipProcedureEvent::CALLMANAGER_REJECT_VOIP, static_cast<int32_t>(ret));
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("reject call failed!");
         return CALL_ERR_ANSWER_FAILED;
@@ -104,6 +109,8 @@ int32_t VoIPCall::HangUpCall()
     }
     voipcallInfo.errorReason = ErrorReason::USER_ANSWER_CELLULAR_FIRST;
     DelayedSingleton<VoipCallConnection>::GetInstance()->HangUpCall(voipcallInfo);
+    CallManagerHisysevent::RecordVoipProcedure(voipcallInfo.voipCallId,
+        VoipProcedureEvent::CALLMANAGER_HUNGUP_VOIP, static_cast<int32_t>(voipcallInfo.errorReason));
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("hangup call failed!");
         return CALL_ERR_ANSWER_FAILED;
@@ -122,6 +129,8 @@ int32_t VoIPCall::HangUpCall(const ErrorReason &status)
     }
     voipcallInfo.errorReason = status;
     DelayedSingleton<VoipCallConnection>::GetInstance()->HangUpCall(voipcallInfo);
+    CallManagerHisysevent::RecordVoipProcedure(voipcallInfo.voipCallId,
+        VoipProcedureEvent::CALLMANAGER_HUNGUP_VOIP, static_cast<int32_t>(voipcallInfo.errorReason));
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("hangup call failed!");
         return CALL_ERR_ANSWER_FAILED;
@@ -165,6 +174,8 @@ int32_t VoIPCall::SetMute(int32_t mute, int32_t slotId)
     TELEPHONY_LOGI("VoIPCall::setMute voipCallId: %{public}s, callAudioEvent: %{public}d", voipCallId.c_str(),
         callAudioEvent);
     DelayedSingleton<VoipCallConnection>::GetInstance()->SendCallUiEvent(voipCallId, callAudioEvent);
+    CallManagerHisysevent::RecordVoipProcedure(info.voipCallInfo.voipCallId,
+        VoipProcedureEvent::CALLMANAGER_MUTE_VOIP, static_cast<int32_t>(callAudioEvent));
     return TELEPHONY_SUCCESS;
 }
 

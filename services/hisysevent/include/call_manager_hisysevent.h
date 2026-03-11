@@ -17,8 +17,10 @@
 #define CALL_MANAGER_HISYSEVENT_H
 
 #include <string>
-
+#include "ffrt.h"
 #include "telephony_hisysevent.h"
+#include "nlohmann/json.hap"
+#include "voip_call_manager_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -48,11 +50,6 @@ enum class IncomingCallType {
     CS_VOICE_INCOMING,
 };
 
-enum class VoIPCallErrorCode {
-    REPORTING_DISCONNECTED_VOIP_CALL_AGAIN = 300,
-    GET_VOIPCALLMANAGER_INTERFACEPTR_IS_NULL,
-    VIRTUAL_CALL_SET_FAILED,
-};
 class CallManagerHisysevent : public TelephonyHiSysEvent {
 public:
     static void WriteCallStateBehaviorEvent(const int32_t slotId, const int32_t state, const int32_t index);
@@ -77,7 +74,11 @@ public:
     static void WriteVoipCallStatisticalEvent(const std::string &callId, const int32_t &uid,
         const std::string statisticalField);
     static void WriteVoipCallStatisticalEvent(const int32_t &callId, const std::string statisticalField);
-    static void WriteVoipCallFaultEvent(const std::string &voipCallId, int32_t uid, const int32_t errCode);
+    static void RecordVoipProcedure(const std::string &callId, const VoipProcedureEvent voipProcedureEvent,
+        const int32_t ScenarioDetailCode);
+    static void RecordVoipProcedure(const int32_t &callId, const VoipProcedureEvent voipProcedureEvent,
+        const int32_t ScenarioDetailCode);
+    static void ReportCallProcedureEvents(const std::string &callId, const std::string &procedureJsonStr);
 
 public:
     template<typename... Types>
@@ -92,11 +93,15 @@ private:
     static int32_t CallInterfaceErrorCodeConversion(const int32_t errCode, CallErrorCode &eventValue);
     static int32_t TelephonyErrorCodeConversion(const int32_t errCode, CallErrorCode &eventValue);
     static void GetAppIndexByBundleName(std::string &bundleName, int32_t uid, int32_t &appIndex);
+    static void AddVoipProcedureCallInfo(const std::string &callId, nlohmann::json scenarioJson);
+    static bool GetVoipProcedureCallInfo(const std::string &callId, nlohmann::json &scenarioJson);
 
 private:
     int64_t dialStartTime_ = 0;
     int64_t incomingStartTime_ = 0;
     int64_t answerStartTime_ = 0;
+    static std::map<std::string, nlohmann::json> voipProcedureCallInfo_;
+    static ffrt::shared_mutex voipProcedureCallInfoLock_;
 };
 } // namespace Telephony
 } // namespace OHOS

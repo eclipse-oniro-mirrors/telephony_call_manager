@@ -1069,6 +1069,9 @@ HWTEST_F(ZeroBranch2Test, Telephony_ReportCallInfoHandler_001, Function | Medium
 {
     CallDetailInfo mCallDetailInfo;
     DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(mCallDetailInfo);
+    std::string callId = "callId";
+    std::string procedureJsonStr = "procedureJsonStr";
+    DelayedSingleton<ReportCallInfoHandler>::GetInstance()->ReportCallProcedureEvents(callId, procedureJsonStr);
     CallDetailsInfo mCallDetailsInfo;
     ASSERT_NE(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallsReportInfo(mCallDetailsInfo),
         TELEPHONY_ERR_SUCCESS);

@@ -403,6 +403,8 @@ int32_t CallManagerService::AnswerCall(int32_t callId, int32_t videoState, bool 
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     DelayedSingleton<CallManagerHisysevent>::GetInstance()->SetAnswerStartTime();
+    CallManagerHisysevent::RecordVoipProcedure(callId,
+        VoipProcedureEvent::CALLUI_SEND_UI_EVENT, static_cast<int32_t>(CalluiSendUiEventDetail::CALLUI_ANSWER_VOIP));
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->AnswerCall(callId, videoState, isRTT);
     } else {
@@ -422,6 +424,8 @@ int32_t CallManagerService::RejectCall(int32_t callId, bool rejectWithMessage, s
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
+    CallManagerHisysevent::RecordVoipProcedure(callId,
+        VoipProcedureEvent::CALLUI_SEND_UI_EVENT, static_cast<int32_t>(CalluiSendUiEventDetail::CALLUI_REJECT_VOIP));
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->RejectCall(callId, rejectWithMessage, textMessage);
     } else {
@@ -441,6 +445,8 @@ int32_t CallManagerService::HangUpCall(int32_t callId)
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
+    CallManagerHisysevent::RecordVoipProcedure(callId,
+        VoipProcedureEvent::CALLUI_SEND_UI_EVENT, static_cast<int32_t>(CalluiSendUiEventDetail::CALLUI_HUNGUP_VOIP));
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->HangUpCall(callId);
     } else {
@@ -1826,11 +1832,6 @@ int32_t CallManagerService::SetCallPolicyInfo(bool isDialingTrustlist, const std
     } else {
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-}
-
-int32_t CallManagerService::WriteVoipCallFaultEvent(std::string voipCallId, int32_t faultId)
-{
-    return DelayedSingleton<VoipCallConnection>::GetInstance()->WriteVoipCallFaultEvent(voipCallId, faultId);
 }
 
 bool CallManagerService::EndCall()

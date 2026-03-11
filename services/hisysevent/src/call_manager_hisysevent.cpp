@@ -59,6 +59,11 @@ static const int32_t SATELLITE_CALL_TYPE = 5;
 static const int32_t VOICE_TYPE = 0;
 static const int32_t VIDEO_TYPE = 1;
 using namespace OHOS::AppExecFwk;
+using json = nlohmann::json;
+
+std::map<std::string, nlohmann::json> CallManagerHisysevent::voipProcedureCallInfo_ = {};
+ffrt::shared_mutex CallManagerHisysevent::voipProcedureCallInfoLock_ = {};
+
 void CallManagerHisysevent::WriteCallStateBehaviorEvent(const int32_t slotId, const int32_t state, const int32_t index)
 {
     HiWriteBehaviorEvent(CALL_STATE_CHANGED_EVENT, SLOT_ID_KEY, slotId, STATE_KEY, state, INDEX_ID_KEY, index);
@@ -360,18 +365,6 @@ void CallManagerHisysevent::WriteVoipCallStatisticalEvent(const int32_t &callId,
     WriteVoipCallStatisticalEvent(voipCall->GetVoipCallId(), voipCall->GetVoipUid(), statisticalField);
 }
 
-void CallManagerHisysevent::WriteVoipCallFaultEvent(const std::string &voipCallId, int32_t uid, const int32_t errCode)
-{
-    ffrt::submit([voipCallId, uid, errCode]() {
-        std::string bundleName;
-        int32_t appIndex = -1;
-        int64_t timestamp = static_cast<int64_t>(time(0));
-        GetAppIndexByBundleName(bundleName, uid, appIndex);
-        HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_PERFORMANCE", EventType::FAULT, CALL_ID_KEY, voipCallId,
-            "BUNDLE_NAME", bundleName, "ERR_CODE", errCode, "APP_INDEX", appIndex, "TIME_STAMP", timestamp);
-    });
-}
-
 void CallManagerHisysevent::GetAppIndexByBundleName(std::string &bundleName, int32_t uid, int32_t &appIndex)
 {
     sptr<ISystemAbilityManager> systemAbilityManager =
@@ -389,5 +382,130 @@ void CallManagerHisysevent::GetAppIndexByBundleName(std::string &bundleName, int
     bundleMgr->GetNameAndIndexForUid(uid, bundleName, appIndex);
 }
 
+void CallManagerHisysevent::AddVoipProcedureCallInfo(const std::string &callId, nlohmann::json scenarioJson)
+{
+    std::lock_guard<ffrt::shared_mutex> lock(voipProcedureCallInfoLock_);
+    voipProcedureCallInfo_[callId] = scenarioJson;
+}
+
+bool CallManagerHisysevent::GetVoipProcedureCallInfo(const std::string &callId, nlohmann::json &scenarioJson)
+{
+    std::shared_lock<ffrt::shared_mutex> lock(voipProcedureCallInfoLock_);
+    auto voipProcedureCallInfoItem = voipProcedureCallInfo_.find(callId);
+    if (voipProcedureCallInfoItem != voipProcedureCallInfo_.end()) {
+        scenarioJson = voipProcedureCallInfoItem->second;
+        if (scenarioJson.is_null()) {
+            TELEPHONY_LOGE("scenarioJson value is null.");
+            return false;
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void CallManagerHisysevent::RecordVoipProcedure(
+    const std::string &callId, const VoipProcedureEvent voipProcedureEvent, const int32_t ScenarioDetailCode)
+{
+    json behaviorDottingJson;
+    behaviorDottingJson["E"] = voipProcedureEvent;
+    behaviorDottingJson["D"] = voipProcedureEvent;
+    behaviorDottingJson["E"] =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
+        .count();
+    json scenarioJson;
+    if (GetVoipProcedureCallInfo(callId, scenarioJson)) {
+        if (scenarioJson.is_null()) {
+            TELEPHONY_LOGE("scenarioJson value is null.");
+            return;
+        }
+        if (scenarioJson.contains("Procedures") && scenarioJson["Procedures"].is_object()) {
+            json &procedures = scenarioJson["Procedures"];
+            procedures["cnt"] = procedures["cnt"].get<int32_t>() + 1;
+            procedures["P"].push_back(behaviorDottingJson);
+            scenarioJson["Procedures"] = procedures;
+        } else {
+            TELEPHONY_LOGE("procedures invalid.");
+            return;
+        }
+        AddVoipProcedureCallInfo(callId, scenarioJson);
+    } else {
+        json procedures;
+        procedures["cnt"] = 1;
+        json p = json::array();
+        p.push_back(behaviorDottingJson);
+        procedures["P"] = p;
+        scenarioJson["Procedures"] = procedures;
+        AddVoipProcedureCallInfo(callId, scenarioJson);
+    }
+}
+
+void CallManagerHisysevent::RecordVoipProcedure(
+    const int32_t &callId, const VoipProcedureEvent voipProcedureEvent, const int32_t ScenarioDetailCode)
+{
+    sptr<CallBase> call = CallObjectManager::GetOneCallObject(callId);
+    if (call == nullptr) {
+        return;
+    }
+    if (call->GetCallType() == CallType::TYPE_VOIP) {
+        CallAttributeInfo info;
+        call->GetCallAttributeInfo(info);
+        RecordVoipProcedure(info.voipCallInfo.voipCallId, voipProcedureEvent, ScenarioDetailCode);
+    }
+}
+
+void CallManagerHisysevent::ReportCallProcedureEvents(const std::string &callId, const std::string &procedureJsonStr)
+{
+    json scenarioJson;
+    GetVoipProcedureCallInfo(callId, scenarioJson);
+    if (!scenarioJson.contains("Procedures")) {
+        scenarioJson["Procedures"] = json::object();
+    }
+    auto proceduresc = scenarioJson["Procedures"];
+    auto pc = proceduresc["P"];
+    auto procedureJson = json::parse(procedureJsonStr.c_str(), nullptr, false);
+    if (procedureJson.is_null()) {
+        TELEPHONY_LOGE("procedureJson value is null.");
+        return;
+    }
+    auto procedures = procedureJson["Procedures"];
+    if (!procedures["P"].is_array() || !proceduresc["P"].is_array()) {
+        TELEPHONY_LOGE("procedures do not contain P of the array type!");
+        return;
+    }
+    auto p = procedures["P"];
+    std::vector<json> mergedProcedure;
+    mergedProcedure.insert(mergedProcedure.end(), p.begin(), p.end());
+    mergedProcedure.insert(mergedProcedure.end(), pc.begin(), pc.end());
+    std::sort(mergedProcedure.begin(), mergedProcedure.end(), [](const json &a, const json &b) {
+        return a["T"] < b["T"];
+    });
+    json newProcedure = json::array();1
+    newProcedure = std::move(mergedProcedure);
+    procedures["P"] = newProcedure;
+    procedures["cnt"] = procedures.value("cnt", 0) + proceduresc.value("cnt", 0);
+    procedureJson["Procedures"] = procedures;
+    auto callAttribute = procedureJson["CallAttribute"];
+    std::string bundleName = callAttribute.value("bundleName", "");
+    int32_t voipCallType = callAttribute.value("voipCallType", -1);
+    bool isConferenceCall = callAttribute.value("isConferenceCall", false);
+    bool showBannerForIncomingCall = callAttribute.value("showBannerForIncomingCall", false);
+    int32_t direction = callAttribute.value("direction", -1);
+    int32_t appIndex = callAttribute.value("appIndex", -1);
+    callAttribute.erase("bundleName");
+    callAttribute.erase("voipCallType");
+    callAttribute.erase("isConferenceCall");
+    callAttribute.erase("showBannerForIncomingCall");
+    callAttribute.erase("direction");
+    callAttribute.erase("appIndex");
+    procedureJson["CallAttribute"] = callAttribute;
+    time_t beginTime = newProcedure[0]["T"];
+    HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_PERFORMANCE", EventType::FAULT, CALL_ID_KEY, callId, "BUNDLE_NAME",
+        bundleName, "APP_INDEX", appIndex, "PROCEDURE_FAULTS", procedureJson.dump(), "CALL_DIRECTION", direction,
+        "CALL_TYPE", voipCallType, "INCOMING_CALL_BANNER", showBannerForIncomingCall, "IS_CONFERENCE_CALL",
+        isConferenceCall, "BEGIN_TIME", beginTime);
+    std::lock_guard<ffrt::shared_mutex> lock(voipProcedureCallInfoLock_);
+    voipProcedureCallInfo_.erase(callId);
+}
 } // namespace Telephony
 } // namespace OHOS
