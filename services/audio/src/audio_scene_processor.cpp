@@ -215,8 +215,13 @@ bool AudioSceneProcessor::SwitchIncoming()
     auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
-    if (audioDeviceManager == nullptr || audioControlManager == nullptr || callControlManager == nullptr) {
+    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+    if (audioDeviceManager == nullptr || audioControlManager == nullptr || callControlManager == nullptr ||
+        callStateProcessor == nullptr) {
         return false;
+    }
+    if (callStateProcessor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING) > 1) {
+        audioControlManager->SetIncomingConflict(true);
     }
     currentState_ = std::make_unique<IncomingState>();
     if (currentState_ == nullptr) {

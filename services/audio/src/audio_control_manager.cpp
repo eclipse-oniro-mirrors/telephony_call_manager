@@ -48,6 +48,8 @@ constexpr uint64_t UNMUTE_SOUNDTONE_DELAY_TIME = 500000;
 const int16_t MIN_MULITY_ACTIVE_CALL_COUNT = 1;
 const int16_t MIN_DC_MULITY_ACTIVE_CALL_COUNT = 2;
 const int32_t AUDIO_EVENT_MUTED_RINGTONE = 4;
+const int32_t MAX_RINGTONE_RETRY_COUNT = 3;
+const int32_t RINGTONE_RETRY_TIME = 100;
 
 AudioControlManager::AudioControlManager()
     : isLocalRingbackNeeded_(false), ring_(nullptr), tone_(nullptr), sound_(nullptr)
@@ -160,6 +162,10 @@ void AudioControlManager::CallStateUpdated(
     HandleCallStateUpdated(callObjectPtr, priorState, nextState);
     if (nextState == TelCallState::CALL_STATUS_DISCONNECTED && totalCalls_.count(callObjectPtr) > 0) {
         totalCalls_.erase(callObjectPtr);
+    }
+    if (priorState == TelCallState::CALL_STATUS_INCOMING && priorState != nextState &&
+        DelayedSingleton<CallStateProcessor>::GetInstance()->GetCallNumber(TelCallState::CALL_STATUS_INCOMING) == 0) {
+        isIncomingConflict_ = false;
     }
     UpdateForegroundLiveCall();
 }
@@ -853,7 +859,6 @@ bool AudioControlManager::IsSystemVideoRing(sptr<CallBase> &callObjectPtr)
 
 bool AudioControlManager::PlayRingtone()
 {
-    int32_t ret;
     if (!ShouldPlayRingtone()) {
         TELEPHONY_LOGE("should not play ringtone");
         return false;
@@ -879,9 +884,39 @@ bool AudioControlManager::PlayRingtone()
         return true;
     }
     std::lock_guard<ffrt::recursive_mutex> lock(ringMutex_);
+    PlayRingtone(incomingCall, info, contactInfo);
+    return true;
+}
+
+void AudioControlManager::PlayRingtone(sptr<CallBase> incomingCall, CallAttributeInfo info, ContactInfo contactInfo)
+{
+    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
+    if (audioProxy == nullptr) {
+        return;
+    }
+    if (!isIncomingConflict_ && !audioProxy->IsStreamActive(AudioStandard::AudioVolumeType::STREAM_VOICE_RING)) {
+        PlayRing(incomingCall, info, contactInfo);
+        return;
+    }
+    ffrt::submit([=]() {
+        int32_t retryCount = 0;
+        for (; retryCount < MAX_RINGTONE_RETRY_COUNT; ++retryCount) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(RINGTONE_RETRY_TIME));
+            if (!audioProxy->IsStreamActive(AudioStandard::AudioVolumeType::STREAM_VOICE_RING)) {
+                PlayRing(incomingCall, info, contactInfo);
+                break;
+            }
+        }
+        TELEPHONY_LOGE("PlayRingtone IsStreamActive retryCount is %{public}d", retryCount);
+    });
+}
+
+void AudioControlManager::PlayRing(sptr<CallBase> incomingCall, CallAttributeInfo info, ContactInfo contactInfo)
+{
+    int32_t ret;
     if (ring_ == nullptr) {
         TELEPHONY_LOGE("PlayRingtone error, ring_ is null");
-        return false;
+        return;
     }
     if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
         ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST);
@@ -890,11 +925,10 @@ bool AudioControlManager::PlayRingtone()
     }
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play ringtone failed");
-        return false;
+        return;
     }
     HILOG_COMM_INFO("play ringtone success");
     PostProcessRingtone();
-    return true;
 }
 
 bool AudioControlManager::PlayForNoRing()

@@ -104,7 +104,8 @@ public:
 #endif
     bool ShouldPlaySoundTone();
     bool ShouldPlayRingback();
-    void SetCallAudioMode(int32_t mode, int32_t scenarios);
+    void SetIncomingConflict(bool isConflict);
+
 private:
     RingState ringState_ = RingState::STOPPED;
     void HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState);
@@ -141,6 +142,8 @@ private:
     void UnmuteSoundTone();
     void ProcessSoundtone(sptr<CallBase> &callObjectPtr);
     void MuteWaitingTone();
+    void PlayRingtone(sptr<CallBase> incomingCall, CallAttributeInfo info, ContactInfo contactInfo);
+    void PlayRing(sptr<CallBase> incomingCall, CallAttributeInfo info, ContactInfo contactInfo);
 
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
@@ -164,6 +167,7 @@ private:
     ffrt::mutex audioRendererMutex_{};
     ffrt::recursive_mutex ringMutex_{};
     bool isPlayForNoRing_ = false;
+    std::atomic<bool> isIncomingConflict_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -671,4 +671,33 @@ HWTEST_F(ZeroBranch9Test, Telephony_IsNeedSilentInDoNotDisturbMode_001, Function
     EXPECT_EQ(CallObjectManager::IsNeedSilentInDoNotDisturbMode(), false);
     CallObjectManager::DeleteOneCallObject(imsCall);
 }
+
+HWTEST_F(ZeroBranch9Test, Telephony_PlayRingtone_CallNumberExceed1, Function | MediumTest | Level3)
+{
+ 	auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+ 	audioControl->Init();
+ 	auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+ 	callStateProcessor->alertingCalls_.clear();
+    callStateProcessor->incomingCalls_.clear();
+ 	callStateProcessor->incomingCalls_.insert(CRS_TYPE);
+    DelayedSingleton<AudioSceneProcessor>::GetInstance()->SwitchIncoming();
+    CallObjectManager::callObjectPtrList_.clear();
+    sptr<CallBase> call1 = new IMSCall(info);
+    CallObjectManager::AddOneCallObject(call1);
+    CallAttributeInfo info;
+    ContactInfo contactInfo;
+    audioControl->PlayRingtone(call1, info, contactInfo);
+ 	DialParaInfo info;
+ 	CallObjectManager::callObjectPtrList_.clear();
+ 	sptr<CallBase> call2 = new IMSCall(info);
+ 	call2->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+ 	call2->SetCrsType(0);
+ 	CallObjectManager::AddOneCallObject(call2);
+ 	audioControl->SetRingState(RingState::STOPPED);
+ 	audioControl->SetSoundState(SoundState::STOPPED);
+    callStateProcessor->incomingCalls_.clear();
+ 	audioControl->CallStateUpdated(call2, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_DIALING);
+    EXPECT_TRUE(audioControl->PlayRingtone());
+ 	audioControl->UnInit();
+}
 }
