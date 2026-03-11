@@ -163,8 +163,12 @@ void AudioControlManager::CallStateUpdated(
     if (nextState == TelCallState::CALL_STATUS_DISCONNECTED && totalCalls_.count(callObjectPtr) > 0) {
         totalCalls_.erase(callObjectPtr);
     }
+    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+    if (callStateProcessor == nullptr) {
+        return;
+    }
     if (priorState == TelCallState::CALL_STATUS_INCOMING && priorState != nextState &&
-        DelayedSingleton<CallStateProcessor>::GetInstance()->GetCallNumber(TelCallState::CALL_STATUS_INCOMING) == 0) {
+        callStateProcessor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING) == 0) {
         isIncomingConflict_ = false;
     }
     UpdateForegroundLiveCall();
@@ -888,13 +892,17 @@ bool AudioControlManager::PlayRingtone()
     return true;
 }
 
-void AudioControlManager::PlayRingtone(sptr<CallBase> incomingCall, CallAttributeInfo info, ContactInfo contactInfo)
+void AudioControlManager::PlayRingtone(const sptr<CallBase>& incomingCall, const CallAttributeInfo& info,
+    const ContactInfo& contactInfo)
 {
     auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
     if (audioProxy == nullptr) {
         return;
     }
-    if (!isIncomingConflict_ && !audioProxy->IsStreamActive(AudioStandard::AudioVolumeType::STREAM_VOICE_RING)) {
+    std::unique_lockffrt::mutex lock(mutex_);
+    auto isIncomingConflict = isIncomingConflict_;
+    lock.unlock();
+    if (!isIncomingConflict && !audioProxy->IsStreamActive(AudioStandard::AudioVolumeType::STREAM_VOICE_RING)) {
         PlayRing(incomingCall, info, contactInfo);
         return;
     }
@@ -911,7 +919,8 @@ void AudioControlManager::PlayRingtone(sptr<CallBase> incomingCall, CallAttribut
     });
 }
 
-void AudioControlManager::PlayRing(sptr<CallBase> incomingCall, CallAttributeInfo info, ContactInfo contactInfo)
+void AudioControlManager::PlayRing(const sptr<CallBase>& incomingCall, const CallAttributeInfo& info,
+    const ContactInfo& contactInfo)
 {
     int32_t ret;
     if (ring_ == nullptr) {
