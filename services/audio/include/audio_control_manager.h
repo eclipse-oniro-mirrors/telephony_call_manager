@@ -19,9 +19,7 @@
 #include <set>
 
 #include "audio_device_manager.h"
-#include "audio_proxy.h"
 #include "audio_scene_processor.h"
-#include "call_manager_inner_type.h"
 #include "call_state_listener_base.h"
 #include "ffrt.h"
 #include "ring.h"
@@ -105,6 +103,8 @@ public:
     bool ShouldPlaySoundTone();
     bool ShouldPlayRingback();
     void SetCallAudioMode(int32_t mode, int32_t scenarios);
+    static void SetIncomingConflict(bool isConflict);
+
 private:
     RingState ringState_ = RingState::STOPPED;
     void HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState);
@@ -141,6 +141,9 @@ private:
     void UnmuteSoundTone();
     void ProcessSoundtone(sptr<CallBase> &callObjectPtr);
     void MuteWaitingTone();
+    void PlayRingtone(const sptr<CallBase>& incomingCall,
+        const CallAttributeInfo& info, const ContactInfo& contactInfo);
+    void PlayRing(const sptr<CallBase>& incomingCall, const CallAttributeInfo& info, const ContactInfo& contactInfo);
 
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
@@ -164,6 +167,8 @@ private:
     ffrt::mutex audioRendererMutex_{};
     ffrt::recursive_mutex ringMutex_{};
     bool isPlayForNoRing_ = false;
+    static bool isIncomingConflict_;
+    static ffrt::mutex incomingMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
