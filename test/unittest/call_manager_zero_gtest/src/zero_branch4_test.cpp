@@ -933,7 +933,7 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_003, TestSize.Level0)
     callManagerHisysevent->RecordVoipProcedure(callId, VoipProcedureEvent::PUSH_REPORT_INCOMING_CALL, 1);
     callId = "test_call_procedures_null";
     nlohmann::json scenarioJson;
-    scenarioJson[Procedures] = nullptr;
+    scenarioJson["Procedures"] = nullptr;
     callManagerHisysevent->voipProcedureCallInfo_[callId] = scenarioJson;
     callManagerHisysevent->RecordVoipProcedure(callId, VoipProcedureEvent::PUSH_REPORT_INCOMING_CALL, 100);
     callId = "test_call_null_value";
@@ -943,9 +943,9 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_003, TestSize.Level0)
     callManagerHisysevent->GetVoipProcedureCallInfo(callId, outJson);
     std::string procedureJsonStr = "procedureJsonStr";
     callManagerHisysevent->ReportCallProcedureEvents(callId, procedureJsonStr);
-    procedureJsonStr = R"({"Procedures":{"P":[{"T":1000}],"cnt":1},)"
-    R"("CallAttribute":{"bundleName":"test.app","voipCallType":1,"
-    "isConferenceCall":false,"direction":0,"appIndex":0}})";
+    procedureJsonStr = R"({"Procedures" : {"P" : [{"T" : 1000}], "cnt":1}, )"
+    R"("CallAttribute" : {"bundleName" : "test.app", "voipCallType" : 1,"
+        "isConferenceCall" : false, "direction" : 0, "appIndex" : 0}})";
     callManagerHisysevent->ReportCallProcedureEvents(callId, procedureJsonStr);
 }
 /**
