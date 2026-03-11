@@ -174,7 +174,6 @@ void AudioControlManager::CallStateUpdated(
         callStateProcessor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING) == 0) {
         std::unique_lock<ffrt::mutex> lock(incomingMutex_);
         isIncomingConflict_ = false;
-        lock.unlock();
     }
     UpdateForegroundLiveCall();
 }
