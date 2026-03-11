@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef INCOMING_FLASH_REMINDER_ADAPTER_H
-#define INCOMING_FLASH_REMINDER_ADAPTER_H
+#ifndef COMMON_DEPS_ADAPTER_H
+#define COMMON_DEPS_ADAPTER_H
 
 namespace OHOS {
 namespace Telephony {
@@ -22,17 +22,20 @@ namespace Telephony {
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+// deps for camera
 bool IsTorchSupported();
 
 int GetTorchMode();
 
 int SetTorchMode(int mode);
 
-bool IsScreenLocked();
-
 void FreeCamera();
 
+// deps for ScreenLock
+bool IsScreenLocked();
+
+// deps for Sms
+int SendMessage(int32_t slotId, const char16_t* desAddr, const char16_t* text);
 #ifdef __cplusplus
 }
 #endif
