@@ -221,7 +221,7 @@ bool AudioSceneProcessor::SwitchIncoming()
         return false;
     }
     if (callStateProcessor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING) > 1) {
-        audioControlManager::SetIncomingConflict(true)
+        AudioControlManager::SetIncomingConflict(true);
     }
     currentState_ = std::make_unique<IncomingState>();
     if (currentState_ == nullptr) {

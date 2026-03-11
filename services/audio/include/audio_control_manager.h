@@ -19,9 +19,6 @@
 #include <set>
 
 #include "audio_device_manager.h"
-#include "audio_proxy.h"
-#include "audio_scene_processor.h"
-#include "call_manager_inner_type.h"
 #include "call_state_listener_base.h"
 #include "ffrt.h"
 #include "ring.h"

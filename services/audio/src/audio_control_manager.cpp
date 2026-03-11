@@ -14,7 +14,9 @@
  */
 
 #include "audio_control_manager.h"
-
+#include "audio_proxy.h"
+#include "call_manager_inner_type.h"
+#include "audio_scene_processor.h"
 #include "call_ability_report_proxy.h"
 #include "call_control_manager.h"
 #include "call_dialog.h"
@@ -171,7 +173,9 @@ void AudioControlManager::CallStateUpdated(
     }
     if (priorState == TelCallState::CALL_STATUS_INCOMING && priorState != nextState &&
         callStateProcessor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING) == 0) {
+        std::unique_lock<ffrt::mutex> lock(incomingMutex_);
         isIncomingConflict_ = false;
+        lock.unlock();
     }
     UpdateForegroundLiveCall();
 }
@@ -901,7 +905,7 @@ void AudioControlManager::PlayRingtone(const sptr<CallBase>& incomingCall, const
     if (audioProxy == nullptr) {
         return;
     }
-    std::unique_lock<ffrt::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(incomingMutex_);
     auto isIncomingConflict = isIncomingConflict_;
     lock.unlock();
     if (!isIncomingConflict && !audioProxy->IsStreamActive(AudioStandard::AudioVolumeType::STREAM_VOICE_RING)) {
