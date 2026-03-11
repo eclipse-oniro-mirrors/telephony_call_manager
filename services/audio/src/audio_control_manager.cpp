@@ -16,7 +16,6 @@
 #include "audio_control_manager.h"
 #include "audio_proxy.h"
 #include "call_manager_inner_type.h"
-#include "audio_scene_processor.h"
 #include "call_ability_report_proxy.h"
 #include "call_control_manager.h"
 #include "call_dialog.h"
