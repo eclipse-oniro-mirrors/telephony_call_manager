@@ -19,7 +19,7 @@
 #include <string>
 #include "ffrt.h"
 #include "telephony_hisysevent.h"
-#include "nlohmann/json.hap"
+#include "nlohmann/json.hpp"
 #include "voip_call_manager_info.h"
 
 namespace OHOS {
