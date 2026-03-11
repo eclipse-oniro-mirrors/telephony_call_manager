@@ -61,7 +61,11 @@ if (isNeedCompile)
       "core_service:libtel_common",
     ]
 
-    cflags_cc = []
+    cflags_cc = [
+      "-fno-asynchronous-unwind-tables", 
+      "-fno-unwind-tables",
+      "-fvisibility=hidden",
+    ]
     
     ldflags = []
 

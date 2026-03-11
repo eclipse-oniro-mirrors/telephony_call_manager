@@ -23,20 +23,20 @@ namespace Telephony {
 extern "C" {
 #endif
 // deps for camera
-bool IsTorchSupported();
+__attribute__((visibility("default"))) bool IsTorchSupported();
 
-int GetTorchMode();
+__attribute__((visibility("default"))) int GetTorchMode();
 
-int SetTorchMode(int mode);
+__attribute__((visibility("default"))) int SetTorchMode(int mode);
 
-void FreeCamera();
+__attribute__((visibility("default"))) void FreeCamera();
 
 // deps for ScreenLock
-bool IsScreenLocked();
+__attribute__((visibility("default"))) bool IsScreenLocked();
 
 // deps for Sms
-int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text,
-    unsigned int addrLen, unsigned int textLen);
+__attribute__((visibility("default"))) int SendMessage(int slotId, const char16_t* desAddr,
+    const char16_t* text, unsigned int addrLen, unsigned int textLen);
 #ifdef __cplusplus
 }
 #endif
