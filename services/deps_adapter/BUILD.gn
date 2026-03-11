@@ -15,83 +15,63 @@ import("//build/ohos.gni")
 
 call_manager_path = "//base/telephony/call_manager"
 
-ohos_shared_library("tel_cm_deps_adapter") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-    cfi_vcall_icall_only = true
-  }
-  branch_protector_ret = "pac_ret"
-  sources = []
+isNeedCamera = defined(global_parts_info) &&
+  defined(global_parts_info.multimedia_camera_framework) &&
+  global_parts_info.multimedia_camera_framework
 
-  include_dirs = [
-    "${call_manager_path}/services/deps_adapter/include",
-  ]
+isNeedScreenLock = defined(global_parts_info) &&
+  defined(global_parts_info.theme_screenlock_mgr) &&
+  global_parts_info.theme_screenlock_mgr &&
 
-  external_deps = [
-    "ability_runtime:abilitykit_native",
-    "hilog:libhilog",
-    "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
-    "hitrace:libhitracechain",
-    "c_utils:utils", # 以下为头文件依赖引入
-    "graphic_surface:surface",
-    "core_service:libtel_common",
-  ]
+isNeedSms = defined(global_parts_info) &&
+  defined(global_parts_info.telephony_sms_mms) &&
+  global_parts_info.telephony_sms_mms
 
-  cflags_cc = [
-    "-Wunused",
-    "-Wunreachable-code",
-    "-fno-exceptions",
-    "-fno-rtti",
-    "-fstack-protector-all",
-    "-Os",
-    "-D_FORTIFY_SOURCE=2",
-    "-Wno-unused-but-set-variable",
-    "-fdata-sections",
-    "-ffunction-sections",
-    "-fno-asynchronous-unwind-tables",
-    "-fno-unwind-tables",
-  ]
-  
-  ldflags = [
-    "-Wl,--gc-sections",
-  ]
+isNeedCompile = isNeedCamera || isNeedScreenLock || isNeedSms
+if (isNeedCompile)
+{
+  ohos_shared_library("tel_cm_deps_adapter") {
+    sanitize = {
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+      cfi_vcall_icall_only = true
+    }
+    branch_protector_ret = "pac_ret"
 
-  isNeedFlashReminder = defined(global_parts_info) &&
-    defined(global_parts_info.theme_screenlock_mgr) &&
-    global_parts_info.theme_screenlock_mgr &&
-    defined(global_parts_info.multimedia_camera_framework) &&
-    global_parts_info.multimedia_camera_framework
+    include_dirs = [
+      "${call_manager_path}/services/deps_adapter/include",
+    ]
 
-  if (isNeedFlashReminder) {
-    external_deps += [
+    sources = [
+      "${call_manager_path}/services/deps_adapter/src/common_deps_adapter.cpp",
+    ]
+
+    external_deps = [
       "screenlock_mgr:screenlock_client",
       "camera_framework:camera_framework",
-    ]
-    sources += [
-      "${call_manager_path}/services/deps_adapter/src/incoming_flash_reminder_adapter.cpp",
-    ]
-  }
-
-  if (defined(global_parts_info) &&
-    defined(global_parts_info.telephony_sms_mms) &&
-    global_parts_info.telephony_sms_mms) {
-    external_deps += [
       "sms_mms:tel_sms_mms_api",
+      "ability_runtime:abilitykit_native",
+      "hilog:libhilog",
+      "hisysevent:libhisysevent",
+      "hitrace:hitrace_meter",
+      "hitrace:libhitracechain",
+      "c_utils:utils", # 以下为头文件依赖引入。
+      "graphic_surface:surface",
+      "core_service:libtel_common",
     ]
-    sources += [
-      "${call_manager_path}/services/deps_adapter/src/sms_adapter.cpp",
+
+    cflags_cc = []
+    
+    ldflags = []
+
+    defines = [
+      "TELEPHONY_LOG_TAG = \"CallManager\"",
+      "LOG_DOMAIN = 0xD001F10",
+      "LOG_TAG = \"CallManager\"",
     ]
+
+    part_name = "call_manager"
+    subsystem_name = "telephony"
   }
-
-  defines = [
-    "TELEPHONY_LOG_TAG = \"CallManager\"",
-    "LOG_DOMAIN = 0xD001F10",
-    "LOG_TAG = \"CallManager\"",
-  ]
-
-  part_name = "call_manager"
-  subsystem_name = "telephony"
 }

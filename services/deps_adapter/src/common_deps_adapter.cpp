@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-#include "incoming_flash_reminder_adapter.h"
+#include "common_deps_adapter.h"
+
 #include "input/camera_manager.h"
 #include "screenlock_manager.h"
+#include "sms_service_manager_client.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-#ifdef __cplusplus
-extern "C" {
-#endif
 
+// deps for camera
 bool IsTorchSupported()
 {
     sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
@@ -54,16 +54,6 @@ int SetTorchMode(int mode)
     return camMgr->SetTorchMode(static_cast<CameraStandard::TorchMode>(mode));
 }
 
-bool IsScreenLocked()
-{
-    auto screenLockMgr = OHOS::ScreenLock::ScreenLockManager::GetInstance();
-    if (screenLockMgr == nullptr) {
-        TELEPHONY_LOGE("get screenLockMgr null");
-        return false;
-    }
-    return screenLockMgr->IsScreenLocked();
-}
-
 void FreeCamera()
 {
     sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
@@ -76,8 +66,23 @@ void FreeCamera()
     camMgr->SetCameraManagerNull();
 }
 
-#ifdef __cplusplus
+// deps for ScreenLock
+bool IsScreenLocked()
+{
+    auto screenLockMgr = OHOS::ScreenLock::ScreenLockManager::GetInstance();
+    if (screenLockMgr == nullptr) {
+        TELEPHONY_LOGE("get screenLockMgr null");
+        return false;
+    }
+    return screenLockMgr->IsScreenLocked();
 }
-#endif
+
+// deps for Sms
+int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text) // 此处是否需要调整接口，增加两个传入长度。
+{
+    return Singleton<SmsServiceManagerClient>::GetInstance()
+        .SendMessage(slotId, std::u16string(desAddr), std::u16string(u""), std::u16string(text), nullptr, nullptr);
+}
+
 } // Telephony
 } // OHOS
