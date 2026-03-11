@@ -51,6 +51,7 @@ const int32_t AUDIO_EVENT_MUTED_RINGTONE = 4;
 const int32_t MAX_RINGTONE_RETRY_COUNT = 3;
 const int32_t RINGTONE_RETRY_TIME = 100;
 bool AudioControlManager::isIncomingConflict_ = false;
+ffrt::mutex AudioControlManager::incomingMutex_ = {};
 
 AudioControlManager::AudioControlManager()
     : isLocalRingbackNeeded_(false), ring_(nullptr), tone_(nullptr), sound_(nullptr)
@@ -900,7 +901,7 @@ void AudioControlManager::PlayRingtone(const sptr<CallBase>& incomingCall, const
     if (audioProxy == nullptr) {
         return;
     }
-    std::unique_lockffrt::mutex lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     auto isIncomingConflict = isIncomingConflict_;
     lock.unlock();
     if (!isIncomingConflict && !audioProxy->IsStreamActive(AudioStandard::AudioVolumeType::STREAM_VOICE_RING)) {
@@ -1788,7 +1789,7 @@ void AudioControlManager::SetCallAudioMode(int32_t mode, int32_t scenarios)
 
 void AudioControlManager::SetIncomingConflict(bool isConflict)
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(incomingMutex_);
     isIncomingConflict_ = isConflict;
 }
 } // namespace Telephony

@@ -170,6 +170,7 @@ private:
     ffrt::recursive_mutex ringMutex_{};
     bool isPlayForNoRing_ = false;
     static bool isIncomingConflict_;
+    static ffrt::mutex incomingMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
