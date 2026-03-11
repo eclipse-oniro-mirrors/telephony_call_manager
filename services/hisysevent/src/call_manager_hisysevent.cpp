@@ -480,7 +480,7 @@ void CallManagerHisysevent::ReportCallProcedureEvents(const std::string &callId,
     std::sort(mergedProcedure.begin(), mergedProcedure.end(), [](const json &a, const json &b) {
         return a["T"] < b["T"];
     });
-    json newProcedure = json::array();1
+    json newProcedure = json::array();
     newProcedure = std::move(mergedProcedure);
     procedures["P"] = newProcedure;
     procedures["cnt"] = procedures.value("cnt", 0) + proceduresc.value("cnt", 0);
