@@ -34,6 +34,7 @@ public:
 
 private:
     std::shared_ptr<ImsRttManager> rttManager_ = nullptr;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

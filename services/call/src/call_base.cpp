@@ -648,11 +648,13 @@ bool CallBase::IsCurrentRinging()
 
 std::string CallBase::GetAccountNumber()
 {
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     return accountNumber_;
 }
 
 void CallBase::SetAccountNumber(const std::string accountNumber)
 {
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     accountNumber_ = accountNumber;
 }
 
@@ -687,6 +689,7 @@ bool CallBase::IsAliveState()
 
 void CallBase::SetBundleName(const char *bundleName)
 {
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     bundleName_ = bundleName;
 }
 

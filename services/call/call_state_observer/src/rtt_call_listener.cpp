@@ -56,6 +56,7 @@ void RttCallListener::InitRttManager(sptr<IMSCall> &imsCall)
     }
     int32_t currCallID = imsCall->GetCallID();
     int32_t currChannelID = imsCall->GetRttChannelId();
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (rttManager_ == nullptr) {
         rttManager_ = std::make_shared<ImsRttManager>(currCallID, currChannelID);
     } else {
@@ -70,6 +71,7 @@ void RttCallListener::InitRttManager(sptr<IMSCall> &imsCall)
 void RttCallListener::UnInitRttManager()
 {
     TELEPHONY_LOGI("Start to UnInitRttManager");
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (rttManager_ == nullptr) {
         TELEPHONY_LOGI("RttManager already un-initialized");
         return;
@@ -81,6 +83,7 @@ void RttCallListener::UnInitRttManager()
 
 int32_t RttCallListener::SendRttMessage(const std::string &rttMessage)
 {
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (rttManager_ == nullptr) {
         TELEPHONY_LOGE("rttManager_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

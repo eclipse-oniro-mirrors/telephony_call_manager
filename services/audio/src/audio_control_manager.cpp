@@ -1287,6 +1287,7 @@ void AudioControlManager::PlayCallEndedTone()
         HandleNotNormalRingerMode();
         return;
     }
+    std::lock_guard<std::recursive_mutex> lock(toneStateLock_);
     if (toneState_ == ToneState::TONEING) {
         StopCallTone();
     }
@@ -1311,6 +1312,7 @@ void AudioControlManager::PlayCallEndedTone()
 void AudioControlManager::HandleNotNormalRingerMode()
 {
     TELEPHONY_LOGE("ringer mode is not normal");
+    std::lock_guard<std::recursive_mutex> lock(toneStateLock_);
     if (toneState_ == ToneState::TONEING) {
         StopCallTone();
         TELEPHONY_LOGI("ringer mode is not normal, stop call tone!");
