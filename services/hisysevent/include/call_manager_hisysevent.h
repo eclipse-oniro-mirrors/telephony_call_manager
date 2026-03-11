@@ -95,7 +95,8 @@ private:
     static void GetAppIndexByBundleName(std::string &bundleName, int32_t uid, int32_t &appIndex);
     static void AddVoipProcedureCallInfo(const std::string &callId, nlohmann::json scenarioJson);
     static bool GetVoipProcedureCallInfo(const std::string &callId, nlohmann::json &scenarioJson);
-
+    static void ReportCallProcedureEventsInternal(const std::string &callId, nlohmann::json &callAttribute,
+        nlohmann::json &procedureJson);
 private:
     int64_t dialStartTime_ = 0;
     int64_t incomingStartTime_ = 0;
