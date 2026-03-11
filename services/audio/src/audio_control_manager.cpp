@@ -50,6 +50,7 @@ const int16_t MIN_DC_MULITY_ACTIVE_CALL_COUNT = 2;
 const int32_t AUDIO_EVENT_MUTED_RINGTONE = 4;
 const int32_t MAX_RINGTONE_RETRY_COUNT = 3;
 const int32_t RINGTONE_RETRY_TIME = 100;
+bool AudioControlManager::isIncomingConflict_ = false;
 
 AudioControlManager::AudioControlManager()
     : isLocalRingbackNeeded_(false), ring_(nullptr), tone_(nullptr), sound_(nullptr)
