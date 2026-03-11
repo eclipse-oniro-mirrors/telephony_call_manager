@@ -91,7 +91,7 @@ int32_t CallStatusCallbackProxy::ReportCallProcedureEvents(const std::string &ca
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     if (procedureJsonStr.length() > MAX_PROCEDURE_JSON_SIZE) {
-        TELEPHONY_LOGE("the procedureJsonStr is too long %{public}lu", procedureJsonStr.length());
+        TELEPHONY_LOGE("the procedureJsonStr is too long %{public}u", procedureJsonStr.length());
         return TELEPHONY_ERR_FAIL;
     }
     dataParcel.WriteString(callId);
