@@ -106,6 +106,7 @@ private:
     std::shared_ptr<Media::SystemSoundManager> SystemSoundManager_ = nullptr;
     std::shared_ptr<Media::RingtonePlayer> RingtonePlayer_ = nullptr;
     int32_t defaultVolume_ = 1;
+    ffrt::mutex ringMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
