@@ -138,7 +138,7 @@ enum class VoipProcedureEvent {
     // Voip -> CallServiceKit
     VOIP_REPORT_INCOMING_CALL,                          // detail ref: 0
     VOIP_REPORT_INCOMING_CALL_ERROR,                    // detail ref: ReportVoipCallFailedCauser from @voip
-    VOIP_REPORT_INCOMING_CALL_PROCEDURE,                //VoipReportIncomingCallProcedureDetail
+    VOIP_REPORT_INCOMING_CALL_PROCEDURE,                // VoipReportIncomingCallProcedureDetail
     VOIP_REPORT_OUTGOING_CALL,                          // detail ref: 0
     VOIP_REPORT_OUTGOING_CALL_PROCEDURE,                // detail ref: VoipReportOutgoingCallProcedureDetail
 
@@ -163,7 +163,6 @@ enum class VoipProcedureEvent {
     CALLMANAGER_MUTE_VOIP,                              // detail ref: callAudioEvent
     CALLMANAGER_HANDLE_CALL_STATE_CHANGE,               // detail no
     CALLMANAGER_HANDLE_AUDIO_CHANGE,                    // detail no
-    // eg...
 };
 
 enum class CalluiSendUiEventDetail {
@@ -171,6 +170,7 @@ enum class CalluiSendUiEventDetail {
     CALLUI_HUNGUP_VOIP,
     CALLUI_REJECT_VOIP,
     CALLUI_MUTE_VOIP,
+    CALLUI_UNMUTE_VOIP,
     CALLUI_MUTE_VOIP_RINGER,
 };
 
