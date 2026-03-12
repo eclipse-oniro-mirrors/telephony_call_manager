@@ -146,7 +146,7 @@ int32_t Ring::Stop()
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     result = RingtonePlayer_->Stop();
-    std::unique_lock<ffrt::mutex> lock(ringMutex_);
+    std::unique_lock<ffrt::mutex> lock(muteRingMutex_);
     isMutedRing_ = false;
     lock.unlock();
     DelayedSingleton<CallControlManager>::GetInstance()->SetReduceRingToneVolume(false);
@@ -176,7 +176,7 @@ int32_t Ring::SetMute()
         TELEPHONY_LOGE("RingtonePlayer_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_lock<ffrt::mutex> lock(ringMutex_);
+    std::unique_lock<ffrt::mutex> lock(muteRingMutex_);
     isMutedRing_ = true;
     lock.unlock();
     return RingtonePlayer_->Configure(0, true);
@@ -185,7 +185,7 @@ int32_t Ring::SetMute()
 int32_t Ring::SetRingToneVolume(float volume)
 {
     TELEPHONY_LOGI("SetRingToneVolume volume = %{public}f", volume);
-    std::unique_lock<ffrt::mutex> lock(ringMutex_);
+    std::unique_lock<ffrt::mutex> lock(muteRingMutex_);
     if (isMutedRing_) {
         TELEPHONY_LOGI("ringTone is already muted");
         return TELEPHONY_SUCCESS;
