@@ -415,10 +415,6 @@ void CallManagerHisysevent::RecordVoipProcedure(
         .count();
     json scenarioJson;
     if (GetVoipProcedureCallInfo(callId, scenarioJson)) {
-        if (scenarioJson.is_null()) {
-            TELEPHONY_LOGE("scenarioJson value is null.");
-            return;
-        }
         if (scenarioJson.contains("Procedures") && scenarioJson["Procedures"].is_object()) {
             json &procedures = scenarioJson["Procedures"];
             procedures["cnt"] = procedures.value("cnt", 0) + 1;
@@ -444,14 +440,12 @@ void CallManagerHisysevent::RecordVoipProcedure(
     const int32_t &callId, const VoipProcedureEvent voipProcedureEvent, const int32_t ScenarioDetailCode)
 {
     sptr<CallBase> call = CallObjectManager::GetOneCallObject(callId);
-    if (call == nullptr) {
+    if (call == nullptr || call->GetCallType() == CallType::TYPE_VOIP) {
         return;
     }
-    if (call->GetCallType() == CallType::TYPE_VOIP) {
-        CallAttributeInfo info;
-        call->GetCallAttributeInfo(info);
-        RecordVoipProcedure(info.voipCallInfo.voipCallId, voipProcedureEvent, ScenarioDetailCode);
-    }
+    CallAttributeInfo info;
+    call->GetCallAttributeInfo(info);
+    RecordVoipProcedure(info.voipCallInfo.voipCallId, voipProcedureEvent, ScenarioDetailCode);
 }
 
 void CallManagerHisysevent::ReportCallProcedureEvents(const std::string &callId, const std::string &procedureJsonStr)
@@ -487,7 +481,7 @@ void CallManagerHisysevent::ReportCallProcedureEvents(const std::string &callId,
     procedureJson["Procedures"] = procedures;
     auto callAttribute = procedureJson["CallAttribute"];
     ReportCallProcedureEventsInternal(callId, callAttribute, procedureJson);
-    }
+}
 
 void CallManagerHisysevent::ReportCallProcedureEventsInternal(const std::string &callId, nlohmann::json &callAttribute,
     nlohmann::json &procedureJson)
