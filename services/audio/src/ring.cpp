@@ -148,7 +148,7 @@ int32_t Ring::Stop()
     result = RingtonePlayer_->Stop();
     std::unique_lock<ffrt::mutex> lockMuteRing(muteRingMutex_);
     isMutedRing_ = false;
-    lock.unlock();
+    lockMuteRing.unlock();
     DelayedSingleton<CallControlManager>::GetInstance()->SetReduceRingToneVolume(false);
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
     std::unique_lock<ffrt::mutex> lockRing(ringStopMutex_);
