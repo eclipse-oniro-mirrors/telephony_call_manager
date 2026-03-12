@@ -421,7 +421,7 @@ void CallManagerHisysevent::RecordVoipProcedure(
         }
         if (scenarioJson.contains("Procedures") && scenarioJson["Procedures"].is_object()) {
             json &procedures = scenarioJson["Procedures"];
-            procedures["cnt"] = procedures["cnt"].get<int32_t>() + 1;
+            procedures["cnt"] = procedures.value("cnt", 0) + 1;
             procedures["P"].push_back(behaviorDottingJson);
             scenarioJson["Procedures"] = procedures;
         } else {
@@ -505,7 +505,12 @@ void CallManagerHisysevent::ReportCallProcedureEventsInternal(const std::string 
     callAttribute.erase("direction");
     callAttribute.erase("appIndex");
     procedureJson["CallAttribute"] = callAttribute;
-    time_t beginTime = procedureJson["Procedures"]["P"][0]["T"];
+    time_t beginTime;
+    if (procedureJson["Procedures"]["P"] != 0) {
+        beginTime = procedureJson["Procedures"]["P"][0]["T"];
+    } else {
+        beginTime = -1;
+    }
     HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_PERFORMANCE", EventType::FAULT, CALL_ID_KEY, callId, "BUNDLE_NAME",
         bundleName, "APP_INDEX", appIndex, "PROCEDURE_FAULTS", procedureJson.dump(), "CALL_DIRECTION", direction,
         "CALL_TYPE", voipCallType, "INCOMING_CALL_BANNER", showBannerForIncomingCall, "IS_CONFERENCE_CALL",
