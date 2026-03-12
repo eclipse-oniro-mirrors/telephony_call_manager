@@ -1148,7 +1148,9 @@ int32_t CallControlManager::SetMuted(bool isMute)
         CallAttributeInfo info;
         call->GetCallAttributeInfo(info);
         CallManagerHisysevent::RecordVoipProcedure(info.voipCallInfo.voipCallId,
-            VoipProcedureEvent::CALLUI_SEND_UI_EVENT, static_cast<int32_t>(CalluiSendUiEventDetail::CALLUI_MUTE_VOIP));
+            VoipProcedureEvent::CALLUI_SEND_UI_EVENT, 
+            (isMute ? static_cast<int32_t>(CalluiSendUiEventDetail::CALLUI_MUTE_VOIP)
+                : static_cast<int32_t>(CalluiSendUiEventDetail::CALLUI_UNMUTE_VOIP)));
         return call->SetMute(isMute, call->GetSlotId());
     }
     if (call->GetCallType() == CallType::TYPE_IMS
