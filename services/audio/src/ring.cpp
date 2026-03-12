@@ -146,7 +146,7 @@ int32_t Ring::Stop()
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     result = RingtonePlayer_->Stop();
-    std::unique_lock<ffrt::mutex> lock(muteRingMutex_);
+    std::unique_lock<ffrt::mutex> lockMuteRing(muteRingMutex_);
     isMutedRing_ = false;
     lock.unlock();
     DelayedSingleton<CallControlManager>::GetInstance()->SetReduceRingToneVolume(false);
