@@ -446,6 +446,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_001, Function | MediumTest
     CallObjectManager::GetCallInfoList(DEFAULT_INDEX);
     CallObjectManager::GetCallInfoList(DEFAULT_INDEX, false);
     CallObjectManager::GetAllCallInfoList(false);
+    CallObjectManager::GetVoipCallInfoList();
     ASSERT_FALSE(res);
 }
 

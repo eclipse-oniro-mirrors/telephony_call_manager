@@ -907,7 +907,8 @@ std::vector<CallAttributeInfo> CallObjectManager::GetVoipCallInfoList()
     std::vector<CallAttributeInfo> callVec;
     int32_t voipState = DelayedSingleton<CallControlManager>::GetInstance()->GetMeetimeCallState();
     TELEPHONY_LOGI("voip state is :%{public}d", voipState);
-    if (voipState == (int32_t)TelCallState::CALL_STATUS_INCOMING ||
+    if (voipState == (int32_t)TelCallState::CALL_STATUS_DIALING ||
+        voipState == (int32_t)TelCallState::CALL_STATUS_INCOMING ||
         voipState == (int32_t)TelCallState::CALL_STATUS_IDLE ||
         voipState == (int32_t)TelCallState::CALL_STATUS_ALERTING) {
         std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.begin();
