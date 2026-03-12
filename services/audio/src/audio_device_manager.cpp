@@ -766,7 +766,7 @@ int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
         info_.isMuted, info_.callId);
     CallManagerHisysevent::RecordVoipProcedure((call != nullptr) ? call->GetCallID() : -1,
         VoipProcedureEvent::CALLMANAGER_HANDLE_AUDIO_CHANGE,
-        static_cast<int32_t>(CalluiSendUiEventDetail::CALLUI_MUTE_VOIP_RINGER));
+        static_cast<int32_t>(info_.currentAudioDevice.deviceType));
     int32_t ret = DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
     info_.currentAudioDevice.deviceType = deviceType;
     return ret;
