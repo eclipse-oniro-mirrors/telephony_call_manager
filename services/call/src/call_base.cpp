@@ -129,6 +129,7 @@ int32_t CallBase::AnswerCallBase()
 
 int32_t CallBase::RejectCallBase()
 {
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     answerType_ = CallAnswerType::CALL_ANSWER_REJECT;
     return TELEPHONY_SUCCESS;
 }
