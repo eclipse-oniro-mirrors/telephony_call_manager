@@ -79,6 +79,7 @@ public:
     static void RecordVoipProcedure(const int32_t &callId, const VoipProcedureEvent voipProcedureEvent,
         const int32_t ScenarioDetailCode);
     static void ReportCallProcedureEvents(const std::string &callId, const std::string &procedureJsonStr);
+    static void ClearVoipProcedureCallInfo(const std::string &callId);
 
 public:
     template<typename... Types>
