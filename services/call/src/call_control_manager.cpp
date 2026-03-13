@@ -606,6 +606,10 @@ bool CallControlManager::NotifyCallStateUpdated(
     HILOG_COMM_INFO("NotifyCallStateUpdated priorState:%{public}d,nextState:%{public}d", priorState, nextState);
     callStateListenerPtr_->CallStateUpdated(callObjectPtr, priorState, nextState);
     if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
+        CallAttributeInfo info;
+        callObjectPtr->GetCallAttributeInfo(info);
+        CallManagerHisysevent::RecordVoipProcedure(info.voipCallInfo.voipCallId,
+            VoipProcedureEvent::REPORT_CALL_STATE_TO_CALLUI, static_cast<int32_t>(nextState));
         return true;
     }
     if (IsCallActivated(priorState, nextState)) {
@@ -1141,6 +1145,12 @@ int32_t CallControlManager::SetMuted(bool isMute)
 
     if (call->GetCallType() == CallType::TYPE_VOIP) {
         TELEPHONY_LOGI("SetMute by voip");
+        CallAttributeInfo info;
+        call->GetCallAttributeInfo(info);
+        CallManagerHisysevent::RecordVoipProcedure(info.voipCallInfo.voipCallId,
+            VoipProcedureEvent::CALLUI_SEND_UI_EVENT,
+            (isMute ? static_cast<int32_t>(CalluiSendUiEventDetail::CALLUI_MUTE_VOIP)
+                : static_cast<int32_t>(CalluiSendUiEventDetail::CALLUI_UNMUTE_VOIP)));
         return call->SetMute(isMute, call->GetSlotId());
     }
     if (call->GetCallType() == CallType::TYPE_IMS

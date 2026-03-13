@@ -117,6 +117,63 @@ enum class LiveVideWindowEvent {
     LIVE_VIDEO_WINDOW_EVENT_FAIL,
 };
 
+enum class VoipProcedureScenarioEvent {
+    PUSH_REPORT_CALL_INFO = 1,
+    VOIP_REPORT_CALL_INFO,
+    VOIP_REPORT_CALLSTATE,
+    VOIP_REPORT_AUDIO_CHANGE,
+    SEND_UI_EVENT_TO_VOIP,
+    REPORT_CALL_INFO_TO_CALLUI,
+    CALLUI_SEND_UI_EVENT,
+    AUDIO_OPERATION_FOR_VOIP,
+    AUDIO_EVENT_FROM_AUDIOFW,
+    COMMON_EVENT,
+};
+
+enum class VoipProcedureEvent {
+    // PUSH -> CallServiceKit
+    PUSH_REPORT_INCOMING_CALL = 1,                      // detail ref: 0
+    PUSH_REPORT_INCOMING_CALL_PRECEDURE,                // detail ref: PushReportIncomingCallProcedureDetail
+
+    // Voip -> CallServiceKit
+    VOIP_REPORT_INCOMING_CALL,                          // detail ref: 0
+    VOIP_REPORT_INCOMING_CALL_ERROR,                    // detail ref: ReportVoipCallFailedCauser from @voip
+    VOIP_REPORT_INCOMING_CALL_PROCEDURE,                // VoipReportIncomingCallProcedureDetail
+    VOIP_REPORT_OUTGOING_CALL,                          // detail ref: 0
+    VOIP_REPORT_OUTGOING_CALL_PROCEDURE,                // detail ref: VoipReportOutgoingCallProcedureDetail
+
+    VOIP_REPORT_CALL_STATE_CHANGE,                      // detail ref: state from @voip
+    VOIP_REPORT_CALL_STATE_CHANGE_PROCEDURE,            // detail ref: VoipReportCallStateChangeProcedureDetail
+    VOIP_REPORT_CALL_AUDIO_CHANGE,                      // detail ref: audio event from @voip
+    VOIP_REPORT_CALL_AUDIO_CHANGE_PROCEDURE,            // detail ref: VoipReportAudioStateChangeProcedureDetail
+    // CallServiceKit -> VoIP,
+    REPORT_UI_EVENT_TO_VOIP,                            // detail ref: voipCallEvent: answer, hungup,reject,
+                                                        // audio operation.
+    REPORT_UI_EVENT_TO_VOIP_PROCEDURE,                  // detail ref: ret of OnVoipCallEventChange()
+    // CallManager -> CallUi
+    REPORT_CALL_STATE_TO_CALLUI,                        // detail ref: tel call state
+    REPORT_AUDIO_EVENT_TO_CALLUI,                       // detail ref: audio event
+    // CallUi -> CallManager
+    CALLUI_SEND_UI_EVENT,                               // detail ref: CalluiSendUiEventDetail, such as answer, hungup,
+                                                        // reject, audio operation.
+    //CallManager inner
+    CALLMANAGER_ANSWER_VOIP,                            // detail ref: 0
+    CALLMANAGER_REJECT_VOIP,                            // detail no
+    CALLMANAGER_HUNGUP_VOIP,                            // detail ref: errorReason
+    CALLMANAGER_MUTE_VOIP,                              // detail ref: callAudioEvent
+    CALLMANAGER_HANDLE_CALL_STATE_CHANGE,               // detail no
+    CALLMANAGER_HANDLE_AUDIO_CHANGE,                    // detail no
+};
+
+enum class CalluiSendUiEventDetail {
+    CALLUI_ANSWER_VOIP,
+    CALLUI_HUNGUP_VOIP,
+    CALLUI_REJECT_VOIP,
+    CALLUI_MUTE_VOIP,
+    CALLUI_UNMUTE_VOIP,
+    CALLUI_MUTE_VOIP_RINGER,
+};
+
 /**
  * @brief Indicates the voip call attribute.
  */

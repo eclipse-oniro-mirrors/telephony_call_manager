@@ -27,6 +27,7 @@ const int32_t MAX_CALL_NUM = 10;
 const int32_t IMS_SUPP_EXT_CODE_MIN = 0;
 const int32_t IMS_SUPP_EXT_CODE_MAX = 10;
 const int32_t IMS_SUPP_EXT_CODE_SPECIAL = 22;
+const int32_t MAX_PROCEDURE_JSON_SIZE = 2000;
 
 CallStatusCallbackStub::CallStatusCallbackStub()
 {
@@ -80,6 +81,8 @@ void CallStatusCallbackStub::InitBasicFuncMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnPeerDimensionsChange(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CALL_DATA_USAGE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnCallDataUsageChange(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(VOIP_REPORT_CALL_PROCEDURE_EVENTS)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnReportCallProcedureEvents(data, reply); };
 }
 
 void CallStatusCallbackStub::InitSupplementFuncMap()
@@ -152,6 +155,26 @@ int32_t CallStatusCallbackStub::OnRemoteRequest(
         }
     }
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+}
+
+int32_t CallStatusCallbackStub::OnReportCallProcedureEvents(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    std::string callId = data.ReadString();
+    std::string procedureJsonStr = data.ReadString();
+    if (procedureJsonStr.length() > MAX_PROCEDURE_JSON_SIZE) {
+        TELEPHONY_LOGE("the procedureJsonStr is too long %{public}zu", procedureJsonStr.length());
+        return TELEPHONY_ERR_FAIL;
+    }
+    result = ReportCallProcedureEvents(callId, procedureJsonStr);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRecordCallProcedureEvents writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusCallbackStub::OnUpdateCallReportInfo(MessageParcel &data, MessageParcel &reply)

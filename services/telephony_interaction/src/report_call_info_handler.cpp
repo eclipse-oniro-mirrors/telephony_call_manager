@@ -101,7 +101,21 @@ void ReportCallInfoHandler::DisconnectBtCallWhenPhoneAnswered(const CallDetailIn
         }
 }
 #endif
- 
+
+int32_t ReportCallInfoHandler::ReportCallProcedureEvents(const std::string &callId,
+    const std::string &procedureJsonStr)
+{
+    if (callStatusManagerPtr_ == nullptr) {
+        TELEPHONY_LOGE("ReportCallProcedureEvents callStatusManagerPtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    auto ret = callStatusManagerPtr_->ReportCallProcedureEvents(callId, procedureJsonStr);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ReportCallProcedureEvents failed! ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 void ReportCallInfoHandler::BuildCallDetailsInfo(CallDetailsInfo &info, CallDetailsInfo &callDetailsInfo)
 {
     CallDetailInfo callDetailInfo;

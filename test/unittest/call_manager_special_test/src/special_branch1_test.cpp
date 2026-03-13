@@ -312,7 +312,6 @@ HWTEST_F(SpecialBranch1Test, CallManagerService_NormalFuncTest, TestSize.Level0)
     callManagerService->UnRegisterVoipCallManagerCallback();
     callManagerService->GetVoIPCallState(state);
     callManagerService->SetVoIPCallInfo(1, 1, "1234567890");
-    callManagerService->WriteVoipCallFaultEvent("1", 1);
     callManagerService->AnswerCall();
     callManagerService->RejectCall();
     callManagerService->HangUpCall();

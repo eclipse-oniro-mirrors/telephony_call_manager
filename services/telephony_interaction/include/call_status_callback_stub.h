@@ -37,6 +37,7 @@ private:
     using CallStatusCallbackFunc = std::function<int32_t(MessageParcel &data, MessageParcel &reply)>;
 
     int32_t OnUpdateCallReportInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnReportCallProcedureEvents(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateCallsReportInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateDisconnectedCause(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateEventReport(MessageParcel &data, MessageParcel &reply);

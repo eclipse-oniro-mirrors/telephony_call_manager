@@ -630,7 +630,6 @@ HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTes
     sptr<CallBase> call = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
     sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
     CallObjectManager::AddOneCallObject(call);
-    voipCallConnection->WriteVoipCallFaultEvent(voipCall->GetVoipCallId(), 200);
     voipCallConnection->ClearVoipCall();
     int32_t uid = 20020211;
     voipCallConnection->NotifyVoIPAudioStreamStart(uid);

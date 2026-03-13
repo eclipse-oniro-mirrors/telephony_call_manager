@@ -30,6 +30,7 @@ public:
     void Init();
     int32_t UpdateCallReportInfo(const CallDetailInfo &info);
     int32_t UpdateCallsReportInfo(CallDetailsInfo &info);
+    int32_t ReportCallProcedureEvents(const std::string &callId, const std::string &procedureJsonStr);
     int32_t UpdateDisconnectedCause(const DisconnectedDetails &details);
     int32_t UpdateEventResultInfo(const CellularCallEventInfo &info);
     int32_t UpdateOttEventInfo(const OttCallEventInfo &info);

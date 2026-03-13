@@ -19,6 +19,7 @@
 #include "bluetooth_call_manager.h"
 #include "bluetooth_device_state.h"
 #include "call_ability_report_proxy.h"
+#include "call_manager_hisysevent.h"
 #include "call_object_manager.h"
 #include "earpiece_device_state.h"
 #include "inactive_device_state.h"
@@ -763,6 +764,9 @@ int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
     TELEPHONY_LOGI("report audio device info, currentAudioDeviceType:%{public}d, currentAddress:%{public}s, "
         "mute:%{public}d, callId:%{public}d", info_.currentAudioDevice.deviceType, ConvertAddress().c_str(),
         info_.isMuted, info_.callId);
+    CallManagerHisysevent::RecordVoipProcedure((call != nullptr) ? call->GetCallID() : -1,
+        VoipProcedureEvent::CALLMANAGER_HANDLE_AUDIO_CHANGE,
+        static_cast<int32_t>(info_.currentAudioDevice.deviceType));
     int32_t ret = DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
     info_.currentAudioDevice.deviceType = deviceType;
     return ret;

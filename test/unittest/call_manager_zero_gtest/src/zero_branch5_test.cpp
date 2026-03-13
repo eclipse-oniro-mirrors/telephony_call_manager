@@ -179,7 +179,10 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_004, TestSize.Level0)
     data.WriteInt32(SIM1_SLOTID);
     data.RewindRead(0);
     callStatusCallback->OnUpdateCallsReportInfo(data, reply);
-
+    callStatusCallback->OnReportCallProcedureEvents(data, reply);
+    std::string callId = "callId";
+    std::string procedureJsonStr = "procedureJsonStr";
+    callStatusCallback->ReportCallProcedureEvents(callId, procedureJsonStr);
     MessageParcel messageParcel;
     messageParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
     CellularCallEventInfo info;

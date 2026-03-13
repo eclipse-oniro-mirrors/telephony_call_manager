@@ -700,6 +700,9 @@ HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_001, TestSize.Level0)
     auto callStatusCallbackProxy = std::make_shared<CallStatusCallbackProxy>(nullptr);
     CallReportInfo callReportInfo;
     callStatusCallbackProxy->UpdateCallReportInfo(callReportInfo);
+    std::string callId = "callId";
+    std::string procedureJsonStr = "procedureJsonStr";
+    callStatusCallbackProxy->ReportCallProcedureEvents(callId, procedureJsonStr);
     CallsReportInfo callsReportInfo;
     callStatusCallbackProxy->UpdateCallsReportInfo(callsReportInfo);
     DisconnectedDetails details;
