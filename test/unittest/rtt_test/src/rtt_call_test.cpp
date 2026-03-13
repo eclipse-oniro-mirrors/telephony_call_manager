@@ -457,6 +457,12 @@ HWTEST_F(RttCallTest, Telephony_ImsRttManagerTest003, Function | MediumTest | Le
         0x61, 0xC2, 0x98, 0xEF, 0xBB, 0xBF};
     std::string result7 = manager.RttDataStreamToString(testData7, sizeof(testData7));
     EXPECT_EQ(result7, "Hello\r\n");
+
+    uint8_t testData8[] = {0};
+    std::string result8 = manager.RttDataStreamToString(testData8, 501);
+    EXPECT_EQ(result8, "");
+    std::string result9 = manager.RttDataStreamToString(testData8, -1);
+    EXPECT_EQ(result9, "");
 }
 
 /**
@@ -690,7 +696,7 @@ HWTEST_F(RttCallTest, Telephony_CallControlManager_UpdateImsRttCallMode_AllBranc
 {
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     ASSERT_TRUE(callControlManager != nullptr);
-    callControlManager->Init()
+    callControlManager->Init();
     CallObjectManager::callObjectPtrList_.clear();
     int32_t callId = -1;
     ImsRTTCallMode mode = ImsRTTCallMode::LOCAL_REQUEST_DOWNGRADE;
