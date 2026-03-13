@@ -19,6 +19,7 @@ declare_args() {
   call_manager_feature_support_hearing_aid = true
   call_manager_sos_no_ringback_tone = false
   call_manager_watch_call_blocking = false
+  call_manager_thermal_protection = false
 }
 
 call_manager_path = "//base/telephony/call_manager"
@@ -373,4 +374,9 @@ if (call_manager_sos_no_ringback_tone) {
 
 if (call_manager_watch_call_blocking) {
   call_manager_defines += [ "CALL_MANAGER_WATCH_CALL_BLOCKING" ]
+}
+
+if (call_manager_thermal_protection) {
+  print("callmanager thermal protection")
+  call_manager_defines += [ "CALL_MANAGER_THERMAL_PROTECTION" ]
 }

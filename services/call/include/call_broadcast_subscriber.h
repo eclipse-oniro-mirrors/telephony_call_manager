@@ -47,6 +47,9 @@ private:
         HFP_EVENT,
         SCREEN_UNLOCKED,
         MUTE_KEY_PRESS,
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+        THERMAL_LEVEL_CHANGED,
+#endif
         TELEPHONY_EXIT_STR
     };
     using broadcastSubscriberFunc = std::function<void(const EventFwk::CommonEventData &data)>;
@@ -64,6 +67,9 @@ private:
     void HfpConnectBroadcast(const EventFwk::CommonEventData &data);
     void ScreenUnlockedBroadcast(const EventFwk::CommonEventData &data);
     void MuteKeyBroadcast(const EventFwk::CommonEventData &data);
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+    void HandleThermalLevelChangedBroadcast(const EventFwk::CommonEventData &data);
+#endif
     void TelephonyExitSTRBroadcast(const EventFwk::CommonEventData &data);
     std::map<uint32_t, broadcastSubscriberFunc> memberFuncMap_;
 };

@@ -65,6 +65,10 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { MuteKeyBroadcast(data); };
     memberFuncMap_[TELEPHONY_EXIT_STR] =
         [this](const EventFwk::CommonEventData &data) { TelephonyExitSTRBroadcast(data); };
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+    memberFuncMap_[THERMAL_LEVEL_CHANGED] =
+        [this](const EventFwk::CommonEventData &data) { HandleThermalLevelChangedBroadcast(data); };
+#endif
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -99,6 +103,10 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
         code = MUTE_KEY_PRESS;
     } else if (action == "usual.event.TELEPHONY_EXIT_STR") {
         code = TELEPHONY_EXIT_STR;
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED) {
+        code = THERMAL_LEVEL_CHANGED;
+#endif
     } else {
         code = UNKNOWN_BROADCAST_EVENT;
     }
@@ -200,7 +208,8 @@ void CallBroadcastSubscriber::ConnectCallUiUserSwitchedBroadcast(const EventFwk:
 void CallBroadcastSubscriber::ShutdownBroadcast(const EventFwk::CommonEventData &data)
 {
     TELEPHONY_LOGI("system is shutdown.");
-    DelayedSingleton<CallControlManager>::GetInstance()->DisconnectAllCalls();
+    bool isIncludeEmergencyCall = false;
+    DelayedSingleton<CallControlManager>::GetInstance()->DisconnectAllCalls(isThermal);
     DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
 }
 
@@ -268,5 +277,21 @@ void CallBroadcastSubscriber::TelephonyExitSTRBroadcast(const EventFwk::CommonEv
         callControlMgr->SetWearState(WEAR_STATUS_ON);
     }
 }
+
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+void CallBroadcastSubscriber::HandleThermalLevelChangedBroadcast(const EventFwk::CommonEventData &data)
+{
+    int32_t level = data.GetWant().GetIntParam("0", -1);
+    if (level < 0) {
+        TELEPHONY_LOGI("Invalid thermal level received");
+        return;
+    }
+    auto callControlMgr = DelayedSingleton<CallControlManager>::GetInstance();
+    if (callControlMgr == nullptr) {
+        TELEPHONY_LOGI("callControlMgr is nullptr!");
+    }
+    callControlMgr->HandleThermalLevelChange(level);
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

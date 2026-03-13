@@ -472,6 +472,70 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBroadCastSubscriber_006, Function | Medi
     EXPECT_TRUE(g_receiveUnknownEvent);
 }
 
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+/**
+ * @tc.number   Telephony_CallBroadCastSubscriber_007
+ * @tc.name     test OnReceiveEvent ex
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallBroadCastSubscriber_007, Function | MediumTest | Level1)
+{
+    g_receiveUnknownEvent = false;
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
+    subscriberPtr->memberFuncMap_[CallBroadcastSubscriber::UNKNOWN_BROADCAST_EVENT] =
+        [](const EventFwk::CommonEventData &data) { UnknownBroadcastStub(data); };
+    EventFwk::CommonEventData data;
+    OHOS::EventFwk::Want want;
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED);
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    want.SetAction("unknown.event");
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    subscriberPtr->memberFuncMap_.clear();
+    subscriberPtr->OnReceiveEvent(data);
+    EXPECT_TRUE(g_receiveUnknownEvent);
+}
+ 
+/**
+ * @tc.number   Telephony_ThermalProtection_001
+ * @tc.name     test HangUpCall & RejectCall
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_ThermalProtection_001, Function | MediumTest | Level1)
+{
+    auto callControl = DelayedSingleton<CallControlManager>::GetInstance();
+    auto callState = DelayedSingleton<CallStatusManager>::GetInstance();
+    DialParaInfo dialInfo;
+    AppExecFwk::PacMap extras;
+    sptr<CallBase> call = new IMSCall(dialInfo);
+    call->SetCallDirection(CallDirection::CALL_DIRECTION_OUT);
+    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    call->SetCallId(1);
+    CallObjectManager::AddOneCallObject(call);
+    extras.PutIntValue("dialScene", (int32_t)DialScene::CALL_EMERGENCY);
+    callControl->extras_ = extras;
+    callControl->HandleThermalLevelChange(4);
+    CallObjectManager::DeleteOneCallObject(call);
+    sptr<CallBase> call1 = new IMSCall(dialInfo);
+    call1->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    call1->SetCallId(2);
+    CallObjectManager::AddOneCallObject(call1);
+    callControl->HandleThermalLevelChange(4);
+    CallObjectManager::DeleteOneCallObject(call1);
+    CallDetailInfo detailInfo;
+    sptr<CallBase> call2 = new IMSCall(dialInfo);
+    call2->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    callControl->thermalLevel_ = 4;
+    callState->IncomingHandle(detailInfo);
+    EXPECT_TRUE(callControl->IsThermalProtectionRequired());
+    EXPECT_TRUE(callState->ShouldRejectIncomingCall());
+    CallObjectManager::DeleteOneCallObject(call2);
+}
+#endif
+
 /**
  * @tc.number   Telephony_BluetoothCallState_001
  * @tc.name     test OnConnectionStateChanged & OnScoStateChanged
