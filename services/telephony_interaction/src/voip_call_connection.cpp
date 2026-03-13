@@ -222,6 +222,7 @@ void VoipCallConnection::ClearVoipCall()
                 TELEPHONY_LOGI("Report disconnected voip call again!");
                 CallAttributeInfo info;
                 call->GetCallAttributeInfo(info);
+                CallManagerHisysevent::ClearVoipProcedureCallInfo(info.voipCallInfo.voipCallId);
                 CallReportInfo callReportInfo;
                 BuildDisconnectedCallInfo(callReportInfo, info.voipCallInfo);
                 callReportInfo.callMode = call->GetVideoStateType();
