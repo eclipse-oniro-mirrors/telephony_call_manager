@@ -399,9 +399,8 @@ bool CallManagerHisysevent::GetVoipProcedureCallInfo(const std::string &callId, 
             return false;
         }
         return true;
-    } else {
-        return false;
     }
+    return false;
 }
 
 void CallManagerHisysevent::RecordVoipProcedure(
