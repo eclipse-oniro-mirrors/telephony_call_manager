@@ -160,7 +160,6 @@ int32_t CallStatusCallbackStub::OnRemoteRequest(
 int32_t CallStatusCallbackStub::OnReportCallProcedureEvents(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    CallReportInfo parcelPtr;
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
