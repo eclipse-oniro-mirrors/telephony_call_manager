@@ -513,7 +513,7 @@ void CallManagerHisysevent::ReportCallProcedureEventsInternal(const std::string 
         "CALL_TYPE", voipCallType, "INCOMING_CALL_BANNER", showBannerForIncomingCall, "IS_CONFERENCE_CALL",
         isConferenceCall, "BEGIN_TIME", beginTime);
     std::lock_guard<ffrt::shared_mutex> lock(voipProcedureCallInfoLock_);
-    ClearVoipProcedureCallInfo(callId);
+    voipProcedureCallInfo_.erase(callId);
 }
 
 void CallManagerHisysevent::ClearVoipProcedureCallInfo(const std::string &callId)
