@@ -451,7 +451,10 @@ void CallManagerHisysevent::RecordVoipProcedure(
 void CallManagerHisysevent::ReportCallProcedureEvents(const std::string &callId, const std::string &procedureJsonStr)
 {
     json scenarioJson;
-    GetVoipProcedureCallInfo(callId, scenarioJson);
+    if (!GetVoipProcedureCallInfo(callId, scenarioJson)) {
+        TELEPHONY_LOGE("ReportCallProcedureEvents scenarioJson value is null!");
+        return;
+    }
     if (!scenarioJson.contains("Procedures")) {
         scenarioJson["Procedures"] = json::object();
     }
@@ -509,6 +512,12 @@ void CallManagerHisysevent::ReportCallProcedureEventsInternal(const std::string 
         bundleName, "APP_INDEX", appIndex, "PROCEDURE_FAULTS", procedureJson.dump(), "CALL_DIRECTION", direction,
         "CALL_TYPE", voipCallType, "INCOMING_CALL_BANNER", showBannerForIncomingCall, "IS_CONFERENCE_CALL",
         isConferenceCall, "BEGIN_TIME", beginTime);
+    std::lock_guard<ffrt::shared_mutex> lock(voipProcedureCallInfoLock_);
+    ClearVoipProcedureCallInfo(callId);
+}
+
+void CallManagerHisysevent::ClearVoipProcedureCallInfo(const std::string &callId)
+{
     std::lock_guard<ffrt::shared_mutex> lock(voipProcedureCallInfoLock_);
     voipProcedureCallInfo_.erase(callId);
 }
