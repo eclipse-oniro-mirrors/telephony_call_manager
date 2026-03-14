@@ -1733,7 +1733,7 @@ void CallControlManager::DisconnectAllCalls(bool isIncludeEmergencyCall)
             ret = RejectCall(call->GetCallID(), false, Str8ToStr16(""));
         } else {
 #ifdef CALL_MANAGER_THERMAL_PROTECTION
-            if (isIncludeEmergencyCall && IsEmergencyCall(call)) {
+            if (!isIncludeEmergencyCall && IsEmergencyCall(call)) {
                 TELEPHONY_LOGI("Emergency call in progress, skipping thermal action");
                 continue;
             }
@@ -2317,8 +2317,7 @@ void CallControlManager::HandleThermalLevelChange(int32_t level)
         TELEPHONY_LOGI("No active call exists");
         return;
     }
-    bool isIncludeEmergencyCall = true;
-    DisconnectAllCalls(isIncludeEmergencyCall);
+    DisconnectAllCalls(false);
     TELEPHONY_LOGI("Terminating all calls due to thermal level");
 }
 

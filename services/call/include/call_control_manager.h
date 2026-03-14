@@ -161,7 +161,7 @@ public:
     void ReleaseIncomingLock();
     void AcquireDisconnectedLock();
     void ReleaseDisconnectedLock();
-    void DisconnectAllCalls(bool isIncludeEmergencyCall);
+    void DisconnectAllCalls(bool isIncludeEmergencyCall = true);
     void StartFlashRemind();
     void StopFlashRemind();
     void ClearFlashReminder();
