@@ -182,7 +182,7 @@ public:
     int32_t SetCallAudioMode(int32_t mode, int32_t scenarios);
 #ifdef CALL_MANAGER_THERMAL_PROTECTION
     void HandleThermalLevelChange(int32_t level);
-    bool IsThermalProtectionRejectCall();
+    bool IsThermalProtectionRequired();
     bool IsEmergencyCall(const sptr<CallBase> &call);
 #endif
 

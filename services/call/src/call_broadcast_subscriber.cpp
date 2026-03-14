@@ -209,7 +209,7 @@ void CallBroadcastSubscriber::ShutdownBroadcast(const EventFwk::CommonEventData 
 {
     TELEPHONY_LOGI("system is shutdown.");
     bool isIncludeEmergencyCall = false;
-    DelayedSingleton<CallControlManager>::GetInstance()->DisconnectAllCalls(isThermal);
+    DelayedSingleton<CallControlManager>::GetInstance()->DisconnectAllCalls(isIncludeEmergencyCall);
     DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
 }
 
