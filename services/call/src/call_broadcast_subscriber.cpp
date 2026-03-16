@@ -288,6 +288,7 @@ void CallBroadcastSubscriber::HandleThermalLevelChangedBroadcast(const EventFwk:
     auto callControlMgr = DelayedSingleton<CallControlManager>::GetInstance();
     if (callControlMgr == nullptr) {
         TELEPHONY_LOGI("callControlMgr is nullptr!");
+        return;
     }
     callControlMgr->HandleThermalLevelChange(level);
 }
