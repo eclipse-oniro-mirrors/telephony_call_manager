@@ -15,19 +15,19 @@ import("//build/ohos.gni")
 
 call_manager_path = "//base/telephony/call_manager"
 
-isNeedCamera = defined(global_parts_info) &&
+isNeedCameraDep = defined(global_parts_info) &&
   defined(global_parts_info.multimedia_camera_framework) &&
   global_parts_info.multimedia_camera_framework
 
-isNeedScreenLock = defined(global_parts_info) &&
+isNeedScreenLockDep = defined(global_parts_info) &&
   defined(global_parts_info.theme_screenlock_mgr) &&
   global_parts_info.theme_screenlock_mgr &&
 
-isNeedSms = defined(global_parts_info) &&
+isNeedSmsDep = defined(global_parts_info) &&
   defined(global_parts_info.telephony_sms_mms) &&
   global_parts_info.telephony_sms_mms
 
-isNeedCompile = isNeedCamera || isNeedScreenLock || isNeedSms
+isNeedCompile = isNeedCameraDep || isNeedScreenLockDep || isNeedSmsDep
 if (isNeedCompile)
 {
   ohos_shared_library("tel_cm_deps_adapter") {
@@ -48,18 +48,27 @@ if (isNeedCompile)
     ]
 
     external_deps = [
-      "screenlock_mgr:screenlock_client",
-      "camera_framework:camera_framework",
-      "sms_mms:tel_sms_mms_api",
       "ability_runtime:abilitykit_native",
       "hilog:libhilog",
-      "hisysevent:libhisysevent",
-      "hitrace:hitrace_meter",
-      "hitrace:libhitracechain",
       "c_utils:utils", # 以下为头文件依赖引入。
       "graphic_surface:surface",
       "core_service:libtel_common",
     ]
+    cm_deps_adapter_defines = []
+
+    if (isNeedCameraDep) {
+      external_deps += [ "camera_framework:camera_framework" ]
+    }
+
+    if (isNeedScreenLockDep) {
+      external_deps += [ ""screenlock_mgr:screenlock_client"" ]
+      cm_deps_adapter_defines += [ "ABILITY_SCREENLOCKMGR_SUPPORT" ]
+    }
+
+    if (isNeedSmsDep) {
+      external_deps += [ "sms_mms:tel_sms_mms_api" ]
+      cm_deps_adapter_defines += [ "ABILITY_SMS_SUPPORT" ]
+    }
 
     cflags_cc = [
       "-fno-asynchronous-unwind-tables", 
@@ -74,6 +83,8 @@ if (isNeedCompile)
       "LOG_DOMAIN = 0xD001F10",
       "LOG_TAG = \"CallManager\"",
     ]
+
+    defines += cm_deps_adapter_defines
 
     part_name = "call_manager"
     subsystem_name = "telephony"

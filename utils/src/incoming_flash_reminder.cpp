@@ -108,7 +108,8 @@ bool IncomingFlashReminder::IsScreenStatusSatisfied()
         TELEPHONY_LOGE("deps adapter is nullptr");
         return false;
     }
-    IsScreenLockedFunc isScreenLocked = reinterpret_cast<IsScreenLockedFunc>(dlsym(libAdapterHandler_, "IsScreenLocked"));
+    IsScreenLockedFunc isScreenLocked =
+        reinterpret_cast<IsScreenLockedFunc>(dlsym(libAdapterHandler_, "IsScreenLocked"));
     if (isScreenLocked == nullptr) {
         TELEPHONY_LOGE("dlsym IsScreenLocked failed : %{public}s", dlerror());
         return false;
