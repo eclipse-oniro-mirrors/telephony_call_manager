@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Telephony {
 
-// deps for camera
+#ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
 bool IsTorchSupported()
 {
     sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
@@ -65,8 +65,9 @@ void FreeCamera()
     camMgr->DestroyStubObj();
     camMgr->SetCameraManagerNull();
 }
+#endif
 
-// deps for ScreenLock
+#ifdef ABILITY_SCREENLOCKMGR_SUPPORT
 bool IsScreenLocked()
 {
     auto screenLockMgr = OHOS::ScreenLock::ScreenLockManager::GetInstance();
@@ -76,8 +77,9 @@ bool IsScreenLocked()
     }
     return screenLockMgr->IsScreenLocked();
 }
+#endif
 
-// deps for Sms
+#indef ABILITY_SMS_SUPPORT
 int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text,
     unsigned int addrLen, unsigned int textLen)
 {
@@ -87,6 +89,7 @@ int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text,
     return Singleton<SmsServiceManagerClient>::GetInstance().SendMessage(slotId, std::u16string(desAddr, addrLen), u"",
         std::u16string(text, textLen), nullptr, nullptr);
 }
+#endif
 
 } // Telephony
 } // OHOS

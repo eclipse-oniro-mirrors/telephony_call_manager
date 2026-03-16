@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 
 call_manager_path = "//base/telephony/call_manager"
 
+declare_args() {
 isNeedCameraDep = defined(global_parts_info) &&
   defined(global_parts_info.multimedia_camera_framework) &&
   global_parts_info.multimedia_camera_framework
@@ -26,8 +27,12 @@ isNeedScreenLockDep = defined(global_parts_info) &&
 isNeedSmsDep = defined(global_parts_info) &&
   defined(global_parts_info.telephony_sms_mms) &&
   global_parts_info.telephony_sms_mms
+}
 
-isNeedCompile = isNeedCameraDep || isNeedScreenLockDep || isNeedSmsDep
+isNeedCompile = isNeedCameraDep ||
+  isNeedScreenLockDep ||
+  isNeedSmsDep
+
 if (isNeedCompile)
 {
   ohos_shared_library("tel_cm_deps_adapter") {
@@ -50,7 +55,7 @@ if (isNeedCompile)
     external_deps = [
       "ability_runtime:abilitykit_native",
       "hilog:libhilog",
-      "c_utils:utils", # 以下为头文件依赖引入。
+      "c_utils:utils",
       "graphic_surface:surface",
       "core_service:libtel_common",
     ]
