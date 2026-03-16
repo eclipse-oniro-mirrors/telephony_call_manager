@@ -454,6 +454,8 @@ ohos_unittest("tel_call_manager_zero10_gtest") {
     "cJSON:cjson",
     "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
+    "screenlock_mgr:screenlock_client",
+    "camera_framework:camera_framework",
   ]
   external_deps += call_manager_external_deps
   external_deps -= ["ffrt:libffrt"]

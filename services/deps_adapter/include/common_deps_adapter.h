@@ -36,7 +36,7 @@ __attribute__((visibility("default"))) void FreeCamera();
 __attribute__((visibility("default"))) bool IsScreenLocked();
 #endif
 
-#indef ABILITY_SMS_SUPPORT
+#ifdef ABILITY_SMS_SUPPORT
 __attribute__((visibility("default"))) int SendMessage(int slotId, const char16_t* desAddr,
     const char16_t* text, unsigned int addrLen, unsigned int textLen);
 #endif
