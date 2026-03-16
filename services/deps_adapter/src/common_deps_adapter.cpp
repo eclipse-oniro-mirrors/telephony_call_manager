@@ -15,9 +15,18 @@
 
 #include "common_deps_adapter.h"
 
+#ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
 #include "input/camera_manager.h"
+#endif
+
+#ifdef ABILITY_SCREENLOCKMGR_SUPPORT
 #include "screenlock_manager.h"
+#endif
+
+#indef ABILITY_SMS_SUPPORT
 #include "sms_service_manager_client.h"
+#endif
+
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -63,7 +72,6 @@ void FreeCamera()
     }
     
     camMgr->DestroyStubObj();
-    camMgr->SetCameraManagerNull();
 }
 #endif
 
