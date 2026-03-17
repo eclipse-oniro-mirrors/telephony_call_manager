@@ -2323,19 +2323,12 @@ void CallControlManager::HandleThermalLevelChange(int32_t level)
 
 bool CallControlManager::IsEmergencyCall(const sptr<CallBase> &call)
 {
+    CallAttributeInfo info;
+    call->GetCallAttributeInfo(info);
     CallDirection direction = call->GetCallDirection();
-    if (direction == CallDirection::CALL_DIRECTION_OUT) {
-        AppExecFwk::PacMap extras;
-        DialParaInfo paraInfo;
-        GetDialParaInfo(paraInfo, extras);
-        DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
-        TELEPHONY_LOGI("current dialScene is: %{public}d", dialScene);
-        return dialScene == DialScene::CALL_EMERGENCY;
-    }
-    if (direction == CallDirection::CALL_DIRECTION_IN) {
-        CallAttributeInfo info;
-        call->GetCallAttributeInfo(info);
-        return info.isEcc;
+    if (direction == CallDirection::CALL_DIRECTION_OUT || direction == CallDirection::CALL_DIRECTION_IN) {
+        TELEPHONY_LOGI("isEcc: %{public}d, isEccContact: %{public}d", info.isEcc, info.isEccContact);
+        return info.isEcc || info.isEccContact;
     }
     return false;
 }
