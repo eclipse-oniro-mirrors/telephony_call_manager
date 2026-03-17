@@ -518,12 +518,18 @@ HWTEST_F(ZeroBranch7Test, Telephony_ThermalProtection_001, Function | MediumTest
     extras.PutIntValue("dialScene", (int32_t)DialScene::CALL_EMERGENCY);
     callControl->extras_ = extras;
     callControl->HandleThermalLevelChange(4);
+    EXPECT_TRUE(callControl->IsEmergencyCall(call));
     CallObjectManager::DeleteOneCallObject(call);
     sptr<CallBase> call1 = new IMSCall(dialInfo);
+    call1->SetCallDirection(CallDirection::CALL_DIRECTION_IN);
     call1->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
     call1->SetCallId(2);
     CallObjectManager::AddOneCallObject(call1);
+    CallAttributeInfo info;
+    info.isEcc = true;
+    call1->GetCallAttributeInfo(info);
     callControl->HandleThermalLevelChange(4);
+    EXPECT_TRUE(callControl->IsEmergencyCall(call1));
     CallObjectManager::DeleteOneCallObject(call1);
     CallDetailInfo detailInfo;
     sptr<CallBase> call2 = new IMSCall(dialInfo);
