@@ -161,7 +161,7 @@ public:
     void ReleaseIncomingLock();
     void AcquireDisconnectedLock();
     void ReleaseDisconnectedLock();
-    void DisconnectAllCalls();
+    void DisconnectAllCalls(bool isIncludeEmergencyCall = true);
     void StartFlashRemind();
     void StopFlashRemind();
     void ClearFlashReminder();
@@ -180,6 +180,11 @@ public:
     void HandleVideoRingPlayFail();
     bool EndCall();
     int32_t SetCallAudioMode(int32_t mode, int32_t scenarios);
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+    void HandleThermalLevelChange(int32_t level);
+    bool IsThermalProtectionRequired();
+    bool IsEmergencyCall(const sptr<CallBase> &call);
+#endif
 
 private:
     void CallStateObserve();
@@ -224,6 +229,9 @@ private:
         void HfpBroadcastSubscriber();
         void MuteKeyBroadcastSubscriber();
         void TelephonyExitSTRBroadcastSubscriber();
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+        void ThermalLevelChangedBroadcastSubscriber();
+#endif
 
     private:
         std::vector<std::shared_ptr<CallBroadcastSubscriber>> subscriberPtrList_;
@@ -275,6 +283,9 @@ private:
     ffrt::mutex reminderMutex_;
     ffrt::mutex ringToneMutex_;
     std::shared_ptr<IncomingFlashReminder> incomingFlashReminder_ {nullptr};
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+    std::atomic<int32_t> thermalLevel_ = -1;
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -62,6 +62,10 @@ bool CallControlManager::alarmSeted = false;
 constexpr int32_t CRS_TYPE = 2;
 const uint64_t DISCONNECT_DELAY_TIME = 1000000;
 static const int32_t SATCOMM_UID = 1096;
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+static const int32_t THERMAL_UID = 5528;
+static const int32_t CRITICAL_THERMAL_LEVEL = 4;
+#endif
 using namespace OHOS::EventFwk;
 CallControlManager::CallControlManager()
     : callStateListenerPtr_(nullptr), CallRequestHandlerPtr_(nullptr), incomingCallWakeup_(nullptr),
@@ -1724,7 +1728,7 @@ void CallControlManager::ReleaseDisconnectedLock()
 #endif
 }
 
-void CallControlManager::DisconnectAllCalls()
+void CallControlManager::DisconnectAllCalls(bool isIncludeEmergencyCall)
 {
     std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
     int32_t ret = -1;
@@ -1738,6 +1742,12 @@ void CallControlManager::DisconnectAllCalls()
         if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
             ret = RejectCall(call->GetCallID(), false, Str8ToStr16(""));
         } else {
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+            if (!isIncludeEmergencyCall && IsEmergencyCall(call)) {
+                TELEPHONY_LOGI("Emergency call in progress, skipping thermal action");
+                continue;
+            }
+#endif
             ret = HangUpCall(call->GetCallID());
         }
         if (ret == TELEPHONY_SUCCESS) {
@@ -1764,6 +1774,9 @@ void CallControlManager::SystemAbilityListener::OnAddSystemAbility(int32_t syste
     HfpBroadcastSubscriber();
     MuteKeyBroadcastSubscriber();
     TelephonyExitSTRBroadcastSubscriber();
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+    ThermalLevelChangedBroadcastSubscriber();
+#endif
     IPCSkeleton::SetCallingIdentity(identity);
 }
 
@@ -1894,6 +1907,21 @@ void CallControlManager::SystemAbilityListener::TelephonyExitSTRBroadcastSubscri
     subscriberPtrList_.emplace_back(subscriber);
     EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
 }
+
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+void CallControlManager::SystemAbilityListener::ThermalLevelChangedBroadcastSubscriber()
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_THERMAL_LEVEL_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfos(matchingSkills);
+    subscriberInfos.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    subscriberInfos.SetPublisherUid(THERMAL_UID);
+    std::shared_ptr<CallBroadcastSubscriber> subscriber = std::make_shared<CallBroadcastSubscriber>(subscriberInfos);
+    subscriberPtrList_.emplace_back(subscriber);
+    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
+    TELEPHONY_LOGI("ThermalLevelChangedBroadcastSubscriber subscribeResult = %{public}d", subscribeResult);
+}
+#endif
 
 int32_t CallControlManager::SubscriberSaStateChange()
 {
@@ -2286,5 +2314,35 @@ int32_t CallControlManager::SetCallAudioMode(int32_t mode, int32_t scenarios)
     audioControlManager->SetCallAudioMode(mode, scenarios);
     return TELEPHONY_SUCCESS;
 }
+
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+void CallControlManager::HandleThermalLevelChange(int32_t level)
+{
+    thermalLevel_ = level;
+    TELEPHONY_LOGI("Received thermal level: %{public}d", level);
+    if (level < CRITICAL_THERMAL_LEVEL) {
+        return;
+    }
+    if (!HasCallExist()) {
+        TELEPHONY_LOGI("No active call exists");
+        return;
+    }
+    DisconnectAllCalls(false);
+    TELEPHONY_LOGI("Terminating all calls due to thermal level");
+}
+
+bool CallControlManager::IsEmergencyCall(const sptr<CallBase> &call)
+{
+    CallAttributeInfo info;
+    call->GetCallAttributeInfo(info);
+    TELEPHONY_LOGI("isEcc: %{public}d, isEccContact: %{public}d", info.isEcc, info.isEccContact);
+    return info.isEcc || info.isEccContact;
+}
+
+bool CallControlManager::IsThermalProtectionRequired()
+{
+    return (thermalLevel_ >= CRITICAL_THERMAL_LEVEL);
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

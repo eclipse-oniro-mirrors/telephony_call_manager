@@ -1901,7 +1901,12 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         TELEPHONY_LOGI("HasEmergencyCall reject incoming call.");
         return true;
     }
-
+#ifdef CALL_MANAGER_THERMAL_PROTECTION
+    if (DelayedSingleton<CallControlManager>::GetInstance()->IsThermalProtectionRequired()) {
+        TELEPHONY_LOGI("Rejecting call due to thermal protection level");
+        return true;
+    }
+#endif
 #ifdef CONFIG_FACTORY_VERSION
     TELEPHONY_LOGI("ShouldRejectIncomingCall: CONFIG_FACTORY_VERSION is true");
     return false;
