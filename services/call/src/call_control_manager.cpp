@@ -2325,12 +2325,8 @@ bool CallControlManager::IsEmergencyCall(const sptr<CallBase> &call)
 {
     CallAttributeInfo info;
     call->GetCallAttributeInfo(info);
-    CallDirection direction = call->GetCallDirection();
-    if (direction == CallDirection::CALL_DIRECTION_OUT || direction == CallDirection::CALL_DIRECTION_IN) {
-        TELEPHONY_LOGI("isEcc: %{public}d, isEccContact: %{public}d", info.isEcc, info.isEccContact);
-        return info.isEcc || info.isEccContact;
-    }
-    return false;
+    TELEPHONY_LOGI("isEcc: %{public}d, isEccContact: %{public}d", info.isEcc, info.isEccContact);
+    return info.isEcc || info.isEccContact;
 }
 
 bool CallControlManager::IsThermalProtectionRequired()
