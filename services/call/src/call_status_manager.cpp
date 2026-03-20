@@ -1589,14 +1589,20 @@ void CallStatusManager::SetVideoCallState(sptr<CallBase> &call, TelCallState nex
     if (slotId >= SLOT_NUM || slotId < 0) {
         return;
     }
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    if (audioControlManager == nullptr) {
+        return;
+    }
     VideoStateType videoState = call->GetVideoStateType();
     TELEPHONY_LOGI("nextVideoState:%{public}d, priorVideoState:%{public}d", videoState, priorVideoState_[slotId]);
     if (priorVideoState_[slotId] != videoState) {
-        DelayedSingleton<AudioControlManager>::GetInstance()->VideoStateUpdated(
-            call, priorVideoState_[slotId], videoState);
+        audioControlManager->VideoStateUpdated(call, priorVideoState_[slotId], videoState);
         priorVideoState_[slotId] = videoState;
     }
     if (nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
+        if (priorVideoState_[slotId] == VideoStateType::TYPE_VIDEO) {
+            audioControlManager->VideoStateUpdated(call, priorVideoState_[slotId], VideoStateType::TYPE_VOICE);
+        }
         priorVideoState_[slotId] = VideoStateType::TYPE_VOICE;
     }
 }
