@@ -746,9 +746,6 @@ bool CallManagerClient::HasVoiceCapability()
         return true;
     }
 
-    if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->HasDistributedCommunicationCapability();
-    }
     return false;
 }
 
