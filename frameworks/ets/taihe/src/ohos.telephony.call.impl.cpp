@@ -104,7 +104,7 @@ void FormatPhoneNumberSync(
     CallManagerClientInitializer init;
     std::u16string phoneNum = OHOS::Str8ToStr16(std::string(phoneNumber));
     std::string code = std::string(options.countryCode.value_or("cn"));
-    if (code.size() < 1) {
+    if (code.empty()) {
         code = "cn";
     }
     std::u16string countryCode = OHOS::Str8ToStr16(code);
