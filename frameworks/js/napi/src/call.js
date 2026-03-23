@@ -17,6 +17,7 @@ const ARGUMENTS_LEN_TWO = 2;
 const ARGUMENTS_LEN_ONE = 1;
 async function makeCallFunc(...args) {
     if ((arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] === 'function') ||
+        (arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] === 'object') ||
         (arguments.length === ARGUMENTS_LEN_ONE)) {
         try {
             let context = getContext(this);
@@ -60,7 +61,8 @@ async function startAbility(args, context) {
     let config = {
         parameters: {
             'phoneNumber': '',
-            'pageFlag': 'page_flag_edit_before_calling'
+            'pageFlag': 'page_flag_edit_before_calling',
+            'isHideDialScreen': false
         },
         bundleName: 'com.ohos.contacts',
         abilityName: 'com.ohos.contacts.MainAbility'
@@ -72,6 +74,9 @@ async function startAbility(args, context) {
             config.parameters.phoneNumber = phoneNumber;
         } else {
             config.parameters.phoneNumber = args[0];
+        }
+        if (args.length > 1 && typeof args[1] === 'object') {
+            config.parameters.isHideDialScreen = args[1]?.isHideDialScreen;
         }
     } else if (args.length > 1 && typeof args[1] === 'string') {
         let phoneNumberUri = new URL(args[1]);
