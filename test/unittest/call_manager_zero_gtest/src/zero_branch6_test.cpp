@@ -74,6 +74,7 @@
 #include "status_bar.h"
 #include "wired_headset.h"
 #include "call_status_policy.h"
+#include "audio_device_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -374,7 +375,10 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     callObjectPtr->SetCallId(1);
     bool publishResult = callStatusManager->PublishIncomingCallBlockInfo(callObjectPtr, false);
     EXPECT_TRUE(publishResult);
+    dialParaInfo.videoState = VideoStateType::TYPE_VIDEO;
     callStatusManager->SetVideoCallState(callObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED);
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    EXPECT_NE(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
 }
 
 #ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
