@@ -496,6 +496,7 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
                 StopVibrator();
             }
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
+            isSetAudioDeviceByUser_ = false;
             break;
         default:
             break;
