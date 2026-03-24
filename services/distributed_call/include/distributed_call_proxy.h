@@ -37,6 +37,7 @@ public:
         const std::shared_ptr<OHOS::DistributedHardware::IDCallDeviceCallback>& callback);
     int32_t UnRegisterDeviceCallback(const std::string& name);
     int32_t GetDCallDeviceInfo(const std::string &devId, OHOS::DistributedHardware::DCallDeviceInfo& devInfo);
+    bool IsSelectVirtualModem();
 
 private:
     OHOS::DistributedHardware::IDCallClient* GetDCallClient();

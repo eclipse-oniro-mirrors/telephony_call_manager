@@ -156,5 +156,15 @@ int32_t DistributedCallProxy::GetDCallDeviceInfo(const std::string &devId,
     }
     return dcallClient_->GetDCallDeviceInfo(devId, devInfo);
 }
+
+bool DistributedCallProxy::IsSelectVirtualModem()
+{
+    std::lock_guard<ffrt::mutex> lock(dcallClientMtx_);
+    if (dcallClient_ == nullptr) {
+        TELEPHONY_LOGE("dcallClient_ is nullptr");
+        return false;
+    }
+    return dcallClient_->IsSelectVirtualModem();
+}
 } // namespace Telephony
 } // namespace OHOS
