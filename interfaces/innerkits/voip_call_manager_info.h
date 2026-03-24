@@ -45,6 +45,10 @@ enum class CallAudioEvent {
      * Indicates whether the VOIP incoming call allows user to mute ringtone.
      */
     AUDIO_EVENT_MUTED_RINGTONE = 4,
+    /**
+     * Indicates the event of VOIP call muted and disabled the microphone switch.
+     */
+    AUDIO_EVENT_MIC_DISABLE = 5,
 };
 
 /**
