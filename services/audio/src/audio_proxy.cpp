@@ -381,6 +381,9 @@ int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device, bool isNe
 
 bool AudioProxy::IsDistributedPreferredOutputAudioDevice()
 {
+    // Deprecated API
+    DelayedSingleton<DistributedCallManager>::GetInstance()->IsSelectVirtualModem();
+
     AudioStandard::AudioRendererInfo rendererInfo;
     rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_UNKNOWN;
     rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;

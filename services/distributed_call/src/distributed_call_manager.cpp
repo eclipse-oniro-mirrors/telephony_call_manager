@@ -444,6 +444,20 @@ void DistributedCallManager::SwitchOffDCallDeviceSync()
     }
 }
 
+bool DistributedCallManager::IsSelectVirtualModem()
+{
+    if (onlineDCallDevices_.size() <= 0) {
+        TELEPHONY_LOGW("no dcall device");
+        return false;
+    }
+    std::lock_guard<ffrt::mutex> lock(dcallProxyMtx_);
+    if (dcallProxy_ == nullptr) {
+        TELEPHONY_LOGE("fail to create dcall proxy obj");
+        return false;
+    }
+    return dcallProxy_->IsSelectVirtualModem();
+}
+
 void DistributedCallManager::ReportDistributedDeviceInfo(const AudioDevice& device)
 {
     std::string curDevId = GetDevIdFromAudioDevice(device);
