@@ -188,7 +188,6 @@ void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, 
         MyLocationEngine::BootComplete(alarmSwitchState);
     }
     SystemAbilitySubscriber();
-    statusChangeListener_ = nullptr;
 }
 
 bool LocationSystemAbilityListener::GetSystemAbility(int32_t systemAbilityId)
