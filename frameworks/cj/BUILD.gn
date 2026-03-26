@@ -20,6 +20,7 @@ ohos_shared_library("cj_telephony_call_ffi") {
     cfi_cross_dso = true
     debug = false
   }
+  branch_protector_ret = "pac_ret"
 
   sources = [
     "src/telephony_call_ffi.cpp",
