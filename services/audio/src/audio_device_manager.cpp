@@ -740,20 +740,26 @@ std::string AudioDeviceManager::ConvertAddress()
 
 int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
 {
-    if (call != nullptr && (call->GetCallType() == CallType::TYPE_VOIP ||
-        call->GetCallType() == CallType::TYPE_BLUETOOTH)) {
+    if (call == nullptr) {
+        TELEPHONY_LOGE("call is nullptr.");
+        return TELEPHONY_ERR_ARGUMENT_NULL;
+    }
+    info_.callId = call->GetCallID();
+    CallType currentCallType = call->GetCallType();
+    TelCallState currentTelCallState = call->GetTelCallState();
+    if (currentCallType == CallType::TYPE_VOIP || currentCallType == CallType::TYPE_BLUETOOTH) {
         info_.isMuted = call->IsMuted();
     } else {
         info_.isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
     }
-    if (call != nullptr) {
-        info_.callId = call->GetCallID();
+    if (currentCallType == CallType::TYPE_VOIP) {
+        info_.isMicDisabled = call->IsMicDisabled();
     }
     AudioDeviceType deviceType = info_.currentAudioDevice.deviceType;
-    if (call != nullptr && call->GetCallType() == CallType::TYPE_BLUETOOTH &&
-        (call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE ||
-        call->GetTelCallState() == TelCallState::CALL_STATUS_DIALING ||
-        call->GetTelCallState() == TelCallState::CALL_STATUS_ALERTING)) {
+    if (currentCallType == CallType::TYPE_BLUETOOTH &&
+        (currentTelCallState == TelCallState::CALL_STATUS_ACTIVE ||
+        currentTelCallState == TelCallState::CALL_STATUS_DIALING ||
+        currentTelCallState == TelCallState::CALL_STATUS_ALERTING)) {
         bool state = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetBtCallScoConnected();
         if (state) {
             info_.currentAudioDevice.deviceType = AudioDeviceType::DEVICE_SPEAKER;
@@ -761,9 +767,9 @@ int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
             info_.currentAudioDevice.deviceType = AudioDeviceType::DEVICE_EARPIECE;
         }
     }
-    TELEPHONY_LOGI("report audio device info, currentAudioDeviceType:%{public}d, currentAddress:%{public}s, "
-        "mute:%{public}d, callId:%{public}d", info_.currentAudioDevice.deviceType, ConvertAddress().c_str(),
-        info_.isMuted, info_.callId);
+    TELEPHONY_LOGI("report audio device info, currentAudioDeviceType:%{public}d, "
+        "mute:%{public}d, mic disabled:%{public}d, callId:%{public}d",
+        info_.currentAudioDevice.deviceType, info_.isMuted, info_.isMicDisabled, info_.callId);
     CallManagerHisysevent::RecordVoipProcedure((call != nullptr) ? call->GetCallID() : -1,
         VoipProcedureEvent::CALLMANAGER_HANDLE_AUDIO_CHANGE,
         static_cast<int32_t>(info_.currentAudioDevice.deviceType));
