@@ -963,5 +963,22 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBase_001, Function | MediumTest | Level1
     EXPECT_EQ(call3->conferenceState_, TelConferenceState::TEL_CONFERENCE_DISCONNECTING);
     CallObjectManager::callObjectPtrList_.clear();
 }
+
+/**
+ * @tc.number   Telephony_CallBase_SetMicDisabled_IsMicDisabled
+ * @tc.name     SetMicDisabled and IsMicDisabled test
+ * @tc.desc     Test SetMicDisabled and IsMicDisabled methods of CallBase class
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallBase_SetMicDisabled_IsMicDisabled, Function | MediumTest | Level1)
+{
+    DialParaInfo info;
+    sptr<CallBase> call = new VoIPCall(info);
+    EXPECT_NE(call, nullptr);
+    call->SetMicDisabled(true);
+    EXPECT_EQ(call->IsMicDisabled(), true);
+    call->SetMicDisabled(false);
+    EXPECT_EQ(call->IsMicDisabled(), false);
+    CallObjectManager::callObjectPtrList_.clear();
+}
 } // namespace Telephony
 } // namespace OHOS
