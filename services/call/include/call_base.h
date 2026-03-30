@@ -133,7 +133,7 @@ public:
     virtual int32_t GetCallIndex() {return 0;}
     int32_t SetMicPhoneState(bool isMuted);
     bool IsMuted();
-    int32_t SetMicDisabled(bool isMicDisabled);
+    void SetMicDisabled(bool isMicDisabled);
     bool IsMicDisabled();
     void SetIsEccContact(bool isEccContact);
     void SetCeliaCallType(int32_t celiaCallType);
