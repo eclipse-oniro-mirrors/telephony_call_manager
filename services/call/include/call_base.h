@@ -161,7 +161,6 @@ public:
     void SetBtCallSlotId(int32_t slotId);
     bool isNonVirtualCall();
     void SetNonVirtualCall(bool isNonVirtualCall);
-    bool isMicDisabled_;
 
 protected:
     int32_t callId_;
@@ -220,6 +219,7 @@ private:
     int32_t btCallSlotId_{BT_CALL_INVALID_SLOT};
     bool isNonVirtualCall_{false};
     int32_t imsDomain_ = 0;
+    bool isMicDisabled_;
 };
 } // namespace Telephony
 } // namespace OHOS
