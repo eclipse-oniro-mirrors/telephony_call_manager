@@ -1043,6 +1043,11 @@ struct AudioDeviceInfo {
      * The callId of audio device change.
      */
     int32_t callId = 0;
+    /**
+     * Indicates whether the microphone of device is disabled,
+     * true: muted and microphone is disabled, false: microphone is not disabled
+     */
+    bool isMicDisabled = false;
 };
 
 enum class MmiCodeResult {
