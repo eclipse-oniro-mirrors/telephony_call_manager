@@ -714,6 +714,19 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallRecordsManager_003, TestSize.Level0)
     ASSERT_NE(callObjectPtr, nullptr);
 #endif
 }
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallRecordsManager_RetainOriginNumber, TestSize.Level0)
+{
+    CallRecordsManager callRecordsManager;
+    callRecordsManager.Init();
+
+    CallAttributeInfo info;
+    std::string number = "13188889999,0655";
+    memcpy_s(&info.accountNumber, kMaxNumberLen, number.c_str(), number.length());
+    EXPECT_NO_THROW(callRecordsManager.AddOneCallRecord(info));
+    EXPECT_EQ(std::string(info.accountNumber), number);
+}
+
 /**
  * @tc.number   Telephony_CallControlManager_001
  * @tc.name     test error branch

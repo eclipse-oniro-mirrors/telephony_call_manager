@@ -190,8 +190,10 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
         TELEPHONY_LOGE("hide violence or emergency nums in call log!");
         return;
     }
-    errno_t result = memcpy_s(data.phoneNumber, kMaxNumberLen, info.accountNumber, strlen(info.accountNumber));
-    if (result != EOK) {
+    // the call number stored only retains the main number, does not retain the extension number.
+    size_t commaPos = strcspn(info.accountNumber, ",");
+    size_t copyLength = (commaPos < strlen(info.accountNumber)) ? commaPos : strlen(info.accountNumber);
+    if (strncpy_s(data.phoneNumber, kMaxNumberLen, info.accountNumber, copyLength) != EOK) {
         TELEPHONY_LOGE("memcpy_s failed!");
         return;
     }
@@ -199,13 +201,11 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
         TELEPHONY_LOGE("Location out of limit!");
         return;
     }
-    result = memcpy_s(data.numberLocation, kMaxNumberLen, info.numberLocation, strlen(info.numberLocation));
-    if (result != EOK) {
+    if (strcpy_s(data.numberLocation, kMaxNumberLen, info.numberLocation) != EOK) {
         TELEPHONY_LOGE("memcpy_s failed!");
         return;
     }
-    if (memcpy_s(data.detectDetails, sizeof(data.detectDetails), info.detectDetails, strlen(info.detectDetails))
-        != EOK) {
+    if (strcpy_s(data.detectDetails, sizeof(data.detectDetails), info.detectDetails) != EOK) {
         TELEPHONY_LOGE("memcpy_s detectDetails failed!");
         return;
     }
@@ -213,12 +213,10 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
     std::string countryIso = GetCountryIso();
     int32_t formatRet = CopyFormatNumberToRecord(countryIso, data);
     if (formatRet != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("CopyFormatNumberToRecord failed!");
         return;
     }
     int32_t formatToE164Ret = CopyFormatNumberToE164ToRecord(countryIso, data);
     if (formatToE164Ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("CopyFormatNumberToE164ToRecord failed!");
         return;
     }
     callRecordsHandlerServerPtr_->StoreCallRecord(data);
