@@ -305,6 +305,14 @@ enum class VoipCallEvent {
      * Indicates the user clicked speaker off.
      */
     VOIP_CALL_EVENT_SPEAKER_OFF,
+    /**
+     * Indicates whether the VOIP incoming call allows user to mute ringtone.
+     */
+    VOIP_CALL_EVENT_MUTE_RINGTONE,
+    /**
+     * Indicates the VOIP call muted and disabled the microphone switch.
+     */
+    VOIP_CALL_EVENT_MIC_DISABLE,
 };
 
 /**

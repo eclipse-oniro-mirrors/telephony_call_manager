@@ -446,14 +446,22 @@ int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &in
     }
     if (info.voipCallEvent == VoipCallEvent::VOIP_CALL_EVENT_MUTED) {
         call->SetMicPhoneState(true);
+        call->SetMicDisabled(false);
     } else if (info.voipCallEvent == VoipCallEvent::VOIP_CALL_EVENT_UNMUTED) {
         call->SetMicPhoneState(false);
+        call->SetMicDisabled(false);
+    } else if (info.voipCallEvent == VoipCallEvent::VOIP_CALL_EVENT_MIC_DISABLE) {
+        call->SetMicPhoneState(true);
+        call->SetMicDisabled(true);
+    }
+    if (info.voipCallEvent >= VoipCallEvent::VOIP_CALL_EVENT_MUTED &&
+        info.voipCallEvent <= VoipCallEvent::VOIP_CALL_EVENT_SPEAKER_OFF) {
         AudioDevice device = {
             .deviceType = AudioDeviceType::DEVICE_EARPIECE,
             .address = { 0 },
         };
-        if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device, true) ==
-            TELEPHONY_SUCCESS) {
+        if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device,
+            AudioStandard::StreamUsage::STREAM_USAGE_INVALID) == TELEPHONY_SUCCESS) {
             DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device);
         }
     }

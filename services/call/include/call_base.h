@@ -133,6 +133,8 @@ public:
     virtual int32_t GetCallIndex() {return 0;}
     int32_t SetMicPhoneState(bool isMuted);
     bool IsMuted();
+    void SetMicDisabled(bool isMicDisabled);
+    bool IsMicDisabled();
     void SetIsEccContact(bool isEccContact);
     void SetCeliaCallType(int32_t celiaCallType);
     int32_t GetCeliaCallType();
@@ -217,6 +219,7 @@ private:
     int32_t btCallSlotId_{BT_CALL_INVALID_SLOT};
     bool isNonVirtualCall_{false};
     int32_t imsDomain_ = 0;
+    bool isMicDisabled_;
 };
 } // namespace Telephony
 } // namespace OHOS

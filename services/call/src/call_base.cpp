@@ -44,7 +44,7 @@ CallBase::CallBase(DialParaInfo &info)
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
       blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams), isAnswered_(false),
       detectDetails_(""), phoneOrWatch_(info.phoneOrWatch), isAiAutoAnswer_(false),
-      isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox), imsDomain_(0)
+      isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox), imsDomain_(0), isMicDisabled_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -62,7 +62,8 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
       numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1),
       extraParams_(info.extraParams), isAnswered_(false), detectDetails_(""), phoneOrWatch_(info.phoneOrWatch),
-      isAiAutoAnswer_(false), isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox), imsDomain_(0)
+      isAiAutoAnswer_(false), isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox), imsDomain_(0),
+      isMicDisabled_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -713,6 +714,18 @@ int32_t CallBase::SetMicPhoneState(bool isMuted)
 bool CallBase::IsMuted()
 {
     return isMuted_;
+}
+
+void CallBase::SetMicDisabled(bool isMicDisabled)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    isMicDisabled_ = isMicDisabled;
+}
+
+bool CallBase::IsMicDisabled()
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    return isMicDisabled_;
 }
 
 void CallBase::SetCallDirection(CallDirection direction)
