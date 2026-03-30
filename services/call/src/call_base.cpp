@@ -716,11 +716,10 @@ bool CallBase::IsMuted()
     return isMuted_;
 }
 
-int32_t CallBase::SetMicDisabled(bool isMicDisabled)
+void CallBase::SetMicDisabled(bool isMicDisabled)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
     isMicDisabled_ = isMicDisabled;
-    return TELEPHONY_SUCCESS;
 }
 
 bool CallBase::IsMicDisabled()
