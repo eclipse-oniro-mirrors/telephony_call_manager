@@ -514,11 +514,6 @@ void CallManagerHisysevent::ReportCallProcedureEventsInternal(const std::string 
             beginTime = firstP["T"].get<int>();
         }
     }
-    if (procedureJson["Procedures"]["P"] != 0) {
-        beginTime = procedureJson["Procedures"]["P"][0]["T"];
-    } else {
-        beginTime = -1;
-    }
     HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_PERFORMANCE", EventType::FAULT, CALL_ID_KEY, callId, "BUNDLE_NAME",
         bundleName, "APP_INDEX", appIndex, "PROCEDURE_FAULTS", procedureJson.dump(), "CALL_DIRECTION", direction,
         "CALL_TYPE", voipCallType, "INCOMING_CALL_BANNER", showBannerForIncomingCall, "IS_CONFERENCE_CALL",
