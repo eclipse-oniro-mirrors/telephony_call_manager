@@ -382,7 +382,7 @@ void CallManagerHisysevent::GetAppIndexByBundleName(std::string &bundleName, int
     bundleMgr->GetNameAndIndexForUid(uid, bundleName, appIndex);
 }
 
-void CallManagerHisysevent::AddVoipProcedureCallInfo(const std::string &callId, nlohmann::json scenarioJson)
+void CallManagerHisysevent::UpdateVoipProcedureCallInfo(const std::string &callId, nlohmann::json scenarioJson)
 {
     std::lock_guard<ffrt::shared_mutex> lock(voipProcedureCallInfoLock_);
     voipProcedureCallInfo_[callId] = scenarioJson;
@@ -423,7 +423,7 @@ void CallManagerHisysevent::RecordVoipProcedure(
             TELEPHONY_LOGE("procedures invalid.");
             return;
         }
-        AddVoipProcedureCallInfo(callId, scenarioJson);
+        UpdateVoipProcedureCallInfo(callId, scenarioJson);
     } else {
         json procedures;
         procedures["cnt"] = 1;
@@ -431,7 +431,7 @@ void CallManagerHisysevent::RecordVoipProcedure(
         p.push_back(behaviorDottingJson);
         procedures["P"] = p;
         scenarioJson["Procedures"] = procedures;
-        AddVoipProcedureCallInfo(callId, scenarioJson);
+        UpdateVoipProcedureCallInfo(callId, scenarioJson);
     }
 }
 
@@ -460,11 +460,15 @@ void CallManagerHisysevent::ReportCallProcedureEvents(const std::string &callId,
     auto proceduresc = scenarioJson["Procedures"];
     auto pc = proceduresc["P"];
     auto procedureJson = json::parse(procedureJsonStr.c_str(), nullptr, false);
-    if (procedureJson.is_null()) {
+    if (procedureJson.is_discarded() || !procedureJson.contains("Procedures")) {
         TELEPHONY_LOGE("procedureJson value is null.");
         return;
     }
     auto procedures = procedureJson["Procedures"];
+    if (procedures.contains("P") || !proceduresc.contains("P")) {
+        TELEPHONY_LOGE("procedures do not contain P");
+        return;
+    }
     if (!procedures["P"].is_array() || !proceduresc["P"].is_array()) {
         TELEPHONY_LOGE("procedures do not contain P of the array type!");
         return;
@@ -494,14 +498,21 @@ void CallManagerHisysevent::ReportCallProcedureEventsInternal(const std::string 
     bool showBannerForIncomingCall = callAttribute.value("showBannerForIncomingCall", false);
     int32_t direction = callAttribute.value("direction", -1);
     int32_t appIndex = callAttribute.value("appIndex", -1);
-    callAttribute.erase("bundleName");
-    callAttribute.erase("voipCallType");
-    callAttribute.erase("isConferenceCall");
-    callAttribute.erase("showBannerForIncomingCall");
-    callAttribute.erase("direction");
-    callAttribute.erase("appIndex");
+    const key *keysToRemove[] = {
+        "bundleName", "voipCallType", "isConferenceCall", "showBannerForIncomingCall", "direction", "appIndex"};
+    for (const char *key : keysToRemove) {
+        callAttribute.erase(key);
+    }
     procedureJson["CallAttribute"] = callAttribute;
-    time_t beginTime;
+    time_t beginTime = -1;
+    const auto &procedures = procedureJson.value("Procedures", nlohmann::json::object());
+    const auto &pArray = procedures.value("P", nlohmann::json::array());
+    if (!pArray.empty() && pArray[0].is_object()) {
+        const auto &firstP = pArray[0];
+        if (firstP.contains("T") && firstP["T"].is_number_integer()) {
+            beginTime = firstP["T"].get<int>();
+        }
+    }
     if (procedureJson["Procedures"]["P"] != 0) {
         beginTime = procedureJson["Procedures"]["P"][0]["T"];
     } else {

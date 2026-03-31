@@ -947,6 +947,7 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_003, TestSize.Level0)
     R"("CallAttribute" : {"bundleName" : "test.app", "voipCallType" : 1,"
         "isConferenceCall" : false, "direction" : 0, "appIndex" : 0}})";
     callManagerHisysevent->ReportCallProcedureEvents(callId, procedureJsonStr);
+    callManagerHisysevent->ClearVoipProcedureCallInfo(callId);
 }
 /**
  * @tc.number   Telephony_OTTCall_001

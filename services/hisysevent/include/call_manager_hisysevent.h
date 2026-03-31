@@ -94,7 +94,7 @@ private:
     static int32_t CallInterfaceErrorCodeConversion(const int32_t errCode, CallErrorCode &eventValue);
     static int32_t TelephonyErrorCodeConversion(const int32_t errCode, CallErrorCode &eventValue);
     static void GetAppIndexByBundleName(std::string &bundleName, int32_t uid, int32_t &appIndex);
-    static void AddVoipProcedureCallInfo(const std::string &callId, nlohmann::json scenarioJson);
+    static void UpdateVoipProcedureCallInfo(const std::string &callId, nlohmann::json scenarioJson);
     static bool GetVoipProcedureCallInfo(const std::string &callId, nlohmann::json &scenarioJson);
     static void ReportCallProcedureEventsInternal(const std::string &callId, nlohmann::json &callAttribute,
         nlohmann::json &procedureJson);
