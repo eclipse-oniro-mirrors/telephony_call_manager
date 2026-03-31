@@ -498,7 +498,7 @@ void CallManagerHisysevent::ReportCallProcedureEventsInternal(const std::string 
     bool showBannerForIncomingCall = callAttribute.value("showBannerForIncomingCall", false);
     int32_t direction = callAttribute.value("direction", -1);
     int32_t appIndex = callAttribute.value("appIndex", -1);
-    const key *keysToRemove[] = {
+    const char *keysToRemove[] = {
         "bundleName", "voipCallType", "isConferenceCall", "showBannerForIncomingCall", "direction", "appIndex"};
     for (const char *key : keysToRemove) {
         callAttribute.erase(key);
