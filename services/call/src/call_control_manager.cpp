@@ -1993,11 +1993,12 @@ bool CallControlManager::HangUpOtherCall(int32_t answerCallId)
         answerCall->GetTelCallState() != TelCallState::CALL_STATUS_WAITING)) {
         return false;
     }
-    if (answerCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
+    auto answerCallType = answerCall->GetCallType();
+    if (answerCallType == CallType::TYPE_BLUETOOTH) {
         HangUpOtherCallByAnswerCallID(answerCallId);
         return false;
     }
-    if (answerCall->GetCallType() == CallType::TYPE_CS || answerCall->GetCallType() == CallType::TYPE_IMS) {
+    if (answerCallType == CallType::TYPE_CS || answerCallType == CallType::TYPE_IMS) {
         bool isSupportCallHold = false;
         OperatorConfig config;
         CoreServiceClient::GetInstance().GetOperatorConfigs(answerCall->GetSlotId(), config);
@@ -2023,7 +2024,8 @@ void CallControlManager::HangUpOtherCallByAnswerCallID(int32_t answerCallId, boo
     }
     std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
     for (const auto& call : allCallList) {
-        if (call->GetCallID() == answerCallId) {
+        int32_t callId = call->GetCallID();
+        if (callId == answerCallId) {
             continue;
         }
         TelCallState telCallState = call->GetTelCallState();
@@ -2031,20 +2033,20 @@ void CallControlManager::HangUpOtherCallByAnswerCallID(int32_t answerCallId, boo
             telCallState == TelCallState::CALL_STATUS_DIALING ||
             telCallState == TelCallState::CALL_STATUS_ALERTING ||
             telCallState == TelCallState::CALL_STATUS_HOLDING) {
-            TELEPHONY_LOGI("HangUpCall callid=%{public}d", call->GetCallID());
-            int32_t ret = HangUpCall(call->GetCallID());
+            TELEPHONY_LOGI("HangUpCall callid=%{public}d", callId);
+            int32_t ret = HangUpCall(callId);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("HangUpCall fail callid=%{public}d", call->GetCallID());
+                TELEPHONY_LOGE("HangUpCall fail callid=%{public}d", callId);
             }
         } else if (telCallState == TelCallState::CALL_STATUS_INCOMING ||
             telCallState == TelCallState::CALL_STATUS_WAITING) {
-            TELEPHONY_LOGI("RejectCall callid=%{public}d", call->GetCallID());
+            TELEPHONY_LOGI("RejectCall callid=%{public}d", callId);
             if (answerCall != nullptr && answerCall->GetAccountNumber() == call->GetAccountNumber()) {
                 continue;
             }
-            int32_t ret = RejectCall(call->GetCallID(), false, Str8ToStr16(""));
+            int32_t ret = RejectCall(callId, false, Str8ToStr16(""));
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("RejectCall fail callid=%{public}d", call->GetCallID());
+                TELEPHONY_LOGE("RejectCall fail callid=%{public}d", callId);
             }
         }
     }

@@ -2446,16 +2446,17 @@ void CallStatusManager::AnswerPendingCall()
         }
 #endif
         if (call->GetAutoAnswerState()) {
-            TELEPHONY_LOGI("Auto AnswerCall callid=%{public}d", call->GetCallID());
+            int32_t callId = call->GetCallID();
+            TELEPHONY_LOGI("Auto AnswerCall callid=%{public}d", callId);
             auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
             if (callControlManager == nullptr) {
                 return;
             }
             call->SetAutoAnswerState(false);
-            int32_t ret = callControlManager->AnswerCall(call->GetCallID(),
+            int32_t ret = callControlManager->AnswerCall(callId,
                 static_cast<int32_t>(call->GetVideoStateType()), isRtt);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("Auto AnswerCall failed callid=%{public}d", call->GetCallID());
+                TELEPHONY_LOGE("Auto AnswerCall failed callid=%{public}d", callId);
             }
             return;
         }
