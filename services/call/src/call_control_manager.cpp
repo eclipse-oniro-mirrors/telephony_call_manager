@@ -2001,8 +2001,8 @@ bool CallControlManager::HangUpOtherCall(int32_t answerCallId)
         bool isSupportCallHold = false;
         OperatorConfig config;
         CoreServiceClient::GetInstance().GetOperatorConfigs(answerCall->GetSlotId(), config);
-        if (config.boolValue.find("carrier_support_multi_calls_bool") != config.boolValue.end()) {
-            isSupportCallHold = config.boolValue["carrier_support_multi_calls_bool"];
+        if (config.boolValue.find("support_multi_calls_bool") != config.boolValue.end()) {
+            isSupportCallHold = config.boolValue["support_multi_calls_bool"];
         }
         if (!isSupportCallHold || CallObjectManager::HasBtCallWithDifferentNumber(answerCall->GetAccountNumber())) {
             HangUpOtherCallByAnswerCallID(answerCallId, true);
