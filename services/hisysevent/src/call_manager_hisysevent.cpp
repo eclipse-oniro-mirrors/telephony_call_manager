@@ -483,7 +483,8 @@ void CallManagerHisysevent::ReportCallProcedureEvents(const std::string &callId,
     json newProcedure = json::array();
     newProcedure = std::move(mergedProcedure);
     proceduresOfProceduresJson["P"] = newProcedure;
-    proceduresOfProceduresJson["cnt"] = proceduresOfProceduresJson.value("cnt", 0) + proceduresOfScenarioJson.value("cnt", 0);
+    proceduresOfProceduresJson["cnt"] = proceduresOfProceduresJson.value("cnt", 0) +
+        proceduresOfScenarioJson.value("cnt", 0);
     procedureJson["Procedures"] = proceduresOfProceduresJson;
     auto callAttribute = procedureJson["CallAttribute"];
     ReportCallProcedureEventsInternal(callId, callAttribute, procedureJson);
