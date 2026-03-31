@@ -457,23 +457,23 @@ void CallManagerHisysevent::ReportCallProcedureEvents(const std::string &callId,
     if (!scenarioJson.contains("Procedures")) {
         scenarioJson["Procedures"] = json::object();
     }
-    auto proceduresc = scenarioJson["Procedures"];
-    auto pc = proceduresc["P"];
+    auto proceduresOfScenarioJson = scenarioJson["Procedures"];
     auto procedureJson = json::parse(procedureJsonStr.c_str(), nullptr, false);
     if (procedureJson.is_discarded() || !procedureJson.contains("Procedures")) {
         TELEPHONY_LOGE("procedureJson value is null.");
         return;
     }
-    auto procedures = procedureJson["Procedures"];
-    if (procedures.contains("P") || !proceduresc.contains("P")) {
+    auto proceduresOfProceduresJson = procedureJson["Procedures"];
+    if (proceduresOfProceduresJson).contains("P") || !proceduresOfScenarioJson.contains("P")) {
         TELEPHONY_LOGE("procedures do not contain P");
         return;
     }
-    if (!procedures["P"].is_array() || !proceduresc["P"].is_array()) {
+    if (!proceduresOfProceduresJson["P"].is_array() || !proceduresOfScenarioJson["P"].is_array()) {
         TELEPHONY_LOGE("procedures do not contain P of the array type!");
         return;
     }
-    auto p = procedures["P"];
+    auto p = proceduresOfProceduresJson["P"];
+    auto pc = proceduresOfScenarioJson["P"];
     std::vector<json> mergedProcedure;
     mergedProcedure.insert(mergedProcedure.end(), p.begin(), p.end());
     mergedProcedure.insert(mergedProcedure.end(), pc.begin(), pc.end());
@@ -482,9 +482,9 @@ void CallManagerHisysevent::ReportCallProcedureEvents(const std::string &callId,
     });
     json newProcedure = json::array();
     newProcedure = std::move(mergedProcedure);
-    procedures["P"] = newProcedure;
-    procedures["cnt"] = procedures.value("cnt", 0) + proceduresc.value("cnt", 0);
-    procedureJson["Procedures"] = procedures;
+    proceduresOfProceduresJson["P"] = newProcedure;
+    proceduresOfProceduresJson["cnt"] = proceduresOfProceduresJson.value("cnt", 0) + proceduresOfScenarioJson.value("cnt", 0);
+    procedureJson["Procedures"] = proceduresOfProceduresJson;
     auto callAttribute = procedureJson["CallAttribute"];
     ReportCallProcedureEventsInternal(callId, callAttribute, procedureJson);
 }
