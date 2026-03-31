@@ -167,11 +167,8 @@ public:
     void ClearFlashReminder();
     bool SetVirtualCall(bool isVirtual);
 #ifdef NOT_SUPPORT_MULTICALL
-    bool HangUpFirstCallBtAndESIM(int32_t secondCallId);
-    bool HangUpFirstCallBtCall(int32_t secondCallId);
-    bool HangUpFirstCallESIMCall(int32_t secondCallId);
-    bool HangUpFirstCall(int32_t secondCallId);
-    void HangUpFirstCallBySecondCallID(int32_t secondCallId, bool secondAutoAnswer = false);
+    bool HangUpOtherCall(int32_t answerCallId);
+    void HangUpOtherCallByAnswerCallID(int32_t answerCallId, bool autoAnswerState = false);
 #endif
     bool IsNotWearOnWrist();
     void SetWearState(int32_t state);

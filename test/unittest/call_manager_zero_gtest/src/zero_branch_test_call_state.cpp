@@ -361,7 +361,9 @@ HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_001, TestSize.Level0)
     std::string deviceName = "";
     audioDeviceManager->UpdateBtDevice(address, deviceName);
     audioDeviceManager->UpdateNearlinkDevice(address, deviceName);
+#ifdef SUPPORT_HEARING_AID
     audioDeviceManager->UpdateBtHearingAidDevice(address, deviceName);
+#endif
     audioDeviceManager->ProcessEvent(AudioEvent::WIRED_HEADSET_DISCONNECTED);
     audioDeviceManager->EnableBtSco();
     audioDeviceManager->GetCurrentAudioDevice();

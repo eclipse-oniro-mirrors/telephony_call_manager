@@ -103,10 +103,7 @@ public:
     static bool IsNeedSilentInDoNotDisturbMode();
     static bool IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath);
 #ifdef NOT_SUPPORT_MULTICALL
-    static bool IsTwoCallBtCallAndESIM();
-    static bool IsTwoCallBtCall();
-    static bool IsTwoCallESIMCall();
-    static bool IsOneNumberDualTerminal();
+    static bool HasBtCallWithDifferentNumber(const std::string &accountNumber);
 #endif
 protected:
     static ffrt::condition_variable cv_;

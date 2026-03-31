@@ -588,13 +588,14 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_005, Function | MediumTest
 {
 #ifdef NOT_SUPPORT_MULTICALL
     DialParaInfo mDialParaInfo;
-    sptr<CallBase> csCall = new CSCall(mDialParaInfo);
-    csCall->callId_ = 0;
-    csCall->SetCallIndex(0);
-    csCall->SetSlotId(0);
-    csCall->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
-    csCall->SetCallType(CallType::TYPE_CS);
-    CallObjectManager::AddOneCallObject(csCall);
+    sptr<CallBase> btCall = new BluetoothCall(mDialParaInfo, "");
+    btCall->callId_ = 0;
+    btCall->SetCallIndex(0);
+    btCall->SetSlotId(0);
+    btCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    btCall->SetCallType(CallType::TYPE_BLUETOOTH);
+    btCall->SetAccountNumber("111");
+    CallObjectManager::AddOneCallObject(btCall);
     DialParaInfo dialInfo;
     sptr<CallBase> call = new IMSCall(dialInfo);
     call->callId_ = 1;
@@ -602,8 +603,9 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_005, Function | MediumTest
     call->SetSlotId(0);
     call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
     call->SetCallType(CallType::TYPE_IMS);
+    call->SetAccountNumber("222");
     CallObjectManager::AddOneCallObject(call);
-    ASSERT_TRUE(CallObjectManager::IsTwoCallESIMCall());
+    ASSERT_TRUE(CallObjectManager::HasBtCallWithDifferentNumber("222"));
 #endif
 }
 
