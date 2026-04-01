@@ -465,7 +465,6 @@ void CallManagerHisysevent::ReportCallProcedureEvents(const std::string &callId,
         return;
     }
     auto proceduresOfProceduresJson = procedureJson["Procedures"];
-    // P:
     if (proceduresOfProceduresJson.contains("P") || !proceduresOfScenarioJson.contains("P")) {
         TELEPHONY_LOGE("procedures do not contain P");
         return;
