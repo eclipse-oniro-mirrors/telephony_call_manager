@@ -406,10 +406,11 @@ bool CallManagerHisysevent::GetVoipProcedureCallInfo(const std::string &callId, 
 void CallManagerHisysevent::RecordVoipProcedure(
     const std::string &callId, const VoipProcedureEvent voipProcedureEvent, const int32_t ScenarioDetailCode)
 {
+    // E is ScenarioEvent,D is ScenarioDetailCode,T is HappenTime,P is procedure
     json behaviorDottingJson;
     behaviorDottingJson["E"] = voipProcedureEvent;
-    behaviorDottingJson["D"] = voipProcedureEvent;
-    behaviorDottingJson["E"] =
+    behaviorDottingJson["D"] = ScenarioDetailCode;
+    behaviorDottingJson["T"] =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
         .count();
     json scenarioJson;
@@ -464,6 +465,7 @@ void CallManagerHisysevent::ReportCallProcedureEvents(const std::string &callId,
         return;
     }
     auto proceduresOfProceduresJson = procedureJson["Procedures"];
+    // P:
     if (proceduresOfProceduresJson.contains("P") || !proceduresOfScenarioJson.contains("P")) {
         TELEPHONY_LOGE("procedures do not contain P");
         return;
