@@ -382,7 +382,7 @@ void CallManagerHisysevent::GetAppIndexByBundleName(std::string &bundleName, int
     bundleMgr->GetNameAndIndexForUid(uid, bundleName, appIndex);
 }
 
-void CallManagerHisysevent::AddVoipProcedureCallInfo(const std::string &callId, nlohmann::json scenarioJson)
+void CallManagerHisysevent::UpdateVoipProcedureCallInfo(const std::string &callId, nlohmann::json scenarioJson)
 {
     std::lock_guard<ffrt::shared_mutex> lock(voipProcedureCallInfoLock_);
     voipProcedureCallInfo_[callId] = scenarioJson;
@@ -406,10 +406,11 @@ bool CallManagerHisysevent::GetVoipProcedureCallInfo(const std::string &callId, 
 void CallManagerHisysevent::RecordVoipProcedure(
     const std::string &callId, const VoipProcedureEvent voipProcedureEvent, const int32_t ScenarioDetailCode)
 {
+    // E is ScenarioEvent,D is ScenarioDetailCode,T is HappenTime,P is procedure
     json behaviorDottingJson;
     behaviorDottingJson["E"] = voipProcedureEvent;
-    behaviorDottingJson["D"] = voipProcedureEvent;
-    behaviorDottingJson["E"] =
+    behaviorDottingJson["D"] = ScenarioDetailCode;
+    behaviorDottingJson["T"] =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
         .count();
     json scenarioJson;
@@ -423,7 +424,7 @@ void CallManagerHisysevent::RecordVoipProcedure(
             TELEPHONY_LOGE("procedures invalid.");
             return;
         }
-        AddVoipProcedureCallInfo(callId, scenarioJson);
+        UpdateVoipProcedureCallInfo(callId, scenarioJson);
     } else {
         json procedures;
         procedures["cnt"] = 1;
@@ -431,7 +432,7 @@ void CallManagerHisysevent::RecordVoipProcedure(
         p.push_back(behaviorDottingJson);
         procedures["P"] = p;
         scenarioJson["Procedures"] = procedures;
-        AddVoipProcedureCallInfo(callId, scenarioJson);
+        UpdateVoipProcedureCallInfo(callId, scenarioJson);
     }
 }
 
@@ -457,19 +458,23 @@ void CallManagerHisysevent::ReportCallProcedureEvents(const std::string &callId,
     if (!scenarioJson.contains("Procedures")) {
         scenarioJson["Procedures"] = json::object();
     }
-    auto proceduresc = scenarioJson["Procedures"];
-    auto pc = proceduresc["P"];
+    auto proceduresOfScenarioJson = scenarioJson["Procedures"];
     auto procedureJson = json::parse(procedureJsonStr.c_str(), nullptr, false);
-    if (procedureJson.is_null()) {
+    if (procedureJson.is_discarded() || !procedureJson.contains("Procedures")) {
         TELEPHONY_LOGE("procedureJson value is null.");
         return;
     }
-    auto procedures = procedureJson["Procedures"];
-    if (!procedures["P"].is_array() || !proceduresc["P"].is_array()) {
+    auto proceduresOfProceduresJson = procedureJson["Procedures"];
+    if (proceduresOfProceduresJson.contains("P") || !proceduresOfScenarioJson.contains("P")) {
+        TELEPHONY_LOGE("procedures do not contain P");
+        return;
+    }
+    if (!proceduresOfProceduresJson["P"].is_array() || !proceduresOfScenarioJson["P"].is_array()) {
         TELEPHONY_LOGE("procedures do not contain P of the array type!");
         return;
     }
-    auto p = procedures["P"];
+    auto p = proceduresOfProceduresJson["P"];
+    auto pc = proceduresOfScenarioJson["P"];
     std::vector<json> mergedProcedure;
     mergedProcedure.insert(mergedProcedure.end(), p.begin(), p.end());
     mergedProcedure.insert(mergedProcedure.end(), pc.begin(), pc.end());
@@ -478,9 +483,10 @@ void CallManagerHisysevent::ReportCallProcedureEvents(const std::string &callId,
     });
     json newProcedure = json::array();
     newProcedure = std::move(mergedProcedure);
-    procedures["P"] = newProcedure;
-    procedures["cnt"] = procedures.value("cnt", 0) + proceduresc.value("cnt", 0);
-    procedureJson["Procedures"] = procedures;
+    proceduresOfProceduresJson["P"] = newProcedure;
+    proceduresOfProceduresJson["cnt"] = proceduresOfProceduresJson.value("cnt", 0) +
+        proceduresOfScenarioJson.value("cnt", 0);
+    procedureJson["Procedures"] = proceduresOfProceduresJson;
     auto callAttribute = procedureJson["CallAttribute"];
     ReportCallProcedureEventsInternal(callId, callAttribute, procedureJson);
 }
@@ -494,18 +500,20 @@ void CallManagerHisysevent::ReportCallProcedureEventsInternal(const std::string 
     bool showBannerForIncomingCall = callAttribute.value("showBannerForIncomingCall", false);
     int32_t direction = callAttribute.value("direction", -1);
     int32_t appIndex = callAttribute.value("appIndex", -1);
-    callAttribute.erase("bundleName");
-    callAttribute.erase("voipCallType");
-    callAttribute.erase("isConferenceCall");
-    callAttribute.erase("showBannerForIncomingCall");
-    callAttribute.erase("direction");
-    callAttribute.erase("appIndex");
+    const char *keysToRemove[] = {
+        "bundleName", "voipCallType", "isConferenceCall", "showBannerForIncomingCall", "direction", "appIndex"};
+    for (const char *key : keysToRemove) {
+        callAttribute.erase(key);
+    }
     procedureJson["CallAttribute"] = callAttribute;
-    time_t beginTime;
-    if (procedureJson["Procedures"]["P"] != 0) {
-        beginTime = procedureJson["Procedures"]["P"][0]["T"];
-    } else {
-        beginTime = -1;
+    time_t beginTime = -1;
+    const auto &procedures = procedureJson.value("Procedures", nlohmann::json::object());
+    const auto &pArray = procedures.value("P", nlohmann::json::array());
+    if (!pArray.empty() && pArray[0].is_object()) {
+        const auto &firstP = pArray[0];
+        if (firstP.contains("T") && firstP["T"].is_number_integer()) {
+            beginTime = firstP["T"].get<int>();
+        }
     }
     HiSysEventWrite(DOMAIN_NAME, "VOIP_CALL_PERFORMANCE", EventType::FAULT, CALL_ID_KEY, callId, "BUNDLE_NAME",
         bundleName, "APP_INDEX", appIndex, "PROCEDURE_FAULTS", procedureJson.dump(), "CALL_DIRECTION", direction,
