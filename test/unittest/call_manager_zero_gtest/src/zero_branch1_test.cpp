@@ -14,6 +14,7 @@
  */
 #define private public
 #define protected public
+#include "bluetooth_call.h"
 #include "bluetooth_call_client.h"
 #include "bluetooth_call_manager.h"
 #include "bluetooth_call_service.h"
