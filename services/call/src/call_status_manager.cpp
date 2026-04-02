@@ -1279,7 +1279,12 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     call->ExitConference();
     TelCallState priorState = call->GetTelCallState();
     UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
-    MyLocationEngine::StopEccService(call->GetCallID());
+    int32_t callId = call->GetCallID();
+    MyLocationEngine::StopEccService(callId);
+    if (needWaitHold_ && GetCallNum(TelCallState::CALL_STATUS_ACTIVE) == 0) {
+        needWaitHold_ = false;
+        HandleDialWhenHolding(callId, call);
+    }
     HandleHoldCallOrAutoAnswerCall(call, callIdList, previousState, priorState);
     std::vector<sptr<CallBase>> conferenceCallList = GetConferenceCallList(call->GetSlotId());
     if (conferenceCallList.size() == 1) {

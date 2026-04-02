@@ -383,6 +383,9 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_005, Function | MediumTes
     callDetailInfo.voiceDomain = static_cast<int32_t>(imsCall->GetCallType());
     std::shared_ptr<CallStatusManager> callStatusManagerPtr = std::make_shared<CallStatusManager>();
     callStatusManagerPtr->DisconnectedHandle(callDetailInfo);
+    callStatusManagerPtr->needWaitHold_ = true;
+    CallObjectManager::AddOneCallObject(imsCall);
+    EXPECT_EQ(callStatusManagerPtr->DisconnectedHandle(callDetailInfo), TELEPHONY_SUCCESS);
     EXPECT_FALSE(CallObjectManager::HasCellularCallExist());
 }
 
