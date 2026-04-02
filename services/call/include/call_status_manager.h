@@ -164,7 +164,7 @@ private:
 #endif
 
 #ifdef NOT_SUPPORT_MULTICALL
-    void AutoAnswerSecondCall();
+    void AnswerPendingCall();
 #endif
     bool IsFromTheSameNumberAtTheSameTime(const sptr<CallBase> &newCall);
     void ModifyEsimType();

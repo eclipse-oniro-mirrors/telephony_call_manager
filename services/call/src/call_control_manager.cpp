@@ -55,7 +55,9 @@
 #ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
 #endif
-
+#ifdef NOT_SUPPORT_MULTICALL
+#include "core_service_client.h"
+#endif
 namespace OHOS {
 namespace Telephony {
 bool CallControlManager::alarmSeted = false;
@@ -250,7 +252,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState, bool 
 {
     StopFlashRemind();
 #ifdef NOT_SUPPORT_MULTICALL
-    if (HangUpFirstCall(callId)) {
+    if (HangUpOtherCall(callId)) {
         return TELEPHONY_SUCCESS;
     }
 #endif
@@ -1981,80 +1983,72 @@ bool CallControlManager::onButtonDealing(HeadsetButtonService::ButtonEvent type)
 }
 #endif
 #ifdef NOT_SUPPORT_MULTICALL
-bool CallControlManager::HangUpFirstCallBtAndESIM(int32_t secondCallId)
+bool CallControlManager::HangUpOtherCall(int32_t answerCallId)
 {
-    if (!CallObjectManager::IsTwoCallBtCallAndESIM()) {
+    if (CallObjectManager::GetCurrentCallNum() <= 1) { // only one current call
         return false;
     }
-    HangUpFirstCallBySecondCallID(secondCallId, true);
-    return true;
-}
-
-bool CallControlManager::HangUpFirstCallBtCall(int32_t secondCallId)
-{
-    if (!CallObjectManager::IsTwoCallBtCall()) {
+    sptr<CallBase> answerCall = CallObjectManager::GetOneCallObject(answerCallId);
+    if (answerCall == nullptr || (answerCall->GetTelCallState() != TelCallState::CALL_STATUS_INCOMING &&
+        answerCall->GetTelCallState() != TelCallState::CALL_STATUS_WAITING)) {
         return false;
     }
-    HangUpFirstCallBySecondCallID(secondCallId);
-    return true;
-}
-
-bool CallControlManager::HangUpFirstCallESIMCall(int32_t secondCallId)
-{
-    if (!CallObjectManager::IsTwoCallESIMCall()) {
+    auto answerCallType = answerCall->GetCallType();
+    if (answerCallType == CallType::TYPE_BLUETOOTH) {
+        HangUpOtherCallByAnswerCallID(answerCallId);
         return false;
     }
-    HangUpFirstCallBySecondCallID(secondCallId, true);
-    return true;
-}
-
-bool CallControlManager::HangUpFirstCall(int32_t secondCallId)
-{
-    if (CallObjectManager::IsTwoCallBtCallAndESIM()) {
-        return HangUpFirstCallBtAndESIM(secondCallId);
-    } else if (CallObjectManager::IsTwoCallBtCall()) {
-        HangUpFirstCallBtCall(secondCallId);
-    } else if (CallObjectManager::IsTwoCallESIMCall()) {
-        return HangUpFirstCallESIMCall(secondCallId);
+    if (answerCallType == CallType::TYPE_CS || answerCallType == CallType::TYPE_IMS) {
+        bool isSupportCallHold = false;
+        OperatorConfig config;
+        CoreServiceClient::GetInstance().GetOperatorConfigs(answerCall->GetSlotId(), config);
+        if (config.boolValue.find("support_multi_calls_bool") != config.boolValue.end()) {
+            isSupportCallHold = config.boolValue["support_multi_calls_bool"];
+        }
+        if (!isSupportCallHold || CallObjectManager::HasBtCallWithDifferentNumber(answerCall->GetAccountNumber())) {
+            HangUpOtherCallByAnswerCallID(answerCallId, true);
+            return true;
+        }
     }
     return false;
 }
 
-void CallControlManager::HangUpFirstCallBySecondCallID(int32_t secondCallId, bool secondAutoAnswer)
+void CallControlManager::HangUpOtherCallByAnswerCallID(int32_t answerCallId, bool autoAnswerState)
 {
-    sptr<CallBase> answerCall = CallObjectManager::GetOneCallObject(secondCallId);
+    sptr<CallBase> answerCall = CallObjectManager::GetOneCallObject(answerCallId);
     if (answerCall != nullptr &&
         (answerCall->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
         answerCall->GetTelCallState() == TelCallState::CALL_STATUS_WAITING)) {
-        TELEPHONY_LOGI("AutoAnswerCall second callid=%{public}d", secondCallId);
-        answerCall->SetAutoAnswerState(secondAutoAnswer);
+        TELEPHONY_LOGI("AutoAnswerCall callid=%{public}d", answerCallId);
+        answerCall->SetAutoAnswerState(autoAnswerState);
     }
     std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
-    for (auto call : allCallList) {
-        if (call->GetCallID() == secondCallId) {
+    for (const auto& call : allCallList) {
+        int32_t callId = call->GetCallID();
+        if (callId == answerCallId) {
             continue;
         }
         TelCallState telCallState = call->GetTelCallState();
         if (telCallState == TelCallState::CALL_STATUS_ACTIVE ||
             telCallState == TelCallState::CALL_STATUS_DIALING ||
-            telCallState == TelCallState::CALL_STATUS_ALERTING) {
-            TELEPHONY_LOGI("first call HangUpCall callid=%{public}d", call->GetCallID());
-            int32_t ret = HangUpCall(call->GetCallID());
+            telCallState == TelCallState::CALL_STATUS_ALERTING ||
+            telCallState == TelCallState::CALL_STATUS_HOLDING) {
+            TELEPHONY_LOGI("HangUpCall callid=%{public}d", callId);
+            int32_t ret = HangUpCall(callId);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("first call HangUpCall fail callid=%{public}d", call->GetCallID());
+                TELEPHONY_LOGE("HangUpCall fail callid=%{public}d", callId);
             }
         } else if (telCallState == TelCallState::CALL_STATUS_INCOMING ||
             telCallState == TelCallState::CALL_STATUS_WAITING) {
-            TELEPHONY_LOGI("first call RejectCall callid=%{public}d", call->GetCallID());
+            TELEPHONY_LOGI("RejectCall callid=%{public}d", callId);
             if (answerCall != nullptr && answerCall->GetAccountNumber() == call->GetAccountNumber()) {
-                break;
+                continue;
             }
-            int32_t ret = RejectCall(call->GetCallID(), false, Str8ToStr16(""));
+            int32_t ret = RejectCall(callId, false, Str8ToStr16(""));
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("first call RejectCall fail callid=%{public}d", call->GetCallID());
+                TELEPHONY_LOGE("RejectCall fail callid=%{public}d", callId);
             }
         }
-        break;
     }
 }
 #endif

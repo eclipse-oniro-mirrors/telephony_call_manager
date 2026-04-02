@@ -1315,6 +1315,37 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_012, Function | MediumTes
 }
 
 /**
+ * @tc.number   Telephony_CallControlManager_013
+ * @tc.name     test CallControlManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_013, Function | MediumTest | Level1)
+{
+#ifdef NOT_SUPPORT_MULTICALL
+    CallObjectManager::callObjectPtrList_.clear();
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    DialParaInfo mDialParaInfo;
+    sptr<CallBase> call = new IMSCall(mDialParaInfo);
+    call->callId_ = 0;
+    call->SetCallIndex(0);
+    call->SetSlotId(0);
+    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    call->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::callObjectPtrList_.push_back(call);
+    ASSERT_FALSE(callControlManager->HangUpOtherCall(0));
+    DialParaInfo dialInfo;
+    sptr<CallBase> incomingCall = new IMSCall(dialInfo);
+    incomingCall->callId_ = 1;
+    incomingCall->SetCallIndex(1);
+    incomingCall->SetSlotId(0);
+    incomingCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    incomingCall->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::callObjectPtrList_.push_back(incomingCall);
+    ASSERT_TRUE(callControlManager->HangUpOtherCall(1));
+#endif
+}
+
+/**
  * @tc.number   Telephony_CallStatusManager_016
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1968,7 +1999,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_018, TestSize.Level0)
     imsCallActive->autoAnswerState_ = false;
     CallObjectManager::callObjectPtrList_.clear();
     CallObjectManager::AddOneCallObject(imsCallActive);
-    EXPECT_NO_THROW(callStatusManager->AutoAnswerSecondCall());
+    EXPECT_NO_THROW(callStatusManager->AnswerPendingCall());
 
     info.state = TelCallState::CALL_STATUS_INCOMING;
     info.callType = CallType::TYPE_IMS;
@@ -1977,10 +2008,10 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_018, TestSize.Level0)
     imsCallIncoming->autoAnswerState_ = false;
     CallObjectManager::callObjectPtrList_.clear();
     CallObjectManager::AddOneCallObject(imsCallIncoming);
-    EXPECT_NO_THROW(callStatusManager->AutoAnswerSecondCall());
+    EXPECT_NO_THROW(callStatusManager->AnswerPendingCall());
 
     imsCallIncoming->autoAnswerState_ = true;
-    EXPECT_NO_THROW(callStatusManager->AutoAnswerSecondCall());
+    EXPECT_NO_THROW(callStatusManager->AnswerPendingCall());
 }
 #endif
 #endif

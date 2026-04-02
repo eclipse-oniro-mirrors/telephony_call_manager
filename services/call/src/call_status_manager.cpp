@@ -1269,10 +1269,6 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         DelayedSingleton<CallControlManager>::GetInstance()->AcquireDisconnectedLock();
     }
     StopAntiFraudDetect(call, info);
-#ifdef NOT_SUPPORT_MULTICALL
-    bool isTwoCallBtCallAndESIM = CallObjectManager::IsTwoCallBtCallAndESIM();
-    bool IsTwoCallESIMCall = CallObjectManager::IsTwoCallESIMCall();
-#endif
     call = RefreshCallIfNecessary(call, info);
     RefreshCallDisconnectReason(call, static_cast<int32_t>(info.reason), info.message);
     ClearPendingState(call);
@@ -1295,18 +1291,17 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
             UpdateCallState(leftOneConferenceCall, leftOneConferenceCall->GetTelCallState());
         }
     }
+    auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    auto callSuperPrivacyControlManager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
+    if (callControlManager == nullptr || callSuperPrivacyControlManager == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     if (CallObjectManager::GetCurrentCallNum() <= 0) {
-        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RestoreSuperPrivacyMode();
-        DelayedSingleton<CallControlManager>::GetInstance()->SetReduceRingToneVolume(false);
+        callSuperPrivacyControlManager->RestoreSuperPrivacyMode();
+        callControlManager->SetReduceRingToneVolume(false);
     }
-#ifdef NOT_SUPPORT_MULTICALL
-    if (isTwoCallBtCallAndESIM || IsTwoCallESIMCall) {
-        TELEPHONY_LOGI("Auto AnswerCall");
-        AutoAnswerSecondCall();
-    }
-#endif
     StopCallMotionRecognition(TelCallState::CALL_STATUS_DISCONNECTED);
-    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
+    callControlManager->StopFlashRemind();
     return TELEPHONY_SUCCESS;
 }
 
@@ -1373,6 +1368,9 @@ void CallStatusManager::HandleHoldCallOrAutoAnswerCall(const sptr<CallBase> call
     }
     DeleteOneCallObject(call->GetCallID());
     TELEPHONY_LOGI("Ready to uninitialized RttManager when HandleHoldCallOrAutoAnswerCall");
+#ifdef NOT_SUPPORT_MULTICALL
+    AnswerPendingCall();
+#else
     int32_t dsdsMode = DSDS_MODE_V2;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
     if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
@@ -1387,6 +1385,7 @@ void CallStatusManager::HandleHoldCallOrAutoAnswerCall(const sptr<CallBase> call
     if (dsdsMode == DSDS_MODE_V3) {
         AutoAnswer(activeCallNum, waitingCallNum);
     }
+#endif
 }
 
 bool CallStatusManager::AutoAnswerVideoCallForNotDsda(const sptr<CallBase> disconnectedCall, int32_t activeCallNum)
@@ -2430,8 +2429,9 @@ void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, 
     }
 }
 #ifdef NOT_SUPPORT_MULTICALL
-void CallStatusManager::AutoAnswerSecondCall()
+void CallStatusManager::AnswerPendingCall()
 {
+    TELEPHONY_LOGI("AnswerPendingCall");
     std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
     for (auto call : allCallList) {
         if (call->GetTelCallState() != TelCallState::CALL_STATUS_INCOMING &&
@@ -2446,11 +2446,17 @@ void CallStatusManager::AutoAnswerSecondCall()
         }
 #endif
         if (call->GetAutoAnswerState()) {
-            TELEPHONY_LOGI("Auto AnswerCall callid=%{public}d", call->GetCallID());
-            int ret = DelayedSingleton<CallControlManager>::GetInstance()->AnswerCall(call->GetCallID(),
+            int32_t callId = call->GetCallID();
+            TELEPHONY_LOGI("Auto AnswerCall callid=%{public}d", callId);
+            auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+            if (callControlManager == nullptr) {
+                return;
+            }
+            call->SetAutoAnswerState(false);
+            int32_t ret = callControlManager->AnswerCall(callId,
                 static_cast<int32_t>(call->GetVideoStateType()), isRtt);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("Auto AnswerCall failed callid=%{public}d", call->GetCallID());
+                TELEPHONY_LOGE("Auto AnswerCall failed callid=%{public}d", callId);
             }
             return;
         }
