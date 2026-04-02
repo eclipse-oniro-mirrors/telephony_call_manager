@@ -1686,7 +1686,7 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
     if (eventName == "EVENT_IS_CELIA_CALL") {
         return dealCeliaCallEvent(callId);
     } else if (eventName == "EVENT_SPEAKER_OFF") {
-        if (!DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(false)) {
+        if (!DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(false, true)) {
             return TELEPHONY_ERR_FAIL;
         }
     } else if (eventName == "DISPLAY_SPECIFIED_CALL_PAGE_BY_CALL_ID") {
