@@ -340,7 +340,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     callStatusManager->RegisterObserver();
-    EXPECT_EQ(helper->RegisterToDataShare(uri, oobeStatusObserver_), true);
+    ASSERT_EQ(helper->RegisterToDataShare(uri, oobeStatusObserver_), true);
     oobeStatusObserver_->OnChange();
     callStatusManager->deviceProvisioned_ = -1;
     callStatusManager->UpdateDevProvisioned();

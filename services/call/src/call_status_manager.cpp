@@ -2686,6 +2686,10 @@ int32_t CallStatusManager::GetDevProvisioned()
 void CallStatusManager::UpdateDevProvisioned()
 {
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
+    if (datashareHelper == nullptr) {
+        TELEPHONY_LOGE("datashareHelper is null");
+        return;
+    }
     std::string deviceProvisioned {"0"};
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned");
