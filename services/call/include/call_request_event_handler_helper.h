@@ -44,7 +44,7 @@ private:
     bool pendingHangup_ = false;
     int32_t pendingMoCallId_ = -1;
     int32_t pendingHangupCallId_ = -1;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
