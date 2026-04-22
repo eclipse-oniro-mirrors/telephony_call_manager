@@ -53,7 +53,7 @@ public:
 
 protected:
     wptr<NetCallBase> call_;
-    ffrt::mutex updateStatusMutex_;
+    ffrt::shared_mutex updateStatusMutex_;
     VideoUpdateStatus updateStatus_;
 };
 

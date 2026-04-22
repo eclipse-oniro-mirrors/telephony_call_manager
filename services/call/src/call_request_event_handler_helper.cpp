@@ -64,7 +64,7 @@ void CallRequestEventHandlerHelper::RemoveEventHandlerTask()
 
 void CallRequestEventHandlerHelper::RestoreDialingFlag(bool isDialingCallProcessing)
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
+    std::lock_guard<ffrt::shared_mutex> lock(mutex_);
     if (isDialingCallProcessing != isDialingCallProcessing_) {
         isDialingCallProcessing_ = isDialingCallProcessing;
     }
@@ -73,26 +73,26 @@ void CallRequestEventHandlerHelper::RestoreDialingFlag(bool isDialingCallProcess
 
 bool CallRequestEventHandlerHelper::IsDialingCallProcessing()
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
+    std::shared_lock<ffrt::shared_mutex> lock(mutex_);
     return isDialingCallProcessing_;
 }
 
 void CallRequestEventHandlerHelper::SetPendingMo(bool pendingMo, int32_t callId)
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
+    std::lock_guard<ffrt::shared_mutex> lock(mutex_);
     pendingMo_ = pendingMo;
     pendingMoCallId_ = callId;
 }
 
 bool CallRequestEventHandlerHelper::HasPendingMo(int32_t callId)
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
+    std::shared_lock<ffrt::shared_mutex> lock(mutex_);
     return pendingMo_ && (pendingMoCallId_ == callId);
 }
 
 bool CallRequestEventHandlerHelper::IsPendingHangup()
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
+    std::shared_lock<ffrt::shared_mutex> lock(mutex_);
     if (pendingHangupCallId_ != -1) {
         return pendingHangup_;
     }
@@ -101,7 +101,7 @@ bool CallRequestEventHandlerHelper::IsPendingHangup()
 
 int32_t CallRequestEventHandlerHelper::GetPendingHangupCallId()
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
+    std::shared_lock<ffrt::shared_mutex> lock(mutex_);
     if (pendingHangup_) {
         return pendingHangupCallId_;
     }
@@ -110,14 +110,14 @@ int32_t CallRequestEventHandlerHelper::GetPendingHangupCallId()
 
 void CallRequestEventHandlerHelper::SetPendingHangup(bool pendingHangup, int32_t callId)
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
+    std::lock_guard<ffrt::shared_mutex> lock(mutex_);
     pendingHangup_ = pendingHangup;
     pendingHangupCallId_ = callId;
 }
 
 bool CallRequestEventHandlerHelper::HasPendingHangup(int32_t callId)
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
+    std::shared_lock<ffrt::shared_mutex> lock(mutex_);
     return pendingHangup_ && (pendingHangupCallId_ == callId);
 }
 
