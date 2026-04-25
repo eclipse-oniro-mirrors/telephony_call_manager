@@ -262,7 +262,6 @@ void IncomingFlashReminder::ReleaseDepsAdapter()
 {
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
     if (libAdapterHandler_ == nullptr) {
-        TELEPHONY_LOGE("deps adapter is nullptr");
         return;
     }
     FreeCameraFunc freeCameraFunc = reinterpret_cast<FreeCameraFunc>(dlsym(libAdapterHandler_, "FreeCamera"));
