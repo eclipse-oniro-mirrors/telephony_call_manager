@@ -10,3 +10,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+ohos_shared_library("tel_cm_deps_adapter_test_mock") {
+  output_dir = "${target_out_dir}/mock_libs"
+  install_enable = false
+  testonly = true
+
+  sources = [ "mock_deps_adapter.cpp" ]
+
+  cflags = [ "-fPIC" ]
+  cflags_cc = [ "-fPIC" ]
+
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+}

@@ -469,20 +469,6 @@ ohos_unittest("tel_call_manager_zero10_gtest") {
   defines += call_manager_defines
 }
 
-ohos_shared_library("tel_cm_deps_adapter_test_mock") {
-  output_dir = "${target_out_dir}/mock_libs"
-  install_enable = false
-  testonly = true
-
-  sources = [ "src/mock_deps_adapter.cpp" ]
-
-  cflags = [ "-fPIC" ]
-  cflags_cc = [ "-fPIC" ]
-
-  subsystem_name = "telephony"
-  part_name = "call_manager"
-}
-
 ohos_unittest("tel_call_manager_zero_incoming_flash_reminder_test") {
   install_enable = true
   subsystem_name = "telephony"
@@ -500,7 +486,7 @@ ohos_unittest("tel_call_manager_zero_incoming_flash_reminder_test") {
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
     "${CALL_MANAGER_PATH}/utils/src/incoming_flash_reminder.cpp",
-    "src/mock_deps_adapter.cpp",
+    "${CALL_MANAGER_PATH}/test/mock/mock_deps_adapter.cpp",
     "src/zero_branch_incoming_flash_reminder_test.cpp",
   ]
   sources += call_manager_sources
