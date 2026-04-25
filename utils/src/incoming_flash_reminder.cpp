@@ -190,7 +190,7 @@ void IncomingFlashReminder::HandleStartFlashRemind()
     }
     if (!IsFlashRemindNecessary()) {
         TELEPHONY_LOGE("no need to StartFlashRemind");
-        HandleEndFlashRemind();
+        ReleaseDepsAdapter();
         return;
     }
 #endif
@@ -250,7 +250,7 @@ void IncomingFlashReminder::HandleStopFlashRemind()
     }
 
     int32_t result = static_cast<int32_t>(setTorchMode(static_cast<int>(TelTorchMode::TORCH_MODE_OFF)));
-    HandleEndFlashRemind();
+    ReleaseDepsAdapter();
 #endif
     isFlashRemindUsed_ = false;
     if (stopFlashRemindDone_ != nullptr) {
@@ -258,7 +258,7 @@ void IncomingFlashReminder::HandleStopFlashRemind()
     }
 }
 
-void IncomingFlashReminder::HandleEndFlashRemind()
+void IncomingFlashReminder::ReleaseDepsAdapter()
 {
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
     if (libAdapterHandler_ == nullptr) {

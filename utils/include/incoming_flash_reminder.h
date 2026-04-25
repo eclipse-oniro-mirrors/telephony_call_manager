@@ -38,7 +38,7 @@ private:
     void HandleSetTorchMode();
     void HandleStopFlashRemind();
     void HandleStartFlashRemind();
-    void HandleEndFlashRemind();
+    void ReleaseDepsAdapter();
     bool isFlashRemindUsed_ = false;
     std::function<void()> stopFlashRemindDone_;
     void* libAdapterHandler_ = nullptr;
