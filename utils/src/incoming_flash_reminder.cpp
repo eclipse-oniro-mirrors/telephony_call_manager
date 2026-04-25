@@ -126,8 +126,8 @@ bool IncomingFlashReminder::IsTorchReady()
     if (isTorchSupported == nullptr || getTorchMode == nullptr) {
         return false;
     }
-    if (isTorchSupported() == false) {
-        TELEPHONY_LOGE("do not support torch");
+    if (!isTorchSupported()) {
+        TELEPHONY_LOGI("do not support torch");
         return false;
     }
     
@@ -250,7 +250,7 @@ void IncomingFlashReminder::HandleStopFlashRemind()
     }
 
     int32_t result = static_cast<int32_t>(setTorchMode(static_cast<int>(TelTorchMode::TORCH_MODE_OFF)));
-    HandleEndFlashRemind()
+    HandleEndFlashRemind();
 #endif
     isFlashRemindUsed_ = false;
     if (stopFlashRemindDone_ != nullptr) {

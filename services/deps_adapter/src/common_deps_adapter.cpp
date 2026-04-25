@@ -23,7 +23,7 @@
 #include "screenlock_manager.h"
 #endif
 
-#indef ABILITY_SMS_SUPPORT
+#ifdef ABILITY_SMS_SUPPORT
 #include "sms_service_manager_client.h"
 #endif
 
@@ -93,6 +93,7 @@ int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text,
 {
     if (desAddr == nullptr || text == nullptr) {
         TELEPHONY_LOGE("input error");
+        return -1;
     }
     return Singleton<SmsServiceManagerClient>::GetInstance().SendMessage(slotId, std::u16string(desAddr, addrLen), u"",
         std::u16string(text, textLen), nullptr, nullptr);

@@ -22,7 +22,7 @@ isNeedCameraDep = defined(global_parts_info) &&
 
 isNeedScreenLockDep = defined(global_parts_info) &&
   defined(global_parts_info.theme_screenlock_mgr) &&
-  global_parts_info.theme_screenlock_mgr &&
+  global_parts_info.theme_screenlock_mgr
 
 isNeedSmsDep = defined(global_parts_info) &&
   defined(global_parts_info.telephony_sms_mms) &&
@@ -66,7 +66,7 @@ if (isNeedCompile)
     }
 
     if (isNeedScreenLockDep) {
-      external_deps += [ ""screenlock_mgr:screenlock_client"" ]
+      external_deps += [ "screenlock_mgr:screenlock_client" ]
       cm_deps_adapter_defines += [ "ABILITY_SCREENLOCKMGR_SUPPORT" ]
     }
 
