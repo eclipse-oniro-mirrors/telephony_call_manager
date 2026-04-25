@@ -468,3 +468,16 @@ ohos_unittest("tel_call_manager_zero10_gtest") {
   ]
   defines += call_manager_defines
 }
+
+ohos_shared_library("tel_cm_deps_adapter_test_mock") {
+  output_dir = "${target_out_dir}/mock_libs"
+  install_enable = false
+
+  sources = [ "src/mock_deps_adapter.cpp" ]
+
+  cflags = [ "-fPIC" ]
+  cflags_cc = [ "-fPIC" ]
+
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+}
