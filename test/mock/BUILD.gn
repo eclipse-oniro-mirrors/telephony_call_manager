@@ -12,7 +12,6 @@
 # limitations under the License.
 
 ohos_shared_library("tel_cm_deps_adapter_test_mock") {
-  output_dir = "${target_out_dir}/mock_libs"
   install_enable = false
   testonly = true
 

@@ -508,6 +508,7 @@ ohos_unittest("tel_call_manager_zero_incoming_flash_reminder_test") {
   external_deps -= ["ffrt:libffrt"]
 
   deps = [
+    "${CALL_MANAGER_PATH}/test/mock:tel_cm_deps_adapter_test_mock",
     "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
   ]
 
