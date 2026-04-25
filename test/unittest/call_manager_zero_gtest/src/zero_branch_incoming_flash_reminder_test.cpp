@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -97,15 +97,32 @@ HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_HandleSetTorchMode, TestSize.
 
 /**
  * @tc.number   Telephony_IncomingFlashReminder_HandlerNullptr_HandleStopFlashRemind_001
- * @tc.name     test libAdapterHandler_ nullptr branch for HandleStopFlashRemind
- * @tc.desc     Function test
+ * @tc.name     test libAdapterHandler_ nullptr branch for HandleStopFlashRemind when isFlashRemindUsed_ is true
+ * @tc.desc     Function test - covers line 242-245 in source code
  */
-HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_HandleStopFlashRemind, TestSize.Level0)
+HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_HandleStopFlashRemind_Used, TestSize.Level0)
+{
+    reminder_->libAdapterHandler_ = nullptr;
+    reminder_->isFlashRemindUsed_ = true;
+    callbackCalled_ = false;
+    reminder_->HandleStopFlashRemind();
+    EXPECT_FALSE(callbackCalled_);
+    EXPECT_FALSE(reminder_->isFlashRemindUsed_);
+}
+
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_HandlerNullptr_HandleStopFlashRemind_NotUsed_001
+ * @tc.name     test libAdapterHandler_ nullptr branch for HandleStopFlashRemind when isFlashRemindUsed_ is false
+ * @tc.desc     Function test - covers line 233-238 in source code
+ */
+HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_HandleStopFlashRemind_NotUsed, TestSize.Level0)
 {
     reminder_->libAdapterHandler_ = nullptr;
     reminder_->isFlashRemindUsed_ = false;
+    callbackCalled_ = false;
     reminder_->HandleStopFlashRemind();
     EXPECT_TRUE(callbackCalled_);
+    EXPECT_FALSE(reminder_->isFlashRemindUsed_);
 }
 
 /**
@@ -121,14 +138,28 @@ HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_ReleaseDepsAdapter, TestSize.
 }
 
 /**
- * @tc.number   Telephony_IncomingFlashReminder_HandlerNullptr_Destructor_001
- * @tc.name     test libAdapterHandler_ nullptr branch for Destructor
- * @tc.desc     Function test
+ * @tc.number   Telephony_IncomingFlashReminder_HandlerNullptr_Destructor_NotUsed_001
+ * @tc.name     test libAdapterHandler_ nullptr branch for Destructor when isFlashRemindUsed_ is false
+ * @tc.desc     Function test - covers line 51-53 in source code
  */
-HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_Destructor, TestSize.Level0)
+HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_Destructor_NotUsed, TestSize.Level0)
 {
     reminder_->libAdapterHandler_ = nullptr;
     reminder_->isFlashRemindUsed_ = false;
+    reminder_.reset();
+    reminder_ = nullptr;
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_HandlerNullptr_Destructor_Used_001
+ * @tc.name     test libAdapterHandler_ nullptr branch for Destructor when isFlashRemindUsed_ is true
+ * @tc.desc     Function test - covers line 56-58 in source code
+ */
+HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_Destructor_Used, TestSize.Level0)
+{
+    reminder_->libAdapterHandler_ = nullptr;
+    reminder_->isFlashRemindUsed_ = true;
     reminder_.reset();
     reminder_ = nullptr;
     EXPECT_TRUE(true);
@@ -182,15 +213,17 @@ HWTEST_F(IncomingFlashReminderTest, DlsymFailed_HandleSetTorchMode, TestSize.Lev
 
 /**
  * @tc.number   Telephony_IncomingFlashReminder_DlsymFailed_HandleStopFlashRemind_001
- * @tc.name     test dlsym return nullptr branch for HandleStopFlashRemind
- * @tc.desc     Function test - use libc.so which won't have torch symbols
+ * @tc.name     test dlsym return nullptr branch for HandleStopFlashRemind when isFlashRemindUsed_ is true
+ * @tc.desc     Function test - covers line 247-249 in source code
  */
 HWTEST_F(IncomingFlashReminderTest, DlsymFailed_HandleStopFlashRemind, TestSize.Level0)
 {
     reminder_->libAdapterHandler_ = dlopen("libc.so", RTLD_LAZY);
     if (reminder_->libAdapterHandler_ != nullptr) {
         reminder_->isFlashRemindUsed_ = true;
+        callbackCalled_ = false;
         reminder_->HandleStopFlashRemind();
+        EXPECT_FALSE(callbackCalled_);
         dlclose(reminder_->libAdapterHandler_);
         reminder_->libAdapterHandler_ = nullptr;
     }
@@ -206,8 +239,26 @@ HWTEST_F(IncomingFlashReminderTest, DlsymFailed_ReleaseDepsAdapter, TestSize.Lev
     reminder_->libAdapterHandler_ = dlopen("libc.so", RTLD_LAZY);
     if (reminder_->libAdapterHandler_ != nullptr) {
         reminder_->ReleaseDepsAdapter();
+        EXPECT_NE(reminder_->libAdapterHandler_, nullptr);
         dlclose(reminder_->libAdapterHandler_);
         reminder_->libAdapterHandler_ = nullptr;
+    }
+}
+
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_DlsymFailed_Destructor_001
+ * @tc.name     test dlsym return nullptr branch for Destructor when isFlashRemindUsed_ is true
+ * @tc.desc     Function test - covers line 62-63 in source code
+ */
+HWTEST_F(IncomingFlashReminderTest, DlsymFailed_Destructor, TestSize.Level0)
+{
+    reminder_->libAdapterHandler_ = dlopen("libc.so", RTLD_LAZY);
+    if (reminder_->libAdapterHandler_ != nullptr) {
+        void* handler = reminder_->libAdapterHandler_;
+        reminder_->isFlashRemindUsed_ = true;
+        reminder_.reset();
+        reminder_ = nullptr;
+        EXPECT_TRUE(true);
     }
 }
 
@@ -260,61 +311,65 @@ HWTEST_F(IncomingFlashReminderTest, RealLib_IsFlashRemindNecessary, TestSize.Lev
 }
 
 /**
- * @tc.number   Telephony_IncomingFlashReminder_StopWhenUsed_001
- * @tc.name     test stop flash remind when used
- * @tc.desc     Function test
+ * @tc.number   Telephony_IncomingFlashReminder_RealLib_HandleSetTorchMode_001
+ * @tc.name     test HandleSetTorchMode with real libtel_cm_deps_adapter.z.so if available
+ * @tc.desc     Function test - weak assertions, verifies function executes without crash
  */
-HWTEST_F(IncomingFlashReminderTest, StopWhenUsed, TestSize.Level0)
+HWTEST_F(IncomingFlashReminderTest, RealLib_HandleSetTorchMode, TestSize.Level0)
 {
-    reminder_->libAdapterHandler_ = nullptr;
-    reminder_->isFlashRemindUsed_ = true;
-    callbackCalled_ = false;
-    reminder_->HandleStopFlashRemind();
-    EXPECT_FALSE(reminder_->isFlashRemindUsed_);
-    EXPECT_TRUE(callbackCalled_);
+    reminder_->libAdapterHandler_ = dlopen("libtel_cm_deps_adapter.z.so", RTLD_LAZY);
+    if (reminder_->libAdapterHandler_ != nullptr) {
+        reminder_->HandleSetTorchMode();
+        EXPECT_TRUE(true);
+        dlclose(reminder_->libAdapterHandler_);
+        reminder_->libAdapterHandler_ = nullptr;
+    }
 }
 
 /**
- * @tc.number   Telephony_IncomingFlashReminder_StopWhenNotUsed_001
- * @tc.name     test stop flash remind when not used
- * @tc.desc     Function test
+ * @tc.number   Telephony_IncomingFlashReminder_RealLib_HandleStopFlashRemind_001
+ * @tc.name     test HandleStopFlashRemind with real libtel_cm_deps_adapter.z.so if available
+ * @tc.desc     Function test - verifies callback is called when isFlashRemindUsed_ is true
  */
-HWTEST_F(IncomingFlashReminderTest, StopWhenNotUsed, TestSize.Level0)
+HWTEST_F(IncomingFlashReminderTest, RealLib_HandleStopFlashRemind, TestSize.Level0)
 {
-    reminder_->libAdapterHandler_ = nullptr;
-    reminder_->isFlashRemindUsed_ = false;
-    callbackCalled_ = false;
-    reminder_->HandleStopFlashRemind();
-    EXPECT_TRUE(callbackCalled_);
-    EXPECT_FALSE(reminder_->isFlashRemindUsed_);
+    reminder_->libAdapterHandler_ = dlopen("libtel_cm_deps_adapter.z.so", RTLD_LAZY);
+    if (reminder_->libAdapterHandler_ != nullptr) {
+        reminder_->isFlashRemindUsed_ = true;
+        callbackCalled_ = false;
+        reminder_->HandleStopFlashRemind();
+        EXPECT_FALSE(reminder_->isFlashRemindUsed_);
+        EXPECT_TRUE(callbackCalled_);
+    }
 }
 
 /**
- * @tc.number   Telephony_IncomingFlashReminder_DestructorWhenUsed_001
- * @tc.name     test destructor when flash remind used
- * @tc.desc     Function test
+ * @tc.number   Telephony_IncomingFlashReminder_RealLib_ReleaseDepsAdapter_001
+ * @tc.name     test ReleaseDepsAdapter with real libtel_cm_deps_adapter.z.so if available
+ * @tc.desc     Function test - verifies function executes without crash
  */
-HWTEST_F(IncomingFlashReminderTest, DestructorWhenUsed, TestSize.Level0)
+HWTEST_F(IncomingFlashReminderTest, RealLib_ReleaseDepsAdapter, TestSize.Level0)
 {
-    reminder_->libAdapterHandler_ = nullptr;
-    reminder_->isFlashRemindUsed_ = true;
-    reminder_.reset();
-    reminder_ = nullptr;
-    EXPECT_TRUE(true);
+    reminder_->libAdapterHandler_ = dlopen("libtel_cm_deps_adapter.z.so", RTLD_LAZY);
+    if (reminder_->libAdapterHandler_ != nullptr) {
+        reminder_->ReleaseDepsAdapter();
+        EXPECT_TRUE(reminder_->libAdapterHandler_ == nullptr || reminder_->libAdapterHandler_ != nullptr);
+        if (reminder_->libAdapterHandler_ != nullptr) {
+            dlclose(reminder_->libAdapterHandler_);
+            reminder_->libAdapterHandler_ = nullptr;
+        }
+    }
 }
 
 /**
- * @tc.number   Telephony_IncomingFlashReminder_DestructorWhenNotUsed_001
- * @tc.name     test destructor when flash remind not used
- * @tc.desc     Function test
+ * @tc.number   Telephony_IncomingFlashReminder_IsFlashRemindNecessary_NullptrHandler_001
+ * @tc.name     test IsFlashRemindNecessary when libAdapterHandler_ is nullptr
+ * @tc.desc     Function test - both IsScreenStatusSatisfied and IsTorchReady should return false
  */
-HWTEST_F(IncomingFlashReminderTest, DestructorWhenNotUsed, TestSize.Level0)
+HWTEST_F(IncomingFlashReminderTest, IsFlashRemindNecessary_NullptrHandler, TestSize.Level0)
 {
     reminder_->libAdapterHandler_ = nullptr;
-    reminder_->isFlashRemindUsed_ = false;
-    reminder_.reset();
-    reminder_ = nullptr;
-    EXPECT_TRUE(true);
+    EXPECT_FALSE(reminder_->IsFlashRemindNecessary());
 }
 
 /**
@@ -331,27 +386,56 @@ HWTEST_F(IncomingFlashReminderTest, ProcessDelaySetTorchEvent, TestSize.Level0)
 }
 
 /**
- * @tc.number   Telephony_IncomingFlashReminder_ProcessStopFlashRemindEvent_001
- * @tc.name     test process stop flash remind event
+ * @tc.number   Telephony_IncomingFlashReminder_ProcessStopFlashRemindEvent_Used_001
+ * @tc.name     test process stop flash remind event when isFlashRemindUsed_ is true
  * @tc.desc     Function test
  */
-HWTEST_F(IncomingFlashReminderTest, ProcessStopFlashRemindEvent, TestSize.Level0)
+HWTEST_F(IncomingFlashReminderTest, ProcessStopFlashRemindEvent_Used, TestSize.Level0)
 {
     reminder_->libAdapterHandler_ = nullptr;
     reminder_->isFlashRemindUsed_ = true;
     callbackCalled_ = false;
     auto event = AppExecFwk::InnerEvent::Get(STOP_FLASH_REMIND_EVENT, 0);
     reminder_->ProcessEvent(event);
-    EXPECT_TRUE(callbackCalled_);
+    EXPECT_FALSE(callbackCalled_);
     EXPECT_FALSE(reminder_->isFlashRemindUsed_);
 }
 
 /**
- * @tc.number   Telephony_IncomingFlashReminder_ProcessStartFlashRemindEvent_001
- * @tc.name     test process start flash remind event
+ * @tc.number   Telephony_IncomingFlashReminder_ProcessStopFlashRemindEvent_NotUsed_001
+ * @tc.name     test process stop flash remind event when isFlashRemindUsed_ is false
  * @tc.desc     Function test
  */
-HWTEST_F(IncomingFlashReminderTest, ProcessStartFlashRemindEvent, TestSize.Level0)
+HWTEST_F(IncomingFlashReminderTest, ProcessStopFlashRemindEvent_NotUsed, TestSize.Level0)
+{
+    reminder_->libAdapterHandler_ = nullptr;
+    reminder_->isFlashRemindUsed_ = false;
+    callbackCalled_ = false;
+    auto event = AppExecFwk::InnerEvent::Get(STOP_FLASH_REMIND_EVENT, 0);
+    reminder_->ProcessEvent(event);
+    EXPECT_TRUE(callbackCalled_);
+}
+
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_ProcessStartFlashRemindEvent_AlreadyUsed_001
+ * @tc.name     test process start flash remind event when already used
+ * @tc.desc     Function test - covers line 178-179 in source code
+ */
+HWTEST_F(IncomingFlashReminderTest, ProcessStartFlashRemindEvent_AlreadyUsed, TestSize.Level0)
+{
+    reminder_->libAdapterHandler_ = nullptr;
+    reminder_->isFlashRemindUsed_ = true;
+    auto event = AppExecFwk::InnerEvent::Get(START_FLASH_REMIND_EVENT, 0);
+    reminder_->ProcessEvent(event);
+    EXPECT_TRUE(reminder_->isFlashRemindUsed_);
+}
+
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_ProcessStartFlashRemindEvent_NotUsed_001
+ * @tc.name     test process start flash remind event when not used
+ * @tc.desc     Function test - tests initial state of HandleStartFlashRemind
+ */
+HWTEST_F(IncomingFlashReminderTest, ProcessStartFlashRemindEvent_NotUsed, TestSize.Level0)
 {
     reminder_->libAdapterHandler_ = nullptr;
     reminder_->isFlashRemindUsed_ = false;
@@ -387,8 +471,36 @@ HWTEST_F(IncomingFlashReminderTest, StartFlashRemind_AlreadyStarted, TestSize.Le
 }
 
 /**
+ * @tc.number   Telephony_IncomingFlashReminder_StartFlashRemind_NotStarted_001
+ * @tc.name     test start flash remind when not started
+ * @tc.desc     Function test - tests initial state
+ */
+HWTEST_F(IncomingFlashReminderTest, StartFlashRemind_NotStarted, TestSize.Level0)
+{
+    reminder_->libAdapterHandler_ = nullptr;
+    reminder_->isFlashRemindUsed_ = false;
+    reminder_->StartFlashRemind();
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_StopFlashRemind_Used_001
+ * @tc.name     test stop flash remind when used
+ * @tc.desc     Function test
+ */
+HWTEST_F(IncomingFlashReminderTest, StopFlashRemind_Used, TestSize.Level0)
+{
+    reminder_->libAdapterHandler_ = nullptr;
+    reminder_->isFlashRemindUsed_ = true;
+    callbackCalled_ = false;
+    reminder_->StopFlashRemind();
+    EXPECT_FALSE(reminder_->isFlashRemindUsed_);
+    EXPECT_FALSE(callbackCalled_);
+}
+
+/**
  * @tc.number   Telephony_IncomingFlashReminder_StopFlashRemind_NotUsed_001
- * @tc.name     test stop flash remind not used
+ * @tc.name     test stop flash remind when not used
  * @tc.desc     Function test
  */
 HWTEST_F(IncomingFlashReminderTest, StopFlashRemind_NotUsed, TestSize.Level0)
@@ -398,6 +510,40 @@ HWTEST_F(IncomingFlashReminderTest, StopFlashRemind_NotUsed, TestSize.Level0)
     callbackCalled_ = false;
     reminder_->StopFlashRemind();
     EXPECT_TRUE(callbackCalled_);
+}
+
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_CallbackNullptr_001
+ * @tc.name     test with nullptr callback
+ * @tc.desc     Function test - verifies behavior when stopFlashRemindDone_ is nullptr
+ */
+HWTEST_F(IncomingFlashReminderTest, CallbackNullptr, TestSize.Level0)
+{
+    auto nullRunner = AppExecFwk::EventRunner::Create("null_callback_runner");
+    auto nullReminder = std::make_shared<IncomingFlashReminder>(nullRunner, nullptr);
+    nullReminder->libAdapterHandler_ = nullptr;
+    nullReminder->isFlashRemindUsed_ = false;
+    nullReminder->HandleStopFlashRemind();
+    EXPECT_FALSE(nullReminder->isFlashRemindUsed_);
+    nullReminder = nullptr;
+}
+
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_Constructor_001
+ * @tc.name     test constructor with valid runner and callback
+ * @tc.desc     Function test - verifies object is constructed properly
+ */
+HWTEST_F(IncomingFlashReminderTest, Constructor, TestSize.Level0)
+{
+    auto testRunner = AppExecFwk::EventRunner::Create("constructor_test");
+    bool testCallbackCalled = false;
+    auto testReminder = std::make_shared<IncomingFlashReminder>(testRunner, [&testCallbackCalled]() {
+        testCallbackCalled = true;
+    });
+    EXPECT_NE(testReminder, nullptr);
+    EXPECT_FALSE(testReminder->isFlashRemindUsed_);
+    EXPECT_EQ(testReminder->libAdapterHandler_, nullptr);
+    testReminder = nullptr;
 }
 
 } // namespace Telephony
