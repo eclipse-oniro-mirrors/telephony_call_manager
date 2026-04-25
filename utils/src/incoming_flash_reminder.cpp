@@ -27,7 +27,7 @@ constexpr int64_t DELAY_SET_TORCH_MODE_TIME = 300;
 using IsTorchSupportedFunc = bool(*)();
 using GetTorchModeFunc = int (*)();
 using SetTorchModeFunc = int32_t (*)(int mode);
-using FreeCameraFunc = void (*)();
+using FreeCameraFunc = int (*)();
 enum class TelTorchMode {
     TORCH_MODE_UNKNOWN = -1,
     TORCH_MODE_OFF = 0,
