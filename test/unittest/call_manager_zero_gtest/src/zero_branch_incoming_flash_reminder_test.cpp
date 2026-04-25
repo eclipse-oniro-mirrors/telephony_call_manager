@@ -54,11 +54,13 @@ public:
     }
     void TearDown() override
     {
-        if (reminder_ != nullptr && reminder_->libAdapterHandler_ != nullptr) {
-            dlclose(reminder_->libAdapterHandler_);
-            reminder_->libAdapterHandler_ = nullptr;
+        if (reminder_ != nullptr) {
+            if (reminder_->libAdapterHandler_ != nullptr) {
+                dlclose(reminder_->libAdapterHandler_);
+                reminder_->libAdapterHandler_ = nullptr;
+            }
+            reminder_ = nullptr;
         }
-        reminder_ = nullptr;
         runner_ = nullptr;
     }
 
@@ -68,18 +70,33 @@ protected:
     bool callbackCalled_ = false;
 };
 
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_HandlerNullptr_IsScreenStatusSatisfied_001
+ * @tc.name     test libAdapterHandler_ nullptr branch for IsScreenStatusSatisfied
+ * @tc.desc     Function test
+ */
 HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_IsScreenStatusSatisfied, TestSize.Level0)
 {
     reminder_->libAdapterHandler_ = nullptr;
     EXPECT_FALSE(reminder_->IsScreenStatusSatisfied());
 }
 
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_HandlerNullptr_IsTorchReady_001
+ * @tc.name     test libAdapterHandler_ nullptr branch for IsTorchReady
+ * @tc.desc     Function test
+ */
 HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_IsTorchReady, TestSize.Level0)
 {
     reminder_->libAdapterHandler_ = nullptr;
     EXPECT_FALSE(reminder_->IsTorchReady());
 }
 
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_HandlerNullptr_HandleSetTorchMode_001
+ * @tc.name     test libAdapterHandler_ nullptr branch for HandleSetTorchMode
+ * @tc.desc     Function test
+ */
 HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_HandleSetTorchMode, TestSize.Level0)
 {
     reminder_->libAdapterHandler_ = nullptr;
@@ -87,6 +104,11 @@ HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_HandleSetTorchMode, TestSize.
     EXPECT_EQ(Mock_GetTorchMode(), 0);
 }
 
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_HandlerNullptr_HandleStopFlashRemind_001
+ * @tc.name     test libAdapterHandler_ nullptr branch for HandleStopFlashRemind
+ * @tc.desc     Function test
+ */
 HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_HandleStopFlashRemind, TestSize.Level0)
 {
     reminder_->libAdapterHandler_ = nullptr;
@@ -95,6 +117,11 @@ HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_HandleStopFlashRemind, TestSi
     EXPECT_TRUE(callbackCalled_);
 }
 
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_HandlerNullptr_ReleaseDepsAdapter_001
+ * @tc.name     test libAdapterHandler_ nullptr branch for ReleaseDepsAdapter
+ * @tc.desc     Function test
+ */
 HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_ReleaseDepsAdapter, TestSize.Level0)
 {
     reminder_->libAdapterHandler_ = nullptr;
@@ -102,6 +129,11 @@ HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_ReleaseDepsAdapter, TestSize.
     EXPECT_EQ(reminder_->libAdapterHandler_, nullptr);
 }
 
+/**
+ * @tc.number   Telephony_IncomingFlashReminder_HandlerNullptr_Destructor_001
+ * @tc.name     test libAdapterHandler_ nullptr branch for Destructor
+ * @tc.desc     Function test
+ */
 HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_Destructor, TestSize.Level0)
 {
     reminder_->libAdapterHandler_ = nullptr;
