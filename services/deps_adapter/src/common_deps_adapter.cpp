@@ -63,15 +63,15 @@ int SetTorchMode(int mode)
     return camMgr->SetTorchMode(static_cast<CameraStandard::TorchMode>(mode));
 }
 
-void FreeCamera()
+int FreeCamera()
 {
     sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
     if (camMgr == nullptr) {
         TELEPHONY_LOGE("get cameraMgr null");
-        return;
+        return 0;
     }
     
-    camMgr->DestroyStubObj();
+    return camMgr->DestroyStubObj();
 }
 #endif
 

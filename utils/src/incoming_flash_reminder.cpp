@@ -41,7 +41,6 @@ enum class TelTorchMode {
 constexpr uint32_t DELAY_SET_TORCH_EVENT = 1000000;
 constexpr uint32_t STOP_FLASH_REMIND_EVENT = 1000001;
 constexpr uint32_t START_FLASH_REMIND_EVENT = 1000002;
-constexpr uint32_t END_FLASH_REMIND_EVENT = 1000003;
 const std::string FLASH_REMINDER_SWITCH_SUBSTRING = "INCOMING_CALL";
 IncomingFlashReminder::IncomingFlashReminder(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     std::function<void()> stopFlashRemindDone)
@@ -61,13 +60,11 @@ IncomingFlashReminder::~IncomingFlashReminder()
     SetTorchModeFunc setTorchMode = reinterpret_cast<SetTorchModeFunc>
         (dlsym(libAdapterHandler_, "SetTorchMode"));
     if (setTorchMode == nullptr) {
-        TELEPHONY_LOGE("dlsym SetTorchMode failed : %{public}s", dlerror());
         return;
     }
     int32_t result = setTorchMode(static_cast<int>(TelTorchMode::TORCH_MODE_OFF));
     dlclose(libAdapterHandler_);
     libAdapterHandler_ = nullptr;
-    TELEPHONY_LOGI("set torch mode result: %{public}d", result);
 #endif
 }
 
@@ -83,9 +80,6 @@ void IncomingFlashReminder::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &
         case START_FLASH_REMIND_EVENT:
             HandleStartFlashRemind();
             break;
-        case END_FLASH_REMIND_EVENT:
-            HandleEndFlashRemind();
-            break;
         default:
             TELEPHONY_LOGE("receive unknown event %{public}u", event->GetInnerEventId());
             break;
@@ -94,10 +88,6 @@ void IncomingFlashReminder::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &
 
 bool IncomingFlashReminder::IsFlashRemindNecessary()
 {
-    if (!IsFlashReminderSwitchOn()) {
-        TELEPHONY_LOGI("flash remind switch off");
-        return false;
-    }
     return IsScreenStatusSatisfied() && IsTorchReady();
 }
 
@@ -111,7 +101,6 @@ bool IncomingFlashReminder::IsScreenStatusSatisfied()
     IsScreenLockedFunc isScreenLocked =
         reinterpret_cast<IsScreenLockedFunc>(dlsym(libAdapterHandler_, "IsScreenLocked"));
     if (isScreenLocked == nullptr) {
-        TELEPHONY_LOGE("dlsym IsScreenLocked failed : %{public}s", dlerror());
         return false;
     }
 
@@ -135,7 +124,6 @@ bool IncomingFlashReminder::IsTorchReady()
     GetTorchModeFunc getTorchMode = reinterpret_cast<GetTorchModeFunc>
         (dlsym(libAdapterHandler_, "GetTorchMode"));
     if (isTorchSupported == nullptr || getTorchMode == nullptr) {
-        TELEPHONY_LOGE("dlsym SetTorchMode or GetTorchMode failed : %{public}s", dlerror());
         return false;
     }
     if (isTorchSupported() == false) {
@@ -191,6 +179,10 @@ void IncomingFlashReminder::HandleStartFlashRemind()
         return;
     }
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
+    if (!IsFlashReminderSwitchOn()) {
+        TELEPHONY_LOGI("flash remind switch off");
+        return;
+    }
     libAdapterHandler_ = dlopen("libtel_cm_deps_adapter.z.so", RTLD_LAZY);
     if (libAdapterHandler_ == nullptr) {
         TELEPHONY_LOGE("deps adapter dlopen failed : %{public}s", dlerror());
@@ -198,8 +190,7 @@ void IncomingFlashReminder::HandleStartFlashRemind()
     }
     if (!IsFlashRemindNecessary()) {
         TELEPHONY_LOGE("no need to StartFlashRemind");
-        dlclose(libAdapterHandler_);
-        libAdapterHandler_ = nullptr;
+        HandleEndFlashRemind();
         return;
     }
 #endif
@@ -219,7 +210,6 @@ void IncomingFlashReminder::HandleSetTorchMode()
     GetTorchModeFunc getTorchMode = reinterpret_cast<GetTorchModeFunc>(dlsym(libAdapterHandler_, "GetTorchMode"));
     SetTorchModeFunc setTorchMode = reinterpret_cast<SetTorchModeFunc>(dlsym(libAdapterHandler_, "SetTorchMode"));
     if (getTorchMode == nullptr || setTorchMode == nullptr) {
-        TELEPHONY_LOGE("dlsym SetTorchMode or GetTorchMode failed : %{public}s", dlerror());
         return;
     }
 
@@ -256,22 +246,16 @@ void IncomingFlashReminder::HandleStopFlashRemind()
 
     SetTorchModeFunc setTorchMode = reinterpret_cast<SetTorchModeFunc>(dlsym(libAdapterHandler_, "SetTorchMode"));
     if (setTorchMode == nullptr) {
-        TELEPHONY_LOGE("dlsym SetTorchMode failed : %{public}s", dlerror());
         return;
     }
 
     int32_t result = static_cast<int32_t>(setTorchMode(static_cast<int>(TelTorchMode::TORCH_MODE_OFF)));
-    TELEPHONY_LOGI("set torch mode result: %{public}d", result);
-
-    FreeCameraFunc freeCameraFunc = reinterpret_cast<FreeCameraFunc>(dlsym(libAdapterHandler_, "FreeCamera"));
-    if (freeCameraFunc == nullptr) {
-        TELEPHONY_LOGE("dlsym FreeCamera failed : %{public}s", dlerror());
-        return;
-    }
-    freeCameraFunc();
+    HandleEndFlashRemind()
 #endif
-    const int32_t WAIT_RELEASE_TIME_IN_MS = 500;
-    SendEvent(AppExecFwk::InnerEvent::Get(END_FLASH_REMIND_EVENT, 0), WAIT_RELEASE_TIME_IN_MS);
+    isFlashRemindUsed_ = false;
+    if (stopFlashRemindDone_ != nullptr) {
+        stopFlashRemindDone_();
+    }
 }
 
 void IncomingFlashReminder::HandleEndFlashRemind()
@@ -281,14 +265,16 @@ void IncomingFlashReminder::HandleEndFlashRemind()
         TELEPHONY_LOGE("deps adapter is nullptr");
         return;
     }
-
-    dlclose(libAdapterHandler_);
-    libAdapterHandler_ = nullptr;
-#endif
-    isFlashRemindUsed_ = false;
-    if (stopFlashRemindDone_ != nullptr) {
-        stopFlashRemindDone_();
+    FreeCameraFunc freeCameraFunc = reinterpret_cast<FreeCameraFunc>(dlsym(libAdapterHandler_, "FreeCamera"));
+    if (freeCameraFunc == nullptr) {
+        return;
     }
+    int32_t result = freeCameraFunc();
+    if (result == 0) {
+        dlclose(libAdapterHandler_);
+        libAdapterHandler_ = nullptr;
+    }
+#endif
 }
 }
 }

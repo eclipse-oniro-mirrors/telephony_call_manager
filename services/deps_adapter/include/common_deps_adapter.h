@@ -29,7 +29,7 @@ __attribute__((visibility("default"))) int GetTorchMode();
 
 __attribute__((visibility("default"))) int SetTorchMode(int mode);
 
-__attribute__((visibility("default"))) void FreeCamera();
+__attribute__((visibility("default"))) int FreeCamera();
 #endif
 
 #ifdef ABILITY_SCREENLOCKMGR_SUPPORT
