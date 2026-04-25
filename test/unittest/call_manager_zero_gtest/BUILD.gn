@@ -486,7 +486,6 @@ ohos_unittest("tel_call_manager_zero_incoming_flash_reminder_test") {
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
     "${CALL_MANAGER_PATH}/utils/src/incoming_flash_reminder.cpp",
-    "${CALL_MANAGER_PATH}/test/mock/mock_deps_adapter.cpp",
     "src/zero_branch_incoming_flash_reminder_test.cpp",
   ]
   sources += call_manager_sources
