@@ -92,7 +92,6 @@ int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text,
     unsigned int addrLen, unsigned int textLen)
 {
     if (desAddr == nullptr || text == nullptr) {
-        TELEPHONY_LOGE("input error");
         return -1;
     }
     return Singleton<SmsServiceManagerClient>::GetInstance().SendMessage(slotId, std::u16string(desAddr, addrLen), u"",
