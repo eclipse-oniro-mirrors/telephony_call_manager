@@ -446,6 +446,8 @@ HWTEST_F(IncomingFlashReminderTest, ProcessStopFlashRemindEvent, TestSize.Level0
     reminder_->ProcessEvent(event);
     EXPECT_TRUE(callbackCalled_);
     EXPECT_FALSE(reminder_->isFlashRemindUsed_);
+    dlclose(reminder_->libAdapterHandler_);
+    reminder_->libAdapterHandler_ = nullptr;
 }
 
 /**
@@ -461,6 +463,8 @@ HWTEST_F(IncomingFlashReminderTest, ProcessStartFlashRemindEvent, TestSize.Level
     reminder_->isFlashRemindUsed_ = false;
     auto event = AppExecFwk::InnerEvent::Get(START_FLASH_REMIND_EVENT, 0);
     reminder_->ProcessEvent(event);
+    dlclose(reminder_->libAdapterHandler_);
+    reminder_->libAdapterHandler_ = nullptr;
 }
 
 /**
@@ -487,6 +491,8 @@ HWTEST_F(IncomingFlashReminderTest, StartFlashRemind_Normal, TestSize.Level0)
     Mock_SetTorchMode(0);
     reminder_->isFlashRemindUsed_ = false;
     reminder_->StartFlashRemind();
+    dlclose(reminder_->libAdapterHandler_);
+    reminder_->libAdapterHandler_ = nullptr;
 }
 
 /**
@@ -517,6 +523,8 @@ HWTEST_F(IncomingFlashReminderTest, StopFlashRemind_Normal, TestSize.Level0)
     reminder_->isFlashRemindUsed_ = true;
     callbackCalled_ = false;
     reminder_->StopFlashRemind();
+    dlclose(reminder_->libAdapterHandler_);
+    reminder_->libAdapterHandler_ = nullptr;
 }
 
 /**
