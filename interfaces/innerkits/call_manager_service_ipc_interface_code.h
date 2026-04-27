@@ -110,6 +110,7 @@ enum CallManagerInterfaceCode {
     INTERFACE_ANSWER_CALL_NO_PARAM,
     INTERFACE_REJECT_CALL_NO_PARAM,
     INTERFACE_DISCONNECT_CALL_NO_PARAM,
+    INTERFACE_UPDATE_CALLUI,
 };
 } // end extern
 } // namespace Telephony
