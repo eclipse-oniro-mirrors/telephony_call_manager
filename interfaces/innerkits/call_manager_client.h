@@ -645,6 +645,13 @@ public:
     int32_t UnRegisterVoipCallManagerCallback();
 
     /**
+     * @brief update call ui
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UpdateCallUI(bool isConnectService);
+
+    /**
      * @brief send call ui event
      *
      * @return Returns 0 on success, others on failure.
