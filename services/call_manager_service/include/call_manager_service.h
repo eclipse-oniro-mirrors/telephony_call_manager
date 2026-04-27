@@ -770,6 +770,13 @@ public:
     int32_t SendCallUiEvent(int32_t callId, std::string &eventName) override;
 
     /**
+     * @brief update callui
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UpdateCallUI(bool isConnectService) override;
+
+    /**
      * OnAddSystemAbility
      *
      * @brief on system ability added
