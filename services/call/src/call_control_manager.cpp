@@ -1336,7 +1336,6 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
     CallVoiceAssistantManager::GetInstance()->UpdateVoipCallState(state);
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE ||
         VoIPCallState_ == CallStateToApp::CALL_STATE_UNKNOWN) {
-        std::lock_guard<ffrt::mutex> lock(voipMutex_);
         UnregisterAppStateObserver();
     } else {
         RegisterAppStateObserver();
