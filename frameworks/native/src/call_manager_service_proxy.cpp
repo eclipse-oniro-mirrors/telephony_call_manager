@@ -1380,6 +1380,23 @@ int32_t CallManagerServiceProxy::SendCallUiEvent(int32_t callId, std::string &ev
     return replyParcel.ReadInt32();
 }
 
+int32_t CallManagerServiceProxy::UpdateCallUI(bool isConnectService)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteBool(isConnectService);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_UPDATE_CALLUI, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function UpdateCallUI call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
 sptr<ICallStatusCallback> CallManagerServiceProxy::RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress)
 {
     MessageParcel dataParcel;
