@@ -175,6 +175,7 @@ public:
     void RegisterObserver();
     void UnRegisterObserver();
     void HandleVideoRingPlayFail();
+    void UpdateCallUI(bool isConnectService, int32_t callingPid);
     bool EndCall();
     int32_t SetCallAudioMode(int32_t mode, int32_t scenarios);
 #ifdef CALL_MANAGER_THERMAL_PROTECTION
@@ -194,7 +195,8 @@ private:
     int32_t CanDial(std::u16string &number, AppExecFwk::PacMap &extras, bool isEcc);
     void AnswerHandlerForSatelliteOrVideoCall(sptr<CallBase> &call, int32_t videoState);
     bool CurrentIsSuperPrivacyMode(int32_t callId, int32_t videoState);
-    void AppStateObserver();
+    void RegisterAppStateObserver();
+    void UnregisterAppStateObserver();
     void SetCallTypeExtras(AppExecFwk::PacMap &extras);
     void HandleVoipConnected(int32_t &numActive, int32_t callId);
     void HandleVoipDialing(int32_t callId, const std::string &phoneNumber);
@@ -257,6 +259,7 @@ private:
     bool shouldDisconnect = true;
     bool ReduceRingToneVolume_ = false;
     static std::atomic<bool> alarmSeted_;
+    std::vector<int32_t> preloadedCallUiRequestPids_ = {};
     struct AnsweredCallQueue {
         bool hasCall = false;
         int32_t callId = 0;
@@ -271,9 +274,10 @@ private:
 
     ffrt::task_handle disconnectHandle = nullptr;
     sptr<ApplicationStateObserver> appStateObserver = nullptr;
-    sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
+    sptr<AppExecFwk::IAppMgr> appMgrProxy_ = nullptr;
     
-    ffrt::mutex voipMutex_;
+    ffrt::mutex appStateObserverMutex_;
+    ffrt::mutex preloadedCallUiRequestPidsMutex_;
     sptr<WearStatusObserver> wearStatusObserver_ = nullptr;
     int32_t wearStatus_ = WEAR_STATUS_INVALID;
     ffrt::mutex wearStatusMutex_;
