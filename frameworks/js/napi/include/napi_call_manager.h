@@ -141,6 +141,8 @@ public:
     static napi_value SetVoIPCallInfo(napi_env env, napi_callback_info info);
     static napi_value CancelCallUpgrade(napi_env env, napi_callback_info info);
     static napi_value SendCallUiEvent(napi_env env, napi_callback_info info);
+    static napi_value PreloadCallUI(napi_env env, napi_callback_info info);
+    static napi_value UnloadCallUI(napi_env env, napi_callback_info info);
     static napi_value SendUssdResponse(napi_env env, napi_callback_info info);
 #ifdef SUPPORT_RTT_CALL
     static napi_value StartRtt(napi_env env, napi_callback_info info);
@@ -165,6 +167,7 @@ private:
     static void NativeGetMainCallIdCallBack(napi_env env, napi_status status, void *data);
     static void NativeIsImsSwitchEnabledCallBack(napi_env env, napi_status status, void *data);
     static void NativeGetVoNRStateCallBack(napi_env env, napi_status status, void *data);
+    static void NativeCallUICallBackWithErrorCode(napi_env env, napi_status status, void *data);
     static void NativeBoolCallBack(napi_env env, napi_status status, void *data);
     static void NativeBoolCallBackWithErrorCode(napi_env env, napi_status status, void *data);
     static void NativeIsEmergencyPhoneNumberCallBack(napi_env env, napi_status status, void *data);
@@ -236,6 +239,8 @@ private:
     static void NativeSetVoIPCallInfo(napi_env env, void *data);
     static void NativeCancelCallUpgrade(napi_env env, void *data);
     static void NativeSendCallUiEvent(napi_env env, void *data);
+    static void NativePreloadCallUI(napi_env env, void *data);
+    static void NativeUnloadCallUI(napi_env env, void *data);
     static bool MatchEmptyParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchOneOptionalNumberParameter(
         napi_env env, const napi_value parameters[], const size_t parameterCount);
