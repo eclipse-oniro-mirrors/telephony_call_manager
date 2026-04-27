@@ -1720,6 +1720,26 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallManagerService::UpdateCallUI(bool isConnectService)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (callControlManagerPtr_ != nullptr) {
+        int32_t callingPid = IPCSkeleton::GetCallingPid();
+        callControlManagerPtr_->UpdateCallUI(isConnectService, callingPid);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerService::HandleVoIPCallEvent(int32_t callId, std::string &eventName)
 {
     AppExecFwk::PacMap mPacMap;
