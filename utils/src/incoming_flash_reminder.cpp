@@ -63,8 +63,6 @@ IncomingFlashReminder::~IncomingFlashReminder()
         return;
     }
     int32_t result = setTorchMode(static_cast<int>(TelTorchMode::TORCH_MODE_OFF));
-    dlclose(libAdapterHandler_);
-    libAdapterHandler_ = nullptr;
 #endif
 }
 
@@ -238,6 +236,7 @@ void IncomingFlashReminder::HandleStopFlashRemind()
         return;
     }
     RemoveEvent(DELAY_SET_TORCH_EVENT);
+    isFlashRemindUsed_ = false;
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
     if (libAdapterHandler_ == nullptr) {
         TELEPHONY_LOGE("deps adapter is nullptr");
@@ -252,7 +251,6 @@ void IncomingFlashReminder::HandleStopFlashRemind()
     int32_t result = static_cast<int32_t>(setTorchMode(static_cast<int>(TelTorchMode::TORCH_MODE_OFF)));
     ReleaseDepsAdapter();
 #endif
-    isFlashRemindUsed_ = false;
     if (stopFlashRemindDone_ != nullptr) {
         stopFlashRemindDone_();
     }
