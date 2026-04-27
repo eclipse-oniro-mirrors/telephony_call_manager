@@ -85,6 +85,8 @@ void CallManagerServiceStub::InitCallBasicRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnInputDialerSpecialCode(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SEND_CALLUI_EVENT)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSendCallUiEvent(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UPDATE_CALLUI)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallUI(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_END_CALL)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnEndCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_NOTIFY_VOIP_AUDIO_STREAM_START)] =
@@ -1411,6 +1413,19 @@ int32_t CallManagerServiceStub::OnSendCallUiEvent(MessageParcel &data, MessagePa
     std::string eventName = data.ReadString();
     int32_t result = SendCallUiEvent(callId, eventName);
     TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CallManagerServiceStub::OnUpdateCallUI(MessageParcel &data, MessageParcel &reply)
+{
+    bool isConnectService = data.ReadBool();
+    int32_t result = UpdateCallUI(isConnectService);
+    TELEPHONY_LOGI("CallManagerServiceStub::UpdateCallUI isConnectService: %{public}d, \
+        result:%{public}d", isConnectService, result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
