@@ -779,6 +779,16 @@ int32_t CallManagerClient::RequestCameraCapabilities(int32_t callId)
     }
 }
 
+int32_t CallManagerClient::UpdateCallUI(bool isConnectService)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->UpdateCallUI(isConnectService);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t CallManagerClient::SendCallUiEvent(int32_t callId, std::string &eventName)
 {
     if (g_callManagerProxy != nullptr) {
