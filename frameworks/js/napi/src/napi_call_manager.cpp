@@ -3331,7 +3331,7 @@ void NapiCallManager::NativePreloadCallUI(napi_env env, void *data)
     asyncContext->enabled = true;
     auto callManagerClient = DelayedSingleton<CallManagerClient>::GetInstance();
     if (callManagerClient != nullptr) {
-        asyncContext->errorCode = callManagerClient->UpdateCallUI(asyncContext->enabled);
+        asyncContext->errorCode = callManagerClient->UpdateCallUI(true);
     }
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = TELEPHONY_SUCCESS;
@@ -3346,10 +3346,10 @@ void NapiCallManager::NativeUnloadCallUI(napi_env env, void *data)
         return;
     }
     auto asyncContext = (BoolResultAsyncContext *)data;
-    asyncContext->enabled = false;
+    asyncContext->enabled = true;
     auto callManagerClient = DelayedSingleton<CallManagerClient>::GetInstance();
     if (callManagerClient != nullptr) {
-        asyncContext->resolved = callManagerClient->UpdateCallUI(asyncContext->enabled);
+        asyncContext->errorCode = callManagerClient->UpdateCallUI(false);
     }
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = TELEPHONY_SUCCESS;
