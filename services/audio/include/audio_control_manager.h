@@ -17,6 +17,7 @@
 #define TELEPHONY_AUDIO_MANAGER_H
 
 #include <set>
+#include <atomic>
 
 #include "audio_device_manager.h"
 #include "audio_scene_processor.h"
@@ -120,6 +121,7 @@ private:
     bool ShouldPlayRingtone() const;
     bool DealCrsScene(const AudioStandard::AudioRingerMode &ringMode, int32_t accountId);
     bool IsEmergencyCallExists();
+    void RecoverSysMicrophoneMute();
     void UpdateForegroundLiveCall();
     void ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr);
     void ResumeCrsSoundTone();
@@ -169,6 +171,8 @@ private:
     bool isPlayForNoRing_ = false;
     static bool isIncomingConflict_;
     static ffrt::mutex incomingMutex_;
+    std::atomic<bool> recoverSysMuteAfterCall_ = false;
+    std::atomic<bool> recoverSysMuteState_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

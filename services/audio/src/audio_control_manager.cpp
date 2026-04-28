@@ -88,12 +88,24 @@ void AudioControlManager::UnInit()
 #endif
 }
 
+void AudioControlManager::RecoverSysMicrophoneMute()
+{
+    if (recoverSysMuteAfterCall_) {
+        TELEPHONY_LOGI("recover sys mute");
+        auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
+        if (audioProxy != nullptr) {
+            audioProxy->SetMicrophoneMute(recoverSysMuteState_);
+        }
+    }
+    recoverSysMuteAfterCall_ = false;
+}
+
 void AudioControlManager::UpdateForegroundLiveCall()
 {
     int32_t callId = DelayedSingleton<CallStateProcessor>::GetInstance()->GetAudioForegroundLiveCall();
     if (callId == INVALID_CALLID) {
         frontCall_ = nullptr;
-        DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false);
+        RecoverSysMicrophoneMute();
         TELEPHONY_LOGE("callId is invalid");
         return;
     }
@@ -1235,6 +1247,11 @@ int32_t AudioControlManager::SetMute(bool isMute)
         TELEPHONY_LOGE("frontCall_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
+    if (audioProxy == nullptr) {
+        TELEPHONY_LOGE("audioProxy is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     if (DelayedSingleton<CallControlManager>::GetInstance()->IsCallExist(CallType::TYPE_BLUETOOTH,
         TelCallState::CALL_STATUS_ACTIVE)) {
         std::string strMute = isMute ? "true" : "false";
@@ -1245,14 +1262,19 @@ int32_t AudioControlManager::SetMute(bool isMute)
         OHOS::AudioStandard::AudioSystemManager::GetInstance()->SetExtraParameters("hfp_extra", vec);
         currentCall->SetMicPhoneState(isMute);
     } else {
-        if (!DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(isMute)) {
+        bool oldMute = audioProxy->IsMicrophoneMute();
+        if (!audioProxy->SetMicrophoneMute(isMute)) {
             TELEPHONY_LOGE("set mute failed");
             return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
+        }
+        if (!recoverSysMuteAfterCall_ && (oldMute != isMute)) {
+            recoverSysMuteAfterCall_ = true;
+            recoverSysMuteState_ = oldMute;
         }
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
     if (currentCall->GetCallType() != CallType::TYPE_BLUETOOTH) {
-        bool muted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+        bool muted = audioProxy->IsMicrophoneMute();
         currentCall->SetMicPhoneState(muted);
         TELEPHONY_LOGI("SetMute success callId:%{public}d, mute:%{public}d", currentCall->GetCallID(), muted);
     }

@@ -572,6 +572,29 @@ HWTEST_F(ZeroBranch9Test, Telephony_DealVideoRingPath_001, TestSize.Level0)
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
+HWTEST_F(ZeroBranch9Test, Telephony_CallStateUpdated_RecoverMute, TestSize.Level1)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    audioControl->Init();
+    audioControl->recoverSysMuteAfterCall_ = true;
+    audioControl->recoverSysMuteState_ = true;
+    DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(true);
+    DialParaInfo mDialParaInfo;
+    mDialParaInfo.accountId = 0;
+    mDialParaInfo.callId = 1;
+    mDialParaInfo.index = 0;
+    mDialParaInfo.callType = CallType::TYPE_IMS;
+    sptr<CallBase> call = new IMSCall(mDialParaInfo);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    CallObjectManager::AddOneCallObject(call);
+    audioControl->HandleNextState(call, TelCallState::CALL_STATUS_ACTIVE);
+    audioControl->HandleNextState(call, TelCallState::CALL_STATUS_DISCONNECTED);
+    audioControl->RecoverSysMicrophoneMute();
+    EXPECT_EQ(audioControl->audioInterruptState_, AudioInterruptState::INTERRUPT_STATE_DEACTIVATED);
+    EXPECT_FALSE(audioControl->recoverSysMuteAfterCall_);
+    audioControl->UnInit();
+}
+
 /**
  * @tc.number   Telephony_PlayRingtone_001
  * @tc.name     test error branch
