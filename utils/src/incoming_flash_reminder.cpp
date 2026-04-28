@@ -62,7 +62,7 @@ IncomingFlashReminder::~IncomingFlashReminder()
     if (setTorchMode == nullptr) {
         return;
     }
-    int32_t result = setTorchMode(static_cast<int>(TelTorchMode::TORCH_MODE_OFF));
+    setTorchMode(static_cast<int>(TelTorchMode::TORCH_MODE_OFF));
 #endif
 }
 
