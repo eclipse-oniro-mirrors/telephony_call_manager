@@ -469,7 +469,7 @@ ohos_unittest("tel_call_manager_zero10_gtest") {
   defines += call_manager_defines
 }
 
-ohos_unittest("tel_call_manager_zero_incoming_flash_reminder_test") {
+ohos_unittest("tel_call_manager_zero_flash_reminder_test") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "call_manager"
@@ -485,8 +485,7 @@ ohos_unittest("tel_call_manager_zero_incoming_flash_reminder_test") {
 
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
-    "${CALL_MANAGER_PATH}/utils/src/incoming_flash_reminder.cpp",
-    "src/zero_branch_incoming_flash_reminder_test.cpp",
+    "src/zero_branch_flash_reminder_test.cpp",
   ]
   sources += call_manager_sources
 
