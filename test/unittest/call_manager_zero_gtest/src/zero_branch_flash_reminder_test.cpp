@@ -12,16 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #define private public
 #define protected public
-#include "incoming_flash_reminder.h"
-#include "gtest/gtest.h"
-#include "telephony_errors.h"
-#include "telephony_log_wrapper.h"
 #include <dlfcn.h>
 #include <functional>
 #include <memory>
+#include "gtest/gtest.h"
+
+#include "incoming_flash_reminder.h"
+#include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
