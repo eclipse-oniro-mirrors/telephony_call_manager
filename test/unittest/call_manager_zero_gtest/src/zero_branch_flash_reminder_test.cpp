@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #define private public
 #define protected public
 #include "incoming_flash_reminder.h"
@@ -112,8 +113,7 @@ HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_Destructor_NotUsed, TestSize.
     reminder_->libAdapterHandler_ = nullptr;
     reminder_->isFlashRemindUsed_ = false;
     reminder_.reset();
-    reminder_ = nullptr;
-    EXPECT_TRUE(true);
+    EXPECT_EQ(reminder_, nullptr);
 }
 
 /**
@@ -126,8 +126,7 @@ HWTEST_F(IncomingFlashReminderTest, HandlerNullptr_Destructor_Used, TestSize.Lev
     reminder_->libAdapterHandler_ = nullptr;
     reminder_->isFlashRemindUsed_ = true;
     reminder_.reset();
-    reminder_ = nullptr;
-    EXPECT_TRUE(true);
+    EXPECT_EQ(reminder_, nullptr);
 }
 
 /**
@@ -175,8 +174,8 @@ HWTEST_F(IncomingFlashReminderTest, DlsymFailed_Destructor, TestSize.Level0)
         reminder_->isFlashRemindUsed_ = true;
         reminder_.reset();
         reminder_ = nullptr;
-        EXPECT_TRUE(true);
     }
+    EXPECT_EQ(reminder_, nullptr);
 }
 
 /**
@@ -249,11 +248,8 @@ HWTEST_F(IncomingFlashReminderTest, FlashRemind, TestSize.Level0)
     reminder_->StartFlashRemind();
     EXPECT_FALSE(callbackCalled_);
 
-    sleep(WAIT_TIME);
     reminder_->isFlashRemindUsed_ = true;
     reminder_->StopFlashRemind();
-
-    sleep(WAIT_TIME);
     EXPECT_FALSE(reminder_->isFlashRemindUsed_);
 }
 
