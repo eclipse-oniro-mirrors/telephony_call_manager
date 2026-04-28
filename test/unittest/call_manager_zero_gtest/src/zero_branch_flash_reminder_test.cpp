@@ -142,6 +142,7 @@ HWTEST_F(IncomingFlashReminderTest, DlsymFailed, TestSize.Level0)
         EXPECT_FALSE(reminder_->IsTorchReady());
         reminder_->HandleSetTorchMode();
         reminder_->ReleaseDepsAdapter();
+        dlclose(reminder_->libAdapterHandler_);
         EXPECT_NE(reminder_->libAdapterHandler_, nullptr);
     }
 }
@@ -158,6 +159,7 @@ HWTEST_F(IncomingFlashReminderTest, DlsymFailed_HandleStopFlashRemind, TestSize.
         reminder_->isFlashRemindUsed_ = true;
         callbackCalled_ = false;
         reminder_->HandleStopFlashRemind();
+        dlclose(reminder_->libAdapterHandler_);
         EXPECT_FALSE(callbackCalled_);
     }
 }
@@ -171,11 +173,11 @@ HWTEST_F(IncomingFlashReminderTest, DlsymFailed_Destructor, TestSize.Level0)
 {
     reminder_->libAdapterHandler_ = dlopen("libtelephony_cust_api.z.so", RTLD_LAZY);
     if (reminder_->libAdapterHandler_ != nullptr) {
-        reminder_->isFlashRemindUsed_ = true;
+        dlclose(reminder_->libAdapterHandler_);
         reminder_.reset();
-        reminder_ = nullptr;
     }
-    EXPECT_EQ(reminder_, nullptr);
+    
+    EXPECT_EQ(reminder_->isFlashRemindUsed_, false);
 }
 
 /**
