@@ -921,5 +921,15 @@ int32_t CallManagerClient::HangUpCall()
         return TELEPHONY_ERR_UNINIT;
     }
 }
+
+int32_t CallManagerClient::GetCallTransferInfo(const std::string number, CallTransferType type)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->GetCallTransferInfo(number, type);
+    } else {
+        TELEPHONY_LOGE("GetCallTransferInfo by number, init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

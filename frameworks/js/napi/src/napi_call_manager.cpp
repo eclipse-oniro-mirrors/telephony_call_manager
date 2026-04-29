@@ -2036,7 +2036,7 @@ napi_value NapiCallManager::SetCallRestrictionPassword(napi_env env, napi_callba
 napi_value NapiCallManager::GetCallTransferInfo(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
-    if (!MatchTwoNumberParameters(env, argv, argc)) {
+    if (!MatchTwoNumberParameters(env, argv, argc) && !MatchNumberAndStringParameters(env, argv, argc)) {
         TELEPHONY_LOGE("NapiCallManager::GetCallTransferInfo MatchTwoNumberParameters failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
@@ -2047,14 +2047,23 @@ napi_value NapiCallManager::GetCallTransferInfo(napi_env env, napi_callback_info
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
-    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
-    napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->type);
+    bool isGetCallTransferInfoByNumber = false;
+    if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_number)) {
+        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
+        napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->type);
+    } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_string)) {
+        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->type);
+        napi_get_value_string_utf8(env, argv[ARRAY_INDEX_SECOND], asyncContext->number,
+            PHONE_NUMBER_MAXIMUM_LIMIT, &(asyncContext->numberLen));
+        isGetCallTransferInfoByNumber = true;
+    }
     if (argc == VALUE_MAXIMUM_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
     napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
-    return HandleAsyncWork(env, asyncContext.release(), "GetCallTransferInfo", NativeGetTransferNumber, NativeCallBack);
+    return HandleAsyncWork(env, asyncContext.release(), "GetCallTransferInfo",
+        isGetCallTransferInfoByNumber ? NativeGetCallTransferByNumber : NativeGetTransferNumber, NativeCallBack);
 }
 
 napi_value NapiCallManager::SetCallTransferInfo(napi_env env, napi_callback_info info)
@@ -5587,6 +5596,44 @@ void NapiCallManager::NativeHangUpCallNoParam(napi_env env, void *data)
         asyncContext->resolved = TELEPHONY_SUCCESS;
     }
     asyncContext->eventId = CALL_MANAGER_DISCONNECT_CALL;
+}
+
+void NapiCallManager::NativeGetCallTransferByNumber(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeGetCallTransferByNumber data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (SupplementAsyncContext *)data;
+    EventCallback infoListener;
+    infoListener.env = asyncContext->env;
+    infoListener.thisVar = asyncContext->thisVar;
+    infoListener.callbackRef = asyncContext->callbackRef;
+    infoListener.deferred = asyncContext->deferred;
+    asyncContext->errorCode = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterGetTransferCallback(
+        infoListener, asyncContext->type);
+    if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("RegisterGetTransferCallback failed!");
+        return;
+    }
+    CallTransferType type = static_cast<CallTransferType>(asyncContext->type);
+    std::string number(asyncContext->number, asyncContext->numberLen);
+    auto callManagerClient = DelayedSingleton<CallManagerClient>::GetInstance();
+    if (callManagerClient == nullptr) {
+        TELEPHONY_LOGE("callManagerClient is nullptr!");
+        return;
+    }
+    asyncContext->errorCode = callManagerClient->GetCallTransferInfo(number, type);
+    if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
+        asyncContext->eventId = CALL_MANAGER_GET_CALL_TRANSFER;
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterGetTransferCallback();
+        TELEPHONY_LOGE("GetCallTransferInfo failed!");
+        return;
+    }
+    asyncContext->resolved = TELEPHONY_SUCCESS;
+    asyncContext->callbackRef = nullptr;
+    asyncContext->deferred = nullptr;
 }
 } // namespace Telephony
 } // namespace OHOS

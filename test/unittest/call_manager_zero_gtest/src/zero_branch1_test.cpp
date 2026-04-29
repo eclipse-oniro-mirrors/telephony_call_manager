@@ -1360,5 +1360,85 @@ HWTEST_F(ZeroBranch2Test, Telephony_EdmCallPolicy_002, Function | MediumTest | L
     edmCallPolicy->SetCallPolicy(false, dialingList, true, incomingList);
     EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), true);
 }
+
+/**
+ * @tc.number   Telephony_CallPolicy_DialPolicy_001
+ * @tc.name     Test CheckDialType - invalid dial type
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_DialPolicy_001, Function | MediumTest | Level1)
+{
+    CallPolicy mCallPolicy;
+    // Test invalid dial type
+    EXPECT_EQ(mCallPolicy.CheckDialType(static_cast<DialType>(-1)), TELEPHONY_ERR_ARGUMENT_INVALID);
+    // Test valid dial types
+    EXPECT_EQ(mCallPolicy.CheckDialType(DialType::DIAL_CARRIER_TYPE), TELEPHONY_SUCCESS);
+    EXPECT_EQ(mCallPolicy.CheckDialType(DialType::DIAL_VOICE_MAIL_TYPE), TELEPHONY_SUCCESS);
+    EXPECT_EQ(mCallPolicy.CheckDialType(DialType::DIAL_OTT_TYPE), TELEPHONY_SUCCESS);
+    EXPECT_EQ(mCallPolicy.CheckDialType(DialType::DIAL_BLUETOOTH_TYPE), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallPolicy_DialPolicy_002
+ * @tc.name     Test ValidateDialScene - invalid dial scene
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_DialPolicy_002, Function | MediumTest | Level1)
+{
+    CallPolicy mCallPolicy;
+    // Test invalid dial scene
+    EXPECT_EQ(mCallPolicy.ValidateDialScene(static_cast<DialScene>(-1)), TELEPHONY_ERR_ARGUMENT_INVALID);
+    // Test valid dial scenes
+    EXPECT_EQ(mCallPolicy.ValidateDialScene(DialScene::CALL_NORMAL), TELEPHONY_SUCCESS);
+    EXPECT_EQ(mCallPolicy.ValidateDialScene(DialScene::CALL_PRIVILEGED), TELEPHONY_SUCCESS);
+    EXPECT_EQ(mCallPolicy.ValidateDialScene(DialScene::CALL_EMERGENCY), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallPolicy_DialPolicy_003
+ * @tc.name     Test ValidateVideoState - invalid video state
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_DialPolicy_003, Function | MediumTest | Level1)
+{
+    CallPolicy mCallPolicy;
+    // Test invalid video state
+    EXPECT_EQ(mCallPolicy.ValidateVideoState(VideoStateType::TYPE_SEND_ONLY), TELEPHONY_ERR_ARGUMENT_INVALID);
+    EXPECT_EQ(mCallPolicy.ValidateVideoState(VideoStateType::TYPE_RECEIVE_ONLY), TELEPHONY_ERR_ARGUMENT_INVALID);
+    // Test valid video states
+    EXPECT_EQ(mCallPolicy.ValidateVideoState(VideoStateType::TYPE_VOICE), TELEPHONY_SUCCESS);
+    EXPECT_EQ(mCallPolicy.ValidateVideoState(VideoStateType::TYPE_VIDEO), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallPolicy_DialPolicy_004
+ * @tc.name     Test ValidateCallType - invalid call type
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_DialPolicy_004, Function | MediumTest | Level1)
+{
+    CallPolicy mCallPolicy;
+    // Test invalid call type
+    EXPECT_EQ(mCallPolicy.ValidateCallType(CallType::TYPE_ERR_CALL), TELEPHONY_ERR_ARGUMENT_INVALID);
+    EXPECT_EQ(mCallPolicy.ValidateCallType(CallType::TYPE_VOIP), TELEPHONY_ERR_ARGUMENT_INVALID);
+    // Test valid call types
+    EXPECT_EQ(mCallPolicy.ValidateCallType(CallType::TYPE_CS), TELEPHONY_SUCCESS);
+    EXPECT_EQ(mCallPolicy.ValidateCallType(CallType::TYPE_IMS), TELEPHONY_SUCCESS);
+    EXPECT_EQ(mCallPolicy.ValidateCallType(CallType::TYPE_OTT), TELEPHONY_SUCCESS);
+    EXPECT_EQ(mCallPolicy.ValidateCallType(CallType::TYPE_SATELLITE), TELEPHONY_SUCCESS);
+    EXPECT_EQ(mCallPolicy.ValidateCallType(CallType::TYPE_BLUETOOTH), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallPolicy_DialPolicy_005
+ * @tc.name     Test CheckCallLimit - ecc and non-ecc scenarios
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_DialPolicy_005, Function | MediumTest | Level1)
+{
+    CallPolicy mCallPolicy;
+    EXPECT_EQ(mCallPolicy.CheckCallLimit(true, VideoStateType::TYPE_VOICE), TELEPHONY_SUCCESS);
+    EXPECT_EQ(mCallPolicy.CheckCallLimit(true, VideoStateType::TYPE_VIDEO), TELEPHONY_SUCCESS);
+}
 } // namespace Telephony
 } // namespace OHOS

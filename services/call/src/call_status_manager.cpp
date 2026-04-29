@@ -473,19 +473,11 @@ int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &in
 int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle incoming state");
-    detectStartTime = std::chrono::system_clock::from_time_t(0);
     int32_t ret = TELEPHONY_SUCCESS;
     bool isExisted = false;
-    ret = RefreshOldCall(info, isExisted);
-    if (isExisted) {
+    ret = PrepareIncomingCall(info, isExisted);
+    if (isExisted || ret != TELEPHONY_SUCCESS) {
         return ret;
-    }
-    if (info.callType == CallType::TYPE_CS || info.callType == CallType::TYPE_IMS ||
-        info.callType == CallType::TYPE_SATELLITE) {
-        ret = IncomingFilterPolicy(info);
-        if (ret != TELEPHONY_SUCCESS) {
-            return ret;
-        }
     }
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
     if (call == nullptr) {
@@ -496,11 +488,18 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         ModifyEsimType();
     }
     SetContactInfo(call, std::string(info.phoneNum));
-    bool block = false;
-    if (IsRejectCall(call, info, block)) {
-        return HandleRejectCall(call, block);
+#ifdef SUPPORT_DSOFTBUS
+    auto dcMgrInstance = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    if (!(dcMgrInstance != nullptr && dcMgrInstance->IsSinkRole() && dcMgrInstance->IsConnected())) {
+#endif
+        bool block = false;
+        if (IsRejectCall(call, info, block)) {
+            return HandleRejectCall(call, block);
+        }
+        PublishIncomingCallBlockInfo(call, block);
+#ifdef SUPPORT_DSOFTBUS
     }
-    PublishIncomingCallBlockInfo(call, block);
+#endif
     if (info.callType != CallType::TYPE_VOIP && info.callType != CallType::TYPE_BLUETOOTH &&
         IsRingOnceCall(call, info)) {
         return HandleRingOnceCall(call);
@@ -508,7 +507,6 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     HandleVideoCallInAdvsecMode(call, info);
     AddOneCallObject(call);
     StartInComingCallMotionRecognition();
-
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
@@ -520,6 +518,20 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("FilterResultsDispose failed!");
     }
     DelayedSingleton<CallControlManager>::GetInstance()->StartFlashRemind();
+    return ret;
+}
+
+int32_t CallStatusManager::PrepareIncomingCall(const CallDetailInfo &info, bool &isExisted)
+{
+    detectStartTime_ = std::chrono::system_clock::from_time_t(0);
+    int32_t ret = RefreshOldCall(info, isExisted);
+    if (isExisted) {
+        return ret;
+    }
+    if (info.callType == CallType::TYPE_CS || info.callType == CallType::TYPE_IMS ||
+        info.callType == CallType::TYPE_SATELLITE) {
+        ret = IncomingFilterPolicy(info);
+    }
     return ret;
 }
 
@@ -1973,7 +1985,7 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
 #ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
     return HandleWatchCallDisposition(spamCallAdapterPtr, call);
 #else
-    detectStartTime = std::chrono::system_clock::now();
+    detectStartTime_ = std::chrono::system_clock::now();
     if (spamCallAdapterPtr->WaitForDetectResult()) {
         TELEPHONY_LOGW("DetectSpamCall no time out");
         NumberMarkInfo numberMarkInfo;
@@ -2054,9 +2066,9 @@ bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDet
         return false;
     }
     auto waitTime = WAIT_TIME_THREE_SECOND;
-    if (detectStartTime != std::chrono::system_clock::from_time_t(0)) {
+    if (detectStartTime_ != std::chrono::system_clock::from_time_t(0)) {
         auto detectEndTime = std::chrono::system_clock::now();
-        auto diff = detectEndTime - detectStartTime;
+        auto diff = detectEndTime - detectStartTime_;
         std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(diff);
         if (diff >= WAIT_TIME_THREE_SECOND) {
             TELEPHONY_LOGW("cost time over 3s, non need check ring once call");

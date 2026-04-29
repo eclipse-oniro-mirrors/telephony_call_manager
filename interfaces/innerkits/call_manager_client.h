@@ -755,6 +755,15 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t HangUpCall();
+
+    /**
+     * @brief Gets the call transfer information of the current phone number
+     *
+     * @param number[in], The phone number which sim card get call transfer
+     * @param type[in], Call Transfer Type
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetCallTransferInfo(const std::string number, CallTransferType type);
 };
 } // namespace Telephony
 } // namespace OHOS

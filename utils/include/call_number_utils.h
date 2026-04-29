@@ -52,8 +52,12 @@ public:
     void NumberLocationUpdate(const sptr<CallBase> &callObjectPtr);
     int32_t QueryYellowPageAndMarkInfo(NumberMarkInfo &numberMarkInfo, std::string accountNumber);
     void YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPtr);
+    bool GetAccountIdByNumber(const std::u16string &number, int32_t& slotId);
+
 private:
     void ProcessSpace(std::string &number);
+    bool IsSamePhoneNumber(const std::u16string &localNumber, const std::u16string &number);
+    std::string NormalizePhoneNumber(const std::u16string &number);
 
 private:
     static const int16_t HAS_A_SLOT = 1;

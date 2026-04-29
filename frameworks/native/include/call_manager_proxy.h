@@ -138,6 +138,7 @@ public:
     int32_t AnswerCall();
     int32_t RejectCall();
     int32_t HangUpCall();
+    int32_t GetCallTransferInfo(const std::string number, CallTransferType type);
 
 private:
     int32_t ConnectService();

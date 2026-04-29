@@ -142,6 +142,7 @@ private:
     int32_t OnAcceptCallNoParam(MessageParcel &data, MessageParcel &reply);
     int32_t OnRejectCallNoParam(MessageParcel &data, MessageParcel &reply);
     int32_t OnHangUpCallNoParam(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetTransferNumberByNumber(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
     std::map<uint32_t, std::string> collieCodeStringMap_ = {

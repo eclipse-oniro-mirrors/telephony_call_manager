@@ -66,6 +66,7 @@ static constexpr const char *OHOS_PERMISSION_ANSWER_CALL = "ohos.permission.ANSW
 static constexpr const char *OHOS_PERMISSION_READ_CALL_LOG = "ohos.permission.READ_CALL_LOG";
 static constexpr const char *OHOS_PERMISSION_WRITE_CALL_LOG = "ohos.permission.WRITE_CALL_LOG";
 static constexpr const char *OHOS_PERMISSION_MANAGE_CALL_FOR_DEVICES = "ohos.permission.MANAGE_CALL_FOR_DEVICES";
+static constexpr const char *OHOS_PERMISSION_GET_CALL_TRANSFER_INFO = "ohos.permission.GET_CALL_TRANSFER_INFO";
 static constexpr const char *SLOT_ID = "accountId";
 static constexpr const char *CALL_TYPE = "callType";
 static constexpr const char *VIDEO_STATE = "videoState";
@@ -73,6 +74,8 @@ static constexpr int32_t CLEAR_VOICE_MAIL_COUNT = 0;
 static constexpr int32_t IS_CELIA_CALL = 1;
 static constexpr int32_t EDM_UID = 3057;
 static constexpr int32_t AUDIO_UID = 1041;
+static std::unordered_map<std::string, std::chrono::steady_clock::time_point> lastGetCallTransferInfoTimes_;
+static const int32_t MIN_GET_CALL_TRANSFER_TIME = 30;
 
 const bool g_registerResult =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<CallManagerService>::GetInstance().get());
@@ -259,12 +262,9 @@ std::string CallManagerService::GetStartServiceSpent()
 
 int32_t CallManagerService::RegisterCallBack(const sptr<ICallAbilityCallback> &callback)
 {
-    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
-        TELEPHONY_LOGE("Non-system applications use system APIs!");
-        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
-    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE) &&
-        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE) &&
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_CALL_TRANSFER_INFO)) {
         TELEPHONY_LOGE("Permission denied.");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
@@ -2011,6 +2011,34 @@ int32_t CallManagerService::HangUpCall()
     }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->HangUpCall(INVALID_CALLID);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::GetCallTransferInfo(const std::string number, CallTransferType type)
+{
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_CALL_TRANSFER_INFO)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    std::lock_guard<ffrt::mutex> guard(callTransferLock_);
+    int32_t slotId = 0;
+    if (!DelayedSingleton<CallNumberUtils>::GetInstance()->GetAccountIdByNumber(Str8ToStr16(number), slotId)) {
+        return CALL_ERR_INVALID_CALL_NUMBER;
+    }
+
+    std::string key = number + ":" + std::to_string(static_cast<int>(type));
+    auto now = std::chrono::steady_clock::now();
+    if (lastGetCallTransferInfoTimes_.find(key) != lastGetCallTransferInfoTimes_.end() &&
+        std::chrono::duration_cast<std::chrono::seconds>(now - lastGetCallTransferInfoTimes_[key]).count() <
+        MIN_GET_CALL_TRANSFER_TIME) {
+        return CALL_ERR_OPERATION_TOO_FREQUENT;
+    }
+    lastGetCallTransferInfoTimes_[key] = now;
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->GetCallTransferInfo(slotId, type);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

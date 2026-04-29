@@ -24,6 +24,7 @@
 #include "call_object_manager.h"
 #include "call_state_processor.h"
 #include "call_status_callback_proxy.h"
+#include "call_status_manager.h"
 #include "cs_call.h"
 #include "cs_call_state.h"
 #include "dialing_state.h"
@@ -1031,5 +1032,25 @@ HWTEST_F(CallStateTest, Telephony_CoreServiceConnection_001, TestSize.Level0)
     ASSERT_FALSE(res);
 }
 
+#ifdef SUPPORT_DSOFTBUS
+/**
+ * @tc.number   Telephony_CallStatusManager_PrepareIncomingCall_001
+ * @tc.name     test PrepareIncomingCall function with TYPE_CS
+ * @tc.desc     Function test - verify PrepareIncomingCall covers new if branch for TYPE_CS
+ */
+HWTEST_F(CallStateTest, Telephony_CallStatusManager_PrepareIncomingCall_001, TestSize.Level0)
+{
+    CallObjectManager::callObjectPtrList_.clear();
+    auto callStatusManager = DelayedSingleton<CallStatusManager>::GetInstance();
+    ASSERT_NE(callStatusManager, nullptr);
+    CallDetailInfo info;
+    info.accountId = 0;
+    info.callType = CallType::TYPE_CS;
+    bool isExisted = false;
+    int32_t ret = callStatusManager->PrepareIncomingCall(info, isExisted);
+    EXPECT_EQ(isExisted, false);
+    EXPECT_NE(ret, TELEPHONY_ERR_ARGUMENT_NULL);
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

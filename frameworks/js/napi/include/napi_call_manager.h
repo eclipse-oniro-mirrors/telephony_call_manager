@@ -284,6 +284,7 @@ private:
     static void NativeAnswerCallNoParam(napi_env env, void *data);
     static void NativeRejectCallNoParam(napi_env env, void *data);
     static void NativeHangUpCallNoParam(napi_env env, void *data);
+    static void NativeGetCallTransferByNumber(napi_env env, void *data);
 private:
     static int32_t registerStatus_;
 };

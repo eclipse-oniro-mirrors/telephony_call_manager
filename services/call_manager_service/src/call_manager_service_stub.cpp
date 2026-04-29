@@ -173,6 +173,8 @@ void CallManagerServiceStub::InitCallSupplementRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnCloseUnFinishedUssd(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SEND_USSD_RESPONSE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSendUssdResponse(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_TRANSFER_BY_NUMBER)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetTransferNumberByNumber(data, reply); };
 }
 
 void CallManagerServiceStub::initCallConferenceExRequest()
@@ -1638,6 +1640,20 @@ int32_t CallManagerServiceStub::OnHangUpCallNoParam(MessageParcel &data, Message
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return result;
+}
+
+int32_t CallManagerServiceStub::OnGetTransferNumberByNumber(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    std::string number = data.ReadString();
+    CallTransferType type = static_cast<CallTransferType>(data.ReadInt32());
+    result = GetCallTransferInfo(number, type);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

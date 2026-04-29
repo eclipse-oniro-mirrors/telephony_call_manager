@@ -56,6 +56,7 @@ private:
     int32_t OnUpdateRttCallErrorReport(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateRttCallMessage(MessageParcel &data, MessageParcel &reply);
 #endif
+    bool HasGetCallTransferPermission();
 
     std::map<uint32_t, CallAbilityCallbackFunc> memberFuncMap_;
 };

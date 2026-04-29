@@ -1613,5 +1613,27 @@ int32_t CallManagerServiceProxy::HangUpCall()
     }
     return replyParcel.ReadInt32();
 }
+
+int32_t CallManagerServiceProxy::GetCallTransferInfo(const std::string number, CallTransferType type)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (number.empty() || number.length() > ACCOUNT_NUMBER_MAX_LENGTH) {
+        TELEPHONY_LOGE("GetCallTransferInfo number is empty!");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    dataParcel.WriteString(number);
+    dataParcel.WriteInt32(static_cast<int32_t>(type));
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_GET_CALL_TRANSFER_BY_NUMBER, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Function GetCallTransfer! errCode:%{public}d", error);
+        return error;
+    }
+    return replyParcel.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS

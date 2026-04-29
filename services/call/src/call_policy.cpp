@@ -39,43 +39,108 @@ CallPolicy::~CallPolicy() {}
 int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extras, bool isEcc)
 {
     DialType dialType = (DialType)extras.GetIntValue("dialType");
+    int32_t ret = CheckDialType(dialType);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    }
+    std::string phoneNum = Str16ToStr8(number);
+    ret = CheckMdmPolicy(phoneNum);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    }
+    int32_t accountId = extras.GetIntValue("accountId");
+    ret = SelectAccountIdForCarrier(accountId, extras);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    }
+    CallType callType = (CallType)extras.GetIntValue("callType");
+    ret = ValidateCallType(callType);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    }
+    DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
+    ret = ValidateDialScene(dialScene);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    }
+    VideoStateType videoState = (VideoStateType)extras.GetIntValue("videoState");
+    ret = ValidateVideoState(videoState);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    }
+    ret = CheckCallLimit(isEcc, videoState);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    }
+    return SuperPrivacyMode(number, extras, isEcc);
+}
+
+int32_t CallPolicy::CheckDialType(DialType dialType)
+{
     if (dialType != DialType::DIAL_CARRIER_TYPE && dialType != DialType::DIAL_VOICE_MAIL_TYPE &&
         dialType != DialType::DIAL_OTT_TYPE && dialType != DialType::DIAL_BLUETOOTH_TYPE) {
         TELEPHONY_LOGE("dial type invalid! dialType=%{public}d", dialType);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    std::string phoneNum = Str16ToStr8(number);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallPolicy::CheckMdmPolicy(const std::string &phoneNum)
+{
     if (!IsDialingEnable(phoneNum)) {
         TELEPHONY_LOGE("MDM policy is disabled!");
+        auto dialog = DelayedSingleton<CallDialog>::GetInstance();
+        if (dialog != nullptr) {
+            dialog->DialogConnectExtension("CALL_FAILED_POLICY_DISABLED");
+        }
         return TELEPHONY_ERR_POLICY_DISABLED;
     }
-    int32_t accountId = extras.GetIntValue("accountId");
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallPolicy::SelectAccountIdForCarrier(int32_t accountId, AppExecFwk::PacMap &extras)
+{
+    DialType dialType = (DialType)extras.GetIntValue("dialType");
     if (dialType == DialType::DIAL_CARRIER_TYPE) {
         if (!DelayedSingleton<CallNumberUtils>::GetInstance()->SelectAccountId(accountId, extras)) {
             extras.PutIntValue("accountId", 0);
             TELEPHONY_LOGE("invalid accountId, select accountId to 0");
         }
     }
-    CallType callType = (CallType)extras.GetIntValue("callType");
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallPolicy::ValidateCallType(CallType callType)
+{
     if (IsValidCallType(callType) != TELEPHONY_SUCCESS) {
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
-    if ((dialScene != DialScene::CALL_NORMAL && dialScene != DialScene::CALL_PRIVILEGED &&
-            dialScene != DialScene::CALL_EMERGENCY)) {
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallPolicy::ValidateDialScene(DialScene dialScene)
+{
+    if (dialScene != DialScene::CALL_NORMAL && dialScene != DialScene::CALL_PRIVILEGED &&
+        dialScene != DialScene::CALL_EMERGENCY) {
         TELEPHONY_LOGE("invalid dial scene!");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    VideoStateType videoState = (VideoStateType)extras.GetIntValue("videoState");
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallPolicy::ValidateVideoState(VideoStateType videoState)
+{
     if (videoState != VideoStateType::TYPE_VOICE && videoState != VideoStateType::TYPE_VIDEO) {
         TELEPHONY_LOGE("invalid video state!");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallPolicy::CheckCallLimit(bool isEcc, VideoStateType videoState)
+{
     if (!isEcc) {
-        if (IsVoiceCallValid(videoState) != TELEPHONY_SUCCESS) {
-            return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
-        }
-        if (HasNewCall() != TELEPHONY_SUCCESS) {
+        if (IsVoiceCallValid(videoState) != TELEPHONY_SUCCESS || HasNewCall() != TELEPHONY_SUCCESS) {
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
         }
         bool hasEccCall = false;
@@ -84,7 +149,7 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
         }
     }
-    return SuperPrivacyMode(number, extras, isEcc);
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallPolicy::SuperPrivacyMode(std::u16string &number, AppExecFwk::PacMap &extras, bool isEcc)

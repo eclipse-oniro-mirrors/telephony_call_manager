@@ -382,5 +382,40 @@ int32_t CallNumberUtils::QueryYellowPageAndMarkInfo(NumberMarkInfo &numberMarkIn
     }
     return TELEPHONY_SUCCESS;
 }
+
+bool CallNumberUtils::GetAccountIdByNumber(const std::u16string &inputNumber, int32_t& slotId)
+{
+    for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
+        std::u16string showNumber;
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetShowNumber(i, showNumber);
+        if (IsSamePhoneNumber(showNumber, inputNumber)) {
+            slotId = i;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CallNumberUtils::IsSamePhoneNumber(const std::u16string &localNumber, const std::u16string &inputNumber)
+{
+    std::string localNumberStr = NormalizePhoneNumber(localNumber);
+    std::string inputNumberStr = NormalizePhoneNumber(inputNumber);
+    if (localNumberStr.empty() || inputNumberStr.empty()) {
+        TELEPHONY_LOGE("localNumberStr or inputNumberStr is empty");
+        return false;
+    }
+    return localNumberStr == inputNumberStr;
+}
+
+std::string CallNumberUtils::NormalizePhoneNumber(const std::u16string &number)
+{
+    std::string normalized = std::regex_replace(Str16ToStr8(number), std::regex("[^0-9]"), "");
+    std::regex pattern("1\\d{10}");
+    std::smatch match;
+    if (std::regex_search(normalized, match, pattern)) {
+        return match.str(0);
+    }
+    return "";
+}
 } // namespace Telephony
 } // namespace OHOS

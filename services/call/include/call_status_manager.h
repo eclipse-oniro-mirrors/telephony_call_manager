@@ -82,6 +82,7 @@ public:
 private:
     void InitCallBaseEvent();
     int32_t IncomingHandle(const CallDetailInfo &info);
+    int32_t PrepareIncomingCall(const CallDetailInfo &info, bool &isExisted);
     int32_t IncomingVoipCallHandle(const CallDetailInfo &info);
     int32_t OutgoingVoipCallHandle(const CallDetailInfo &info);
     int32_t AnsweredVoipCallHandle(const CallDetailInfo &info);
@@ -194,7 +195,7 @@ private:
     const std::string IS_DELETED = "is_deleted";
     const int32_t CALL_NUMBER = 2;
     std::unique_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
-    std::chrono::system_clock::time_point detectStartTime = std::chrono::system_clock::from_time_t(0);
+    std::chrono::system_clock::time_point detectStartTime_ = std::chrono::system_clock::from_time_t(0);
     int32_t antiFraudSlotId_ = -1;
     int32_t antiFraudIndex_ = -1;
     ffrt::mutex mutex_;
