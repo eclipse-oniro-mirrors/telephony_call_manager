@@ -1389,7 +1389,7 @@ int32_t CallManagerServiceProxy::IsPreloadCallUI(bool isConnectService)
     }
     dataParcel.WriteBool(isConnectService);
     MessageParcel replyParcel;
-    int32_t error = SendRequest(INTERFACE_UPDATE_CALLUI, dataParcel, replyParcel);
+    int32_t error = SendRequest(INTERFACE_PRELOAD_CALLUI, dataParcel, replyParcel);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function IsPreloadCallUI call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
