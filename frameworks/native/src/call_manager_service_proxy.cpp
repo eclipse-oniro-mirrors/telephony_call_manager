@@ -1380,18 +1380,18 @@ int32_t CallManagerServiceProxy::SendCallUiEvent(int32_t callId, std::string &ev
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::IsPreloadCallUI(bool isConnectService)
+int32_t CallManagerServiceProxy::PreloadCallUI(bool enable)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    dataParcel.WriteBool(isConnectService);
+    dataParcel.WriteBool(enable);
     MessageParcel replyParcel;
     int32_t error = SendRequest(INTERFACE_PRELOAD_CALLUI, dataParcel, replyParcel);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function IsPreloadCallUI call failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("function PreloadCallUI call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
