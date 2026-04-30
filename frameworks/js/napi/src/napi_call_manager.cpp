@@ -3339,7 +3339,7 @@ void NapiCallManager::NativePreloadCallUI(napi_env env, void *data)
     auto asyncContext = (BoolResultAsyncContext *)data;
     auto callManagerClient = DelayedSingleton<CallManagerClient>::GetInstance();
     if (callManagerClient != nullptr) {
-        asyncContext->errorCode = callManagerClient->IsPreloadCallUI(true);
+        asyncContext->errorCode = callManagerClient->PreloadCallUI(true);
         asyncContext->enabled = true;
     }
 }
@@ -3354,7 +3354,7 @@ void NapiCallManager::NativeUnloadCallUI(napi_env env, void *data)
     auto asyncContext = (BoolResultAsyncContext *)data;
     auto callManagerClient = DelayedSingleton<CallManagerClient>::GetInstance();
     if (callManagerClient != nullptr) {
-        asyncContext->errorCode = callManagerClient->IsPreloadCallUI(false);
+        asyncContext->errorCode = callManagerClient->PreloadCallUI(false);
         asyncContext->enabled = true;
     }
 }
