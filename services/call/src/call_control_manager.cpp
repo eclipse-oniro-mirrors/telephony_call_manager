@@ -2130,10 +2130,11 @@ void CallControlManager::UpdateCallUI(bool isConnectService, int32_t callingPid)
     auto it = std::find(preloadedCallUiRequestPids_.begin(), preloadedCallUiRequestPids_.end(), callingPid);
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     if (isConnectService) {
-        if (it == preloadedCallUiRequestPids_.end()) {
-            preloadedCallUiRequestPids_.push_back(callingPid);
+        if (it != preloadedCallUiRequestPids_.end()) {
+            return;
         }
         TELEPHONY_LOGI("PreloadCallUI pid: %{public}d", callingPid);
+        preloadedCallUiRequestPids_.push_back(callingPid);
         RegisterAppStateObserver();
         ConnectCallUiService(isConnectService);
     } else {
