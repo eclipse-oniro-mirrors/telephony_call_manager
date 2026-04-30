@@ -3305,7 +3305,7 @@ napi_value NapiCallManager::PreloadCallUI(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     return HandleAsyncWork(
-        env, asyncContext.release(), "PreloadCallUI", NativePreloadCallUI, NativeCallUICallBackWithErrorCode);
+        env, asyncContext.release(), "PreloadCallUI", NativePreloadCallUI, NativeBoolCallBackWithErrorCode);
 }
  
 napi_value NapiCallManager::UnloadCallUI(napi_env env, napi_callback_info info)
@@ -3326,7 +3326,7 @@ napi_value NapiCallManager::UnloadCallUI(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     return HandleAsyncWork(
-        env, asyncContext.release(), "UnloadCallUI", NativeUnloadCallUI, NativeCallUICallBackWithErrorCode);
+        env, asyncContext.release(), "UnloadCallUI", NativeUnloadCallUI, NativeBoolCallBackWithErrorCode);
 }
  
 void NapiCallManager::NativePreloadCallUI(napi_env env, void *data)
@@ -3691,48 +3691,6 @@ void NapiCallManager::NativeGetVoNRStateCallBack(napi_env env, napi_status statu
     napi_delete_async_work(env, getVoNRStateContext->work);
     delete getVoNRStateContext;
     getVoNRStateContext = nullptr;
-}
-
-void NapiCallManager::NativeCallUICallBackWithErrorCode(napi_env env, napi_status status, void *data)
-{
-    if (data == nullptr) {
-        TELEPHONY_LOGE("NapiCallManager::NativeBoolCallBackWithErrorCode data is nullptr");
-        NapiUtil::ThrowParameterError(env);
-        return;
-    }
-    auto asyncContext = (BoolResultAsyncContext *)data;
-    if (asyncContext->deferred != nullptr) {
-        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
-            napi_value promiseValue = nullptr;
-            napi_get_boolean(env, true, &promiseValue);
-            napi_status ret = napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
-            TELEPHONY_LOGI("promise failed result = %{public}d", ret);
-        } else {
-            napi_status ret = napi_reject_deferred(env, asyncContext->deferred,
-                NapiCallManagerUtils::CreateErrorCodeAndMessageForJs(
-                    env, asyncContext->errorCode, asyncContext->eventId));
-            TELEPHONY_LOGI("promise failed result = %{public}d", ret);
-        }
-    } else if (asyncContext->callbackRef != nullptr) {
-        napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
-        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
-            callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-            napi_get_boolean(env, true, &callbackValue[ARRAY_INDEX_SECOND]);
-        } else {
-            callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorCodeAndMessageForJs(
-                env, asyncContext->errorCode, asyncContext->eventId);
-            callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
-        }
-        napi_value callback = nullptr;
-        napi_value result = nullptr;
-        napi_get_reference_value(env, asyncContext->callbackRef, &callback);
-        napi_status ret = napi_call_function(env, nullptr, callback, std::size(callbackValue), callbackValue, &result);
-        TELEPHONY_LOGI("callback result = %{public}d", ret);
-        napi_delete_reference(env, asyncContext->callbackRef);
-    }
-    napi_delete_async_work(env, asyncContext->work);
-    delete asyncContext;
-    asyncContext = nullptr;
 }
 
 void NapiCallManager::NativeBoolCallBack(napi_env env, napi_status status, void *data)
