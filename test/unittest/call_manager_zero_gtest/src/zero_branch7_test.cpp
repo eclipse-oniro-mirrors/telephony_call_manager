@@ -575,7 +575,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerClient_001, Function | MediumTest
     std::string eventName = "abc";
     EXPECT_NE(callManagerClient->SendCallUiEvent(callId, eventName), TELEPHONY_ERR_UNINIT);
     bool isConnectService = true;
-    EXPECT_NE(callManagerClient->UpdateCallUI(isConnectService), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->IsPreloadCallUI(isConnectService), TELEPHONY_ERR_UNINIT);
     EXPECT_EQ(callManagerClient->RegisterBluetoothCallManagerCallbackPtr(eventName), nullptr);
     int32_t slotId = 0;
     std::string content = "1";
