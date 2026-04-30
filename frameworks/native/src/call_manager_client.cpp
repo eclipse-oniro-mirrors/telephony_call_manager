@@ -779,10 +779,10 @@ int32_t CallManagerClient::RequestCameraCapabilities(int32_t callId)
     }
 }
 
-int32_t CallManagerClient::UpdateCallUI(bool isConnectService)
+int32_t CallManagerClient::IsPreloadCallUI(bool isConnectService)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->UpdateCallUI(isConnectService);
+        return g_callManagerProxy->IsPreloadCallUI(isConnectService);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
