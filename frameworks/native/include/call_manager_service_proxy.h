@@ -734,10 +734,10 @@ public:
     /**
      * PreloadCallUI
      *
-     * @brief update callui
+     * @brief preload callui
      * @return Returns 0 on success, others on failure.
      */
-    int32_t PreloadCallUI(bool isConnectService) override;
+    int32_t PreloadCallUI(bool enable) override;
 
     /**
      * RegisterBluetoothCallManagerCallback
