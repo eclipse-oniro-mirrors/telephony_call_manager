@@ -645,11 +645,11 @@ public:
     int32_t UnRegisterVoipCallManagerCallback();
 
     /**
-     * @brief update call ui
+     * @brief is preload call ui
      *
      * @return Returns 0 on success, others on failure.
      */
-    int32_t UpdateCallUI(bool isConnectService);
+    int32_t IsPreloadCallUI(bool isConnectService);
 
     /**
      * @brief send call ui event
