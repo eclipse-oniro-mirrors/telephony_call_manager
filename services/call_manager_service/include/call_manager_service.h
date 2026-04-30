@@ -770,11 +770,11 @@ public:
     int32_t SendCallUiEvent(int32_t callId, std::string &eventName) override;
 
     /**
-     * @brief is preload callui
+     * @brief preload callui
      *
      * @return Returns 0 on success, others on failure.
      */
-    int32_t IsPreloadCallUI(bool isConnectService) override;
+    int32_t PreloadCallUI(bool enable) override;
 
     /**
      * OnAddSystemAbility
