@@ -115,7 +115,7 @@ public:
     virtual int32_t RegisterVoipCallManagerCallback() = 0;
     virtual int32_t UnRegisterVoipCallManagerCallback() = 0;
     virtual int32_t SendCallUiEvent(int32_t callId, std::string &eventName) = 0;
-    virtual int32_t IsPreloadCallUI(bool enable) = 0;
+    virtual int32_t PreloadCallUI(bool enable) = 0;
     virtual sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress) = 0;
     virtual int32_t SendUssdResponse(int32_t slotId, const std::string &content) = 0;
     virtual int32_t SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
