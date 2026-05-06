@@ -63,6 +63,7 @@ IncomingFlashReminder::~IncomingFlashReminder()
         return;
     }
     setTorchMode(static_cast<int>(TelTorchMode::TORCH_MODE_OFF));
+    RealeaseDepsAdapter();
 #endif
 }
 
