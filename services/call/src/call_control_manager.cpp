@@ -2124,7 +2124,7 @@ void CallControlManager::HandleVideoRingPlayFail()
     DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
 }
 
-void CallControlManager::PreloadCallUI(bool enable, int32_t callingPid)
+void CallControlManager::PreloadCallUi(bool enable, int32_t callingPid)
 {
     std::lock_guard<ffrt::mutex> lock(preloadedCallUiRequestPidsMutex_);
     auto it = std::find(preloadedCallUiRequestPids_.begin(), preloadedCallUiRequestPids_.end(), callingPid);
@@ -2133,7 +2133,7 @@ void CallControlManager::PreloadCallUI(bool enable, int32_t callingPid)
         if (it != preloadedCallUiRequestPids_.end()) {
             return;
         }
-        TELEPHONY_LOGI("PreloadCallUI pid: %{public}d", callingPid);
+        TELEPHONY_LOGI("PreloadCallUi pid: %{public}d", callingPid);
         preloadedCallUiRequestPids_.push_back(callingPid);
         RegisterAppStateObserver();
         ConnectCallUiService(enable);
