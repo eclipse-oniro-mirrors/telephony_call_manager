@@ -2143,7 +2143,7 @@ void CallControlManager::PreloadCallUi(bool enable, int32_t callingPid)
         }
         preloadedCallUiRequestPids_.erase(it);
         if (preloadedCallUiRequestPids_.empty()) {
-            TELEPHONY_LOGI("UnloadCallUI pid: %{public}d", callingPid);
+            TELEPHONY_LOGI("UnloadCallUi pid: %{public}d", callingPid);
             ConnectCallUiService(enable);
             UnregisterAppStateObserver();
         }
