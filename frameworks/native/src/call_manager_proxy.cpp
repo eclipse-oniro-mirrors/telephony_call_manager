@@ -1664,7 +1664,7 @@ int32_t CallManagerProxy::SendCallUiEvent(int32_t callId, std::string &eventName
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::PreloadCallUI(bool enable)
+int32_t CallManagerProxy::PreloadCallUi(bool enable)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
@@ -1675,9 +1675,9 @@ int32_t CallManagerProxy::PreloadCallUI(bool enable)
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t errCode = callManagerServicePtr_->PreloadCallUI(enable);
+    int32_t errCode = callManagerServicePtr_->PreloadCallUi(enable);
     if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("PreloadCallUI failed, errcode:%{public}d", errCode);
+        TELEPHONY_LOGE("PreloadCallUi failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;
