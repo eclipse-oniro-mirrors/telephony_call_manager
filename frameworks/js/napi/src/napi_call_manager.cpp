@@ -79,8 +79,8 @@ napi_value NapiCallManager::DeclareCallBasisInterface(napi_env env, napi_value e
         DECLARE_NAPI_WRITABLE_FUNCTION("setCallPreferenceMode", SetCallPreferenceMode),
         DECLARE_NAPI_WRITABLE_FUNCTION("hasVoiceCapability", HasVoiceCapability),
         DECLARE_NAPI_WRITABLE_FUNCTION("sendCallUiEvent", SendCallUiEvent),
-        DECLARE_NAPI_WRITABLE_FUNCTION("preloadCallUI", PreloadCallUI),
-        DECLARE_NAPI_WRITABLE_FUNCTION("unloadCallUI", UnloadCallUI),
+        DECLARE_NAPI_WRITABLE_FUNCTION("preloadCallUI", PreloadCallUi),
+        DECLARE_NAPI_WRITABLE_FUNCTION("unloadCallUI", UnloadCallUi),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -3287,7 +3287,7 @@ napi_value NapiCallManager::SendCallUiEvent(napi_env env, napi_callback_info inf
         env, asyncContext.release(), "SendCallUiEvent", NativeSendCallUiEvent, NativeVoidCallBackWithErrorCode);
 }
 
-napi_value NapiCallManager::PreloadCallUI(napi_env env, napi_callback_info info)
+napi_value NapiCallManager::PreloadCallUi(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, ONLY_ONE_VALUE);
     if (!MatchEmptyParameter(env, argv, argc)) {
@@ -3297,7 +3297,7 @@ napi_value NapiCallManager::PreloadCallUI(napi_env env, napi_callback_info info)
     }
     auto asyncContext = std::make_unique<BoolResultAsyncContext>();
     if (asyncContext == nullptr) {
-        TELEPHONY_LOGE("NapiCallManager::PreloadCallUI asyncContext is nullptr.");
+        TELEPHONY_LOGE("NapiCallManager::PreloadCallUi asyncContext is nullptr.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -3305,10 +3305,10 @@ napi_value NapiCallManager::PreloadCallUI(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     return HandleAsyncWork(
-        env, asyncContext.release(), "PreloadCallUI", NativePreloadCallUI, NativeBoolCallBackWithErrorCode);
+        env, asyncContext.release(), "PreloadCallUi", NativePreloadCallUi, NativeBoolCallBackWithErrorCode);
 }
  
-napi_value NapiCallManager::UnloadCallUI(napi_env env, napi_callback_info info)
+napi_value NapiCallManager::UnloadCallUi(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, ONLY_ONE_VALUE);
     if (!MatchEmptyParameter(env, argv, argc)) {
@@ -3318,7 +3318,7 @@ napi_value NapiCallManager::UnloadCallUI(napi_env env, napi_callback_info info)
     }
     auto asyncContext = std::make_unique<BoolResultAsyncContext>();
     if (asyncContext == nullptr) {
-        TELEPHONY_LOGE("NapiCallManager::UnloadCallUI asyncContext is nullptr.");
+        TELEPHONY_LOGE("NapiCallManager::UnloadCallUi asyncContext is nullptr.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -3326,35 +3326,35 @@ napi_value NapiCallManager::UnloadCallUI(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     return HandleAsyncWork(
-        env, asyncContext.release(), "UnloadCallUI", NativeUnloadCallUI, NativeBoolCallBackWithErrorCode);
+        env, asyncContext.release(), "UnloadCallUi", NativeUnloadCallUi, NativeBoolCallBackWithErrorCode);
 }
  
-void NapiCallManager::NativePreloadCallUI(napi_env env, void *data)
+void NapiCallManager::NativePreloadCallUi(napi_env env, void *data)
 {
     if (data == nullptr) {
-        TELEPHONY_LOGE("NapiCallManager::NativePreloadCallUI data is nullptr");
+        TELEPHONY_LOGE("NapiCallManager::NativePreloadCallUi data is nullptr");
         NapiUtil::ThrowParameterError(env);
         return;
     }
     auto asyncContext = (BoolResultAsyncContext *)data;
     auto callManagerClient = DelayedSingleton<CallManagerClient>::GetInstance();
     if (callManagerClient != nullptr) {
-        asyncContext->errorCode = callManagerClient->PreloadCallUI(true);
+        asyncContext->errorCode = callManagerClient->PreloadCallUi(true);
         asyncContext->enabled = true;
     }
 }
  
-void NapiCallManager::NativeUnloadCallUI(napi_env env, void *data)
+void NapiCallManager::NativeUnloadCallUi(napi_env env, void *data)
 {
     if (data == nullptr) {
-        TELEPHONY_LOGE("NapiCallManager::NativeUnloadCallUI data is nullptr");
+        TELEPHONY_LOGE("NapiCallManager::NativeUnloadCallUi data is nullptr");
         NapiUtil::ThrowParameterError(env);
         return;
     }
     auto asyncContext = (BoolResultAsyncContext *)data;
     auto callManagerClient = DelayedSingleton<CallManagerClient>::GetInstance();
     if (callManagerClient != nullptr) {
-        asyncContext->errorCode = callManagerClient->PreloadCallUI(false);
+        asyncContext->errorCode = callManagerClient->PreloadCallUi(false);
         asyncContext->enabled = true;
     }
 }
