@@ -22,6 +22,8 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr char* LIB_TEL_CM_ADAPTER_PATH = "libtel_cm_deps_adapter.z.so";
+
 RejectCallSms::RejectCallSms() {}
 
 void RejectCallSms::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content)
@@ -40,9 +42,8 @@ void RejectCallSms::SendMessage(int32_t slotId, const std::u16string &desAddr, c
     using SendMessageFunc = int (*)(int, const char16_t*,
         const char16_t*, unsigned int, unsigned int);
 
-    void *adapterHandler = dlopen("libtel_cm_deps_adapter.z.so", RTLD_LAZY);
+    void *adapterHandler = dlopen(LIB_TEL_CM_ADAPTER_PATH, RTLD_LAZY);
     if (adapterHandler == nullptr) {
-        TELEPHONY_LOGE("fail to dlopen libtel_cm_deps_adapter.z.so");
         return;
     }
 

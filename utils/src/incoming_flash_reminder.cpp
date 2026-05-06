@@ -23,6 +23,7 @@
 namespace OHOS {
 namespace Telephony {
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
+constexpr char* LIB_TEL_CM_ADAPTER_PATH = "libtel_cm_deps_adapter.z.so";
 constexpr int64_t DELAY_SET_TORCH_MODE_TIME = 300;
 using IsTorchSupportedFunc = bool(*)();
 using GetTorchModeFunc = int (*)();
@@ -182,7 +183,7 @@ void IncomingFlashReminder::HandleStartFlashRemind()
         TELEPHONY_LOGI("flash remind switch off");
         return;
     }
-    libAdapterHandler_ = dlopen("libtel_cm_deps_adapter.z.so", RTLD_LAZY);
+    libAdapterHandler_ = dlopen(LIB_TEL_CM_ADAPTER_PATH, RTLD_LAZY);
     if (libAdapterHandler_ == nullptr) {
         TELEPHONY_LOGE("deps adapter dlopen failed : %{public}s", dlerror());
         return;
