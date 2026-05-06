@@ -821,7 +821,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_009, TestSize.Level0
     callManagerService->OnGetProxyObjectPtr(data15, reply);
     ASSERT_NE(callManagerService->OnSendCallUiEvent(data15, reply), TELEPHONY_SUCCESS);
     data15.WriteBool(true);
-    ASSERT_NE(callManagerService->OnPreloadCallUI(data15, reply), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->OnPreloadCallUi(data15, reply), TELEPHONY_SUCCESS);
 
     MessageParcel data16;
     data15.WriteInt32(0);
