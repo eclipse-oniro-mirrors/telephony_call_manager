@@ -1720,7 +1720,7 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerService::PreloadCallUI(bool enable)
+int32_t CallManagerService::PreloadCallUi(bool enable)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -1732,7 +1732,7 @@ int32_t CallManagerService::PreloadCallUI(bool enable)
     }
     if (callControlManagerPtr_ != nullptr) {
         int32_t callingPid = IPCSkeleton::GetCallingPid();
-        callControlManagerPtr_->PreloadCallUI(enable, callingPid);
+        callControlManagerPtr_->PreloadCallUi(enable, callingPid);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
