@@ -126,6 +126,7 @@ private:
     int32_t OnRegisterVoipCallManagerCallback(MessageParcel &data, MessageParcel &reply);
     int32_t OnUnRegisterVoipCallManagerCallback(MessageParcel &data, MessageParcel &reply);
     int32_t OnSendCallUiEvent(MessageParcel &data, MessageParcel &reply);
+    int32_t OnPreloadCallUi(MessageParcel &data, MessageParcel &reply);
     int32_t OnRegisterBluetoothCallManagerCallbackPtr(MessageParcel &data, MessageParcel &reply);
     int32_t OnSendUssdResponse(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetCallPolicyInfo(MessageParcel &data, MessageParcel &reply);

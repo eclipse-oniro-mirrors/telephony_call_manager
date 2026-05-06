@@ -160,6 +160,8 @@ export default {
     setVoIPCallState: call.setVoIPCallState,
     setVoIPCallInfo: call.setVoIPCallInfo,
     sendCallUiEvent: call.sendCallUiEvent,
+    preloadCallUI: call.preloadCallUI,
+    unloadCallUI: call.unloadCallUI,
     DialOptions: call.DialOptions,
     DialCallOptions: call.DialCallOptions,
     MakeCallOptions: call.MakeCallOptions,

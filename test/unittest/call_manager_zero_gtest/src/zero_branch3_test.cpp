@@ -967,6 +967,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_005, TestSize.Level0)
     std::string accountNumber = "1234567";
     callControlManager->PackageDialInformation(extras, accountNumber, isEcc);
     int32_t videoState = 0;
+    int32_t callingPid = 0000;
     callControlManager->CurrentIsSuperPrivacyMode(VALID_CALLID, videoState);
     sptr<CallBase> callObjectPtr = nullptr;
     callControlManager->AnswerHandlerForSatelliteOrVideoCall(callObjectPtr, videoState);
@@ -996,6 +997,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_005, TestSize.Level0)
     callControlManager->SetVoIPCallState(2);
     callControlManager->DisconnectAllCalls();
     callControlManager->SetVirtualCall(true);
+    callControlManager->PreloadCallUi(true, callingPid);
+    callControlManager->PreloadCallUi(false, callingPid);
     ASSERT_EQ(callControlManager->SetVoIPCallState(0), TELEPHONY_SUCCESS);
 }
 

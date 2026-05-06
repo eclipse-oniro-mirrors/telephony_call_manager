@@ -112,14 +112,7 @@ void CallControlManager::UnInit()
             statusChangeListener_ = nullptr;
         }
     }
-    {
-        std::lock_guard<ffrt::mutex> lock(voipMutex_);
-        if (appMgrProxy != nullptr && appStateObserver != nullptr) {
-            appMgrProxy->UnregisterApplicationStateObserver(appStateObserver);
-            appMgrProxy = nullptr;
-            appStateObserver = nullptr;
-        }
-    }
+    UnregisterAppStateObserver();
     UnRegisterObserver();
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
@@ -1343,14 +1336,9 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
     CallVoiceAssistantManager::GetInstance()->UpdateVoipCallState(state);
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE ||
         VoIPCallState_ == CallStateToApp::CALL_STATE_UNKNOWN) {
-        std::lock_guard<ffrt::mutex> lock(voipMutex_);
-        if (appMgrProxy != nullptr && appStateObserver != nullptr) {
-            appMgrProxy->UnregisterApplicationStateObserver(appStateObserver);
-            appMgrProxy = nullptr;
-            appStateObserver = nullptr;
-        }
+        UnregisterAppStateObserver();
     } else {
-        AppStateObserver();
+        RegisterAppStateObserver();
     }
     IPCSkeleton::SetCallingIdentity(identity);
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_ANSWERED) {
@@ -1555,13 +1543,13 @@ int32_t CallControlManager::GetVoIPCallInfo(int32_t &callId, int32_t &state, std
     return TELEPHONY_SUCCESS;
 }
 
-void CallControlManager::AppStateObserver()
+void CallControlManager::RegisterAppStateObserver()
 {
-    std::lock_guard<ffrt::mutex> lock(voipMutex_);
+    std::lock_guard<ffrt::mutex> lock(appStateObserverMutex_);
     if (appStateObserver == nullptr) {
         appStateObserver = new (std::nothrow) ApplicationStateObserver();
         if (appStateObserver == nullptr) {
-            TELEPHONY_LOGE("Failed to Create AppStateObserver Instance");
+            TELEPHONY_LOGE("Failed to Create RegisterAppStateObserver Instance");
             return;
         }
         sptr<ISystemAbilityManager> samgrClient = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -1570,14 +1558,14 @@ void CallControlManager::AppStateObserver()
             appStateObserver = nullptr;
             return;
         }
-        appMgrProxy = iface_cast<AppExecFwk::IAppMgr>(samgrClient->GetSystemAbility(APP_MGR_SERVICE_ID));
-        if (appMgrProxy == nullptr) {
-            TELEPHONY_LOGE("Failed to get appMgrProxy");
+        appMgrProxy_ = iface_cast<AppExecFwk::IAppMgr>(samgrClient->GetSystemAbility(APP_MGR_SERVICE_ID));
+        if (appMgrProxy_ == nullptr) {
+            TELEPHONY_LOGE("Failed to get appMgrProxy_");
             appStateObserver = nullptr;
             samgrClient = nullptr;
             return;
         }
-        appMgrProxy->RegisterApplicationStateObserver(appStateObserver);
+        appMgrProxy_->RegisterApplicationStateObserver(appStateObserver);
     }
 }
 
@@ -2134,6 +2122,44 @@ void CallControlManager::HandleVideoRingPlayFail()
         return;
     }
     DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+}
+
+void CallControlManager::PreloadCallUi(bool enable, int32_t callingPid)
+{
+    std::lock_guard<ffrt::mutex> lock(preloadedCallUiRequestPidsMutex_);
+    auto it = std::find(preloadedCallUiRequestPids_.begin(), preloadedCallUiRequestPids_.end(), callingPid);
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    if (enable) {
+        if (it != preloadedCallUiRequestPids_.end()) {
+            return;
+        }
+        TELEPHONY_LOGI("PreloadCallUi pid: %{public}d", callingPid);
+        preloadedCallUiRequestPids_.push_back(callingPid);
+        RegisterAppStateObserver();
+        ConnectCallUiService(enable);
+    } else {
+        if (it == preloadedCallUiRequestPids_.end()) {
+            return;
+        }
+        preloadedCallUiRequestPids_.erase(it);
+        if (preloadedCallUiRequestPids_.empty()) {
+            TELEPHONY_LOGI("UnloadCallUi pid: %{public}d", callingPid);
+            ConnectCallUiService(enable);
+            UnregisterAppStateObserver();
+        }
+    }
+    IPCSkeleton::SetCallingIdentity(identity);
+}
+
+void CallControlManager::UnregisterAppStateObserver()
+{
+    TELEPHONY_LOGI("UnregisterAppStateObserver enter");
+    std::lock_guard<ffrt::mutex> lock(appStateObserverMutex_);
+    if (appMgrProxy_ != nullptr && appStateObserver != nullptr) {
+        appMgrProxy_->UnregisterApplicationStateObserver(appStateObserver);
+        appMgrProxy_ = nullptr;
+        appStateObserver = nullptr;
+    }
 }
 
 void CallControlManager::StartFlashRemind()

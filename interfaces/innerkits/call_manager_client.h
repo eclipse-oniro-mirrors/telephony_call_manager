@@ -645,6 +645,13 @@ public:
     int32_t UnRegisterVoipCallManagerCallback();
 
     /**
+     * @brief preload call ui
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t PreloadCallUi(bool enable);
+
+    /**
      * @brief send call ui event
      *
      * @return Returns 0 on success, others on failure.
