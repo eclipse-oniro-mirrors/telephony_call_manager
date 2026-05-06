@@ -649,7 +649,7 @@ public:
      *
      * @return Returns 0 on success, others on failure.
      */
-    int32_t PreloadCallUI(bool enable);
+    int32_t PreloadCallUi(bool enable);
 
     /**
      * @brief send call ui event
