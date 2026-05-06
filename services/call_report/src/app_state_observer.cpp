@@ -43,7 +43,7 @@ void ApplicationStateObserver::OnProcessDied(const AppExecFwk::ProcessData& proc
     }
     auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
     if (callControlManager != nullptr) {
-        callControlManager->PreloadCallUI(false, processData.pid);
+        callControlManager->PreloadCallUi(false, processData.pid);
     }
 }
 
