@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr char* LIB_TEL_CM_ADAPTER_PATH = "libtel_cm_deps_adapter.z.so";
+constexpr const char* LIB_TEL_CM_ADAPTER_PATH = "libtel_cm_deps_adapter.z.so";
 
 RejectCallSms::RejectCallSms() {}
 

@@ -23,11 +23,11 @@
 namespace OHOS {
 namespace Telephony {
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
-constexpr char* LIB_TEL_CM_ADAPTER_PATH = "libtel_cm_deps_adapter.z.so";
+constexpr const char* LIB_TEL_CM_ADAPTER_PATH = "libtel_cm_deps_adapter.z.so";
 constexpr int64_t DELAY_SET_TORCH_MODE_TIME = 300;
 using IsTorchSupportedFunc = bool(*)();
 using GetTorchModeFunc = int (*)();
-using SetTorchModeFunc = int32_t (*)(int mode);
+using SetTorchModeFunc = int (*)(int mode);
 using FreeCameraFunc = int (*)();
 enum class TelTorchMode {
     TORCH_MODE_UNKNOWN = -1,
