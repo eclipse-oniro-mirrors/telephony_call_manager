@@ -180,7 +180,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_003, TestSize.Lev
     EXPECT_EQ(proxy.CancelCallUpgrade(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.RequestCameraCapabilities(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.SendCallUiEvent(0, code), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-    EXPECT_EQ(proxy.PreloadCallUI(true), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.PreloadCallUi(true), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.RegisterBluetoothCallManagerCallbackPtr(code), nullptr);
     EXPECT_EQ(proxy.SendUssdResponse(0, code), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     std::vector<std::string> dialingList;
