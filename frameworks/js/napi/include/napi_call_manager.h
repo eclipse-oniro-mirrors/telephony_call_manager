@@ -167,7 +167,6 @@ private:
     static void NativeGetMainCallIdCallBack(napi_env env, napi_status status, void *data);
     static void NativeIsImsSwitchEnabledCallBack(napi_env env, napi_status status, void *data);
     static void NativeGetVoNRStateCallBack(napi_env env, napi_status status, void *data);
-    static void NativeCallUICallBackWithErrorCode(napi_env env, napi_status status, void *data);
     static void NativeBoolCallBack(napi_env env, napi_status status, void *data);
     static void NativeBoolCallBackWithErrorCode(napi_env env, napi_status status, void *data);
     static void NativeIsEmergencyPhoneNumberCallBack(napi_env env, napi_status status, void *data);
