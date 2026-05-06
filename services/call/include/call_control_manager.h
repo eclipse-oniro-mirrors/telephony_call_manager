@@ -175,7 +175,7 @@ public:
     void RegisterObserver();
     void UnRegisterObserver();
     void HandleVideoRingPlayFail();
-    void PreloadCallUI(bool enable, int32_t callingPid);
+    void PreloadCallUi(bool enable, int32_t callingPid);
     bool EndCall();
     int32_t SetCallAudioMode(int32_t mode, int32_t scenarios);
 #ifdef CALL_MANAGER_THERMAL_PROTECTION
