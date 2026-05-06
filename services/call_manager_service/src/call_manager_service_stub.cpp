@@ -86,7 +86,7 @@ void CallManagerServiceStub::InitCallBasicRequest()
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SEND_CALLUI_EVENT)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSendCallUiEvent(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_PRELOAD_CALLUI)] =
-        [this](MessageParcel &data, MessageParcel &reply) { return OnPreloadCallUI(data, reply); };
+        [this](MessageParcel &data, MessageParcel &reply) { return OnPreloadCallUi(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_END_CALL)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnEndCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_NOTIFY_VOIP_AUDIO_STREAM_START)] =
