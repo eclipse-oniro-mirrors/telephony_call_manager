@@ -997,8 +997,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_005, TestSize.Level0)
     callControlManager->SetVoIPCallState(2);
     callControlManager->DisconnectAllCalls();
     callControlManager->SetVirtualCall(true);
-    callControlManager->PreloadCallUI(true, callingPid);
-    callControlManager->PreloadCallUI(false, callingPid);
+    callControlManager->PreloadCallUi(true, callingPid);
+    callControlManager->PreloadCallUi(false, callingPid);
     ASSERT_EQ(callControlManager->SetVoIPCallState(0), TELEPHONY_SUCCESS);
 }
 
