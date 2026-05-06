@@ -1054,6 +1054,7 @@ int32_t NapiCallAbilityCallback::ReportAudioDeviceInfo(AudioDeviceInfo &info, Ev
 
     NapiCallManagerUtils::SetPropertyBoolean(env, callbackValues[ARRAY_INDEX_FIRST], "isMuted", info.isMuted);
     NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "callId", info.callId);
+    NapiCallManagerUtils::SetPropertyBoolean(env, callbackValues[ARRAY_INDEX_FIRST], "isMicDisabled", info.isMicDisabled);
 
     napi_value currentAudioDeviceValue = nullptr;
     napi_create_object(env, &currentAudioDeviceValue);
