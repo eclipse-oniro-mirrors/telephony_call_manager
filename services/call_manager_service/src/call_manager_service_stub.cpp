@@ -1422,11 +1422,11 @@ int32_t CallManagerServiceStub::OnSendCallUiEvent(MessageParcel &data, MessagePa
     return result;
 }
 
-int32_t CallManagerServiceStub::OnPreloadCallUI(MessageParcel &data, MessageParcel &reply)
+int32_t CallManagerServiceStub::OnPreloadCallUi(MessageParcel &data, MessageParcel &reply)
 {
     bool enable = data.ReadBool();
-    int32_t result = PreloadCallUI(enable);
-    TELEPHONY_LOGI("CallManagerServiceStub::PreloadCallUI enable: %{public}d, \
+    int32_t result = PreloadCallUi(enable);
+    TELEPHONY_LOGI("CallManagerServiceStub::PreloadCallUi enable: %{public}d, \
         result:%{public}d", enable, result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
