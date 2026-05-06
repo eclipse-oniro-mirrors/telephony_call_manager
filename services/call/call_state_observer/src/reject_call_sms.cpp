@@ -37,7 +37,7 @@ void RejectCallSms::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSen
 void RejectCallSms::SendMessage(int32_t slotId, const std::u16string &desAddr, const std::u16string &text)
 {
 #ifdef ABILITY_SMS_SUPPORT
-    using SendMessageFunc = int(*)(int32_t, const* desAddr,
+    using SendMessageFunc = int (*)(int, const char16_t*,
         const char16_t*, unsigned int, unsigned int);
 
     void *adapterHandler = dlopen("libtel_cm_deps_adapter.z.so", RTLD_LAZY);
@@ -50,11 +50,10 @@ void RejectCallSms::SendMessage(int32_t slotId, const std::u16string &desAddr, c
         reinterpret_cast<SendMessageFunc>(dlsym(adapterHandler, "SendMessage"));
     if (sendMsgFunc != nullptr) {
         int ret = sendMsgFunc(slotId, desAddr.c_str(), text.c_str(), desAddr.size(), text.size());
-        TELEPHONY_LOGI("reject call message sended, ret=%{publice}d", ret);
+        TELEPHONY_LOGI("reject call message sended, ret=%{public}d", ret);
     }
-    
+
     dlclose(adapterHandler);
-    adapterHandler = nullptr;
 #endif
 }
 
