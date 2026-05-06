@@ -1028,7 +1028,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_019, TestSize.Level1)
     eventName = "123";
     int32_t ret = callManagerService->SendCallUiEvent(1, eventName);
     EXPECT_EQ(ret, 0);
-    ret = callManagerService->PreloadCallUI(true);
+    ret = callManagerService->PreloadCallUi(true);
     EXPECT_EQ(ret, 0);
 }
 
