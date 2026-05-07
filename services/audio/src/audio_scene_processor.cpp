@@ -240,10 +240,10 @@ bool AudioSceneProcessor::SwitchIncoming()
         bool isNotWearWatch = callControlManager->IsNotWearOnWrist();
         audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
         if (!isStartBroadcast && !isNeedSilent && !isNotWearWatch) {
-             TELEPHONY_LOGI("broadcast switch and doNotDisturbMode close, start play system ring");
-             audioControlManager->StopRingtone();
-             // play ringtone while incoming state
-             audioControlManager->PlayRingtone();
+            TELEPHONY_LOGI("broadcast switch and doNotDisturbMode close, start play system ring");
+            audioControlManager->StopRingtone();
+            // play ringtone while incoming state
+            audioControlManager->PlayRingtone();
          } else {
             TELEPHONY_LOGI("isStartBroadcast: %{public}d, isNeedSilent: %{public}d, isNotWearWatch: %{public}d",
                 isStartBroadcast, isNeedSilent, isNotWearWatch);
