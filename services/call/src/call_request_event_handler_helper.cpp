@@ -18,6 +18,7 @@
 
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
+#include <shared_mutex>
 namespace OHOS {
 namespace Telephony {
 
