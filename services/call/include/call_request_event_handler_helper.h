@@ -20,7 +20,6 @@
 #include "refbase.h"
 #include "singleton.h"
 #include "ffrt.h"
-#include <shared_mutex>
 
 namespace OHOS {
 namespace Telephony {
