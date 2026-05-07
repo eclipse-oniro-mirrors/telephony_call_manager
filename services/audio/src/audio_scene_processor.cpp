@@ -244,7 +244,7 @@ bool AudioSceneProcessor::SwitchIncoming()
             audioControlManager->StopRingtone();
             // play ringtone while incoming state
             audioControlManager->PlayRingtone();
-         } else {
+        } else {
             TELEPHONY_LOGI("isStartBroadcast: %{public}d, isNeedSilent: %{public}d, isNotWearWatch: %{public}d",
                 isStartBroadcast, isNeedSilent, isNotWearWatch);
             if (system::GetParameter("const.product.devicetype", "") == "wearable") {
