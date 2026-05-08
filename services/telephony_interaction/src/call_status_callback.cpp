@@ -75,7 +75,12 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
         (info.index == -1 || info.index == INIT_INDEX)) {
             detailInfo.index = INIT_INDEX;
     }
-    int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(detailInfo);
+    auto reportCallInfoHandler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    if (reportCallInfoHandler == nullptr) {
+        TELEPHONY_LOGE("reportCallInfoHandler is nullptr!");
+        return TELEPHONY_ERROR;
+    }
+    int32_t ret = reportCallInfoHandler->UpdateCallReportInfo(detailInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallReportInfo failed! errCode:%{public}d", ret);
     } else {

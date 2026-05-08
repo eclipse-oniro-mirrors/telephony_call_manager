@@ -19,6 +19,7 @@
 #include "event_handler.h"
 #include "refbase.h"
 #include "singleton.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -44,6 +45,7 @@ private:
     bool pendingHangup_ = false;
     int32_t pendingMoCallId_ = -1;
     int32_t pendingHangupCallId_ = -1;
+    ffrt::shared_mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

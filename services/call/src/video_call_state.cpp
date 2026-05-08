@@ -39,11 +39,13 @@ bool VideoCallState::IsCallSupportVideoCall()
 
 void VideoCallState::SetVideoUpdateStatus(VideoUpdateStatus status)
 {
+    std::lock_guard<ffrt::shared_mutex> lock(updateStatusMutex_);
     updateStatus_ = status;
 }
 
 VideoUpdateStatus VideoCallState::GetVideoUpdateStatus()
 {
+    std::shared_lock<ffrt::shared_mutex> lock(updateStatusMutex_);
     return updateStatus_;
 }
 

@@ -35,7 +35,7 @@
 
 namespace OHOS {
 namespace Telephony {
-bool g_flagForDsda = false;
+static std::atomic<bool> g_flagForDsda{false};
 constexpr int32_t INIT_INDEX = 0;
 
 CallRequestProcess::CallRequestProcess() {}
