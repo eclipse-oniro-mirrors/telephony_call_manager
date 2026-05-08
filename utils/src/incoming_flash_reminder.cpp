@@ -189,7 +189,6 @@ void IncomingFlashReminder::HandleStartFlashRemind()
         return;
     }
     if (!IsFlashRemindNecessary()) {
-        TELEPHONY_LOGE("no need to StartFlashRemind");
         ReleaseDepsAdapter();
         return;
     }
@@ -250,7 +249,7 @@ void IncomingFlashReminder::HandleStopFlashRemind()
         return;
     }
 
-    int32_t result = static_cast<int32_t>(setTorchMode(static_cast<int>(TelTorchMode::TORCH_MODE_OFF)));
+    setTorchMode(static_cast<int>(TelTorchMode::TORCH_MODE_OFF));
     ReleaseDepsAdapter();
 #endif
     if (stopFlashRemindDone_ != nullptr) {
