@@ -100,6 +100,10 @@ namespace Telephony {
     char* TelephonyCallImpl::FormatPhoneNumberToE164(char *cPhoneNumber, char *cCountryCode, int32_t *errCode)
     {
         std::u16string formatNumber = u"";
+        if (cPhoneNumber == nullptr || cCountryCode == nullptr) {
+            *errCode = ConvertCJErrCode(TELEPHONY_ERR_ARGUMENT_NULL);
+            return nullptr;
+        }
         std::string tmpCountryCode = cCountryCode;
         std::string tmpPhoneNumber = cPhoneNumber;
         std::u16string phoneNumber = Str8ToStr16(tmpPhoneNumber);
@@ -113,6 +117,9 @@ namespace Telephony {
 
     int32_t TelephonyCallImpl::MakeCall(char* phoneNumber)
     {
+        if (phoneNumber == nullptr) {
+            return ConvertCJErrCode(TELEPHONY_ERR_ARGUMENT_NULL);
+        }
         AAFwk::Want want;
         AppExecFwk::ElementName element("", "com.ohos.contacts", "com.ohos.contacts.MainAbility");
         want.SetElement(element);
@@ -134,6 +141,10 @@ namespace Telephony {
     {
         if (!IsValidSlotId(slotId)) {
             *errCode = ConvertCJErrCode(TELEPHONY_ERR_SLOTID_INVALID);
+            return false;
+        }
+        if (cPhoneNumber == nullptr) {
+            *errCode = ConvertCJErrCode(TELEPHONY_ERR_ARGUMENT_NULL);
             return false;
         }
         std::string temPhoneNumber = cPhoneNumber;
@@ -162,6 +173,9 @@ namespace Telephony {
 
     int32_t TelephonyCallImpl::DialCall(char *phoneNumber, DialCallOptions options)
     {
+        if (phoneNumber == nullptr) {
+            return ConvertCJErrCode(TELEPHONY_ERR_ARGUMENT_NULL);
+        }
         OHOS::AppExecFwk::PacMap dialInfo;
         dialInfo.PutIntValue("accountId", options.accountId);
         dialInfo.PutIntValue("videoState", options.videoState);
@@ -180,6 +194,10 @@ namespace Telephony {
 
     char* TelephonyCallImpl::FormatPhoneNumber(char *cPhoneNumber, char *cCountryCode, int32_t *errCode)
     {
+        if (cPhoneNumber == nullptr || cCountryCode == nullptr) {
+            *errCode = ConvertCJErrCode(TELEPHONY_ERR_ARGUMENT_NULL);
+            return nullptr;
+        }
         std::u16string formatNumber = u"";
         std::string tmpPhoneNumber = cPhoneNumber;
         std::string tmpCountryCode = cCountryCode;
