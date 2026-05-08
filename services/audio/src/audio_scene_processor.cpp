@@ -238,14 +238,12 @@ bool AudioSceneProcessor::SwitchIncoming()
         bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
         bool isNeedSilent = CallObjectManager::IsNeedSilentInDoNotDisturbMode();
         bool isNotWearWatch = callControlManager->IsNotWearOnWrist();
-        if (!isNeedSilent && !isNotWearWatch) {
-            audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
-            if (!isStartBroadcast) {
-                TELEPHONY_LOGI("broadcast switch and doNotDisturbMode close, start play system ring");
-                // play ringtone while incoming state
-                audioControlManager->StopRingtone();
-                audioControlManager->PlayRingtone();
-            }
+        audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
+        if (!isStartBroadcast && !isNeedSilent && !isNotWearWatch) {
+            TELEPHONY_LOGI("broadcast switch and doNotDisturbMode close, start play system ring");
+            audioControlManager->StopRingtone();
+            // play ringtone while incoming state
+            audioControlManager->PlayRingtone();
         } else {
             TELEPHONY_LOGI("isStartBroadcast: %{public}d, isNeedSilent: %{public}d, isNotWearWatch: %{public}d",
                 isStartBroadcast, isNeedSilent, isNotWearWatch);
