@@ -627,9 +627,9 @@ void AudioControlManager::ResumeCrsSoundTone()
         .address = { 0 },
     };
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance(); 
-    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance(); 
-    if (audioDeviceManager == nullptr || audioProxy == nullptr) { 
-        return; 
+    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
+    if (audioDeviceManager == nullptr || audioProxy == nullptr) {
+        return;
     }
     audioProxy->GetPreferredOutputAudioDevice(device);
     TELEPHONY_LOGI("crs soundtone preferred deivce = %{public}d", device.deviceType);
