@@ -181,6 +181,10 @@ void AudioControlManager::CallStateUpdated(
         totalCalls_.erase(callObjectPtr);
     }
     auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    if (audioDeviceManager == nullptr || callStateProcessor == nullptr) {
+        return false;
+    }
     if (callStateProcessor == nullptr) {
         return;
     }
@@ -382,6 +386,7 @@ bool AudioControlManager::PreHandleAnswerdState(
             callStateProcessor->DeleteCall(callId, priorState);
             callObjectPtr->SetIsAnsweredByPhone(true);
             MuteRinger();
+            audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
             return true;
         }
     }
