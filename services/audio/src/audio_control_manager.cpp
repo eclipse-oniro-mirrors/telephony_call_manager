@@ -181,10 +181,6 @@ void AudioControlManager::CallStateUpdated(
         totalCalls_.erase(callObjectPtr);
     }
     auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
-    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
-    if (audioDeviceManager == nullptr || callStateProcessor == nullptr) {
-        return false;
-    }
     if (callStateProcessor == nullptr) {
         return;
     }
@@ -630,6 +626,11 @@ void AudioControlManager::ResumeCrsSoundTone()
         .deviceType = AudioDeviceType::DEVICE_EARPIECE,
         .address = { 0 },
     };
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance(); 
+    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance(); 
+    if (audioDeviceManager == nullptr || audioProxy == nullptr) { 
+        return; 
+    }
     audioProxy->GetPreferredOutputAudioDevice(device);
     TELEPHONY_LOGI("crs soundtone preferred deivce = %{public}d", device.deviceType);
     if (!audioDeviceManager->IsSpeakerMode() || AudioDeviceManager::IsRemoteDevicesConnected()) {
