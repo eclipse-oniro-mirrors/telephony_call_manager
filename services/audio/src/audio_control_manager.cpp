@@ -626,7 +626,7 @@ void AudioControlManager::ResumeCrsSoundTone()
         .deviceType = AudioDeviceType::DEVICE_EARPIECE,
         .address = { 0 },
     };
-    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance(); 
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
     if (audioDeviceManager == nullptr || audioProxy == nullptr) {
         return;
