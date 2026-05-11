@@ -20,6 +20,7 @@
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "call_status_callback_proxy.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -46,7 +47,7 @@ bool ServiceInited()
     return result;
 }
 
-int32_t OnRemoteRequest(const uint8_t *data, size_t size)
+int32_t OnRemoteRequest(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -56,13 +57,13 @@ int32_t OnRemoteRequest(const uint8_t *data, size_t size)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     messageParcel.RewindRead(0);
-    uint32_t code = static_cast<uint32_t>(*data);
+    uint32_t code = provider.ConsumeIntergral<uint32_t>();
     MessageParcel reply;
     MessageOption option;
     return CallStatusCallbackPtr_->OnRemoteRequest(code, messageParcel, reply, option);
 }
 
-int32_t UpdateCallReportInfo(const uint8_t *data, size_t size)
+int32_t UpdateCallReportInfo(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -72,14 +73,14 @@ int32_t UpdateCallReportInfo(const uint8_t *data, size_t size)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     CallReportInfo callReportInfo;
-    callReportInfo.index = static_cast<int32_t>(size);
-    callReportInfo.accountId = static_cast<int32_t>(size % ACCOUNT_ID_NUM);
-    callReportInfo.voiceDomain = static_cast<int32_t>(size % VOICE_DOMAIN_NUM);
-    callReportInfo.mpty = static_cast<int32_t>(size % MULTI_PARTY_NUM);
+    callReportInfo.index = provider.ConsumeIntergral<int32_t>();
+    callReportInfo.accountId = provider.ConsumeIntergral<int32_t>() % ACCOUNT_ID_NUM;
+    callReportInfo.voiceDomain = provider.ConsumeIntergral<int32_t>() % VOICE_DOMAIN_NUM;
+    callReportInfo.mpty = provider.ConsumeIntergral<int32_t>() % MULTI_PARTY_NUM;
     callReportInfo.callType = CallType::TYPE_ERR_CALL;
     callReportInfo.callMode = VideoStateType::TYPE_VOICE;
     callReportInfo.state = TelCallState::CALL_STATUS_UNKNOWN;
-    std::string msg(reinterpret_cast<const char *>(data), size);
+    std::string msg = provider.consumeString();
     int32_t accountLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(callReportInfo.accountNum, kMaxNumberLen, msg.c_str(), accountLength);
     messageParcel.WriteInt32(callReportInfo.index);
@@ -103,7 +104,7 @@ int32_t UpdateCallReportInfo(const uint8_t *data, size_t size)
     return CallStatusCallbackPtr_->OnUpdateCallReportInfo(messageParcel, reply);
 }
 
-int32_t UpdateCallsReportInfo(const uint8_t *data, size_t size)
+int32_t UpdateCallsReportInfo(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -113,16 +114,16 @@ int32_t UpdateCallsReportInfo(const uint8_t *data, size_t size)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     CallReportInfo info;
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
     int32_t vecSize = 1;
-    info.index = static_cast<int32_t>(size);
-    info.accountId = static_cast<int32_t>(size % ACCOUNT_ID_NUM);
-    info.voiceDomain = static_cast<int32_t>(size % VOICE_DOMAIN_NUM);
-    info.mpty = static_cast<int32_t>(size % MULTI_PARTY_NUM);
+    info.index = provider.ConsumeIntergral<int32_t>();
+    info.accountId = provider.ConsumeIntergral<int32_t>() % ACCOUNT_ID_NUM;
+    info.voiceDomain = provider.ConsumeIntergral<int32_t>() % VOICE_DOMAIN_NUM;
+    info.mpty = provider.ConsumeIntergral<int32_t>() % MULTI_PARTY_NUM;
     info.callType = CallType::TYPE_ERR_CALL;
     info.callMode = VideoStateType::TYPE_VOICE;
     info.state = TelCallState::CALL_STATUS_UNKNOWN;
-    std::string msg(reinterpret_cast<const char *>(data), size);
+    std::string msg = provider.consumeString();
     int32_t accountLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(info.accountNum, kMaxNumberLen, msg.c_str(), accountLength);
     messageParcel.WriteInt32(vecSize);
@@ -152,7 +153,7 @@ int32_t UpdateCallsReportInfo(const uint8_t *data, size_t size)
     return CallStatusCallbackPtr_->OnUpdateCallsReportInfo(messageParcel, reply);
 }
 
-int32_t UpdateEventReport(const uint8_t *data, size_t size)
+int32_t UpdateEventReport(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -173,7 +174,7 @@ int32_t UpdateEventReport(const uint8_t *data, size_t size)
     return CallStatusCallbackPtr_->OnUpdateEventReport(messageParcel, reply);
 }
 
-int32_t UpdateGetWaitingResult(const uint8_t *data, size_t size)
+int32_t UpdateGetWaitingResult(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -185,16 +186,16 @@ int32_t UpdateGetWaitingResult(const uint8_t *data, size_t size)
     CallWaitResponse callWaitResponse;
     int32_t length = sizeof(CallWaitResponse);
     messageParcel.WriteInt32(length);
-    callWaitResponse.result = static_cast<int32_t>(*data);
-    callWaitResponse.status = static_cast<int32_t>(*data);
-    callWaitResponse.classCw = static_cast<int32_t>(*data);
+    callWaitResponse.result = provider.ConsumeIntergral<int32_t>();
+    callWaitResponse.status = provider.ConsumeIntergral<int32_t>();
+    callWaitResponse.classCw = provider.ConsumeIntergral<int32_t>();
     messageParcel.WriteRawData((const void *)&callWaitResponse, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return CallStatusCallbackPtr_->OnUpdateGetWaitingResult(messageParcel, reply);
 }
 
-int32_t UpdateGetRestrictionResult(const uint8_t *data, size_t size)
+int32_t UpdateGetRestrictionResult(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -206,16 +207,16 @@ int32_t UpdateGetRestrictionResult(const uint8_t *data, size_t size)
     CallRestrictionResponse callRestrictionResult;
     int32_t length = sizeof(CallRestrictionResponse);
     messageParcel.WriteInt32(length);
-    callRestrictionResult.result = static_cast<int32_t>(*data);
-    callRestrictionResult.status = static_cast<int32_t>(*data);
-    callRestrictionResult.classCw = static_cast<int32_t>(*data);
+    callRestrictionResult.result = provider.ConsumeIntergral<int32_t>();
+    callRestrictionResult.status = provider.ConsumeIntergral<int32_t>();
+    callRestrictionResult.classCw = provider.ConsumeIntergral<int32_t>();
     messageParcel.WriteRawData((const void *)&callRestrictionResult, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return CallStatusCallbackPtr_->OnUpdateGetRestrictionResult(messageParcel, reply);
 }
 
-int32_t UpdateGetTransferResult(const uint8_t *data, size_t size)
+int32_t UpdateGetTransferResult(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -246,7 +247,7 @@ int32_t UpdateGetTransferResult(const uint8_t *data, size_t size)
     return CallStatusCallbackPtr_->OnUpdateGetTransferResult(messageParcel, reply);
 }
 
-int32_t UpdateGetCallClipResult(const uint8_t *data, size_t size)
+int32_t UpdateGetCallClipResult(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -258,16 +259,16 @@ int32_t UpdateGetCallClipResult(const uint8_t *data, size_t size)
     ClipResponse clipResponse;
     int32_t length = sizeof(ClipResponse);
     messageParcel.WriteInt32(length);
-    clipResponse.result = static_cast<int32_t>(*data);
-    clipResponse.action = static_cast<int32_t>(*data);
-    clipResponse.clipStat = static_cast<int32_t>(*data);
+    clipResponse.result = provider.ConsumeIntergral<int32_t>();
+    clipResponse.action = provider.ConsumeIntergral<int32_t>();
+    clipResponse.clipStat = provider.ConsumeIntergral<int32_t>();
     messageParcel.WriteRawData((const void *)&clipResponse, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return CallStatusCallbackPtr_->OnUpdateGetCallClipResult(messageParcel, reply);
 }
 
-int32_t GetImsConfigResult(const uint8_t *data, size_t size)
+int32_t GetImsConfigResult(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -279,15 +280,15 @@ int32_t GetImsConfigResult(const uint8_t *data, size_t size)
     GetImsConfigResponse response;
     int32_t length = sizeof(GetImsConfigResponse);
     messageParcel.WriteInt32(length);
-    response.result = static_cast<int32_t>(*data);
-    response.value = static_cast<int32_t>(*data);
+    response.result = provider.ConsumeIntergral<int32_t>();
+    response.value = provider.ConsumeIntergral<int32_t>();
     messageParcel.WriteRawData((const void *)&response, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return CallStatusCallbackPtr_->OnGetImsConfigResult(messageParcel, reply);
 }
 
-int32_t GetImsFeatureValueResult(const uint8_t *data, size_t size)
+int32_t GetImsFeatureValueResult(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -299,15 +300,15 @@ int32_t GetImsFeatureValueResult(const uint8_t *data, size_t size)
     GetImsFeatureValueResponse response;
     int32_t length = sizeof(GetImsFeatureValueResponse);
     messageParcel.WriteInt32(length);
-    response.result = static_cast<int32_t>(*data);
-    response.value = static_cast<int32_t>(*data);
+    response.result = provider.ConsumeIntergral<int32_t>();
+    response.value = provider.ConsumeIntergral<int32_t>();
     messageParcel.WriteRawData((const void *)&response, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return CallStatusCallbackPtr_->OnGetImsFeatureValueResult(messageParcel, reply);
 }
 
-int32_t SendMmiCodeResult(const uint8_t *data, size_t size)
+int32_t SendMmiCodeResult(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -319,8 +320,8 @@ int32_t SendMmiCodeResult(const uint8_t *data, size_t size)
     MmiCodeInfo info;
     int32_t length = sizeof(MmiCodeInfo);
     messageParcel.WriteInt32(length);
-    info.result = static_cast<int32_t>(size);
-    std::string msg(reinterpret_cast<const char *>(data), size);
+    info.result = provider.ConsumeIntergral<int32_t>();
+    std::string msg = provider.consumeString();
     int32_t msgLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(info.message, kMaxNumberLen, msg.c_str(), msgLength);
     messageParcel.WriteRawData((const void *)&info, length);
@@ -329,7 +330,7 @@ int32_t SendMmiCodeResult(const uint8_t *data, size_t size)
     return CallStatusCallbackPtr_->OnSendMmiCodeResult(messageParcel, reply);
 }
 
-int32_t ReceiveUpdateCallMediaModeRequest(const uint8_t *data, size_t size)
+int32_t ReceiveUpdateCallMediaModeRequest(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -342,16 +343,16 @@ int32_t ReceiveUpdateCallMediaModeRequest(const uint8_t *data, size_t size)
     int32_t length = sizeof(CallModeReportInfo);
     messageParcel.WriteInt32(length);
     CallModeReportInfo callModeReportInfo;
-    callModeReportInfo.callIndex = static_cast<int32_t>(*data % CALL_INDEX_MAX_NUM);
-    callModeReportInfo.callMode = static_cast<ImsCallMode>(*data % IMS_CALL_MODE_NUM);
-    callModeReportInfo.result = static_cast<VideoRequestResultType>(*data % VIDEO_REQUEST_RESULT_TYPE_NUM);
+    callModeReportInfo.callIndex = provider.ConsumeIntergral<int32_t>() % CALL_INDEX_MAX_NUM;
+    callModeReportInfo.callMode = provider.ConsumeIntergral<int32_t>() % IMS_CALL_MODE_NUM;
+    callModeReportInfo.result = provider.ConsumeIntergral<int32_t>() % VIDEO_REQUEST_RESULT_TYPE_NUM;
     messageParcel.WriteRawData((const void *)&callModeReportInfo, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return CallStatusCallbackPtr_->OnReceiveImsCallModeRequest(messageParcel, reply);
 }
 
-int32_t ReceiveUpdateCallMediaModeResponse(const uint8_t *data, size_t size)
+int32_t ReceiveUpdateCallMediaModeResponse(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -364,16 +365,16 @@ int32_t ReceiveUpdateCallMediaModeResponse(const uint8_t *data, size_t size)
     int32_t length = sizeof(CallModeReportInfo);
     messageParcel.WriteInt32(length);
     CallModeReportInfo callModeReportInfo;
-    callModeReportInfo.callIndex = static_cast<int32_t>(*data % CALL_INDEX_MAX_NUM);
-    callModeReportInfo.callMode = static_cast<ImsCallMode>(*data % IMS_CALL_MODE_NUM);
-    callModeReportInfo.result = static_cast<VideoRequestResultType>(*data % VIDEO_REQUEST_RESULT_TYPE_NUM);
+    callModeReportInfo.callIndex = provider.ConsumeIntergral<int32_t>() % CALL_INDEX_MAX_NUM;
+    callModeReportInfo.callMode = provider.ConsumeIntergral<int32_t>() % IMS_CALL_MODE_NUM;
+    callModeReportInfo.result = provider.ConsumeIntergral<VideoRequestResultType>() % VIDEO_REQUEST_RESULT_TYPE_NUM;
     messageParcel.WriteRawData((const void *)&callModeReportInfo, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return CallStatusCallbackPtr_->OnReceiveImsCallModeResponse(messageParcel, reply);
 }
 
-int32_t HandleCallSessionEventChanged(const uint8_t *data, size_t size)
+int32_t HandleCallSessionEventChanged(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -386,15 +387,15 @@ int32_t HandleCallSessionEventChanged(const uint8_t *data, size_t size)
     int32_t length = sizeof(CallSessionReportInfo);
     messageParcel.WriteInt32(length);
     CallSessionReportInfo callSessionReportInfo;
-    callSessionReportInfo.index = static_cast<int32_t>(*data % CALL_INDEX_MAX_NUM);
-    callSessionReportInfo.eventId = static_cast<CallSessionEventId>(*data % CALL_SESSION_EVENT_ID_NUM);
+    callSessionReportInfo.index = provider.ConsumeIntergral<int32_t>() % CALL_INDEX_MAX_NUM;
+    callSessionReportInfo.eventId = provider.ConsumeIntergral<int32_t>() % CALL_SESSION_EVENT_ID_NUM;
     messageParcel.WriteRawData((const void *)&callSessionReportInfo, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return CallStatusCallbackPtr_->OnCallSessionEventChange(messageParcel, reply);
 }
 
-int32_t HandlePeerDimensionsChanged(const uint8_t *data, size_t size)
+int32_t HandlePeerDimensionsChanged(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -407,16 +408,16 @@ int32_t HandlePeerDimensionsChanged(const uint8_t *data, size_t size)
     int32_t length = sizeof(PeerDimensionsReportInfo);
     messageParcel.WriteInt32(length);
     PeerDimensionsReportInfo dimensionsReportInfo;
-    dimensionsReportInfo.index = static_cast<int32_t>(*data % CALL_INDEX_MAX_NUM);
-    dimensionsReportInfo.width = static_cast<int32_t>(*data);
-    dimensionsReportInfo.height = static_cast<int32_t>(*data);
+    dimensionsReportInfo.index = provider.ConsumeIntergral<int32_t>() % CALL_INDEX_MAX_NUM;
+    dimensionsReportInfo.width = provider.ConsumeIntergral<int32_t>();
+    dimensionsReportInfo.height = provider.ConsumeIntergral<int32_t>();
     messageParcel.WriteRawData((const void *)&dimensionsReportInfo, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return CallStatusCallbackPtr_->OnPeerDimensionsChange(messageParcel, reply);
 }
 
-int32_t HandleCallDataUsageChanged(const uint8_t *data, size_t size)
+int32_t HandleCallDataUsageChanged(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -426,14 +427,14 @@ int32_t HandleCallDataUsageChanged(const uint8_t *data, size_t size)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
 
-    int64_t reportInfo = static_cast<int64_t>(*data);
+    int64_t reportInfo = provider.ConsumeIntergral<int64_t>();
     messageParcel.WriteInt64(reportInfo);
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return CallStatusCallbackPtr_->OnCallDataUsageChange(messageParcel, reply);
 }
 
-int32_t HandleCameraCapabilitiesChanged(const uint8_t *data, size_t size)
+int32_t HandleCameraCapabilitiesChanged(FuzzedDataProvider &provider)
 {
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
@@ -446,9 +447,9 @@ int32_t HandleCameraCapabilitiesChanged(const uint8_t *data, size_t size)
     int32_t length = sizeof(CameraCapabilitiesReportInfo);
     messageParcel.WriteInt32(length);
     CameraCapabilitiesReportInfo cameraCapabilitiesReportInfo;
-    cameraCapabilitiesReportInfo.index = static_cast<int32_t>(*data % CALL_INDEX_MAX_NUM);
-    cameraCapabilitiesReportInfo.width = static_cast<int32_t>(*data);
-    cameraCapabilitiesReportInfo.height = static_cast<int32_t>(*data);
+    cameraCapabilitiesReportInfo.index = provider.ConsumeIntergral<int32_t>() % CALL_INDEX_MAX_NUM;
+    cameraCapabilitiesReportInfo.width = provider.ConsumeIntergral<int32_t>();
+    cameraCapabilitiesReportInfo.height = provider.ConsumeIntergral<int32_t>();
     messageParcel.WriteRawData((const void *)&cameraCapabilitiesReportInfo, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -460,23 +461,25 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
-    OnRemoteRequest(data, size);
-    UpdateCallReportInfo(data, size);
-    UpdateCallsReportInfo(data, size);
-    UpdateEventReport(data, size);
-    UpdateGetWaitingResult(data, size);
-    UpdateGetRestrictionResult(data, size);
-    UpdateGetTransferResult(data, size);
-    UpdateGetCallClipResult(data, size);
-    GetImsConfigResult(data, size);
-    GetImsFeatureValueResult(data, size);
-    SendMmiCodeResult(data, size);
-    ReceiveUpdateCallMediaModeRequest(data, size);
-    ReceiveUpdateCallMediaModeResponse(data, size);
-    HandleCallSessionEventChanged(data, size);
-    HandlePeerDimensionsChanged(data, size);
-    HandleCallDataUsageChanged(data, size);
-    HandleCameraCapabilitiesChanged(data, size);
+
+    FuzzedDataProvider provider(data, size);
+    OnRemoteRequest(provider);
+    UpdateCallReportInfo(provider);
+    UpdateCallsReportInfo(provider);
+    UpdateEventReport(provider);
+    UpdateGetWaitingResult(provider);
+    UpdateGetRestrictionResult(provider);
+    UpdateGetTransferResult(provider);
+    UpdateGetCallClipResult(provider);
+    GetImsConfigResult(provider);
+    GetImsFeatureValueResult(provider);
+    SendMmiCodeResult(provider);
+    ReceiveUpdateCallMediaModeRequest(provider);
+    ReceiveUpdateCallMediaModeResponse(provider);
+    HandleCallSessionEventChanged(provider);
+    HandlePeerDimensionsChanged(provider);
+    HandleCallDataUsageChanged(provider);
+    HandleCameraCapabilitiesChanged(provider);
 }
 } // namespace OHOS
 

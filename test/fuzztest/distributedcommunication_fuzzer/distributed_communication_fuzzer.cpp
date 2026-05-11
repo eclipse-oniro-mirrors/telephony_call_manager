@@ -25,22 +25,18 @@
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-void TestCommonController(const std::shared_ptr<DistributedDataController> &controller, const uint8_t *data,
-    size_t size)
+void TestCommonController(const std::shared_ptr<DistributedDataController> &controller, FuzzedDataProvider& provider)
 {
-    FuzzedDataProvider fdp(data, size);
-    std::string stringValue = fdp.ConsumeRandomLengthString();
-    int32_t intValue = static_cast<int32_t>(size);
+    std::string stringValue = provider.ConsumeRandomLengthString();
+    int32_t intValue = provider.ConsumeIntergral<int32_t>();
     AudioDeviceType audioDevType = static_cast<AudioDeviceType>(
         size % static_cast<uint32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_PC));
-    const char *charValue = reinterpret_cast<const char *>(data);
-    uint32_t uintValue = static_cast<uint32_t>(size);
+    const char *charValue = provider.consumeString().c_str();
+    uint32_t uintValue = provider.ConsumeIntergral<uint32_t>();
     DialParaInfo dialParaInfo;
     sptr<OHOS::Telephony::CallBase> call = new IMSCall(dialParaInfo);
-    DistributedDataType distributedDataType = static_cast<DistributedDataType>(
-        size % static_cast<uint32_t>(DistributedDataType::MAX));
-    DistributedMsgType msgType = static_cast<DistributedMsgType>(
-        size % static_cast<uint32_t>(DistributedMsgType::CURRENT_DATA_RSP));
+    DistributedDataType distributedDataType = provider.ConsumeIntergral<DistributedDataType>() % static_cast<uint32_t>(DistributedDataType::MAX);
+    DistributedMsgType msgType = provider.ConsumeIntergral<DistributedMsgType>() % static_cast<uint32_t>(DistributedMsgType::CURRENT_DATA_RSP);
     controller->OnDistributedAudioDeviceChange(stringValue, stringValue, audioDevType, intValue);
     controller->OnRemoveSystemAbility();
     controller->OnReceiveMsg(charValue, uintValue);
@@ -70,7 +66,7 @@ void TestCommonController(const std::shared_ptr<DistributedDataController> &cont
     cJSON_Delete(msg);
 }
 
-void TestSinkController(const uint8_t *data, size_t size)
+void TestSinkController(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
@@ -82,15 +78,15 @@ void TestSinkController(const uint8_t *data, size_t size)
     if (controller == nullptr) {
         return;
     }
-    TestCommonController(controller, data, size);
+    TestCommonController(controller, provider);
 
-    std::string stringValue(reinterpret_cast<const char *>(data), size);
-    int32_t intValue = static_cast<int32_t>(size);
-    DistributedDataType distributedDataType = static_cast<DistributedDataType>(
-        size % static_cast<uint32_t>(DistributedDataType::MAX));
-    DistributedMsgType msgType = static_cast<DistributedMsgType>(
-        size % static_cast<uint32_t>(DistributedMsgType::CURRENT_DATA_RSP));
-    uint32_t uintValue = static_cast<uint32_t>(size);
+    std::string stringValue = provider.consumeString();
+    int32_t intValue = provider.ConsumeIntergral<int32_t>();
+    DistributedDataType distributedDataType = provider.ConsumeIntergral<DistributedDataType>() %
+        static_cast<uint32_t>(DistributedDataType::MAX);
+    DistributedMsgType msgType = provider.ConsumeIntergral<DistributedMsgType>() %
+        static_cast<uint32_t>(DistributedMsgType::CURRENT_DATA_RSP);
+    uint32_t uintValue = provider.ConsumeIntergral<int32_t>();
     DialParaInfo dialParaInfo;
     sptr<OHOS::Telephony::CallBase> call = new IMSCall(dialParaInfo);
     controller->ConnectRemote(stringValue);
@@ -108,7 +104,7 @@ void TestSinkController(const uint8_t *data, size_t size)
     cJSON_Delete(msg);
 }
 
-void TestSourceController(const uint8_t *data, size_t size)
+void TestSourceController(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
@@ -122,15 +118,15 @@ void TestSourceController(const uint8_t *data, size_t size)
     }
     TestCommonController(controller, data, size);
 
-    std::string stringValue(reinterpret_cast<const char *>(data), size);
-    DistributedDataType distributedDataType = static_cast<DistributedDataType>(
-        size % static_cast<uint32_t>(DistributedDataType::MAX));
+    std::string stringValue = provider.consumeString();
+    DistributedDataType distributedDataType = provider.ConsumeIntergral<DistributedDataType>() %
+        static_cast<uint32_t>(DistributedDataType::MAX);
     DialParaInfo dialParaInfo;
     sptr<OHOS::Telephony::CallBase> call = new IMSCall(dialParaInfo);
-    DistributedMsgType msgType = static_cast<DistributedMsgType>(
-        size % static_cast<uint32_t>(DistributedMsgType::CURRENT_DATA_RSP));
-    uint32_t uintValue = static_cast<uint32_t>(size);
-    int32_t intValue = static_cast<int32_t>(size);
+    DistributedMsgType msgType = provider.ConsumeIntergral<DistributedMsgType>() %
+        static_cast<uint32_t>(DistributedMsgType::CURRENT_DATA_RSP);
+    uint32_t uintValue = provider.ConsumeIntergral<uint32_t>();
+    int32_t intValue = provider.ConsumeIntergral<int32_t>();
     controller->SaveLocalData(stringValue, distributedDataType, stringValue);
     controller->SaveLocalData(call, distributedDataType);
     controller->CreateDataRspMsg(msgType, uintValue, stringValue, stringValue, stringValue);
@@ -149,8 +145,9 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    TestSinkController(data, size);
-    TestSourceController(data, size);
+    FuzzedDataProvider provider(data, size);
+    TestSinkController(provider);
+    TestSourceController(provider);
 }
 } // namespace OHOS
 

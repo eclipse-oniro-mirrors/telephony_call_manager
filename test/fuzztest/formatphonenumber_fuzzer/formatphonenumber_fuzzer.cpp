@@ -25,73 +25,77 @@ using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 2;
 
-int32_t GetMainCallId(const uint8_t *data, size_t size)
+int32_t GetMainCallId(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel messageParcel;
-    int32_t callId = static_cast<int32_t>(size);
+    int32_t callId = provider.ConsumeIntergral<int32_t>();
     messageParcel.WriteInt32(callId);
-    size_t mainCallId = static_cast<int32_t>(size);
+    size_t mainCallId = provider.ConsumeIntergral<int32_t>();
     messageParcel.WriteInt32(mainCallId);
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnGetMainCallId(messageParcel, reply);
 }
 
-int32_t GetSubCallIdList(const uint8_t *data, size_t size)
+int32_t GetSubCallIdList(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel messageParcel;
-    int32_t id = static_cast<int32_t>(size);
+    int32_t id = provider.ConsumeIntergral<int32_t>();
     messageParcel.WriteInt32(id);
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnGetSubCallIdList(messageParcel, reply);
 }
 
-int32_t GetCallIdListForConference(const uint8_t *data, size_t size)
+int32_t GetCallIdListForConference(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel messageParcel;
-    int32_t callId = static_cast<int32_t>(size);
+    int32_t callId = provider.ConsumeIntergral<int32_t>();
     messageParcel.WriteInt32(callId);
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallIdListForConference(messageParcel, reply);
 }
 
-int32_t GetCallRestriction(const uint8_t *data, size_t size)
+int32_t GetCallRestriction(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
-    messageParcel.WriteInt32(static_cast<int32_t>(size));
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteInt32(provider.ConsumeIntergral<int32_t>());
+    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallRestriction(messageParcel, reply);
 }
 
-int32_t ReportOttCallDetailsInfo(const uint8_t *data, size_t size)
+int32_t ReportOttCallDetailsInfo(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
     int32_t vecCnt = 1;
     OttCallDetailsInfo info;
-    std::string msg(reinterpret_cast<const char *>(data), size);
+    std::string msg = provider.consumeString();
     int32_t phoneLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     int32_t bundleLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
     memcpy_s(info.phoneNum, kMaxNumberLen, msg.c_str(), phoneLength);
@@ -106,14 +110,14 @@ int32_t ReportOttCallDetailsInfo(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnReportOttCallDetailsInfo(messageParcel, reply);
 }
 
-int32_t ReportOttCallEventInfo(const uint8_t *data, size_t size)
+int32_t ReportOttCallEventInfo(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
     OttCallEventInfo info;
     info.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
-    std::string msg(reinterpret_cast<const char *>(data), size);
+    std::string msg = provider.consumeString();
     int32_t bundleLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
     memcpy_s(info.bundleName, kMaxBundleNameLen, msg.c_str(), bundleLength);
     MessageParcel messageParcel;
@@ -123,12 +127,12 @@ int32_t ReportOttCallEventInfo(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnReportOttCallEventInfo(messageParcel, reply);
 }
 
-int32_t CloseUnFinishedUssd(const uint8_t *data, size_t size)
+int32_t CloseUnFinishedUssd(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
     messageParcel.RewindRead(0);
@@ -136,13 +140,12 @@ int32_t CloseUnFinishedUssd(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnCloseUnFinishedUssd(messageParcel, reply);
 }
 
-int32_t FormatPhoneNumber(const uint8_t *data, size_t size)
+int32_t FormatPhoneNumber(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    FuzzedDataProvider fdp(data, size);
-    std::string number = fdp.ConsumeRandomLengthString();
+    std::string number = provider.ConsumeRandomLengthString();
     auto numberU16 = Str8ToStr16(number);
     std::string countryCode = fdp.ConsumeRandomLengthString();
     auto countryCodeU16 = Str8ToStr16(countryCode);
@@ -160,14 +163,15 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    GetMainCallId(data, size);
-    GetSubCallIdList(data, size);
-    GetCallIdListForConference(data, size);
-    GetCallRestriction(data, size);
-    ReportOttCallDetailsInfo(data, size);
-    ReportOttCallEventInfo(data, size);
-    CloseUnFinishedUssd(data, size);
-    FormatPhoneNumber(data, size);
+    FuzzedDataProvider provider(data, size);
+    GetMainCallId(provider);
+    GetSubCallIdList(provider);
+    GetCallIdListForConference(provider);
+    GetCallRestriction(provider);
+    ReportOttCallDetailsInfo(provider);
+    ReportOttCallEventInfo(provider);
+    CloseUnFinishedUssd(provider);
+    FormatPhoneNumber(provider);
     DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
 }
 } // namespace OHOS

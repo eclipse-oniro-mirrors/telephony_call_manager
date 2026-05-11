@@ -19,20 +19,21 @@
 #include <cstdint>
 #define private public
 #include "addcalltoken_fuzzer.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 2;
 
-bool IsEmergencyPhoneNumber(const uint8_t *data, size_t size)
+bool IsEmergencyPhoneNumber(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return false;
     }
 
-    std::string number(reinterpret_cast<char *>(const_cast<uint8_t *>(data)), size);
+    std::string number = provider.consumeString();
     auto numberU16 = Str8ToStr16(number);
-    int32_t slotId = static_cast<uint32_t>(size % SLOT_NUM);
+    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteString16(numberU16);
     messageParcel.WriteInt32(slotId);
@@ -47,7 +48,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    IsEmergencyPhoneNumber(data, size);
+    FuzzedDataProvider provider(data, size);
+    IsEmergencyPhoneNumber(provider);
     DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
 }
 } // namespace OHOS

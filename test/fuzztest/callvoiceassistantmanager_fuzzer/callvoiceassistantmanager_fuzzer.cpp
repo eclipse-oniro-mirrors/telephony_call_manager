@@ -22,6 +22,7 @@
 #include "cs_call.h"
 #include "call_voice_assistant_manager.h"
 #include "call_manager_base.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -32,7 +33,7 @@ const std::string CONTROL_SWITCH = "incoming_call_voice_control_switch";
 const std::string INCOMING = "come";
 const std::string DIALING = "dial";
 
-void ListenCallStateFunc(const uint8_t *data, size_t size)
+void ListenCallStateFunc(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
@@ -40,8 +41,8 @@ void ListenCallStateFunc(const uint8_t *data, size_t size)
 
     DialParaInfo paraInfo;
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
-    TelCallState priorState = static_cast<TelCallState>(size % CALL_STATE_NUM);
-    TelCallState nextState = static_cast<TelCallState>(size % CALL_STATE_NUM);
+    TelCallState priorState = provider.ConsumeIntergral<TelCallState>() % CALL_STATE_NUM;
+    TelCallState nextState = provider.ConsumeIntergral<TelCallState>() % CALL_STATE_NUM;
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     voicePtr->CallStateUpdated(callObjectPtr, priorState, nextState);
     voicePtr->CallStatusDialing(CALL_ID, ACCOUNT_ID);
@@ -59,7 +60,7 @@ void ListenCallStateFunc(const uint8_t *data, size_t size)
     voicePtr->Release();
 }
 
-void SendRequestFunc(const uint8_t *data, size_t size)
+void SendRequestFunc(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
@@ -86,7 +87,7 @@ void SendRequestFunc(const uint8_t *data, size_t size)
     voicePtr->Release();
 }
 
-void UpdateValueFunc(const uint8_t *data, size_t size)
+void UpdateValueFunc(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
@@ -124,10 +125,11 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
-
-    ListenCallStateFunc(data, size);
-    SendRequestFunc(data, size);
-    UpdateValueFunc(data, size);
+    
+    FuzzedDataProvider provider(data, size);
+    ListenCallStateFunc(provider);
+    SendRequestFunc(provider);
+    UpdateValueFunc(provider);
 }
 } // namespace OHOS
 

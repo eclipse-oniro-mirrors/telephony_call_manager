@@ -20,6 +20,7 @@
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "call_manager_service_stub.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -27,95 +28,101 @@ constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t IMS_CONFIG_ITEM_NUM = 2;
 constexpr int32_t FEATURE_TYPE_NUM = 3;
 
-void IsImsSwitchEnabled(const uint8_t *data, size_t size)
+void IsImsSwitchEnabled(FuzzedDataProvider &provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
-    messageParcel.WriteBuffer(data, size);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnIsVoLteEnabled(messageParcel, reply);
 }
 
-void GetVoNRState(const uint8_t *data, size_t size)
+void GetVoNRState(FuzzedDataProvider &provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
     MessageParcel messageParcel;
-    messageParcel.WriteInt32(static_cast<int32_t>(size % SLOT_NUM));
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteInt32(provider.ConsumeIntergral<int32_t>() % SLOT_NUM);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnGetVoNRState(messageParcel, reply);
 }
 
-void GetImsConfig(const uint8_t *data, size_t size)
+void GetImsConfig(FuzzedDataProvider &provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t item = static_cast<int32_t>(size % IMS_CONFIG_ITEM_NUM);
+    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
+    int32_t item = provider.ConsumeIntergral<int32_t>() % IMS_CONFIG_ITEM_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
     messageParcel.WriteInt32(static_cast<ImsConfigItem>(item));
-    messageParcel.WriteBuffer(data, size);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnGetImsConfig(messageParcel, reply);
 }
 
-void GetImsFeatureValue(const uint8_t *data, size_t size)
+void GetImsFeatureValue(FuzzedDataProvider &provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t type = static_cast<int32_t>(size % FEATURE_TYPE_NUM);
+    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
+    int32_t type = provider.ConsumeIntergral<int32_t>() % FEATURE_TYPE_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
     messageParcel.WriteInt32(static_cast<FeatureType>(type));
-    messageParcel.WriteBuffer(data, size);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnGetImsFeatureValue(messageParcel, reply);
 }
 
-void GetCallTransferInfo(const uint8_t *data, size_t size)
+void GetCallTransferInfo(FuzzedDataProvider &provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
-    messageParcel.WriteInt32(static_cast<int32_t>(size));
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteInt32(provider.ConsumeIntergral<int32_t>());
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnGetTransferNumber(messageParcel, reply);
 }
 
-void SetCallTransferInfo(const uint8_t *data, size_t size)
+void SetCallTransferInfo(FuzzedDataProvider &provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     CallTransferInfo info;
-    (void)memcpy_s(info.transferNum, kMaxNumberLen, reinterpret_cast<const char *>(data), size);
+    std::string msg = provider.consumeString();
+    (void)memcpy_s(info.transferNum, kMaxNumberLen, msg, msg.size());
     info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
     info.type = CallTransferType::TRANSFER_TYPE_BUSY;
     messageParcel.WriteInt32(slotId);
@@ -131,12 +138,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    IsImsSwitchEnabled(data, size);
-    GetVoNRState(data, size);
-    GetImsConfig(data, size);
-    GetImsFeatureValue(data, size);
-    GetCallTransferInfo(data, size);
-    SetCallTransferInfo(data, size);
+    FuzzedDataProvider provider(data, size);
+    IsImsSwitchEnabled(provider);
+    GetVoNRState(provider);
+    GetImsConfig(provider);
+    GetImsFeatureValue(provider);
+    GetCallTransferInfo(provider);
+    SetCallTransferInfo(provider);
     DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
 }
 } // namespace OHOS
