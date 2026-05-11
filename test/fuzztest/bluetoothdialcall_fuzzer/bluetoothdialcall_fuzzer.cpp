@@ -206,7 +206,7 @@ void GetCurrentCallList(FuzzedDataProvider& provider)
     std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
-    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());;
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnGetCurrentCallList(messageParcel, reply);

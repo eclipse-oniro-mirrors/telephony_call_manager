@@ -110,7 +110,7 @@ int32_t GetCallState(FuzzedDataProvider& provider)
     }
     MessageParcel messageParcel;
     messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
-    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());;
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallState(messageParcel, reply);
@@ -189,7 +189,7 @@ void RemoveMissedIncomingCallNotification(FuzzedDataProvider& provider)
     }
     MessageParcel messageParcel;
     messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
-    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());;
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnRemoveMissedIncomingCallNotification(
