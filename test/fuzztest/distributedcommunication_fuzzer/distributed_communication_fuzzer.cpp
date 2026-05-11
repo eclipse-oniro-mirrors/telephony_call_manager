@@ -35,9 +35,9 @@ void TestCommonController(const std::shared_ptr<DistributedDataController> &cont
     uint32_t uintValue = provider.ConsumeIntergral<uint32_t>();
     DialParaInfo dialParaInfo;
     sptr<OHOS::Telephony::CallBase> call = new IMSCall(dialParaInfo);
-    DistributedDataType distributedDataType = provider.ConsumeIntergral<DistributedDataType>() % 
+    DistributedDataType distributedDataType = provider.ConsumeIntergral<DistributedDataType>() %
         static_cast<uint32_t>(DistributedDataType::MAX);
-    DistributedMsgType msgType = provider.ConsumeIntergral<DistributedMsgType>() % 
+    DistributedMsgType msgType = provider.ConsumeIntergral<DistributedMsgType>() %
         static_cast<uint32_t>(DistributedMsgType::CURRENT_DATA_RSP);
     controller->OnDistributedAudioDeviceChange(stringValue, stringValue, audioDevType, intValue);
     controller->OnRemoveSystemAbility();
