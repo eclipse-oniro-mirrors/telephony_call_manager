@@ -24,18 +24,14 @@ extern "C" {
 #endif
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
 __attribute__((visibility("default"))) bool IsTorchSupported();
-
 __attribute__((visibility("default"))) int GetTorchMode();
-
 __attribute__((visibility("default"))) int SetTorchMode(int mode);
-
 __attribute__((visibility("default"))) int FreeCamera();
 #endif
 
 #ifdef ABILITY_SCREENLOCKMGR_SUPPORT
 __attribute__((visibility("default"))) bool IsScreenLocked();
 #endif
-
 #ifdef ABILITY_SMS_SUPPORT
 __attribute__((visibility("default"))) int SendMessage(int slotId, const char16_t* desAddr,
     const char16_t* text, unsigned int addrLen, unsigned int textLen);

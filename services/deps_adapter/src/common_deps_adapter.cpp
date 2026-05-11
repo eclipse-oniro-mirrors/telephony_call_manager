@@ -14,24 +14,20 @@
  */
 
 #include "common_deps_adapter.h"
-
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
 #include "input/camera_manager.h"
 #endif
-
 #ifdef ABILITY_SCREENLOCKMGR_SUPPORT
 #include "screenlock_manager.h"
 #endif
-
 #ifdef ABILITY_SMS_SUPPORT
 #include "sms_service_manager_client.h"
 #endif
-
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-
+const int ERROR = -1;
 #ifdef ABILITY_CAMERA_FRAMEWORK_SUPPORT
 bool IsTorchSupported()
 {
@@ -48,7 +44,7 @@ int GetTorchMode()
     sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
     if (camMgr == nullptr) {
         TELEPHONY_LOGE("get cameraMgr null");
-        return -1;
+        return ERROR;
     }
     return static_cast<int>(camMgr->GetTorchMode());
 }
@@ -58,7 +54,7 @@ int SetTorchMode(int mode)
     sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
     if (camMgr == nullptr) {
         TELEPHONY_LOGE("get cameraMgr null");
-        return -1;
+        return ERROR;
     }
     return camMgr->SetTorchMode(static_cast<CameraStandard::TorchMode>(mode));
 }
@@ -68,7 +64,7 @@ int FreeCamera()
     sptr<CameraStandard::CameraManager> camMgr = CameraStandard::CameraManager::GetInstance();
     if (camMgr == nullptr) {
         TELEPHONY_LOGE("get cameraMgr null");
-        return 0;
+        return ERROR;
     }
     
     return camMgr->DestroyStubObj();
@@ -92,7 +88,7 @@ int SendMessage(int slotId, const char16_t* desAddr, const char16_t* text,
     unsigned int addrLen, unsigned int textLen)
 {
     if (desAddr == nullptr || text == nullptr) {
-        return -1;
+        return ERROR;
     }
     return Singleton<SmsServiceManagerClient>::GetInstance().SendMessage(slotId, std::u16string(desAddr, addrLen), u"",
         std::u16string(text, textLen), nullptr, nullptr);

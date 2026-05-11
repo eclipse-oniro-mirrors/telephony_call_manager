@@ -127,7 +127,6 @@ bool IncomingFlashReminder::IsTorchReady()
         return false;
     }
     if (!isTorchSupported()) {
-        TELEPHONY_LOGI("do not support torch");
         return false;
     }
     
@@ -268,7 +267,7 @@ void IncomingFlashReminder::ReleaseDepsAdapter()
         return;
     }
     int32_t result = freeCameraFunc();
-    if (result == 0) {
+    if (result == TELEPHONY_SUCCESS) {
         dlclose(libAdapterHandler_);
         libAdapterHandler_ = nullptr;
     }
