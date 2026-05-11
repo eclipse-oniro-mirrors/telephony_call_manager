@@ -234,6 +234,7 @@ int32_t CallAbilityCallbackProxy::OnReportAudioDeviceChange(const AudioDeviceInf
     dataParcel.WriteRawData((const void *)&info.currentAudioDevice, sizeof(AudioDevice));
     dataParcel.WriteBool(info.isMuted);
     dataParcel.WriteInt32(info.callId);
+    dataParcel.WriteBool(info.isMicDisabled);
 
     int32_t error = SendRequest(
         static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST),
