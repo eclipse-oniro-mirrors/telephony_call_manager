@@ -969,6 +969,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_005, TestSize.Level0)
     int32_t videoState = 0;
     int32_t callingPid = 0000;
     callControlManager->CurrentIsSuperPrivacyMode(VALID_CALLID, videoState);
+    int32_t callId = 12345;
+    callControlManager->PostPendingHangupProtectTask(callId);
     sptr<CallBase> callObjectPtr = nullptr;
     callControlManager->AnswerHandlerForSatelliteOrVideoCall(callObjectPtr, videoState);
     DialParaInfo dialParaInfo;
