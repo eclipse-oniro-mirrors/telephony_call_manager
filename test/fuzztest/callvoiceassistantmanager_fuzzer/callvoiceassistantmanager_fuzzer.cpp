@@ -41,8 +41,10 @@ void ListenCallStateFunc(FuzzedDataProvider& provider)
 
     DialParaInfo paraInfo;
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
-    TelCallState priorState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
-    TelCallState nextState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
+    TelCallState priorState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM) % CALL_STATE_NUM;
+    TelCallState nextState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM) % CALL_STATE_NUM;
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     voicePtr->CallStateUpdated(callObjectPtr, priorState, nextState);
     voicePtr->CallStatusDialing(CALL_ID, ACCOUNT_ID);

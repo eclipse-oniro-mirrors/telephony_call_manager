@@ -44,17 +44,20 @@ void AudioControlManagerFunc(FuzzedDataProvider& provider)
 
     std::shared_ptr<AudioControlManager> audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
     DialParaInfo paraInfo;
-    paraInfo.dialType = provider.ConsumeIntegral<DialType>();
-    paraInfo.callType = provider.ConsumeIntegral<CallType>();
-    paraInfo.videoState = provider.ConsumeIntegral<VideoStateType>();
-    paraInfo.callState = rovider.ConsumeIntegral<TelCallState>();
+    paraInfo.dialType = static_cast<DialType>(
+        provider.ConsumeIntegralInRange<int32_t>(0, DIAL_TYPE));
+    paraInfo.callType = static_cast<CallType>(
+        provider.ConsumeIntegralInRange<int32_t>(0, CALL_TYPE_NUM));
+    paraInfo.videoState = static_cast<VideoStateType>(
+        provider.ConsumeIntegralInRange<int32_t>(0, VIDIO_TYPE_NUM));
+    paraInfo.callState = static_cast<TelCallState>(provider.ConsumeIntegralInRange<int32_t>(0, TEL_CALL_STATE_NUM));
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
     std::string message = provider.ConsumeRandomLenthString();
     DisconnectedDetails details;
-    bool isMute = provider.ConsumeIntegral<bool>();
-    RingState ringState = provider.ConsumeIntegral<RingState>();
+    bool isMute = provider.ConsumeBool();
+    RingState ringState = static_cast<RingState>(provider.ConsumeIntegralInRange<int32_t>(0, RING_STATE_NUM));
     AudioDevice audioDevice = {
-        .deviceType = provider.ConsumeIntegral<AudioDeviceType>(),
+        .deviceType = static_cast<AudioDeviceType>(provider.ConsumeIntegralInRange<int32_t>(0, AUDIO_DEVICE_NUM)),
         .address = { 0 },
     };
 
@@ -89,8 +92,9 @@ void AudioDeviceManagerFunc(FuzzedDataProvider& provider)
     }
 
     std::shared_ptr<AudioDeviceManager> audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
-    AudioDeviceType deviceType = provider.ConsumeIntegral<AudioDeviceType>();
-    AudioEvent event = provider.ConsumeIntegral<AudioEvent>();
+    AudioDeviceType deviceType = static_cast<AudioDeviceType>(
+        provider.ConsumeIntegralInRange<int32_t>(0, AUDIO_DEVICE_NUM));
+    AudioEvent event = static_cast<AudioEvent>(provider.ConsumeIntegralInRange<int32_t>(0, AUDIO_EVENT));
 
     audioDeviceManager->Init();
     audioDeviceManager->InitAudioDevice();
@@ -122,12 +126,13 @@ void AudioProxyFunc(FuzzedDataProvider& provider)
 
     std::shared_ptr<AudioProxy> audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
     std::shared_ptr<AudioControlManager> audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
-    AudioStandard::AudioScene audioScene = provider.ConsumeIntegral<AudioStandard::AudioScene>();
-    AudioStandard::AudioVolumeType audioVolumeType =
-        provider.ConsumeIntegral<AudioStandard::AudioVolumeType>();
+    AudioStandard::AudioScene audioScene = static_cast<AudioStandard::AudioScene>(
+        provider.ConsumeIntegralInRange<int32_t>(0, AUDIO_SCENE_NUM));
+    AudioStandard::AudioVolumeType audioVolumeType = static_cast<AudioStandard::AudioVolumeType>(
+        provider.ConsumeIntegralInRange<int32_t>(0, AUDIO_VOLUME_TYPE_NUM));
     int32_t volume = provider.ConsumeIntegral<int32_t>();
     int32_t callId = provider.ConsumeIntegral<int32_t>();
-    bool isMute = provider.ConsumeIntegral<bool>();
+    bool isMute = provider.ConsumeBool();
 
     audioControlManager->GetCallBase(callId);
     audioProxy->SetVolumeAudible();

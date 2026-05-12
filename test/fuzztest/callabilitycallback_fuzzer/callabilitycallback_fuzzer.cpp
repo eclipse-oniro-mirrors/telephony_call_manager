@@ -73,14 +73,14 @@ int32_t UpdateCallStateInfo(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     CallAttributeInfo info;
-    std::string msg = provider.consumeString();
+    std::string msg = provider.ConsumeRadomLengthString();
     int32_t accountLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     int32_t bundleLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
     memcpy_s(info.accountNumber, kMaxNumberLen, msg.c_str(), accountLength);
     memcpy_s(info.bundleName, kMaxBundleNameLen, msg.c_str(), bundleLength);
-    info.accountId = provider.ConsumeIntegral<int32_t>();
+    info.accountId = provider.ConsumeIntegral<int32_t>() % ACCOUNT_ID_NUM;
     info.startTime = provider.ConsumeIntegral<uint32_t>();
-    info.callId = provider.ConsumeIntegral<int32_t>();
+    info.callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
     info.callBeginTime = provider.ConsumeIntegral<time_t>();
     info.callEndTime = provider.ConsumeIntegral<time_t>();
     info.ringBeginTime = provider.ConsumeIntegral<time_t>();
@@ -122,7 +122,7 @@ int32_t UpdateCallEvent(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     CallEventInfo info;
-    std::string msg = provider.consumeString();
+    std::string msg = provider.ConsumeRadomLengthString();
     int32_t phoneLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     int32_t bundleLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
     memcpy_s(info.phoneNum, kMaxNumberLen, msg.c_str(), phoneLength);
@@ -143,7 +143,7 @@ int32_t UpdateCallDisconnectedCause(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     int32_t reason = provider.ConsumeIntegral<int32_t>();
-    std::string message = provider.consumeString();
+    std::string message = provider.ConsumeRadomLengthString();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(reason);
     messageParcel.WriteString(message);
@@ -197,7 +197,7 @@ int32_t UpdateMmiCodeResults(FuzzedDataProvider& provider)
     MmiCodeInfo info;
     int32_t length = sizeof(MmiCodeInfo);
     info.result = provider.ConsumeIntegral<uint32_t>();
-    std::string msg = provider.consumeString();
+    std::string msg = provider.ConsumeRadomLengthString();
     int32_t msgLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(info.message, kMaxNumberLen, msg.c_str(), msgLength);
     MessageParcel messageParcel;
@@ -221,7 +221,7 @@ int32_t UpdateAudioDeviceChange(FuzzedDataProvider& provider)
     }
     AudioDevice device;
     device.deviceType = AudioDeviceType::DEVICE_UNKNOWN;
-    std::string msg = provider.consumeString();
+    std::string msg = provider.ConsumeRadomLengthString();
     int32_t length = msg.length() > kMaxAddressLen ? kMaxAddressLen : msg.length();
     memcpy_s(device.address, kMaxAddressLen, msg.c_str(), length);
     int32_t dataSize = provider.ConsumeIntegral<uint32_t>();
@@ -250,7 +250,7 @@ int32_t UpdateImsCallModeChange(FuzzedDataProvider& provider)
     messageParcel.WriteInt32(length);
     CallMediaModeInfo callMediaModeInfo;
     callMediaModeInfo.callId = provider.ConsumeIntegral<int32_t>();
-    callMediaModeInfo.isRequestInfo = provider.ConsumeIntegral<bool>() % BOOL_NUM;
+    callMediaModeInfo.isRequestInfo = provider.ConsumeBool();
     callMediaModeInfo.result = provider.ConsumeIntegral<VideoRequestResultType>() % VIDEO_REQUEST_RESULT_TYPE_NUM;
     callMediaModeInfo.callMode = provider.ConsumeIntegral<ImsCallMode>() % IMS_CALL_MODE_NUM;
     messageParcel.WriteRawData((const void *)&callMediaModeInfo, length);

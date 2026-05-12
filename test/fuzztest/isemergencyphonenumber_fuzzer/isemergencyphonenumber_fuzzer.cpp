@@ -31,7 +31,7 @@ bool IsEmergencyPhoneNumber(FuzzedDataProvider& provider)
         return false;
     }
 
-    std::string number = provider.consumeString();
+    std::string number = provider.ConsumeRadomLengthString();
     auto numberU16 = Str8ToStr16(number);
     int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;

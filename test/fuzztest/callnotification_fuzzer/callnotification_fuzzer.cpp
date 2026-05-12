@@ -45,9 +45,11 @@ void IncomingCallNotificationFunc(FuzzedDataProvider& provider)
     std::shared_ptr<IncomingCallNotification> notification = std::make_shared<IncomingCallNotification>();
     DialParaInfo paraInfo;
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
-    TelCallState priorState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
-    TelCallState nextState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
-    std::string message = provider.consumeString();
+    TelCallState priorState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
+    TelCallState nextState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
+    std::string message = provider.ConsumeRadomLengthString();
     DisconnectedDetails details;
 
     notification->NewCallCreated(callObjectPtr);
@@ -69,9 +71,11 @@ void IncomingCallWakeupFunc(FuzzedDataProvider& provider)
     std::shared_ptr<IncomingCallWakeup> notification = std::make_shared<IncomingCallWakeup>();
     DialParaInfo paraInfo;
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
-    TelCallState priorState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
-    TelCallState nextState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
-    std::string message = provider.consumeString();
+    TelCallState priorState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
+    TelCallState nextState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
+    std::string message = provider.ConsumeRadomLengthString();
     DisconnectedDetails details;
 
     notification->NewCallCreated(callObjectPtr);
@@ -92,9 +96,11 @@ void ProximitySensorFunc(FuzzedDataProvider& provider)
     std::shared_ptr<ProximitySensor> notification = std::make_shared<ProximitySensor>();
     DialParaInfo paraInfo;
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
-    TelCallState priorState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
-    TelCallState nextState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
-    std::string message = provider.consumeString();
+    TelCallState priorState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
+    TelCallState nextState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
+    std::string message = provider.ConsumeRadomLengthString();
     DisconnectedDetails details;
 
     notification->CallDestroyed(details);
@@ -113,9 +119,11 @@ void StatusBarFunc(FuzzedDataProvider& provider)
     std::shared_ptr<StatusBar> notification = std::make_shared<StatusBar>();
     DialParaInfo paraInfo;
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
-    TelCallState priorState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
-    TelCallState nextState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
-    std::string message = provider.consumeString();
+    TelCallState priorState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
+    TelCallState nextState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
+    std::string message = provider.ConsumeRadomLengthString();
     DisconnectedDetails details;
     int32_t isDisplayMute = provider.ConsumeIntegral<int32_t>() % BOOL_NUM;
 
@@ -137,9 +145,11 @@ void WiredHeadsetHandlerFunc(FuzzedDataProvider& provider)
     std::shared_ptr<WiredHeadset> notification = std::make_shared<WiredHeadset>();
     DialParaInfo paraInfo;
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
-    TelCallState priorState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
-    TelCallState nextState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
-    std::string message = provider.consumeString();
+    TelCallState priorState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
+    TelCallState nextState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
+    std::string message = provider.ConsumeRadomLengthString();
     DisconnectedDetails details;
 
     notification->Init();
@@ -156,7 +166,7 @@ void CallDataRdbObserverFunc(FuzzedDataProvider& provider)
         return;
     }
 
-    std::string message = provider.consumeString();
+    std::string message = provider.ConsumeRadomLengthString();
     std::shared_ptr<CallDataBaseHelper> callDataBaseHelper = DelayedSingleton<CallDataBaseHelper>::GetInstance();
     DataShare::DataShareValuesBucket values;
     DataShare::DataSharePredicates predicates;
@@ -185,9 +195,11 @@ void MissedCallNotificationFunc(FuzzedDataProvider& provider)
     std::shared_ptr<MissedCallNotification> notification = std::make_shared<MissedCallNotification>();
     DialParaInfo paraInfo;
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
-    TelCallState priorState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
-    TelCallState nextState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
-    std::string message = provider.consumeString();
+    TelCallState priorState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
+    TelCallState nextState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
+    std::string message = provider.ConsumeRadomLengthString();
     DisconnectedDetails details;
 
     notification->NewCallCreated(callObjectPtr);
@@ -208,8 +220,10 @@ void RejectCallSmsFunc(FuzzedDataProvider& provider)
     DialParaInfo paraInfo;
     int32_t slotId = static_cast<int32_t>(size % 2);
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
-    TelCallState priorState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
-    TelCallState nextState = provider.ConsumeIntegral<TelCallState>() % CALL_STATE_NUM;
+    TelCallState priorState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
+    TelCallState nextState = static_cast<TelCallState>(
+        provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
     FuzzedDataProvider fdp(data, size);
     std::string message = fdp.ConsumeRandomLengthString();
     std::string desAddr = fdp.ConsumeRandomLengthString();

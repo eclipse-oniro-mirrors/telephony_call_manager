@@ -31,7 +31,7 @@ void TestCommonController(const std::shared_ptr<DistributedDataController> &cont
     int32_t intValue = provider.ConsumeIntegral<int32_t>();
     AudioDeviceType audioDevType = static_cast<AudioDeviceType>(
         size % static_cast<uint32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_PC));
-    const char *charValue = provider.consumeString().c_str();
+    const char *charValue = provider.ConsumeRadomLengthString().c_str();
     uint32_t uintValue = provider.ConsumeIntegral<uint32_t>();
     DialParaInfo dialParaInfo;
     sptr<OHOS::Telephony::CallBase> call = new IMSCall(dialParaInfo);
@@ -82,13 +82,14 @@ void TestSinkController(FuzzedDataProvider& provider)
     }
     TestCommonController(controller, provider);
 
-    std::string stringValue = provider.consumeString();
+    std::string stringValue = provider.ConsumeRadomLengthString();
     int32_t intValue = provider.ConsumeIntegral<int32_t>();
-    DistributedDataType distributedDataType = provider.ConsumeIntegral<DistributedDataType>() %
+    DistributedDataType distributedDataType = static_cast<DistributedDataType>(provider.ConsumeIntegral<int32_t>()) %
         static_cast<uint32_t>(DistributedDataType::MAX);
-    DistributedMsgType msgType = provider.ConsumeIntegral<DistributedMsgType>() %
+    int32_t s = provider.ConsumeIntegralInRange<int32_t>(0, 10);
+    DistributedMsgType msgType = static_cast<DistributedMsgType>(provider.ConsumeIntegral<int32_t>()) %
         static_cast<uint32_t>(DistributedMsgType::CURRENT_DATA_RSP);
-    uint32_t uintValue = provider.ConsumeIntegral<int32_t>();
+    uint32_t uintValue = provider.ConsumeIntegral<uint32_t>();
     DialParaInfo dialParaInfo;
     sptr<OHOS::Telephony::CallBase> call = new IMSCall(dialParaInfo);
     controller->ConnectRemote(stringValue);
@@ -120,12 +121,12 @@ void TestSourceController(FuzzedDataProvider& provider)
     }
     TestCommonController(controller, data, size);
 
-    std::string stringValue = provider.consumeString();
-    DistributedDataType distributedDataType = provider.ConsumeIntegral<DistributedDataType>() %
+    std::string stringValue = provider.ConsumeRadomLengthString();
+    DistributedDataType distributedDataType = static_cast<DistributedDataType>(provider.ConsumeIntegral<int32_t>()) %
         static_cast<uint32_t>(DistributedDataType::MAX);
     DialParaInfo dialParaInfo;
     sptr<OHOS::Telephony::CallBase> call = new IMSCall(dialParaInfo);
-    DistributedMsgType msgType = provider.ConsumeIntegral<DistributedMsgType>() %
+    DistributedMsgType msgType = static_cast<DistributedMsgType>(provider.ConsumeIntegral<int32_t>()) %
         static_cast<uint32_t>(DistributedMsgType::CURRENT_DATA_RSP);
     uint32_t uintValue = provider.ConsumeIntegral<uint32_t>();
     int32_t intValue = provider.ConsumeIntegral<int32_t>();

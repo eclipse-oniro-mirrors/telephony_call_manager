@@ -31,7 +31,7 @@ int32_t ControlCamera(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     int32_t callId = provider.ConsumeIntegral<int32_t>();
-    std::string cameraId = provider.consumeString();
+    std::string cameraId = provider.ConsumeRadomLengthString();
     auto cameraIdU16 = Str8ToStr16(cameraId);
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
@@ -47,7 +47,7 @@ int32_t SetPreviewWindow(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     int32_t callId = provider.ConsumeIntegral<int32_t>();
-    std::string surfaceId = provider.consumeString();
+    std::string surfaceId = provider.ConsumeRadomLengthString();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     int len = static_cast<int>(surfaceId.length());
@@ -79,7 +79,7 @@ int32_t SetDisplayWindow(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     int32_t callId = provider.ConsumeIntegral<int32_t>();
-    std::string surfaceId = provider.consumeString();
+    std::string surfaceId = provider.ConsumeRadomLengthString();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     int len = static_cast<int>(surfaceId.length());
@@ -126,7 +126,7 @@ int32_t SetPausePicture(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     int32_t callId = provider.ConsumeIntegral<int32_t>();
-    std::string path = provider.consumeString();
+    std::string path = provider.ConsumeRadomLengthString();
     auto pathU16 = Str8ToStr16(path);
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);

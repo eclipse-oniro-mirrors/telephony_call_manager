@@ -202,7 +202,7 @@ void GetCurrentCallList(FuzzedDataProvider& provider)
         return;
     }
 
-    int32_t slotId = provider.ConsumeIntegral<int32_t>();
+    int32_t slotId = provider.ConsumeIntegralInRange<int32_t>(0, SLOT_NUM);
     std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);

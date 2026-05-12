@@ -31,7 +31,7 @@ void SetPausePicture(FuzzedDataProvider &provider)
         return;
     }
     int32_t callId = provider.ConsumeIntegral<int32_t>();
-    std::string path = provider.consumeString();
+    std::string path = provider.ConsumeRadomLengthString();
     auto pathU16 = Str8ToStr16(path);
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);

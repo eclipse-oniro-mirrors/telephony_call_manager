@@ -80,7 +80,7 @@ int32_t UpdateCallReportInfo(FuzzedDataProvider &provider)
     callReportInfo.callType = CallType::TYPE_ERR_CALL;
     callReportInfo.callMode = VideoStateType::TYPE_VOICE;
     callReportInfo.state = TelCallState::CALL_STATUS_UNKNOWN;
-    std::string msg = provider.consumeString();
+    std::string msg = provider.ConsumeRadomLengthString();
     int32_t accountLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(callReportInfo.accountNum, kMaxNumberLen, msg.c_str(), accountLength);
     messageParcel.WriteInt32(callReportInfo.index);
@@ -123,7 +123,7 @@ int32_t UpdateCallsReportInfo(FuzzedDataProvider &provider)
     info.callType = CallType::TYPE_ERR_CALL;
     info.callMode = VideoStateType::TYPE_VOICE;
     info.state = TelCallState::CALL_STATUS_UNKNOWN;
-    std::string msg = provider.consumeString();
+    std::string msg = provider.ConsumeRadomLengthString();
     int32_t accountLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(info.accountNum, kMaxNumberLen, msg.c_str(), accountLength);
     messageParcel.WriteInt32(vecSize);
@@ -321,7 +321,7 @@ int32_t SendMmiCodeResult(FuzzedDataProvider &provider)
     int32_t length = sizeof(MmiCodeInfo);
     messageParcel.WriteInt32(length);
     info.result = provider.ConsumeIntegral<int32_t>();
-    std::string msg = provider.consumeString();
+    std::string msg = provider.ConsumeRadomLengthString();
     int32_t msgLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(info.message, kMaxNumberLen, msg.c_str(), msgLength);
     messageParcel.WriteRawData((const void *)&info, length);
@@ -367,7 +367,8 @@ int32_t ReceiveUpdateCallMediaModeResponse(FuzzedDataProvider &provider)
     CallModeReportInfo callModeReportInfo;
     callModeReportInfo.callIndex = provider.ConsumeIntegral<int32_t>() % CALL_INDEX_MAX_NUM;
     callModeReportInfo.callMode = provider.ConsumeIntegral<int32_t>() % IMS_CALL_MODE_NUM;
-    callModeReportInfo.result = provider.ConsumeIntegral<VideoRequestResultType>() % VIDEO_REQUEST_RESULT_TYPE_NUM;
+    callModeReportInfo.result = static_cast<VideoRequestResultType>(provider.ConsumeIntegral<int32_t>()) %
+        VIDEO_REQUEST_RESULT_TYPE_NUM;
     messageParcel.WriteRawData((const void *)&callModeReportInfo, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
