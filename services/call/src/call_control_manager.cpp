@@ -30,6 +30,7 @@
 #include "call_manager_hisysevent.h"
 #include "call_number_utils.h"
 #include "call_records_manager.h"
+#include "call_manager_base.h"
 #include "call_request_event_handler_helper.h"
 #include "call_state_report_proxy.h"
 #include "cellular_call_connection.h"
@@ -63,6 +64,7 @@ namespace Telephony {
 std::atomic<bool> CallControlManager::alarmSeted_ = false;
 constexpr int32_t CRS_TYPE = 2;
 const uint64_t DISCONNECT_DELAY_TIME = 1000000;
+const uint64_t PENDINGHANGUP_DELAY_TIME = 30000000;
 static const int32_t SATCOMM_UID = 1096;
 #ifdef CALL_MANAGER_THERMAL_PROTECTION
 static const int32_t THERMAL_UID = 5528;
@@ -453,6 +455,7 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
         callRequestEventHandler->SetPendingMo(false, -1);
         callRequestEventHandler->SetPendingHangup(true, callId);
         TELEPHONY_LOGI("HangUpCall before dialingHandle,hangup after CLCC");
+        PostPendingHangupProtectTask(callId);
         return TELEPHONY_SUCCESS;
     }
     ret = CallRequestHandlerPtr_->HangUpCall(callId);
@@ -462,6 +465,45 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
     }
     CallManagerHisysevent::WriteVoipCallStatisticalEvent(callId, "HungupByBanner");
     return TELEPHONY_SUCCESS;
+}
+
+void CallControlManager::PostPendingHangupProtectTask(int32_t callId)
+{
+    std::lock_guard<ffrt::mutex> lock(pendingHangupHandleMutex_);
+    if (pendingHangupHandle_ != nullptr) {
+        return;
+    }
+    std::weak_ptr<CallControlManager> weakPtr = shared_from_this();
+    pendingHangupHandle_ = ffrt::submit_h([weakPtr, callId]() {
+        auto strong = weakPtr.lock();
+        if (strong == nullptr) {
+            return;
+        }
+        auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
+        if (callRequestEventHandler != nullptr && callRequestEventHandler->HasPendingHangup(callId)) {
+            sptr<CallBase> call = GetOneCallObject(callId);
+            if (call != nullptr) {
+                strong->DealFailDial(call);
+            }
+            callRequestEventHandler->SetPendingHangup(false, -1);
+            std::lock_guard<ffrt::mutex> lock(strong->pendingHangupHandleMutex_);
+            strong->pendingHangupHandle_ = nullptr;
+            TELEPHONY_LOGI("PendingHangup timeout, clear pending state");
+        }
+    }, {}, {}, ffrt::task_attr().delay(PENDINGHANGUP_DELAY_TIME));
+}
+ 
+void CallControlManager::RemovePendingHangupProtectTask()
+{
+    std::lock_guard<ffrt::mutex> lock(pendingHangupHandleMutex_);
+    if (pendingHangupHandle_ == nullptr) {
+        return;
+    }
+    int result = ffrt::skip(pendingHangupHandle_);
+    pendingHangupHandle_ = nullptr;
+    if (result != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("DisconnectedHandle failed! result:%{public}d", result);
+    }
 }
 
 void CallControlManager::sendEventToVoip(CallAbilityEventId eventId)
