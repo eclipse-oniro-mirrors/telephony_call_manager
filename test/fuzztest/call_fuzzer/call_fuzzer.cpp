@@ -61,7 +61,6 @@ void CSCallFunc(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return;
     }
-
     DialParaInfo dialParaInfo;
     dialParaInfo.dialType = static_cast<DialType>(
         provider.ConsumeIntegralInRange<int32_t>(0, DIAL_TYPE));
@@ -85,7 +84,6 @@ void CSCallFunc(FuzzedDataProvider& provider)
         provider.ConsumeIntegral<int32_t>());
     bool needAutoAnswer = provider.ConsumeBool();
     bool canUnHoldState = provider.ConsumeBool();
-
     callObjectPtr->AnswerCall(videoState);
     callObjectPtr->SetMute(mute, slotId);
     callObjectPtr->StartDtmf(provider.ConsumeIntegral<uint8_t>());
