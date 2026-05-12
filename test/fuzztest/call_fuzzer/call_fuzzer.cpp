@@ -63,24 +63,24 @@ void CSCallFunc(FuzzedDataProvider& provider)
     }
 
     DialParaInfo dialParaInfo;
-    dialParaInfo.dialType = provider.ConsumeIntergral<DialType>();
-    dialParaInfo.callType = provider.ConsumeIntergral<CallType>();
-    dialParaInfo.videoState = provider.ConsumeIntergral<VideoStateType>();
-    dialParaInfo.callState = provider.ConsumeIntergral<TelCallState>();
+    dialParaInfo.dialType = provider.ConsumeIntegral<DialType>();
+    dialParaInfo.callType = provider.ConsumeIntegral<CallType>();
+    dialParaInfo.videoState = provider.ConsumeIntegral<VideoStateType>();
+    dialParaInfo.callState = provider.ConsumeIntegral<TelCallState>();
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(dialParaInfo).release();
-    int32_t videoState = provider.ConsumeIntergral<int32_t>();
-    int32_t mute = provider.ConsumeIntergral<int32_t>();
-    int32_t slotId = provider.ConsumeIntergral<int32_t>();
-    TelCallState nextState = provider.ConsumeIntergral<TelCallState>();
-    TelConferenceState telConferenceState = provider.ConsumeIntergral<TelConferenceState>();
-    VideoStateType mediaType = provider.ConsumeIntergral<VideoStateType>();
-    PolicyFlag flag = provider.ConsumeIntergral<PolicyFlag>();
-    bool needAutoAnswer = provider.ConsumeIntergral<bool>();
-    bool canUnHoldState = provider.ConsumeIntergral<bool>();
+    int32_t videoState = provider.ConsumeIntegral<int32_t>();
+    int32_t mute = provider.ConsumeIntegral<int32_t>();
+    int32_t slotId = provider.ConsumeIntegral<int32_t>();
+    TelCallState nextState = provider.ConsumeIntegral<TelCallState>();
+    TelConferenceState telConferenceState = provider.ConsumeIntegral<TelConferenceState>();
+    VideoStateType mediaType = provider.ConsumeIntegral<VideoStateType>();
+    PolicyFlag flag = provider.ConsumeIntegral<PolicyFlag>();
+    bool needAutoAnswer = provider.ConsumeIntegral<bool>();
+    bool canUnHoldState = provider.ConsumeIntegral<bool>();
 
     callObjectPtr->AnswerCall(videoState);
     callObjectPtr->SetMute(mute, slotId);
-    callObjectPtr->StartDtmf(provider.ConsumeIntergral<char>());
+    callObjectPtr->StartDtmf(provider.ConsumeIntegral<char>());
     callObjectPtr->StopDtmf();
     callObjectPtr->GetSlotId();
     callObjectPtr->DialCallBase();
@@ -111,13 +111,13 @@ void DialingProcess(FuzzedDataProvider& provider)
     }
 
     DialParaInfo paraInfo;
-    paraInfo.dialType = provider.ConsumeIntergral<DialType>();
-    paraInfo.callType = provider.ConsumeIntergral<CallType>();
-    paraInfo.videoState = provider.ConsumeIntergral<VideoStateType>();
-    paraInfo.callState = provider.ConsumeIntergral<TelCallState>();
+    paraInfo.dialType = provider.ConsumeIntegral<DialType>();
+    paraInfo.callType = provider.ConsumeIntegral<CallType>();
+    paraInfo.videoState = provider.ConsumeIntegral<VideoStateType>();
+    paraInfo.callState = provider.ConsumeIntegral<TelCallState>();
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
 
-    callObjectPtr->StartDtmf(provider.ConsumeIntergral<char>());
+    callObjectPtr->StartDtmf(provider.ConsumeIntegral<char>());
     callObjectPtr->RejectCall();
     callObjectPtr->HangUpCall();
     callObjectPtr->HoldCall();
@@ -150,23 +150,23 @@ void GetCallerInfo(FuzzedDataProvider& provider)
     }
 
     DialParaInfo info;
-    info.dialType = provider.ConsumeIntergral<DialType>();
-    info.callType = provider.ConsumeIntergral<CallType>();
-    info.videoState = provider.ConsumeIntergral<VideoStateType>();
-    info.callState = provider.ConsumeIntergral<TelCallState>();
+    info.dialType = provider.ConsumeIntegral<DialType>();
+    info.callType = provider.ConsumeIntegral<CallType>();
+    info.videoState = provider.ConsumeIntegral<VideoStateType>();
+    info.callState = provider.ConsumeIntegral<TelCallState>();
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(info).release();
     ContactInfo contactInfo;
-    CallRunningState callRunningState = provider.ConsumeIntergral<CallRunningState>();
-    bool speakerphoneOn = provider.ConsumeIntergral<bool>();
+    CallRunningState callRunningState = provider.ConsumeIntegral<CallRunningState>();
+    bool speakerphoneOn = provider.ConsumeIntegral<bool>();
     std::string phoneNumber = provider.ConsumeRandomLenthString();
-    int32_t callId = provider.ConsumeIntergral<int32_t>();
-    CallAnswerType answerType = provider.ConsumeIntergral<CallAnswerType>();
-    int64_t startTime = provider.ConsumeIntergral<int64_t>();
-    time_t callBeginTime = provider.ConsumeIntergral<time_t>();
-    time_t callCreateTime = provider.ConsumeIntergral<time_t>();
-    time_t callEndTime = provider.ConsumeIntergral<time_t>();
-    time_t ringBeginTime = provider.ConsumeIntergral<time_t>();
-    time_t ringEndTime = provider.ConsumeIntergral<time_t>();
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
+    CallAnswerType answerType = provider.ConsumeIntegral<CallAnswerType>();
+    int64_t startTime = provider.ConsumeIntegral<int64_t>();
+    time_t callBeginTime = provider.ConsumeIntegral<time_t>();
+    time_t callCreateTime = provider.ConsumeIntegral<time_t>();
+    time_t callEndTime = provider.ConsumeIntegral<time_t>();
+    time_t ringBeginTime = provider.ConsumeIntegral<time_t>();
+    time_t ringEndTime = provider.ConsumeIntegral<time_t>();
     callObjectPtr->GetCallerInfo();
     callObjectPtr->SetCallerInfo(contactInfo);
     callObjectPtr->SetCallRunningState(callRunningState);
@@ -194,14 +194,14 @@ void IMSCallFunc(FuzzedDataProvider& provider)
     }
 
     DialParaInfo paraInfo;
-    paraInfo.dialType = provider.ConsumeIntergral<DialType>();
-    paraInfo.callType = provider.ConsumeIntergral<CallType>();
-    paraInfo.videoState = provider.ConsumeIntergral<VideoStateType>();
-    paraInfo.callState = provider.ConsumeIntergral<TelCallState>();
+    paraInfo.dialType = provider.ConsumeIntegral<DialType>();
+    paraInfo.callType = provider.ConsumeIntegral<CallType>();
+    paraInfo.videoState = provider.ConsumeIntegral<VideoStateType>();
+    paraInfo.callState = provider.ConsumeIntegral<TelCallState>();
     sptr<IMSCall> callObjectPtr = std::make_unique<IMSCall>(paraInfo).release();
-    int32_t videoState = provider.ConsumeIntergral<int32_t>();
-    int32_t mute = provider.ConsumeIntergral<int32_t>();
-    int32_t slotId = provider.ConsumeIntergral<int32_t>();
+    int32_t videoState = provider.ConsumeIntegral<int32_t>();
+    int32_t mute = provider.ConsumeIntegral<int32_t>();
+    int32_t slotId = provider.ConsumeIntegral<int32_t>();
 
     callObjectPtr->InitVideoCall();
     callObjectPtr->DialingProcess();
@@ -244,7 +244,7 @@ void VoIPCallFunc(FuzzedDataProvider& provider)
     int32_t mainCallId = 0;
     VoipCallEventInfo voipcallInfo;
     std::vector<std::u16string> callIdList;
-    int32_t videoState = provider.ConsumeIntergral<int32_t>();
+    int32_t videoState = provider.ConsumeIntegral<int32_t>();
     sptr<VoIPCall> voipCall = std::make_unique<VoIPCall>(dialParaInfo).release();
 
     voipCall->DialingProcess();
@@ -280,30 +280,30 @@ void IMSVideoCallFunc(FuzzedDataProvider& provider)
     }
 
     DialParaInfo paraInfo;
-    paraInfo.dialType = provider.ConsumeIntergral<DialType>();
-    paraInfo.callType = provider.ConsumeIntergral<CallType>();
-    paraInfo.videoState = provider.ConsumeIntergral<VideoStateType>();
-    paraInfo.callState = provider.ConsumeIntergral<TelCallState>();
+    paraInfo.dialType = provider.ConsumeIntegral<DialType>();
+    paraInfo.callType = provider.ConsumeIntegral<CallType>();
+    paraInfo.videoState = provider.ConsumeIntegral<VideoStateType>();
+    paraInfo.callState = provider.ConsumeIntegral<TelCallState>();
     sptr<IMSCall> callObjectPtr = std::make_unique<IMSCall>(paraInfo).release();
     std::string msg = provider.ConsumeRandomLenthString();
-    int32_t callingUid = provider.ConsumeIntergral<int32_t>();
-    int32_t callingPid = provider.ConsumeIntergral<int32_t>();
-    int32_t rotation = provider.ConsumeIntergral<int32_t>();
-    ImsCallMode mode = provider.ConsumeIntergral<ImsCallMode>();
+    int32_t callingUid = provider.ConsumeIntegral<int32_t>();
+    int32_t callingPid = provider.ConsumeIntegral<int32_t>();
+    int32_t rotation = provider.ConsumeIntegral<int32_t>();
+    ImsCallMode mode = provider.ConsumeIntegral<ImsCallMode>();
     CallModeReportInfo callModeReportInfo;
-    callModeReportInfo.callIndex = provider.ConsumeIntergral<int32_t>();
-    callModeReportInfo.callMode = provider.ConsumeIntergral<ImsCallMode>();
-    callModeReportInfo.result = provider.ConsumeIntergral<VideoRequestResultType>();
+    callModeReportInfo.callIndex = provider.ConsumeIntegral<int32_t>();
+    callModeReportInfo.callMode = provider.ConsumeIntegral<ImsCallMode>();
+    callModeReportInfo.result = provider.ConsumeIntegral<VideoRequestResultType>();
     callObjectPtr->UpdateImsCallMode(mode);
     callObjectPtr->SendUpdateCallMediaModeRequest(mode);
     callObjectPtr->RecieveUpdateCallMediaModeRequest(callModeReportInfo);
     callObjectPtr->SendUpdateCallMediaModeResponse(mode);
     callObjectPtr->ReceiveUpdateCallMediaModeResponse(callModeReportInfo);
     CallMediaModeInfo callMediaModeInfo;
-    callMediaModeInfo.callId = provider.ConsumeIntergral<int32_t>();
-    callMediaModeInfo.isRequestInfo = provider.ConsumeIntergral<bool>();
-    callMediaModeInfo.result = provider.ConsumeIntergral<VideoRequestResultType>();
-    callMediaModeInfo.callMode = provider.ConsumeIntergral<ImsCallMode>();
+    callMediaModeInfo.callId = provider.ConsumeIntegral<int32_t>();
+    callMediaModeInfo.isRequestInfo = provider.ConsumeIntegral<bool>();
+    callMediaModeInfo.result = provider.ConsumeIntegral<VideoRequestResultType>();
+    callMediaModeInfo.callMode = provider.ConsumeIntegral<ImsCallMode>();
     callObjectPtr->ReportImsCallModeInfo(callMediaModeInfo);
     callObjectPtr->SwitchVideoState(mode);
     callObjectPtr->IsSupportVideoCall();
@@ -322,10 +322,10 @@ void IMSVideoCallWindowFunc(FuzzedDataProvider& provider)
     }
 
     DialParaInfo paraInfo;
-    paraInfo.dialType = provider.ConsumeIntergral<DialType>();
-    paraInfo.callType = provider.ConsumeIntergral<CallType>();
-    paraInfo.videoState = provider.ConsumeIntergral<VideoStateType>();
-    paraInfo.callState = provider.ConsumeIntergral<TelCallState>();
+    paraInfo.dialType = provider.ConsumeIntegral<DialType>();
+    paraInfo.callType = provider.ConsumeIntegral<CallType>();
+    paraInfo.videoState = provider.ConsumeIntegral<VideoStateType>();
+    paraInfo.callState = provider.ConsumeIntegral<TelCallState>();
     sptr<IMSCall> callObjectPtr = std::make_unique<IMSCall>(paraInfo).release();
     std::string msg = provider.ConsumeRandomLenthString();
     int len = static_cast<int>(msg.length());
@@ -352,14 +352,14 @@ void OttCallFunc(FuzzedDataProvider& provider)
     }
 
     DialParaInfo paraInfo;
-    paraInfo.dialType = provider.ConsumeIntergral<DialType>();
-    paraInfo.callType = provider.ConsumeIntergral<CallType>();
-    paraInfo.videoState = provider.ConsumeIntergral<VideoStateType>();
-    paraInfo.callState = provider.ConsumeIntergral<TelCallState>();
+    paraInfo.dialType = provider.ConsumeIntegral<DialType>();
+    paraInfo.callType = provider.ConsumeIntegral<CallType>();
+    paraInfo.videoState = provider.ConsumeIntegral<VideoStateType>();
+    paraInfo.callState = provider.ConsumeIntegral<TelCallState>();
     sptr<OTTCall> callObjectPtr = std::make_unique<OTTCall>(paraInfo).release();
-    int32_t videoState = provider.ConsumeIntergral<int32_t>();
-    int32_t mute = provider.ConsumeIntergral<int32_t>();
-    int32_t slotId = provider.ConsumeIntergral<int32_t>();
+    int32_t videoState = provider.ConsumeIntegral<int32_t>();
+    int32_t mute = provider.ConsumeIntegral<int32_t>();
+    int32_t slotId = provider.ConsumeIntegral<int32_t>();
 
     callObjectPtr->DialingProcess();
     callObjectPtr->AnswerCall(videoState);
@@ -396,31 +396,31 @@ void OttVideoCallFunc(FuzzedDataProvider& provider)
         return;
     }
     DialParaInfo paraInfo;
-    paraInfo.dialType = provider.ConsumeIntergral<DialType>();
-    paraInfo.callType = provider.ConsumeIntergral<CallType>();
-    paraInfo.videoState = provider.ConsumeIntergral<VideoStateType>();
-    paraInfo.callState = provider.ConsumeIntergral<TelCallState>();
+    paraInfo.dialType = provider.ConsumeIntegral<DialType>();
+    paraInfo.callType = provider.ConsumeIntegral<CallType>();
+    paraInfo.videoState = provider.ConsumeIntegral<VideoStateType>();
+    paraInfo.callState = provider.ConsumeIntegral<TelCallState>();
     sptr<OTTCall> callObjectPtr = std::make_unique<OTTCall>(paraInfo).release();
     std::string msg = provider.ConsumeRandomLenthString();
-    int32_t callingUid = provider.ConsumeIntergral<int32_t>();
-    int32_t callingPid = provider.ConsumeIntergral<int32_t>();
-    int32_t rotation = provider.ConsumeIntergral<int32_t>();
+    int32_t callingUid = provider.ConsumeIntegral<int32_t>();
+    int32_t callingPid = provider.ConsumeIntegral<int32_t>();
+    int32_t rotation = provider.ConsumeIntegral<int32_t>();
     callObjectPtr->InitVideoCall();
-    ImsCallMode mode = provider.ConsumeIntergral<ImsCallMode>();
+    ImsCallMode mode = provider.ConsumeIntegral<ImsCallMode>();
     CallModeReportInfo callModeReportInfo;
-    callModeReportInfo.callIndex = provider.ConsumeIntergral<int32_t>();
-    callModeReportInfo.callMode = provider.ConsumeIntergral<ImsCallMode>();
-    callModeReportInfo.result = provider.ConsumeIntergral<VideoRequestResultType>();
+    callModeReportInfo.callIndex = provider.ConsumeIntegral<int32_t>();
+    callModeReportInfo.callMode = provider.ConsumeIntegral<ImsCallMode>();
+    callModeReportInfo.result = provider.ConsumeIntegral<VideoRequestResultType>();
     callObjectPtr->UpdateImsCallMode(mode);
     callObjectPtr->SendUpdateCallMediaModeRequest(mode);
     callObjectPtr->RecieveUpdateCallMediaModeRequest(callModeReportInfo);
     callObjectPtr->SendUpdateCallMediaModeResponse(mode);
     callObjectPtr->ReceiveUpdateCallMediaModeResponse(callModeReportInfo);
     CallMediaModeInfo callMediaModeInfo;
-    callMediaModeInfo.callId = provider.ConsumeIntergral<int32_t>();
-    callMediaModeInfo.isRequestInfo = provider.ConsumeIntergral<bool>();
-    callMediaModeInfo.result = provider.ConsumeIntergral<VideoRequestResultType>();
-    callMediaModeInfo.callMode = provider.ConsumeIntergral<ImsCallMode>();
+    callMediaModeInfo.callId = provider.ConsumeIntegral<int32_t>();
+    callMediaModeInfo.isRequestInfo = provider.ConsumeIntegral<bool>();
+    callMediaModeInfo.result = provider.ConsumeIntegral<VideoRequestResultType>();
+    callMediaModeInfo.callMode = provider.ConsumeIntegral<ImsCallMode>();
     callObjectPtr->ReportImsCallModeInfo(callMediaModeInfo);
     callObjectPtr->ControlCamera(msg, callingUid, callingPid);
     callObjectPtr->SetPausePicture(msg);
@@ -435,10 +435,10 @@ void OttVideoCallWindowFunc(FuzzedDataProvider& provider)
         return;
     }
     DialParaInfo paraInfo;
-    paraInfo.dialType = provider.ConsumeIntergral<DialType>();
-    paraInfo.callType = provider.ConsumeIntergral<CallType>();
-    paraInfo.videoState = provider.ConsumeIntergral<VideoStateType>();
-    paraInfo.callState = provider.ConsumeIntergral<TelCallState>();
+    paraInfo.dialType = provider.ConsumeIntegral<DialType>();
+    paraInfo.callType = provider.ConsumeIntegral<CallType>();
+    paraInfo.videoState = provider.ConsumeIntegral<VideoStateType>();
+    paraInfo.callState = provider.ConsumeIntegral<TelCallState>();
     sptr<OTTCall> callObjectPtr = std::make_unique<OTTCall>(paraInfo).release();
     std::string msg = provider.ConsumeRandomLenthString();
     int len = static_cast<int>(msg.length());
@@ -465,12 +465,12 @@ void SatelliteCallFunc(FuzzedDataProvider& provider)
     }
 
     DialParaInfo paraInfo;
-    paraInfo.dialType = provider.ConsumeIntergral<DialType>();
-    paraInfo.callType = provider.ConsumeIntergral<CallType>();
-    paraInfo.videoState = provider.ConsumeIntergral<VideoStateType>();
-    paraInfo.callState = provider.ConsumeIntergral<TelCallState>();
+    paraInfo.dialType = provider.ConsumeIntegral<DialType>();
+    paraInfo.callType = provider.ConsumeIntegral<CallType>();
+    paraInfo.videoState = provider.ConsumeIntegral<VideoStateType>();
+    paraInfo.callState = provider.ConsumeIntegral<TelCallState>();
     sptr<SatelliteCall> callObjectPtr = std::make_unique<SatelliteCall>(paraInfo).release();
-    int32_t videoState = provider.ConsumeIntergral<int32_t>();
+    int32_t videoState = provider.ConsumeIntegral<int32_t>();
     CallAttributeInfo info;
 
     callObjectPtr->DialingProcess();
@@ -484,11 +484,11 @@ void AntiFraudServiceFunc(FuzzedDataProvider& provider)
 {
     int index = 0;
     auto antiFraudService = DelayedSingleton<Telephony::AntiFraudService>::GetInstance();
-    int32_t slotId = provider.ConsumeIntergral<int32_t>();
-    int32_t count = provider.ConsumeIntergral<int32_t>();
+    int32_t slotId = provider.ConsumeIntegral<int32_t>();
+    int32_t count = provider.ConsumeIntegral<int32_t>();
     antiFraudService->CheckAntiFraudService(provider.ConsumeRandomLengthString(), slotId, count);
     antiFraudService->StartAntiFraudService(provider.ConsumeRandomLengthString(), slotId, count);
-    uint8_t size = provider.ConsumeIntergral<uint8_t>()
+    uint8_t size = provider.ConsumeIntegral<uint8_t>()
     char temp[size + 1];
     for (size_t i = 0; i < sisizeze; ++i) {
         temp[i] = static_cast<char>(data[i]);
@@ -503,8 +503,8 @@ void AntiFraudServiceFunc(FuzzedDataProvider& provider)
     antiFraudService->GetStoppedIndex();
     antiFraudService->AnonymizeText();
     OHOS::AntiFraudService::AntiFraudResult antiFraudResult;
-    antiFraudResult.modelVersion = provider.ConsumeIntergral<int32_t>();
-    antiFraudResult.fraudType = provider.ConsumeIntergral<int32_t>();
+    antiFraudResult.modelVersion = provider.ConsumeIntegral<int32_t>();
+    antiFraudResult.fraudType = provider.ConsumeIntegral<int32_t>();
     antiFraudService->RecordDetectResult(antiFraudResult, provider.ConsumeRandomLengthString(), slotId, count);
     antiFraudService->StopAntiFraudService(slotId, count);
     antiFraudService->SetStoppedSlotId(slotId);
@@ -522,9 +522,9 @@ void InterOperableCommunicationManagerFunc(FuzzedDataProvider& provider)
     int index = 0;
     auto communicationManager = DelayedSingleton<InteroperableCommunicationManager>::GetInstance();
     DistributedHardware::DmDeviceInfo deviceInfo;
-    deviceInfo.range = provider.ConsumeIntergral<int32_t>();
-    deviceInfo.networkType = provider.ConsumeIntergral<int32_t>();
-    communicationManager->SetMuted(provider.ConsumeIntergral<bool>());
+    deviceInfo.range = provider.ConsumeIntegral<int32_t>();
+    deviceInfo.networkType = provider.ConsumeIntegral<int32_t>();
+    communicationManager->SetMuted(provider.ConsumeIntegral<bool>());
     communicationManager->OnDeviceOnline(deviceInfo);
     communicationManager->OnDeviceOffline(deviceInfo);
     communicationManager->MuteRinger();
@@ -535,14 +535,14 @@ void InterOperableDeviceObserverFunc(FuzzedDataProvider& provider)
     auto observer = DelayedSingleton<InteroperableDeviceObserver>::GetInstance();
     auto stateCallback = std::make_shared<DmStateCallback>();
     observer->Init();
-    size_t length = provider.ConsumeIntergral<uint8_t>() / DATA_COUNT;
+    size_t length = provider.ConsumeIntegral<uint8_t>() / DATA_COUNT;
     std::string networkId = provide.consumeString(length);
     std::string devName = provide.consumeString(length);
-    observer->OnDeviceOnline(networkId, devName, provider.ConsumeIntergral<uint16_t>());
-    observer->OnDeviceOffline(networkId, devName, provider.ConsumeIntergral<uint16_t>());
+    observer->OnDeviceOnline(networkId, devName, provider.ConsumeIntegral<uint16_t>());
+    observer->OnDeviceOffline(networkId, devName, provider.ConsumeIntegral<uint16_t>());
     DistributedHardware::DmDeviceInfo deviceInfo;
-    deviceInfo.range = provider.ConsumeIntergral<int32_t>();
-    deviceInfo.networkType = provider.ConsumeIntergral<int32_t>();
+    deviceInfo.range = provider.ConsumeIntegral<int32_t>();
+    deviceInfo.networkType = provider.ConsumeIntegral<int32_t>();
     stateCallback->OnDeviceOnline(deviceInfo);
     stateCallback->OnDeviceOffline(deviceInfo);
 }
@@ -552,18 +552,18 @@ void BluetoothCallConnectionFunc(FuzzedDataProvider& provider)
     int index = 0;
     auto bluetoothConnection = DelayedSingleton<BluetoothCallConnection>::GetInstance();
     DialParaInfo info;
-    info.accountId = provider.ConsumeIntergral<int32_t>();
-    info.callId = provider.ConsumeIntergral<int32_t>();
+    info.accountId = provider.ConsumeIntegral<int32_t>();
+    info.callId = provider.ConsumeIntegral<int32_t>();
     bluetoothConnection->Dial(info);
     bluetoothConnection->GetMacAddress();
     bluetoothConnection->ConnectBtSco();
     bluetoothConnection->DisConnectBtSco();
     bluetoothConnection->GetBtScoIsConnected();
-    bluetoothConnection->SetHfpConnected(provider.ConsumeIntergral<bool>());
+    bluetoothConnection->SetHfpConnected(provider.ConsumeIntegral<bool>());
     bluetoothConnection->GetSupportBtCall();
-    bluetoothConnection->SetBtCallScoConnected(provider.ConsumeIntergral<bool>());
+    bluetoothConnection->SetBtCallScoConnected(provider.ConsumeIntegral<bool>());
     bluetoothConnection->HfpDisConnectedEndBtCall();
-    size_t length = provider.ConsumeIntergral<uint8_t>() / DATA_COUNT;
+    size_t length = provider.ConsumeIntegral<uint8_t>() / DATA_COUNT;
     std::string hfpPhoneNumber = provide.consumeString(length);
     std::string hfpContactName = provide.consumeString(length);
     bluetoothConnection->SetHfpContactName(hfpPhoneNumber, hfpContactName);
@@ -574,8 +574,8 @@ void BluetoothCallStateFunc(FuzzedDataProvider& provider)
 {
     auto bluetoothCallState = std::make_shared<BluetoothCallState>();
     Bluetooth::BluetoothRemoteDevice device;
-    int32_t state = provider.ConsumeIntergral<int32_t>();
-    int32_t cause = provider.ConsumeIntergral<int32_t>();
+    int32_t state = provider.ConsumeIntegral<int32_t>();
+    int32_t cause = provider.ConsumeIntegral<int32_t>();
     bluetoothCallState->OnConnectionStateChanged(device, state, cause);
     bluetoothCallState->OnScoStateChanged(device, state);
 }
@@ -584,18 +584,18 @@ void CallMangerServiceFunc(FuzzedDataProvider& provider)
 {
     auto callManagerService = DelayedSingleton<CallManagerService>::GetInstance();
     int index = 0;
-    int32_t systemAbilityId = provider.ConsumeIntergral<int32_t>();
+    int32_t systemAbilityId = provider.ConsumeIntegral<int32_t>();
     callManagerService->OnAddSystemAbility(systemAbilityId, provider.ConsumeRandomLengthString());
     std::vector<std::u16string> args;
     std::u16string arg = Str8ToStr16(provider.ConsumeRandomLengthString());
     args.push_back(arg);
-    std::int32_t fd = provider.ConsumeIntergral<int32_t>();
+    std::int32_t fd = provider.ConsumeIntegral<int32_t>();
     callManagerService->Dump(fd, args);
     callManagerService->GetBindTime();
     callManagerService->GetStartServiceSpent();
-    bool enabled = provider.ConsumeIntergral<bool>();
+    bool enabled = provider.ConsumeIntegral<bool>();
     callManagerService->IsNewCallAllowed(enabled);
-    int32_t callId = provider.ConsumeIntergral<int32_t>();
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
     callManagerService->SwitchCall(callId);
     callManagerService->UnHoldCall(callId);
     callManagerService->StopDtmf(callId);
@@ -605,14 +605,14 @@ void CallMangerServiceFunc(FuzzedDataProvider& provider)
     std::string eventName = fdp.ConsumeRandomLengthString();
     callManagerService->HandleVoIPCallEvent(callId, eventName);
     callManagerService->HandleDisplaySpecifiedCallPage(callId);
-    callManagerService->HandleCeliaAutoAnswerCall(callId, provider.ConsumeIntergral<bool>());
+    callManagerService->HandleCeliaAutoAnswerCall(callId, provider.ConsumeIntegral<bool>());
     callManagerService->SendUssdResponse(callId, fdp.ConsumeRandomLengthString());
     callManagerService->OnStop();
     callManagerService->UnRegisterCallBack();
     callManagerService->UnInit();
     MessageParcel messageParcel;
     CallAttributeInfo info;
-    info.accountId = provider.ConsumeIntergral<int32_t>();
+    info.accountId = provider.ConsumeIntegral<int32_t>();
     info.callType = CallType::TYPE_VOIP;
     CallManagerUtils::WriteCallAttributeInfo(info, messageParcel);
     CallManagerUtils::IsBundleInstalled(fdp.ConsumeRandomLengthString(), callId);
@@ -624,7 +624,7 @@ void CallMangerServiceStubFunc(FuzzedDataProvider& provider)
     MessageParcel dataParcel;
     MessageParcel reply;
     int index = 0;
-    int32_t callId = provider.ConsumeIntergral<int32_t>();
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
     dataParcel.WriteInt32(callId);
     callManagerService->OnUnHoldCall(dataParcel, reply);
     callManagerService->OnSwitchCall(dataParcel, reply);
@@ -632,7 +632,7 @@ void CallMangerServiceStubFunc(FuzzedDataProvider& provider)
     callManagerService->OnCombineConference(dataParcel, reply);
     callManagerService->OnEnableVoLte(dataParcel, reply);
     callManagerService->OnSendUssdResponse(dataParcel, reply);
-    dataParcel.WriteBool(provider.ConsumeIntergral<bool>());
+    dataParcel.WriteBool(provider.ConsumeIntegral<bool>());
     callManagerService->OnIsNewCallAllowed(dataParcel, reply);
 }
 

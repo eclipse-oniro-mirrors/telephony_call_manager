@@ -34,7 +34,7 @@ void IsImsSwitchEnabled(FuzzedDataProvider &provider)
         return;
     }
 
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
     std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
@@ -51,7 +51,7 @@ void GetVoNRState(FuzzedDataProvider &provider)
     }
 
     MessageParcel messageParcel;
-    messageParcel.WriteInt32(provider.ConsumeIntergral<int32_t>() % SLOT_NUM);
+    messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>() % SLOT_NUM);
     std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
@@ -65,8 +65,8 @@ void GetImsConfig(FuzzedDataProvider &provider)
         return;
     }
 
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
-    int32_t item = provider.ConsumeIntergral<int32_t>() % IMS_CONFIG_ITEM_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t item = provider.ConsumeIntegral<int32_t>() % IMS_CONFIG_ITEM_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
     messageParcel.WriteInt32(static_cast<ImsConfigItem>(item));
@@ -83,8 +83,8 @@ void GetImsFeatureValue(FuzzedDataProvider &provider)
         return;
     }
 
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
-    int32_t type = provider.ConsumeIntergral<int32_t>() % FEATURE_TYPE_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t type = provider.ConsumeIntegral<int32_t>() % FEATURE_TYPE_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
     messageParcel.WriteInt32(static_cast<FeatureType>(type));
@@ -101,10 +101,10 @@ void GetCallTransferInfo(FuzzedDataProvider &provider)
         return;
     }
 
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
-    messageParcel.WriteInt32(provider.ConsumeIntergral<int32_t>());
+    messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>());
     std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
@@ -118,7 +118,7 @@ void SetCallTransferInfo(FuzzedDataProvider &provider)
         return;
     }
 
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     CallTransferInfo info;
     std::string msg = provider.consumeString();

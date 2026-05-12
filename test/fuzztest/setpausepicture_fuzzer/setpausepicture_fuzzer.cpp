@@ -30,7 +30,7 @@ void SetPausePicture(FuzzedDataProvider &provider)
     if (!IsServiceInited()) {
         return;
     }
-    int32_t callId = provider.ConsumeIntergral<int32_t>();
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
     std::string path = provider.consumeString();
     auto pathU16 = Str8ToStr16(path);
     MessageParcel messageParcel;

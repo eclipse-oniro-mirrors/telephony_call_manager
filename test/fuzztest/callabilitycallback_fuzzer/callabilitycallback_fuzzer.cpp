@@ -61,7 +61,7 @@ int32_t OnRemoteRequest(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     messageParcel.RewindRead(0);
-    uint32_t code = provider.ConsumeIntergral<uint32_t>();
+    uint32_t code = provider.ConsumeIntegral<uint32_t>();
     MessageParcel reply;
     MessageOption option;
     return callAbilityCallbackPtr_->OnRemoteRequest(code, messageParcel, reply, option);
@@ -78,13 +78,13 @@ int32_t UpdateCallStateInfo(FuzzedDataProvider& provider)
     int32_t bundleLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
     memcpy_s(info.accountNumber, kMaxNumberLen, msg.c_str(), accountLength);
     memcpy_s(info.bundleName, kMaxBundleNameLen, msg.c_str(), bundleLength);
-    info.accountId = provider.ConsumeIntergral<int32_t>();
-    info.startTime = provider.ConsumeIntergral<uint32_t>();
-    info.callId = provider.ConsumeIntergral<int32_t>();
-    info.callBeginTime = provider.ConsumeIntergral<time_t>();
-    info.callEndTime = provider.ConsumeIntergral<time_t>();
-    info.ringBeginTime = provider.ConsumeIntergral<time_t>();
-    info.ringEndTime = provider.ConsumeIntergral<time_t>();
+    info.accountId = provider.ConsumeIntegral<int32_t>();
+    info.startTime = provider.ConsumeIntegral<uint32_t>();
+    info.callId = provider.ConsumeIntegral<int32_t>();
+    info.callBeginTime = provider.ConsumeIntegral<time_t>();
+    info.callEndTime = provider.ConsumeIntegral<time_t>();
+    info.ringBeginTime = provider.ConsumeIntegral<time_t>();
+    info.ringEndTime = provider.ConsumeIntegral<time_t>();
     MessageParcel messageParcel;
     messageParcel.WriteCString(info.accountNumber);
     messageParcel.WriteCString(info.bundleName);
@@ -142,7 +142,7 @@ int32_t UpdateCallDisconnectedCause(FuzzedDataProvider& provider)
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t reason = provider.ConsumeIntergral<int32_t>();
+    int32_t reason = provider.ConsumeIntegral<int32_t>();
     std::string message = provider.consumeString();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(reason);
@@ -158,8 +158,8 @@ int32_t UpdateAysncResults(FuzzedDataProvider& provider)
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t reportId = provider.ConsumeIntergral<uint32_t>() % REPORT_ID_NUM;
-    int32_t resultId = provider.ConsumeIntergral<uint32_t>() % RESULT_ID_NUM;
+    int32_t reportId = provider.ConsumeIntegral<uint32_t>() % REPORT_ID_NUM;
+    int32_t resultId = provider.ConsumeIntegral<uint32_t>() % RESULT_ID_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(reportId);
     messageParcel.WriteInt32(resultId);
@@ -174,8 +174,8 @@ int32_t UpdateOttCallRequest(FuzzedDataProvider& provider)
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t requestId = provider.ConsumeIntergral<uint32_t>() % OTT_ID_NUM;
-    int32_t videoState = provider.ConsumeIntergral<uint32_t>() % VEDIO_STATE_NUM;
+    int32_t requestId = provider.ConsumeIntegral<uint32_t>() % OTT_ID_NUM;
+    int32_t videoState = provider.ConsumeIntegral<uint32_t>() % VEDIO_STATE_NUM;
     std::string phoneNumber = provider.ConsumeRandomLengthString();
     std::string bundleName = provider.ConsumeRandomLengthString();
     MessageParcel messageParcel;
@@ -196,7 +196,7 @@ int32_t UpdateMmiCodeResults(FuzzedDataProvider& provider)
     }
     MmiCodeInfo info;
     int32_t length = sizeof(MmiCodeInfo);
-    info.result = provider.ConsumeIntergral<uint32_t>();
+    info.result = provider.ConsumeIntegral<uint32_t>();
     std::string msg = provider.consumeString();
     int32_t msgLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(info.message, kMaxNumberLen, msg.c_str(), msgLength);
@@ -224,11 +224,11 @@ int32_t UpdateAudioDeviceChange(FuzzedDataProvider& provider)
     std::string msg = provider.consumeString();
     int32_t length = msg.length() > kMaxAddressLen ? kMaxAddressLen : msg.length();
     memcpy_s(device.address, kMaxAddressLen, msg.c_str(), length);
-    int32_t dataSize = provider.ConsumeIntergral<uint32_t>();
+    int32_t dataSize = provider.ConsumeIntegral<uint32_t>();
     messageParcel.WriteInt32(dataSize);
     messageParcel.WriteRawData((const void *)&device, sizeof(AudioDevice));
     messageParcel.WriteRawData((const void *)&device, sizeof(AudioDevice));
-    messageParcel.WriteBool(provider.ConsumeIntergral<uint32_t>() % BOOL_NUM);
+    messageParcel.WriteBool(provider.ConsumeIntegral<uint32_t>() % BOOL_NUM);
     messageParcel.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
@@ -249,10 +249,10 @@ int32_t UpdateImsCallModeChange(FuzzedDataProvider& provider)
     int32_t length = sizeof(CallMediaModeInfo);
     messageParcel.WriteInt32(length);
     CallMediaModeInfo callMediaModeInfo;
-    callMediaModeInfo.callId = provider.ConsumeIntergral<int32_t>();
-    callMediaModeInfo.isRequestInfo = provider.ConsumeIntergral<bool>() % BOOL_NUM;
-    callMediaModeInfo.result = provider.ConsumeIntergral<VideoRequestResultType>() % VIDEO_REQUEST_RESULT_TYPE_NUM;
-    callMediaModeInfo.callMode = provider.ConsumeIntergral<ImsCallMode>() % IMS_CALL_MODE_NUM;
+    callMediaModeInfo.callId = provider.ConsumeIntegral<int32_t>();
+    callMediaModeInfo.isRequestInfo = provider.ConsumeIntegral<bool>() % BOOL_NUM;
+    callMediaModeInfo.result = provider.ConsumeIntegral<VideoRequestResultType>() % VIDEO_REQUEST_RESULT_TYPE_NUM;
+    callMediaModeInfo.callMode = provider.ConsumeIntegral<ImsCallMode>() % IMS_CALL_MODE_NUM;
     messageParcel.WriteRawData((const void *)&callMediaModeInfo, length);
     messageParcel.RewindRead(0);
     return callAbilityCallbackPtr_->OnUpdateImsCallModeChange(messageParcel, replyParcel);
@@ -272,8 +272,8 @@ int32_t UpdateCallSessionEventChange(FuzzedDataProvider& provider)
     int32_t length = sizeof(CallSessionEvent);
     messageParcel.WriteInt32(length);
     CallSessionEvent callSessionInfo;
-    callSessionInfo.callId = provider.ConsumeIntergral<int32_t>();
-    callSessionInfo.eventId = provider.ConsumeIntergral<CallSessionEventId>() % CALL_SESSION_EVENT_ID_NUM;
+    callSessionInfo.callId = provider.ConsumeIntegral<int32_t>();
+    callSessionInfo.eventId = provider.ConsumeIntegral<CallSessionEventId>() % CALL_SESSION_EVENT_ID_NUM;
     messageParcel.WriteRawData((const void *)&callSessionInfo, length);
     messageParcel.RewindRead(0);
     return callAbilityCallbackPtr_->OnUpdateCallSessionEventChange(messageParcel, replyParcel);
@@ -293,9 +293,9 @@ int32_t UpdatePeerDimensionsChange(FuzzedDataProvider& provider)
     int32_t length = sizeof(PeerDimensionsDetail);
     messageParcel.WriteInt32(length);
     PeerDimensionsDetail peerDimensionsInfo;
-    peerDimensionsInfo.callId = provider.ConsumeIntergral<int32_t>();
-    peerDimensionsInfo.width = provider.ConsumeIntergral<int32_t>();
-    peerDimensionsInfo.height = provider.ConsumeIntergral<int32_t>();
+    peerDimensionsInfo.callId = provider.ConsumeIntegral<int32_t>();
+    peerDimensionsInfo.width = provider.ConsumeIntegral<int32_t>();
+    peerDimensionsInfo.height = provider.ConsumeIntegral<int32_t>();
     messageParcel.RewindRead(0);
     return callAbilityCallbackPtr_->OnUpdatePeerDimensionsChange(messageParcel, replyParcel);
 }
@@ -311,7 +311,7 @@ int32_t UpdateCallDataUsageChange(FuzzedDataProvider& provider)
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    int64_t dataUsage = provider.ConsumeIntergral<int64_t>();
+    int64_t dataUsage = provider.ConsumeIntegral<int64_t>();
     messageParcel.WriteInt64(dataUsage);
     messageParcel.RewindRead(0);
     return callAbilityCallbackPtr_->OnUpdateCallDataUsageChange(messageParcel, replyParcel);
@@ -331,9 +331,9 @@ int32_t UpdateCameraCapabilities(FuzzedDataProvider& provider)
     int32_t length = sizeof(CameraCapabilities);
     messageParcel.WriteInt32(length);
     CameraCapabilities cameraCapabilitiesInfo;
-    cameraCapabilitiesInfo.callId = provider.ConsumeIntergral<int32_t>();
-    cameraCapabilitiesInfo.width = provider.ConsumeIntergral<int32_t>();
-    cameraCapabilitiesInfo.height = provider.ConsumeIntergral<int32_t>();
+    cameraCapabilitiesInfo.callId = provider.ConsumeIntegral<int32_t>();
+    cameraCapabilitiesInfo.width = provider.ConsumeIntegral<int32_t>();
+    cameraCapabilitiesInfo.height = provider.ConsumeIntegral<int32_t>();
     messageParcel.RewindRead(0);
     return callAbilityCallbackPtr_->OnUpdateCameraCapabilities(messageParcel, replyParcel);
 }
@@ -342,9 +342,9 @@ void WriteCallAttributeInfo(FuzzedDataProvider& provider)
 {
     MessageParcel messageParcel;
     CallAttributeInfo info;
-    info.accountId = provider.ConsumeIntergral<int32_t>();
-    info.callId = provider.ConsumeIntergral<int32_t>();
-    info.callState = static_cast<TelCallState>(provider.ConsumeIntergral<int32_t>());
+    info.accountId = provider.ConsumeIntegral<int32_t>();
+    info.callId = provider.ConsumeIntegral<int32_t>();
+    info.callState = static_cast<TelCallState>(provider.ConsumeIntegral<int32_t>());
     CallManagerUtils::WriteCallAttributeInfo(info, messageParcel);
 }
 

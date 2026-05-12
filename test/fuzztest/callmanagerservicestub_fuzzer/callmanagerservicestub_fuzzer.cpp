@@ -70,7 +70,7 @@ int32_t GetProxyObjectPtr(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t type = provider.ConsumeIntergral<int32_t>();
+    int32_t type = provider.ConsumeIntegral<int32_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(type);
     MessageParcel reply;
@@ -82,7 +82,7 @@ int32_t SetVoIPCallState(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t state = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
+    int32_t state = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(state);
     MessageParcel reply;
@@ -109,8 +109,8 @@ int32_t PostDialProceed(FuzzedDataProvider& provider)
     }
     MessageParcel messageParcel;
     MessageParcel reply;
-    int32_t callId = provider.ConsumeIntergral<int32_t>() % CALL_ID_NUM;
-    int32_t activate = provider.ConsumeIntergral<int32_t>() % ACTIVE_NUM;
+    int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
+    int32_t activate = provider.ConsumeIntegral<int32_t>() % ACTIVE_NUM;
     messageParcel.WriteInt32(callId);
     messageParcel.WriteBool(activate);
     return DelayedSingleton<CallManagerService>::GetInstance()->OnPostDialProceed(messageParcel, reply);
@@ -135,14 +135,14 @@ int32_t CanSetCallTransferTime(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
 
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     CallTransferInfo info;
     std::string msg = provider.consumeString();
     (void)memcpy_s(info.transferNum, kMaxNumberLen, msg, msg.length());
     info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
     info.type = CallTransferType::TRANSFER_TYPE_BUSY;
-    int32_t activate = provider.ConsumeIntergral<int32_t>() % ACTIVE_NUM;
+    int32_t activate = provider.ConsumeIntegral<int32_t>() % ACTIVE_NUM;
     messageParcel.WriteInt32(slotId);
     messageParcel.WriteBool(activate);
     messageParcel.WriteRawData((const void *)&info, sizeof(CallTransferInfo));
@@ -170,8 +170,8 @@ int32_t SetVoNRState(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
-    int32_t state = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t state = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
     messageParcel.WriteInt32(state);
@@ -184,7 +184,7 @@ int32_t KickOutFromConference(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = provider.ConsumeIntergral<int32_t>();
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     MessageParcel reply;
@@ -196,11 +196,11 @@ int32_t SetCallRestrictionPassword(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
-    messageParcel.WriteInt32(provider.ConsumeIntergral<int32_t>());
+    messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>());
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;

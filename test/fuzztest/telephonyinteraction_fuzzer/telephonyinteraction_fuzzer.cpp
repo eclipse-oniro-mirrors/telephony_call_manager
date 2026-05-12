@@ -57,7 +57,7 @@ int32_t OnRemoteRequest(FuzzedDataProvider &provider)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     messageParcel.RewindRead(0);
-    uint32_t code = provider.ConsumeIntergral<uint32_t>();
+    uint32_t code = provider.ConsumeIntegral<uint32_t>();
     MessageParcel reply;
     MessageOption option;
     return CallStatusCallbackPtr_->OnRemoteRequest(code, messageParcel, reply, option);
@@ -73,10 +73,10 @@ int32_t UpdateCallReportInfo(FuzzedDataProvider &provider)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     CallReportInfo callReportInfo;
-    callReportInfo.index = provider.ConsumeIntergral<int32_t>();
-    callReportInfo.accountId = provider.ConsumeIntergral<int32_t>() % ACCOUNT_ID_NUM;
-    callReportInfo.voiceDomain = provider.ConsumeIntergral<int32_t>() % VOICE_DOMAIN_NUM;
-    callReportInfo.mpty = provider.ConsumeIntergral<int32_t>() % MULTI_PARTY_NUM;
+    callReportInfo.index = provider.ConsumeIntegral<int32_t>();
+    callReportInfo.accountId = provider.ConsumeIntegral<int32_t>() % ACCOUNT_ID_NUM;
+    callReportInfo.voiceDomain = provider.ConsumeIntegral<int32_t>() % VOICE_DOMAIN_NUM;
+    callReportInfo.mpty = provider.ConsumeIntegral<int32_t>() % MULTI_PARTY_NUM;
     callReportInfo.callType = CallType::TYPE_ERR_CALL;
     callReportInfo.callMode = VideoStateType::TYPE_VOICE;
     callReportInfo.state = TelCallState::CALL_STATUS_UNKNOWN;
@@ -114,12 +114,12 @@ int32_t UpdateCallsReportInfo(FuzzedDataProvider &provider)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     CallReportInfo info;
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     int32_t vecSize = 1;
-    info.index = provider.ConsumeIntergral<int32_t>();
-    info.accountId = provider.ConsumeIntergral<int32_t>() % ACCOUNT_ID_NUM;
-    info.voiceDomain = provider.ConsumeIntergral<int32_t>() % VOICE_DOMAIN_NUM;
-    info.mpty = provider.ConsumeIntergral<int32_t>() % MULTI_PARTY_NUM;
+    info.index = provider.ConsumeIntegral<int32_t>();
+    info.accountId = provider.ConsumeIntegral<int32_t>() % ACCOUNT_ID_NUM;
+    info.voiceDomain = provider.ConsumeIntegral<int32_t>() % VOICE_DOMAIN_NUM;
+    info.mpty = provider.ConsumeIntegral<int32_t>() % MULTI_PARTY_NUM;
     info.callType = CallType::TYPE_ERR_CALL;
     info.callMode = VideoStateType::TYPE_VOICE;
     info.state = TelCallState::CALL_STATUS_UNKNOWN;
@@ -186,9 +186,9 @@ int32_t UpdateGetWaitingResult(FuzzedDataProvider &provider)
     CallWaitResponse callWaitResponse;
     int32_t length = sizeof(CallWaitResponse);
     messageParcel.WriteInt32(length);
-    callWaitResponse.result = provider.ConsumeIntergral<int32_t>();
-    callWaitResponse.status = provider.ConsumeIntergral<int32_t>();
-    callWaitResponse.classCw = provider.ConsumeIntergral<int32_t>();
+    callWaitResponse.result = provider.ConsumeIntegral<int32_t>();
+    callWaitResponse.status = provider.ConsumeIntegral<int32_t>();
+    callWaitResponse.classCw = provider.ConsumeIntegral<int32_t>();
     messageParcel.WriteRawData((const void *)&callWaitResponse, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -207,9 +207,9 @@ int32_t UpdateGetRestrictionResult(FuzzedDataProvider &provider)
     CallRestrictionResponse callRestrictionResult;
     int32_t length = sizeof(CallRestrictionResponse);
     messageParcel.WriteInt32(length);
-    callRestrictionResult.result = provider.ConsumeIntergral<int32_t>();
-    callRestrictionResult.status = provider.ConsumeIntergral<int32_t>();
-    callRestrictionResult.classCw = provider.ConsumeIntergral<int32_t>();
+    callRestrictionResult.result = provider.ConsumeIntegral<int32_t>();
+    callRestrictionResult.status = provider.ConsumeIntegral<int32_t>();
+    callRestrictionResult.classCw = provider.ConsumeIntegral<int32_t>();
     messageParcel.WriteRawData((const void *)&callRestrictionResult, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -259,9 +259,9 @@ int32_t UpdateGetCallClipResult(FuzzedDataProvider &provider)
     ClipResponse clipResponse;
     int32_t length = sizeof(ClipResponse);
     messageParcel.WriteInt32(length);
-    clipResponse.result = provider.ConsumeIntergral<int32_t>();
-    clipResponse.action = provider.ConsumeIntergral<int32_t>();
-    clipResponse.clipStat = provider.ConsumeIntergral<int32_t>();
+    clipResponse.result = provider.ConsumeIntegral<int32_t>();
+    clipResponse.action = provider.ConsumeIntegral<int32_t>();
+    clipResponse.clipStat = provider.ConsumeIntegral<int32_t>();
     messageParcel.WriteRawData((const void *)&clipResponse, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -280,8 +280,8 @@ int32_t GetImsConfigResult(FuzzedDataProvider &provider)
     GetImsConfigResponse response;
     int32_t length = sizeof(GetImsConfigResponse);
     messageParcel.WriteInt32(length);
-    response.result = provider.ConsumeIntergral<int32_t>();
-    response.value = provider.ConsumeIntergral<int32_t>();
+    response.result = provider.ConsumeIntegral<int32_t>();
+    response.value = provider.ConsumeIntegral<int32_t>();
     messageParcel.WriteRawData((const void *)&response, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -300,8 +300,8 @@ int32_t GetImsFeatureValueResult(FuzzedDataProvider &provider)
     GetImsFeatureValueResponse response;
     int32_t length = sizeof(GetImsFeatureValueResponse);
     messageParcel.WriteInt32(length);
-    response.result = provider.ConsumeIntergral<int32_t>();
-    response.value = provider.ConsumeIntergral<int32_t>();
+    response.result = provider.ConsumeIntegral<int32_t>();
+    response.value = provider.ConsumeIntegral<int32_t>();
     messageParcel.WriteRawData((const void *)&response, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -320,7 +320,7 @@ int32_t SendMmiCodeResult(FuzzedDataProvider &provider)
     MmiCodeInfo info;
     int32_t length = sizeof(MmiCodeInfo);
     messageParcel.WriteInt32(length);
-    info.result = provider.ConsumeIntergral<int32_t>();
+    info.result = provider.ConsumeIntegral<int32_t>();
     std::string msg = provider.consumeString();
     int32_t msgLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(info.message, kMaxNumberLen, msg.c_str(), msgLength);
@@ -343,9 +343,9 @@ int32_t ReceiveUpdateCallMediaModeRequest(FuzzedDataProvider &provider)
     int32_t length = sizeof(CallModeReportInfo);
     messageParcel.WriteInt32(length);
     CallModeReportInfo callModeReportInfo;
-    callModeReportInfo.callIndex = provider.ConsumeIntergral<int32_t>() % CALL_INDEX_MAX_NUM;
-    callModeReportInfo.callMode = provider.ConsumeIntergral<int32_t>() % IMS_CALL_MODE_NUM;
-    callModeReportInfo.result = provider.ConsumeIntergral<int32_t>() % VIDEO_REQUEST_RESULT_TYPE_NUM;
+    callModeReportInfo.callIndex = provider.ConsumeIntegral<int32_t>() % CALL_INDEX_MAX_NUM;
+    callModeReportInfo.callMode = provider.ConsumeIntegral<int32_t>() % IMS_CALL_MODE_NUM;
+    callModeReportInfo.result = provider.ConsumeIntegral<int32_t>() % VIDEO_REQUEST_RESULT_TYPE_NUM;
     messageParcel.WriteRawData((const void *)&callModeReportInfo, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -365,9 +365,9 @@ int32_t ReceiveUpdateCallMediaModeResponse(FuzzedDataProvider &provider)
     int32_t length = sizeof(CallModeReportInfo);
     messageParcel.WriteInt32(length);
     CallModeReportInfo callModeReportInfo;
-    callModeReportInfo.callIndex = provider.ConsumeIntergral<int32_t>() % CALL_INDEX_MAX_NUM;
-    callModeReportInfo.callMode = provider.ConsumeIntergral<int32_t>() % IMS_CALL_MODE_NUM;
-    callModeReportInfo.result = provider.ConsumeIntergral<VideoRequestResultType>() % VIDEO_REQUEST_RESULT_TYPE_NUM;
+    callModeReportInfo.callIndex = provider.ConsumeIntegral<int32_t>() % CALL_INDEX_MAX_NUM;
+    callModeReportInfo.callMode = provider.ConsumeIntegral<int32_t>() % IMS_CALL_MODE_NUM;
+    callModeReportInfo.result = provider.ConsumeIntegral<VideoRequestResultType>() % VIDEO_REQUEST_RESULT_TYPE_NUM;
     messageParcel.WriteRawData((const void *)&callModeReportInfo, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -387,8 +387,8 @@ int32_t HandleCallSessionEventChanged(FuzzedDataProvider &provider)
     int32_t length = sizeof(CallSessionReportInfo);
     messageParcel.WriteInt32(length);
     CallSessionReportInfo callSessionReportInfo;
-    callSessionReportInfo.index = provider.ConsumeIntergral<int32_t>() % CALL_INDEX_MAX_NUM;
-    callSessionReportInfo.eventId = provider.ConsumeIntergral<int32_t>() % CALL_SESSION_EVENT_ID_NUM;
+    callSessionReportInfo.index = provider.ConsumeIntegral<int32_t>() % CALL_INDEX_MAX_NUM;
+    callSessionReportInfo.eventId = provider.ConsumeIntegral<int32_t>() % CALL_SESSION_EVENT_ID_NUM;
     messageParcel.WriteRawData((const void *)&callSessionReportInfo, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -408,9 +408,9 @@ int32_t HandlePeerDimensionsChanged(FuzzedDataProvider &provider)
     int32_t length = sizeof(PeerDimensionsReportInfo);
     messageParcel.WriteInt32(length);
     PeerDimensionsReportInfo dimensionsReportInfo;
-    dimensionsReportInfo.index = provider.ConsumeIntergral<int32_t>() % CALL_INDEX_MAX_NUM;
-    dimensionsReportInfo.width = provider.ConsumeIntergral<int32_t>();
-    dimensionsReportInfo.height = provider.ConsumeIntergral<int32_t>();
+    dimensionsReportInfo.index = provider.ConsumeIntegral<int32_t>() % CALL_INDEX_MAX_NUM;
+    dimensionsReportInfo.width = provider.ConsumeIntegral<int32_t>();
+    dimensionsReportInfo.height = provider.ConsumeIntegral<int32_t>();
     messageParcel.WriteRawData((const void *)&dimensionsReportInfo, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -427,7 +427,7 @@ int32_t HandleCallDataUsageChanged(FuzzedDataProvider &provider)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
 
-    int64_t reportInfo = provider.ConsumeIntergral<int64_t>();
+    int64_t reportInfo = provider.ConsumeIntegral<int64_t>();
     messageParcel.WriteInt64(reportInfo);
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -447,9 +447,9 @@ int32_t HandleCameraCapabilitiesChanged(FuzzedDataProvider &provider)
     int32_t length = sizeof(CameraCapabilitiesReportInfo);
     messageParcel.WriteInt32(length);
     CameraCapabilitiesReportInfo cameraCapabilitiesReportInfo;
-    cameraCapabilitiesReportInfo.index = provider.ConsumeIntergral<int32_t>() % CALL_INDEX_MAX_NUM;
-    cameraCapabilitiesReportInfo.width = provider.ConsumeIntergral<int32_t>();
-    cameraCapabilitiesReportInfo.height = provider.ConsumeIntergral<int32_t>();
+    cameraCapabilitiesReportInfo.index = provider.ConsumeIntegral<int32_t>() % CALL_INDEX_MAX_NUM;
+    cameraCapabilitiesReportInfo.width = provider.ConsumeIntegral<int32_t>();
+    cameraCapabilitiesReportInfo.height = provider.ConsumeIntegral<int32_t>();
     messageParcel.WriteRawData((const void *)&cameraCapabilitiesReportInfo, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;

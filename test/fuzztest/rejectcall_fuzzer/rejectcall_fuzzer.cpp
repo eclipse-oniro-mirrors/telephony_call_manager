@@ -33,8 +33,8 @@ void RejectCall(FuzzedDataProvider &provider)
         return;
     }
 
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
-    int32_t rejectWithMessage = provider.ConsumeIntergral<int32_t>() % CHOICE_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t rejectWithMessage = provider.ConsumeIntegral<int32_t>() % CHOICE_NUM;
     std::string message = provider.consumeString();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);

@@ -31,9 +31,9 @@ int32_t GetMainCallId(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     MessageParcel messageParcel;
-    int32_t callId = provider.ConsumeIntergral<int32_t>();
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
     messageParcel.WriteInt32(callId);
-    size_t mainCallId = provider.ConsumeIntergral<int32_t>();
+    size_t mainCallId = provider.ConsumeIntegral<int32_t>();
     messageParcel.WriteInt32(mainCallId);
     messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
@@ -48,7 +48,7 @@ int32_t GetSubCallIdList(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     MessageParcel messageParcel;
-    int32_t id = provider.ConsumeIntergral<int32_t>();
+    int32_t id = provider.ConsumeIntegral<int32_t>();
     messageParcel.WriteInt32(id);
     messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
@@ -63,7 +63,7 @@ int32_t GetCallIdListForConference(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     MessageParcel messageParcel;
-    int32_t callId = provider.ConsumeIntergral<int32_t>();
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
     messageParcel.WriteInt32(callId);
     messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
@@ -77,10 +77,10 @@ int32_t GetCallRestriction(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
-    messageParcel.WriteInt32(provider.ConsumeIntergral<int32_t>());
+    messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>());
     messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
@@ -132,7 +132,7 @@ int32_t CloseUnFinishedUssd(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
     messageParcel.RewindRead(0);

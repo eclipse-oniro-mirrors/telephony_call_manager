@@ -30,7 +30,7 @@ int32_t ControlCamera(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = provider.ConsumeIntergral<int32_t>();
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
     std::string cameraId = provider.consumeString();
     auto cameraIdU16 = Str8ToStr16(cameraId);
     MessageParcel messageParcel;
@@ -46,7 +46,7 @@ int32_t SetPreviewWindow(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = provider.ConsumeIntergral<int32_t>();
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
     std::string surfaceId = provider.consumeString();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
@@ -78,7 +78,7 @@ int32_t SetDisplayWindow(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = provider.ConsumeIntergral<int32_t>();
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
     std::string surfaceId = provider.consumeString();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
@@ -110,7 +110,7 @@ int32_t SetCameraZoom(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    float zoomRatio = provider.ConsumeIntergral<float>();
+    float zoomRatio = provider.ConsumeIntegral<float>();
     MessageParcel messageParcel;
     messageParcel.WriteFloat(zoomRatio);
     std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
@@ -125,7 +125,7 @@ int32_t SetPausePicture(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = provider.ConsumeIntergral<int32_t>();
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
     std::string path = provider.consumeString();
     auto pathU16 = Str8ToStr16(path);
     MessageParcel messageParcel;
@@ -141,8 +141,8 @@ int32_t SetDeviceDirection(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = provider.ConsumeIntergral<int32_t>();
-    int32_t rotation = provider.ConsumeIntergral<int32_t>();
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
+    int32_t rotation = provider.ConsumeIntegral<int32_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     messageParcel.WriteInt32(rotation);
@@ -155,7 +155,7 @@ int32_t CancelCallUpgrade(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = provider.ConsumeIntergral<int32_t>();
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     MessageParcel reply;
@@ -167,7 +167,7 @@ int32_t RequestCameraCapabilities(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = provider.ConsumeIntergral<int32_t>();
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     MessageParcel reply;

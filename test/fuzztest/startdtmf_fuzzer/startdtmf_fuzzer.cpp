@@ -32,7 +32,7 @@ void StartDtmf(FuzzedDataProvider &provider)
         return;
     }
 
-    int32_t callId = provider.ConsumeIntergral<int32_t>() % CALL_ID_NUM;
+    int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
     char str = provider.consumeString().c_str();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
@@ -49,7 +49,7 @@ void StopRtt(FuzzedDataProvider &provider)
         return;
     }
 
-    int32_t callId = provider.ConsumeIntergral<int32_t>() % CALL_ID_NUM;
+    int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     messageParcel.WriteInt32(1);

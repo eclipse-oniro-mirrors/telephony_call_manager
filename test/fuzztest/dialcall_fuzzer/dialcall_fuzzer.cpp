@@ -66,7 +66,7 @@ void OnRemoteRequest(FuzzedDataProvider& provider)
         return;
     }
     messageParcel.RewindRead(0);
-    uint32_t code = provider.ConsumeIntergral<uint32_t>();
+    uint32_t code = provider.ConsumeIntegral<uint32_t>();
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<CallManagerService>::GetInstance()->OnRemoteRequest(code, messageParcel, reply, option);
@@ -121,7 +121,7 @@ int32_t GetCallWaiting(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
     messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
@@ -164,11 +164,11 @@ int32_t DialCall(FuzzedDataProvider& provider)
     }
     std::string number = provider.consumeString();
     auto numberU16 = Str8ToStr16(number);
-    int32_t accountId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
-    int32_t videoState = provider.ConsumeIntergral<int32_t>() % VEDIO_STATE_NUM;
-    int32_t dialScene = provider.ConsumeIntergral<int32_t>() % DIAL_SCENE_NUM;
-    int32_t dialType = provider.ConsumeIntergral<int32_t>() % DIAL_TYPE_NUM;
-    int32_t callType = provider.ConsumeIntergral<int32_t>() % CALL_TYPE_NUM;
+    int32_t accountId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t videoState = provider.ConsumeIntegral<int32_t>() % VEDIO_STATE_NUM;
+    int32_t dialScene = provider.ConsumeIntegral<int32_t>() % DIAL_SCENE_NUM;
+    int32_t dialType = provider.ConsumeIntegral<int32_t>() % DIAL_TYPE_NUM;
+    int32_t callType = provider.ConsumeIntegral<int32_t>() % CALL_TYPE_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteString16(numberU16);
     messageParcel.WriteInt32(accountId);
@@ -201,8 +201,8 @@ int32_t SetCallWaiting(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
-    int32_t activate = provider.ConsumeIntergral<int32_t>() % ACTIVE_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t activate = provider.ConsumeIntegral<int32_t>() % ACTIVE_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
     messageParcel.WriteBool(activate);
@@ -217,7 +217,7 @@ int32_t SetCallRestriction(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     CallRestrictionInfo info;
-    int32_t slotId = provider.ConsumeIntergral<int32_t>() % SLOT_NUM;
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     std::string msg = provider.consumeString();
     int32_t length = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(info.password, kMaxNumberLen, msg.c_str(), length);
@@ -234,7 +234,7 @@ int32_t JoinConference(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = provider.ConsumeIntergral<int32_t>() % CALL_ID_NUM;
+    int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
     std::vector<std::u16string> numberList { u"0000000000" };
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
@@ -251,7 +251,7 @@ int32_t StartRtt(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
 
-    int32_t callId = provider.ConsumeIntergral<int32_t>() % CALL_ID_NUM;
+    int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     messageParcel.WriteInt32(0);
@@ -281,7 +281,7 @@ int32_t CancelCallUpgrade(FuzzedDataProvider& provider)
     }
     MessageParcel messageParcel;
     MessageParcel replyParcel;
-    int32_t callId = provider.ConsumeIntergral<int32_t>() % CALL_ID_NUM;
+    int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
     messageParcel.WriteInt32(callId);
     messageParcel.RewindRead(0);
     return DelayedSingleton<CallManagerService>::GetInstance()->OnCancelCallUpgrade(messageParcel, replyParcel);
@@ -294,7 +294,7 @@ int32_t RequestCameraCapabilities(FuzzedDataProvider& provider)
     }
     MessageParcel messageParcel;
     MessageParcel replyParcel;
-    int32_t callId = provider.ConsumeIntergral<int32_t>() % CALL_ID_NUM;
+    int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
     messageParcel.WriteInt32(callId);
     messageParcel.RewindRead(0);
     return DelayedSingleton<CallManagerService>::GetInstance()->OnRequestCameraCapabilities(messageParcel, replyParcel);

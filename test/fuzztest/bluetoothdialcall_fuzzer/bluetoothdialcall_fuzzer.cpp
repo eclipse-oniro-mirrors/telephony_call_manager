@@ -202,7 +202,7 @@ void GetCurrentCallList(FuzzedDataProvider& provider)
         return;
     }
 
-    int32_t slotId = provider.ConsumeIntergral<int32_t>();
+    int32_t slotId = provider.ConsumeIntegral<int32_t>();
     std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
@@ -221,7 +221,7 @@ void AddAudioDeviceList(FuzzedDataProvider& provider)
     MessageParcel messageParcel;
     std::string str = provider.ConsumeRandomLenthString();
     messageParcel.WriteString(str);
-    messageParcel.WriteInt32(provider.ConsumeIntergral<int32_t>());
+    messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>());
     messageParcel.WriteString(str);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnAddAudioDeviceList(messageParcel, reply);
@@ -236,7 +236,7 @@ void RemoveAudioDeviceList(FuzzedDataProvider& provider)
     MessageParcel messageParcel;
     std::string str = provider.ConsumeRandomLenthString();
     messageParcel.WriteString(str);
-    messageParcel.WriteInt32(provider.ConsumeIntergral<int32_t>());
+    messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>());
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnRemoveAudioDeviceList(messageParcel, reply);
 }
