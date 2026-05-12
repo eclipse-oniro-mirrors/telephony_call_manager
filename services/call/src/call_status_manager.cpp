@@ -2279,6 +2279,10 @@ void CallStatusManager::HandleDialWhenHolding(int32_t callId, sptr<CallBase> &ca
             DeleteOneCallObject(pendingHangupCallId);
         }
         callRequestEventHandler->SetPendingHangup(false, -1);
+        auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+        if (callControlManager != nullptr) {
+            callControlManager->RemovePendingHangupProtectTask();
+        }
     } else {
         int32_t result = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(GetDialCallInfo());
         sptr<CallBase> dialCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
@@ -2404,6 +2408,10 @@ void CallStatusManager::ClearPendingState(sptr<CallBase> &call)
             call->HangUpCall();
         }
         callRequestEventHandler->SetPendingHangup(false, -1);
+        auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+        if (callControlManager != nullptr) {
+            callControlManager->RemovePendingHangupProtectTask();
+        }
     }
 }
 
