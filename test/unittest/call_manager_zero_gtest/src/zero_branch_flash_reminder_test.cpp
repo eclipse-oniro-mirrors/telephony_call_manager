@@ -176,8 +176,7 @@ HWTEST_F(IncomingFlashReminderTest, DlsymFailed_Destructor, TestSize.Level0)
         dlclose(reminder_->libAdapterHandler_);
         reminder_.reset();
     }
-    
-    EXPECT_EQ(reminder_->isFlashRemindUsed_, false);
+    EXPECT_FALSE(callbackCalled_);
 }
 
 /**
@@ -247,11 +246,11 @@ HWTEST_F(IncomingFlashReminderTest, FlashRemind, TestSize.Level0)
 {
     reminder_->libAdapterHandler_ = nullptr;
     reminder_->isFlashRemindUsed_ = false;
-    reminder_->StartFlashRemind();
+    reminder_->HandleStartFlashRemind();
     EXPECT_FALSE(callbackCalled_);
 
     reminder_->isFlashRemindUsed_ = true;
-    reminder_->StopFlashRemind();
+    reminder_->HandleStopFlashRemind();
     EXPECT_FALSE(reminder_->isFlashRemindUsed_);
 }
 
