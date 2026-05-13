@@ -139,7 +139,7 @@ int32_t CanSetCallTransferTime(FuzzedDataProvider& provider)
     MessageParcel messageParcel;
     CallTransferInfo info;
     std::string msg = provider.ConsumeRandomLengthString();
-    (void)memcpy_s(info.transferNum, kMaxNumberLen, msg, msg.length());
+    (void)memcpy_s(info.transferNum, kMaxNumberLen, msg.c_str(), msg.length());
     info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
     info.type = CallTransferType::TRANSFER_TYPE_BUSY;
     int32_t activate = provider.ConsumeIntegral<int32_t>() % ACTIVE_NUM;

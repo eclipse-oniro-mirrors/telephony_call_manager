@@ -35,7 +35,7 @@ int32_t GetMainCallId(FuzzedDataProvider& provider)
     messageParcel.WriteInt32(callId);
     size_t mainCallId = provider.ConsumeIntegral<int32_t>();
     messageParcel.WriteInt32(mainCallId);
-    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -50,7 +50,7 @@ int32_t GetSubCallIdList(FuzzedDataProvider& provider)
     MessageParcel messageParcel;
     int32_t id = provider.ConsumeIntegral<int32_t>();
     messageParcel.WriteInt32(id);
-    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -65,7 +65,7 @@ int32_t GetCallIdListForConference(FuzzedDataProvider& provider)
     MessageParcel messageParcel;
     int32_t callId = provider.ConsumeIntegral<int32_t>();
     messageParcel.WriteInt32(callId);
-    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -81,7 +81,7 @@ int32_t GetCallRestriction(FuzzedDataProvider& provider)
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
     messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>());
-    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;

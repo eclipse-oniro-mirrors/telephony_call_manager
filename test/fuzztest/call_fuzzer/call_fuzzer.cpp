@@ -543,7 +543,7 @@ void AntiFraudServiceFunc(FuzzedDataProvider& provider)
     antiFraudService->StartAntiFraudService(provider.ConsumeRandomLengthString(), slotId, count);
     uint8_t size = provider.ConsumeIntegral<uint8_t>()
     char temp[size + 1];
-    for (size_t i = 0; i < sisizeze; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         temp[i] = static_cast<char>(data[i]);
     }
     temp[size] = '\0';
@@ -589,8 +589,8 @@ void InterOperableDeviceObserverFunc(FuzzedDataProvider& provider)
     auto stateCallback = std::make_shared<DmStateCallback>();
     observer->Init();
     size_t length = provider.ConsumeIntegral<uint8_t>() / DATA_COUNT;
-    std::string networkId = provide.ConsumeRandomLengthString(length);
-    std::string devName = provide.ConsumeRandomLengthString(length);
+    std::string networkId = provider.ConsumeRandomLengthString(length);
+    std::string devName = provider.ConsumeRandomLengthString(length);
     observer->OnDeviceOnline(networkId, devName, provider.ConsumeIntegral<uint16_t>());
     observer->OnDeviceOffline(networkId, devName, provider.ConsumeIntegral<uint16_t>());
     DistributedHardware::DmDeviceInfo deviceInfo;
@@ -655,20 +655,20 @@ void CallMangerServiceFunc(FuzzedDataProvider& provider)
     callManagerService->EnableImsSwitch(callId);
     callManagerService->GetBundleInfo();
     callManagerService->dealCeliaCallEvent(callId);
-    std::string eventName = fdp.ConsumeRandomLengthString();
+    std::string eventName = provider.ConsumeRandomLengthString();
     callManagerService->HandleVoIPCallEvent(callId, eventName);
     callManagerService->HandleDisplaySpecifiedCallPage(callId);
     callManagerService->HandleCeliaAutoAnswerCall(callId, provider.ConsumeBool());
-    callManagerService->SendUssdResponse(callId, fdp.ConsumeRandomLengthString());
+    callManagerService->SendUssdResponse(callId, provider.ConsumeRandomLengthString());
     callManagerService->OnStop();
     callManagerService->UnRegisterCallBack();
-    callManagerService->UnInit();
+    callManagerService->UnInit();.
     MessageParcel messageParcel;
     CallAttributeInfo info;
     info.accountId = provider.ConsumeIntegral<int32_t>();
     info.callType = CallType::TYPE_VOIP;
     CallManagerUtils::WriteCallAttributeInfo(info, messageParcel);
-    CallManagerUtils::IsBundleInstalled(fdp.ConsumeRandomLengthString(), callId);
+    CallManagerUtils::IsBundleInstalled(provider.ConsumeRandomLengthString(), callId);
 }
 
 void CallMangerServiceStubFunc(FuzzedDataProvider& provider)

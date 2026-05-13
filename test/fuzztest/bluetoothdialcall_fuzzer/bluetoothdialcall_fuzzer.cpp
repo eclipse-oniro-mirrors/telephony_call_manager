@@ -175,7 +175,7 @@ void StartDtmf(FuzzedDataProvider& provider)
 
     std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteInt8(static_cast<uint8_t>(testData.data()));
+    messageParcel.WriteInt8(provider.ConsumeIntegral<uint8_t>());
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;

@@ -251,8 +251,10 @@ int32_t UpdateImsCallModeChange(FuzzedDataProvider& provider)
     CallMediaModeInfo callMediaModeInfo;
     callMediaModeInfo.callId = provider.ConsumeIntegral<int32_t>();
     callMediaModeInfo.isRequestInfo = provider.ConsumeBool();
-    callMediaModeInfo.result = provider.ConsumeIntegral<VideoRequestResultType>() % VIDEO_REQUEST_RESULT_TYPE_NUM;
-    callMediaModeInfo.callMode = provider.ConsumeIntegral<ImsCallMode>() % IMS_CALL_MODE_NUM;
+    callMediaModeInfo.result = static_cast<VideoRequestResultType>(
+        provider.ConsumeIntegral<int32_t>() % VIDEO_REQUEST_RESULT_TYPE_NUM);
+    callMediaModeInfo.callMode = static_cast<ImsCallMode>(
+        provider.ConsumeIntegral<int32_t>() % IMS_CALL_MODE_NUM);
     messageParcel.WriteRawData((const void *)&callMediaModeInfo, length);
     messageParcel.RewindRead(0);
     return callAbilityCallbackPtr_->OnUpdateImsCallModeChange(messageParcel, replyParcel);
@@ -273,7 +275,8 @@ int32_t UpdateCallSessionEventChange(FuzzedDataProvider& provider)
     messageParcel.WriteInt32(length);
     CallSessionEvent callSessionInfo;
     callSessionInfo.callId = provider.ConsumeIntegral<int32_t>();
-    callSessionInfo.eventId = provider.ConsumeIntegral<CallSessionEventId>() % CALL_SESSION_EVENT_ID_NUM;
+    callSessionInfo.eventId = static_cast<CallSessionEventId>(
+        provider.ConsumeIntegral<int32_t>() % CALL_SESSION_EVENT_ID_NUM);
     messageParcel.WriteRawData((const void *)&callSessionInfo, length);
     messageParcel.RewindRead(0);
     return callAbilityCallbackPtr_->OnUpdateCallSessionEventChange(messageParcel, replyParcel);
