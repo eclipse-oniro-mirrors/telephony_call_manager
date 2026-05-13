@@ -172,7 +172,7 @@ void GetCallerInfo(FuzzedDataProvider& provider)
     CallRunningState callRunningState = static_cast<CallRunningState>(
         provider.ConsumeIntegralInRange<int32_t>(0, CALL_RUNNING_STATE_NUM));
     bool speakerphoneOn = provider.ConsumeBool();
-    std::string phoneNumber = provider.ConsumeRandomLenthString();
+    std::string phoneNumber = provider.ConsumeRadomLengthString();
     int32_t callId = provider.ConsumeIntegral<int32_t>();
     CallAnswerType answerType = static_cast<CallAnswerType>(
         provider.ConsumeIntegralInRange<int32_t>(0, CALL_ANSWER_TYPE_NUM));
@@ -308,7 +308,7 @@ void IMSVideoCallFunc(FuzzedDataProvider& provider)
     paraInfo.callState = static_cast<TelCallState>(
         provider.ConsumeIntegralInRange<int32_t>(0, TEL_CALL_STATE_NUM));
     sptr<IMSCall> callObjectPtr = std::make_unique<IMSCall>(paraInfo).release();
-    std::string msg = provider.ConsumeRandomLenthString();
+    std::string msg = provider.ConsumeRadomLengthString();
     int32_t callingUid = provider.ConsumeIntegral<int32_t>();
     int32_t callingPid = provider.ConsumeIntegral<int32_t>();
     int32_t rotation = provider.ConsumeIntegral<int32_t>();
@@ -359,7 +359,7 @@ void IMSVideoCallWindowFunc(FuzzedDataProvider& provider)
     paraInfo.callState = static_cast<TelCallState>(
         provider.ConsumeIntegralInRange<int32_t>(0, TEL_CALL_STATE_NUM));
     sptr<IMSCall> callObjectPtr = std::make_unique<IMSCall>(paraInfo).release();
-    std::string msg = provider.ConsumeRandomLenthString();
+    std::string msg = provider.ConsumeRadomLengthString();
     int len = static_cast<int>(msg.length());
     std::string subSurfaceId = msg;
     if (len >= 1) {
@@ -441,7 +441,7 @@ void OttVideoCallFunc(FuzzedDataProvider& provider)
     paraInfo.callState = static_cast<TelCallState>(
         provider.ConsumeIntegralInRange<int32_t>(0, TEL_CALL_STATE_NUM));
     sptr<OTTCall> callObjectPtr = std::make_unique<OTTCall>(paraInfo).release();
-    std::string msg = provider.ConsumeRandomLenthString();
+    std::string msg = provider.ConsumeRadomLengthString();
     int32_t callingUid = provider.ConsumeIntegral<int32_t>();
     int32_t callingPid = provider.ConsumeIntegral<int32_t>();
     int32_t rotation = provider.ConsumeIntegral<int32_t>();
@@ -489,7 +489,7 @@ void OttVideoCallWindowFunc(FuzzedDataProvider& provider)
     paraInfo.callState = static_cast<TelCallState>(
         provider.ConsumeIntegralInRange<int32_t>(0, TEL_CALL_STATE_NUM));
     sptr<OTTCall> callObjectPtr = std::make_unique<OTTCall>(paraInfo).release();
-    std::string msg = provider.ConsumeRandomLenthString();
+    std::string msg = provider.ConsumeRadomLengthString();
     int len = static_cast<int>(msg.length());
     std::string subSurfaceId = msg;
     if (len >= 1) {

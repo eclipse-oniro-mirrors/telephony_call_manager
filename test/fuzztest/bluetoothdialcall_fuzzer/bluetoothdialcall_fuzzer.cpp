@@ -175,7 +175,7 @@ void StartDtmf(FuzzedDataProvider& provider)
 
     std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteInt8(*static_cast<void*>(testData.data()));
+    messageParcel.WriteInt8(static_cast<uint8_t>(testData.data()));
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -219,7 +219,7 @@ void AddAudioDeviceList(FuzzedDataProvider& provider)
     }
 
     MessageParcel messageParcel;
-    std::string str = provider.ConsumeRandomLenthString();
+    std::string str = provider.ConsumeRadomLengthString();
     messageParcel.WriteString(str);
     messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>());
     messageParcel.WriteString(str);
@@ -234,7 +234,7 @@ void RemoveAudioDeviceList(FuzzedDataProvider& provider)
     }
 
     MessageParcel messageParcel;
-    std::string str = provider.ConsumeRandomLenthString();
+    std::string str = provider.ConsumeRadomLengthString();
     messageParcel.WriteString(str);
     messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>());
     MessageParcel reply;
