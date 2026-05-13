@@ -61,7 +61,7 @@ public:
     void OnChange() override;
 };
 class IncomingFlashReminder;
-class CallControlManager : public CallPolicy {
+class CallControlManager : public CallPolicy, public std::enable_shared_from_this<CallControlManager> {
     DECLARE_DELAYED_SINGLETON(CallControlManager)
 
 public:
@@ -119,6 +119,7 @@ public:
     int32_t SetVoNRState(int32_t slotId, int32_t state);
     int32_t GetVoNRState(int32_t slotId, int32_t &state);
     int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode);
+    void RemovePendingHangupProtectTask();
 #ifdef SUPPORT_RTT_CALL
     int32_t SetRttCapability(int32_t slotId, bool isEnable);
     int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode);
@@ -211,6 +212,7 @@ private:
     bool IsCallActivated(const TelCallState& priorState, const TelCallState& nextState);
     void EnqueueAnsweredCall(int32_t callId, int32_t videoState);
     sptr<CallBase> GetRingCall(int32_t callId, int32_t videoState);
+    void PostPendingHangupProtectTask(int32_t callId);
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
     public:
@@ -283,6 +285,8 @@ private:
     ffrt::mutex wearStatusMutex_;
     ffrt::mutex reminderMutex_;
     ffrt::mutex ringToneMutex_;
+    ffrt::task_handle pendingHangupHandle_ = nullptr;
+    ffrt::mutex pendingHangupHandleMutex_;
     std::shared_ptr<IncomingFlashReminder> incomingFlashReminder_ {nullptr};
 #ifdef CALL_MANAGER_THERMAL_PROTECTION
     std::atomic<int32_t> thermalLevel_ = -1;
