@@ -31,7 +31,7 @@ void TestCommonController(const std::shared_ptr<DistributedDataController> &cont
     int32_t intValue = provider.ConsumeIntegral<int32_t>();
     AudioDeviceType audioDevType = static_cast<AudioDeviceType>(
         size % static_cast<uint32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_PC));
-    const char *charValue = provider.ConsumeRadomLengthString().c_str();
+    const char *charValue = provider.ConsumeRandomLengthString().c_str();
     uint32_t uintValue = provider.ConsumeIntegral<uint32_t>();
     DialParaInfo dialParaInfo;
     sptr<OHOS::Telephony::CallBase> call = new IMSCall(dialParaInfo);
@@ -82,7 +82,7 @@ void TestSinkController(FuzzedDataProvider& provider)
     }
     TestCommonController(controller, provider);
 
-    std::string stringValue = provider.ConsumeRadomLengthString();
+    std::string stringValue = provider.ConsumeRandomLengthString();
     int32_t intValue = provider.ConsumeIntegral<int32_t>();
     DistributedDataType distributedDataType = static_cast<DistributedDataType>(provider.ConsumeIntegral<int32_t>()) %
         static_cast<uint32_t>(DistributedDataType::MAX);
@@ -121,7 +121,7 @@ void TestSourceController(FuzzedDataProvider& provider)
     }
     TestCommonController(controller, data, size);
 
-    std::string stringValue = provider.ConsumeRadomLengthString();
+    std::string stringValue = provider.ConsumeRandomLengthString();
     DistributedDataType distributedDataType = static_cast<DistributedDataType>(provider.ConsumeIntegral<int32_t>()) %
         static_cast<uint32_t>(DistributedDataType::MAX);
     DialParaInfo dialParaInfo;

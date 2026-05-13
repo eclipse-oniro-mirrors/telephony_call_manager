@@ -33,7 +33,7 @@ void StartDtmf(FuzzedDataProvider &provider)
     }
 
     int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
-    char str = provider.ConsumeRadomLengthString().c_str();
+    char str = provider.ConsumeRandomLengthString().c_str();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     messageParcel.WriteInt8(str);

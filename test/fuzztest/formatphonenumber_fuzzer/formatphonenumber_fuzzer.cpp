@@ -95,7 +95,7 @@ int32_t ReportOttCallDetailsInfo(FuzzedDataProvider& provider)
     }
     int32_t vecCnt = 1;
     OttCallDetailsInfo info;
-    std::string msg = provider.ConsumeRadomLengthString();
+    std::string msg = provider.ConsumeRandomLengthString();
     int32_t phoneLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     int32_t bundleLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
     memcpy_s(info.phoneNum, kMaxNumberLen, msg.c_str(), phoneLength);
@@ -117,7 +117,7 @@ int32_t ReportOttCallEventInfo(FuzzedDataProvider& provider)
     }
     OttCallEventInfo info;
     info.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
-    std::string msg = provider.ConsumeRadomLengthString();
+    std::string msg = provider.ConsumeRandomLengthString();
     int32_t bundleLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
     memcpy_s(info.bundleName, kMaxBundleNameLen, msg.c_str(), bundleLength);
     MessageParcel messageParcel;

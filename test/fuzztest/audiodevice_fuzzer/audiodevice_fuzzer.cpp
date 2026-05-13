@@ -52,7 +52,7 @@ void AudioControlManagerFunc(FuzzedDataProvider& provider)
         provider.ConsumeIntegralInRange<int32_t>(0, VIDIO_TYPE_NUM));
     paraInfo.callState = static_cast<TelCallState>(provider.ConsumeIntegralInRange<int32_t>(0, TEL_CALL_STATE_NUM));
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
-    std::string message = provider.ConsumeRadomLengthString();
+    std::string message = provider.ConsumeRandomLengthString();
     DisconnectedDetails details;
     bool isMute = provider.ConsumeBool();
     RingState ringState = static_cast<RingState>(provider.ConsumeIntegralInRange<int32_t>(0, RING_STATE_NUM));
@@ -162,7 +162,7 @@ void AudioSceneProcessorFunc(FuzzedDataProvider& provider)
 
     std::shared_ptr<AudioSceneProcessor> audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
     std::shared_ptr<AudioControlManager> audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
-    std::string phoneNum = provider.ConsumeRadomLengthString();
+    std::string phoneNum = provider.ConsumeRandomLengthString();
 
     audioControlManager->IsNumberAllowed(phoneNum);
     audioSceneProcessor->Init();

@@ -31,7 +31,7 @@ void SetAudioDevice(FuzzedDataProvider &provider)
     if (!IsServiceInited()) {
         return;
     }
-    std::string address = provider.ConsumeRadomLengthString();
+    std::string address = provider.ConsumeRandomLengthString();
     AudioDevice audioDevice;
     if (memset_s(&audioDevice, sizeof(AudioDevice), 0, sizeof(AudioDevice)) != EOK) {
         TELEPHONY_LOGE("memset_s fail");

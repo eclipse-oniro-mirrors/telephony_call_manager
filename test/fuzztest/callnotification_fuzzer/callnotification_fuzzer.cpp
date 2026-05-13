@@ -49,7 +49,7 @@ void IncomingCallNotificationFunc(FuzzedDataProvider& provider)
         provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
     TelCallState nextState = static_cast<TelCallState>(
         provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
-    std::string message = provider.ConsumeRadomLengthString();
+    std::string message = provider.ConsumeRandomLengthString();
     DisconnectedDetails details;
 
     notification->NewCallCreated(callObjectPtr);
@@ -75,7 +75,7 @@ void IncomingCallWakeupFunc(FuzzedDataProvider& provider)
         provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
     TelCallState nextState = static_cast<TelCallState>(
         provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
-    std::string message = provider.ConsumeRadomLengthString();
+    std::string message = provider.ConsumeRandomLengthString();
     DisconnectedDetails details;
 
     notification->NewCallCreated(callObjectPtr);
@@ -100,7 +100,7 @@ void ProximitySensorFunc(FuzzedDataProvider& provider)
         provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
     TelCallState nextState = static_cast<TelCallState>(
         provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
-    std::string message = provider.ConsumeRadomLengthString();
+    std::string message = provider.ConsumeRandomLengthString();
     DisconnectedDetails details;
 
     notification->CallDestroyed(details);
@@ -123,7 +123,7 @@ void StatusBarFunc(FuzzedDataProvider& provider)
         provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
     TelCallState nextState = static_cast<TelCallState>(
         provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
-    std::string message = provider.ConsumeRadomLengthString();
+    std::string message = provider.ConsumeRandomLengthString();
     DisconnectedDetails details;
     int32_t isDisplayMute = provider.ConsumeIntegral<int32_t>() % BOOL_NUM;
 
@@ -149,7 +149,7 @@ void WiredHeadsetHandlerFunc(FuzzedDataProvider& provider)
         provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
     TelCallState nextState = static_cast<TelCallState>(
         provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
-    std::string message = provider.ConsumeRadomLengthString();
+    std::string message = provider.ConsumeRandomLengthString();
     DisconnectedDetails details;
 
     notification->Init();
@@ -166,7 +166,7 @@ void CallDataRdbObserverFunc(FuzzedDataProvider& provider)
         return;
     }
 
-    std::string message = provider.ConsumeRadomLengthString();
+    std::string message = provider.ConsumeRandomLengthString();
     std::shared_ptr<CallDataBaseHelper> callDataBaseHelper = DelayedSingleton<CallDataBaseHelper>::GetInstance();
     DataShare::DataShareValuesBucket values;
     DataShare::DataSharePredicates predicates;
@@ -199,7 +199,7 @@ void MissedCallNotificationFunc(FuzzedDataProvider& provider)
         provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
     TelCallState nextState = static_cast<TelCallState>(
         provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
-    std::string message = provider.ConsumeRadomLengthString();
+    std::string message = provider.ConsumeRandomLengthString();
     DisconnectedDetails details;
 
     notification->NewCallCreated(callObjectPtr);

@@ -162,7 +162,7 @@ int32_t DialCall(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    std::string number = provider.ConsumeRadomLengthString();
+    std::string number = provider.ConsumeRandomLengthString();
     auto numberU16 = Str8ToStr16(number);
     int32_t accountId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     int32_t videoState = provider.ConsumeIntegral<int32_t>() % VEDIO_STATE_NUM;
@@ -218,7 +218,7 @@ int32_t SetCallRestriction(FuzzedDataProvider& provider)
     }
     CallRestrictionInfo info;
     int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
-    std::string msg = provider.ConsumeRadomLengthString();
+    std::string msg = provider.ConsumeRandomLengthString();
     int32_t length = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(info.password, kMaxNumberLen, msg.c_str(), length);
     MessageParcel messageParcel;
@@ -266,7 +266,7 @@ int32_t InputDialerSpecialCode(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    std::string specialCode = provider.ConsumeRadomLengthString();
+    std::string specialCode = provider.ConsumeRandomLengthString();
     MessageParcel messageParcel;
     messageParcel.WriteString(specialCode);
     messageParcel.RewindRead(0);

@@ -172,7 +172,7 @@ void GetCallerInfo(FuzzedDataProvider& provider)
     CallRunningState callRunningState = static_cast<CallRunningState>(
         provider.ConsumeIntegralInRange<int32_t>(0, CALL_RUNNING_STATE_NUM));
     bool speakerphoneOn = provider.ConsumeBool();
-    std::string phoneNumber = provider.ConsumeRadomLengthString();
+    std::string phoneNumber = provider.ConsumeRandomLengthString();
     int32_t callId = provider.ConsumeIntegral<int32_t>();
     CallAnswerType answerType = static_cast<CallAnswerType>(
         provider.ConsumeIntegralInRange<int32_t>(0, CALL_ANSWER_TYPE_NUM));
@@ -308,7 +308,7 @@ void IMSVideoCallFunc(FuzzedDataProvider& provider)
     paraInfo.callState = static_cast<TelCallState>(
         provider.ConsumeIntegralInRange<int32_t>(0, TEL_CALL_STATE_NUM));
     sptr<IMSCall> callObjectPtr = std::make_unique<IMSCall>(paraInfo).release();
-    std::string msg = provider.ConsumeRadomLengthString();
+    std::string msg = provider.ConsumeRandomLengthString();
     int32_t callingUid = provider.ConsumeIntegral<int32_t>();
     int32_t callingPid = provider.ConsumeIntegral<int32_t>();
     int32_t rotation = provider.ConsumeIntegral<int32_t>();
@@ -359,7 +359,7 @@ void IMSVideoCallWindowFunc(FuzzedDataProvider& provider)
     paraInfo.callState = static_cast<TelCallState>(
         provider.ConsumeIntegralInRange<int32_t>(0, TEL_CALL_STATE_NUM));
     sptr<IMSCall> callObjectPtr = std::make_unique<IMSCall>(paraInfo).release();
-    std::string msg = provider.ConsumeRadomLengthString();
+    std::string msg = provider.ConsumeRandomLengthString();
     int len = static_cast<int>(msg.length());
     std::string subSurfaceId = msg;
     if (len >= 1) {
@@ -441,7 +441,7 @@ void OttVideoCallFunc(FuzzedDataProvider& provider)
     paraInfo.callState = static_cast<TelCallState>(
         provider.ConsumeIntegralInRange<int32_t>(0, TEL_CALL_STATE_NUM));
     sptr<OTTCall> callObjectPtr = std::make_unique<OTTCall>(paraInfo).release();
-    std::string msg = provider.ConsumeRadomLengthString();
+    std::string msg = provider.ConsumeRandomLengthString();
     int32_t callingUid = provider.ConsumeIntegral<int32_t>();
     int32_t callingPid = provider.ConsumeIntegral<int32_t>();
     int32_t rotation = provider.ConsumeIntegral<int32_t>();
@@ -489,7 +489,7 @@ void OttVideoCallWindowFunc(FuzzedDataProvider& provider)
     paraInfo.callState = static_cast<TelCallState>(
         provider.ConsumeIntegralInRange<int32_t>(0, TEL_CALL_STATE_NUM));
     sptr<OTTCall> callObjectPtr = std::make_unique<OTTCall>(paraInfo).release();
-    std::string msg = provider.ConsumeRadomLengthString();
+    std::string msg = provider.ConsumeRandomLengthString();
     int len = static_cast<int>(msg.length());
     std::string subSurfaceId = msg;
     if (len >= 1) {
@@ -589,8 +589,8 @@ void InterOperableDeviceObserverFunc(FuzzedDataProvider& provider)
     auto stateCallback = std::make_shared<DmStateCallback>();
     observer->Init();
     size_t length = provider.ConsumeIntegral<uint8_t>() / DATA_COUNT;
-    std::string networkId = provide.ConsumeRadomLengthString(length);
-    std::string devName = provide.ConsumeRadomLengthString(length);
+    std::string networkId = provide.ConsumeRandomLengthString(length);
+    std::string devName = provide.ConsumeRandomLengthString(length);
     observer->OnDeviceOnline(networkId, devName, provider.ConsumeIntegral<uint16_t>());
     observer->OnDeviceOffline(networkId, devName, provider.ConsumeIntegral<uint16_t>());
     DistributedHardware::DmDeviceInfo deviceInfo;
@@ -617,8 +617,8 @@ void BluetoothCallConnectionFunc(FuzzedDataProvider& provider)
     bluetoothConnection->SetBtCallScoConnected(provider.ConsumeBool());
     bluetoothConnection->HfpDisConnectedEndBtCall();
     size_t length = provider.ConsumeIntegral<uint8_t>() / DATA_COUNT;
-    std::string hfpPhoneNumber = provide.ConsumeRadomLengthString(length);
-    std::string hfpContactName = provide.ConsumeRadomLengthString(length);
+    std::string hfpPhoneNumber = provide.ConsumeRandomLengthString(length);
+    std::string hfpContactName = provide.ConsumeRandomLengthString(length);
     bluetoothConnection->SetHfpContactName(hfpPhoneNumber, hfpContactName);
     bluetoothConnection->GetHfpContactName(hfpPhoneNumber);
 }

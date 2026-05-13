@@ -121,7 +121,7 @@ void SetCallTransferInfo(FuzzedDataProvider &provider)
     int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     CallTransferInfo info;
-    std::string msg = provider.ConsumeRadomLengthString();
+    std::string msg = provider.ConsumeRandomLengthString();
     (void)memcpy_s(info.transferNum, kMaxNumberLen, msg, msg.size());
     info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
     info.type = CallTransferType::TRANSFER_TYPE_BUSY;

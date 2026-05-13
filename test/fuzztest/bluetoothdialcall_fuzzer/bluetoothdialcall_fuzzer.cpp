@@ -219,7 +219,7 @@ void AddAudioDeviceList(FuzzedDataProvider& provider)
     }
 
     MessageParcel messageParcel;
-    std::string str = provider.ConsumeRadomLengthString();
+    std::string str = provider.ConsumeRandomLengthString();
     messageParcel.WriteString(str);
     messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>());
     messageParcel.WriteString(str);
@@ -234,7 +234,7 @@ void RemoveAudioDeviceList(FuzzedDataProvider& provider)
     }
 
     MessageParcel messageParcel;
-    std::string str = provider.ConsumeRadomLengthString();
+    std::string str = provider.ConsumeRandomLengthString();
     messageParcel.WriteString(str);
     messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>());
     MessageParcel reply;
