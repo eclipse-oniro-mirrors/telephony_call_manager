@@ -541,7 +541,7 @@ void AntiFraudServiceFunc(FuzzedDataProvider& provider)
     int32_t count = provider.ConsumeIntegral<int32_t>();
     antiFraudService->CheckAntiFraudService(provider.ConsumeRandomLengthString(), slotId, count);
     antiFraudService->StartAntiFraudService(provider.ConsumeRandomLengthString(), slotId, count);
-    uint8_t size = provider.ConsumeIntegral<uint8_t>()
+    uint8_t size = provider.ConsumeIntegral<uint8_t>();
     char temp[size + 1];
     for (size_t i = 0; i < size; ++i) {
         temp[i] = static_cast<char>(data[i]);

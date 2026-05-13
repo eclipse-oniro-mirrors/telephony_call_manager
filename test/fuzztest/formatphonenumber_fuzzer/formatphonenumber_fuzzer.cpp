@@ -147,7 +147,7 @@ int32_t FormatPhoneNumber(FuzzedDataProvider& provider)
     }
     std::string number = provider.ConsumeRandomLengthString();
     auto numberU16 = Str8ToStr16(number);
-    std::string countryCode = fdp.ConsumeRandomLengthString();
+    std::string countryCode = provider.ConsumeRandomLengthString();
     auto countryCodeU16 = Str8ToStr16(countryCode);
     MessageParcel messageParcel;
     messageParcel.WriteString16(numberU16);

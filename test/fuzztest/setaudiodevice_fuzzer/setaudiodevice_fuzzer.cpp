@@ -37,7 +37,8 @@ void SetAudioDevice(FuzzedDataProvider &provider)
         TELEPHONY_LOGE("memset_s fail");
         return;
     }
-    audioDevice.deviceType = static_cast<AudioDeviceType>(size % AUDIO_DEVICE_NUM);
+    audioDevice.deviceType = static_cast<AudioDeviceType>(
+        provider.ConsumeIntegral<int32_t>() % AUDIO_DEVICE_NUM);
     if (address.length() > kMaxAddressLen) {
         TELEPHONY_LOGE("address is not too long");
         return;

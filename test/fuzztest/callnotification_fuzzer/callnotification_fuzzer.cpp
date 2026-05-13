@@ -218,15 +218,14 @@ void RejectCallSmsFunc(FuzzedDataProvider& provider)
 
     std::shared_ptr<RejectCallSms> notification = std::make_shared<RejectCallSms>();
     DialParaInfo paraInfo;
-    int32_t slotId = static_cast<int32_t>(size % 2);
+    int32_t slotId = static_cast<int32_t>(provider.ConsumeIntegral<int32_t>() % 2);
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
     TelCallState priorState = static_cast<TelCallState>(
         provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
     TelCallState nextState = static_cast<TelCallState>(
         provider.ConsumeIntegral<int32_t>() % CALL_STATE_NUM);
-    FuzzedDataProvider fdp(data, size);
-    std::string message = fdp.ConsumeRandomLengthString();
-    std::string desAddr = fdp.ConsumeRandomLengthString();
+    std::string message = provider.ConsumeRandomLengthString();
+    std::string desAddr = provider.ConsumeRandomLengthString();
     std::u16string desAddrU16 = Str8ToStr16(desAddr);
     std::u16string messageU16 = Str8ToStr16(message);
     DisconnectedDetails details;

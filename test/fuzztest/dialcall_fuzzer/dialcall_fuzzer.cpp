@@ -20,6 +20,7 @@
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "call_ability_callback.h"
+#include "fold_status_manager.h"
 #include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
@@ -42,7 +43,7 @@ void OnRegisterVoipCallManagerCallback(FuzzedDataProvider& provider)
     if (callbackWrap == nullptr) {
         return;
     }
-    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -83,7 +84,7 @@ int32_t OnRegisterCallBack(FuzzedDataProvider& provider)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     messageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
-    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -96,7 +97,7 @@ bool HasCall(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     MessageParcel messageParcel;
-    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -109,7 +110,7 @@ int32_t GetCallState(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     MessageParcel messageParcel;
-    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -124,7 +125,7 @@ int32_t GetCallWaiting(FuzzedDataProvider& provider)
     int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
-    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -137,7 +138,7 @@ bool IsRinging(FuzzedDataProvider& provider)
         return false;
     }
     MessageParcel messageParcel;
-    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -150,7 +151,7 @@ bool IsInEmergencyCall(FuzzedDataProvider& provider)
         return false;
     }
     MessageParcel messageParcel;
-    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
@@ -188,7 +189,7 @@ void RemoveMissedIncomingCallNotification(FuzzedDataProvider& provider)
         return;
     }
     MessageParcel messageParcel;
-    messageParcel.std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;

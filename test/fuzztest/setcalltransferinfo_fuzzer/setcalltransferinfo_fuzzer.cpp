@@ -122,7 +122,7 @@ void SetCallTransferInfo(FuzzedDataProvider &provider)
     MessageParcel messageParcel;
     CallTransferInfo info;
     std::string msg = provider.ConsumeRandomLengthString();
-    (void)memcpy_s(info.transferNum, kMaxNumberLen, msg, msg.size());
+    (void)memcpy_s(info.transferNum, kMaxNumberLen, msg.c_str(), msg.size());
     info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
     info.type = CallTransferType::TRANSFER_TYPE_BUSY;
     messageParcel.WriteInt32(slotId);

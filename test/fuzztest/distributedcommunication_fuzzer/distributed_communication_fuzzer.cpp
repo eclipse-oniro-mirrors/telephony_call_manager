@@ -30,7 +30,7 @@ void TestCommonController(const std::shared_ptr<DistributedDataController> &cont
     std::string stringValue = provider.ConsumeRandomLengthString();
     int32_t intValue = provider.ConsumeIntegral<int32_t>();
     AudioDeviceType audioDevType = static_cast<AudioDeviceType>(
-        size % static_cast<uint32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_PC));
+        provider.ConsumeIntegral<int32_t>() % static_cast<uint32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_PC));
     const char *charValue = provider.ConsumeRandomLengthString().c_str();
     uint32_t uintValue = provider.ConsumeIntegral<uint32_t>();
     DialParaInfo dialParaInfo;
@@ -73,9 +73,6 @@ void TestSinkController(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return;
     }
-    if (data == nullptr) {
-        return;
-    }
     auto controller = std::make_shared<DistributedDataSinkController>();
     if (controller == nullptr) {
         return;
@@ -112,14 +109,12 @@ void TestSourceController(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return;
     }
-    if (data == nullptr) {
-        return;
-    }
     auto controller = std::make_shared<DistributedDataSourceController>();
     if (controller == nullptr) {
         return;
     }
-    TestCommonController(controller, data, size);
+    TestCommonController(controller,  provider.ConsumeIntegral<int32_t>(),
+        provider.ConsumeIntegral<int32_t>());
 
     std::string stringValue = provider.ConsumeRandomLengthString();
     DistributedDataType distributedDataType = static_cast<DistributedDataType>(
