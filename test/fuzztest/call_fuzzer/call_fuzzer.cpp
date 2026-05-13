@@ -544,7 +544,7 @@ void AntiFraudServiceFunc(FuzzedDataProvider& provider)
     uint8_t size = provider.ConsumeIntegral<uint8_t>();
     char temp[size + 1];
     for (size_t i = 0; i < size; ++i) {
-        temp[i] = static_cast<char>(data[i]);
+        temp[i] = static_cast<char>(provider.ConsumeIntegral<uint8_t>());
     }
     temp[size] = '\0';
     antiFraudService->CreateDataShareHelper(slotId, temp);
@@ -617,8 +617,8 @@ void BluetoothCallConnectionFunc(FuzzedDataProvider& provider)
     bluetoothConnection->SetBtCallScoConnected(provider.ConsumeBool());
     bluetoothConnection->HfpDisConnectedEndBtCall();
     size_t length = provider.ConsumeIntegral<uint8_t>() / DATA_COUNT;
-    std::string hfpPhoneNumber = provide.ConsumeRandomLengthString(length);
-    std::string hfpContactName = provide.ConsumeRandomLengthString(length);
+    std::string hfpPhoneNumber = provider.ConsumeRandomLengthString(length);
+    std::string hfpContactName = provider.ConsumeRandomLengthString(length);
     bluetoothConnection->SetHfpContactName(hfpPhoneNumber, hfpContactName);
     bluetoothConnection->GetHfpContactName(hfpPhoneNumber);
 }
@@ -662,7 +662,7 @@ void CallMangerServiceFunc(FuzzedDataProvider& provider)
     callManagerService->SendUssdResponse(callId, provider.ConsumeRandomLengthString());
     callManagerService->OnStop();
     callManagerService->UnRegisterCallBack();
-    callManagerService->UnInit();.
+    callManagerService->UnInit();
     MessageParcel messageParcel;
     CallAttributeInfo info;
     info.accountId = provider.ConsumeIntegral<int32_t>();
