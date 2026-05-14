@@ -100,11 +100,13 @@ void CallSuperPrivacyControlManager::CloseAllCall()
 
 bool CallSuperPrivacyControlManager::GetIsChangeSuperPrivacyMode()
 {
+    std::shared_lock<ffrt::shared_mutex> lock(superPrivacyModeMutex_);
     return isChangeSuperPrivacyMode;
 }
 
 void CallSuperPrivacyControlManager::SetIsChangeSuperPrivacyMode(bool isChangeSuperPrivacy)
 {
+    std::unique_lock<ffrt::shared_mutex> lock(superPrivacyModeMutex_);
     isChangeSuperPrivacyMode = isChangeSuperPrivacy;
 }
 
@@ -112,11 +114,13 @@ void CallSuperPrivacyControlManager::SetOldSuperPrivacyMode()
 {
     int32_t privpacyMode = system::GetIntParameter(SUPER_PRIVACY_MODE_PARAM_KEY.c_str(), -1);
     TELEPHONY_LOGE("SetOldSuperPrivacyMode privpacyMode:%{public}d", privpacyMode);
+    std::unique_lock<ffrt::shared_mutex> lock(superPrivacyModeMutex_);
     oldSuperPrivacyMode = privpacyMode;
 }
 
 int32_t CallSuperPrivacyControlManager::GetOldSuperPrivacyMode()
 {
+    std::shared_lock<ffrt::shared_mutex> lock(superPrivacyModeMutex_);
     return oldSuperPrivacyMode;
 }
 
