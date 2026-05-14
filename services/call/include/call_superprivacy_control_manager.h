@@ -16,6 +16,7 @@
 #ifndef CALL_SUPERPRIVACY_CONTROL_MANAGER_H
 #define CALL_SUPERPRIVACY_CONTROL_MANAGER_H
 
+#include "ffrt.h"
 #include "singleton.h"
 
 
@@ -42,8 +43,9 @@ public:
     void CloseAllCall();
     
 private:
-    bool isChangeSuperPrivacyMode = false;
-    int32_t oldSuperPrivacyMode = -1;
+    bool isChangeSuperPrivacyMode_ = false;
+    int32_t oldSuperPrivacyMode_ = -1;
+    ffrt::shared_mutex superPrivacyModeMutex_;
     static void ParamChangeCallback(const char *key, const char *value, void *context);
     static void SuperPrivacyModeChangeEvent();
 };
