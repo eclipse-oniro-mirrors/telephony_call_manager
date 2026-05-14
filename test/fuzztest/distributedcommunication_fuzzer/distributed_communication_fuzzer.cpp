@@ -113,8 +113,7 @@ void TestSourceController(FuzzedDataProvider& provider)
     if (controller == nullptr) {
         return;
     }
-    TestCommonController(controller,  provider.ConsumeIntegral<int32_t>(),
-        provider.ConsumeIntegral<int32_t>());
+    TestCommonController(controller,  provider);
 
     std::string stringValue = provider.ConsumeRandomLengthString();
     DistributedDataType distributedDataType = static_cast<DistributedDataType>(

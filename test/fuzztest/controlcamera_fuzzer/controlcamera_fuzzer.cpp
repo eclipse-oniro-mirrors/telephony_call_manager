@@ -110,7 +110,7 @@ int32_t SetCameraZoom(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    float zoomRatio = provider.ConsumeIntegral<float>();
+    float zoomRatio = provider.ConsumeFloatingPoint<float>();
     MessageParcel messageParcel;
     messageParcel.WriteFloat(zoomRatio);
     std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
