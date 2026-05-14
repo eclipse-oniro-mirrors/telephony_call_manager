@@ -33,7 +33,8 @@ CsConference::CsConference() : ConferenceBase()
     maxSubCallLimits_ = CS_CONFERENCE_MAX_CALLS_CNT;
     // get from configuration file
 #ifdef ABILITY_CONFIG_SUPPORT
-    maxSubCallLimits_ = GetConfig(CS_CONFERENCE_SUB_CALL_LIMITS);
+    // avoid using the value from the configuration as the maximum value if it is smaller than the minimum value
+    maxSubCallLimits_ = std::max(GetConfig(CS_CONFERENCE_SUB_CALL_LIMITS), CS_CONFERENCE_MIN_CALLS_CNT);
 #endif
 }
 
