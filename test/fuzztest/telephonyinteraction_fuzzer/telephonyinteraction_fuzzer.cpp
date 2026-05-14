@@ -371,8 +371,8 @@ int32_t ReceiveUpdateCallMediaModeResponse(FuzzedDataProvider &provider)
     callModeReportInfo.callIndex = provider.ConsumeIntegral<int32_t>() % CALL_INDEX_MAX_NUM;
     callModeReportInfo.callMode = static_cast<ImsCallMode>(
         provider.ConsumeIntegral<int32_t>() % IMS_CALL_MODE_NUM);
-    callModeReportInfo.result = static_cast<VideoRequestResultType>(provider.ConsumeIntegral<int32_t>()) %
-        VIDEO_REQUEST_RESULT_TYPE_NUM;
+    callModeReportInfo.result = static_cast<VideoRequestResultType>(provider.ConsumeIntegral<int32_t>() %
+        VIDEO_REQUEST_RESULT_TYPE_NUM);
     messageParcel.WriteRawData((const void *)&callModeReportInfo, length);
     messageParcel.RewindRead(0);
     MessageParcel reply;

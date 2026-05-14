@@ -29,6 +29,7 @@ int32_t FormatPhoneNumberToE164(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
+    FuzzedDataProvider provider(data, size);
     MessageParcel messageParcel;
     std::string number = provider.ConsumeRandomLengthString();
     auto numberU16 = Str8ToStr16(number);
