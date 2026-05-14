@@ -43,11 +43,12 @@ public:
     void CloseAllCall();
     
 private:
+    static void ParamChangeCallback(const char *key, const char *value, void *context);
+    static void SuperPrivacyModeChangeEvent();
+    
     bool isChangeSuperPrivacyMode_ = false;
     int32_t oldSuperPrivacyMode_ = -1;
     ffrt::shared_mutex superPrivacyModeMutex_;
-    static void ParamChangeCallback(const char *key, const char *value, void *context);
-    static void SuperPrivacyModeChangeEvent();
 };
 } // namespace Telephony
 } // namespace OHOS
