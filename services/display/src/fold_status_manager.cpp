@@ -16,8 +16,8 @@
 #include "fold_status_manager.h"
 
 #include "telephony_log_wrapper.h"
-#include "syspara/parameters.h"
 #include "call_dialog.h"
+#include "call_manager_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -85,7 +85,7 @@ void FoldStatusManager::FoldStatusListener::OnFoldStatusChanged(Rosen::FoldStatu
 
 bool FoldStatusManager::IsSmallFoldDevice()
 {
-    std::string screenType = system::GetParameter(FOLD_PRODUCT_TYPE_KEY, "0,0,0,0");
+    std::string screenType = CallManagerUtils::GetSystemParameter(FOLD_PRODUCT_TYPE_KEY, "0,0,0,0");
     TELEPHONY_LOGI("IsSmallFoldDevice foldType is %{public}s", screenType.c_str());
     if (screenType.empty()) {
         return false;

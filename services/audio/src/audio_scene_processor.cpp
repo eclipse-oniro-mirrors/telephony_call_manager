@@ -19,6 +19,7 @@
 #include "alerting_state.h"
 #include "incoming_state.h"
 #include "call_control_manager.h"
+#include "call_manager_utils.h"
 #include "cs_call_state.h"
 #include "holding_state.h"
 #include "ims_call_state.h"
@@ -247,7 +248,7 @@ bool AudioSceneProcessor::SwitchIncoming()
         } else {
             TELEPHONY_LOGI("isStartBroadcast: %{public}d, isNeedSilent: %{public}d, isNotWearWatch: %{public}d",
                 isStartBroadcast, isNeedSilent, isNotWearWatch);
-            if (system::GetParameter("const.product.devicetype", "") == "wearable") {
+            if (CallManagerUtils::GetSystemParameter("const.product.devicetype", "") == "wearable") {
                 audioControlManager->StopRingtone();
                 audioControlManager->PlayForNoRing();
             }

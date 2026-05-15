@@ -18,6 +18,7 @@
 
 #include "call_control_manager.h"
 #include "call_dialog.h"
+#include "call_manager_utils.h"
 #include "call_object_manager.h"
 #include "common_event.h"
 #include "common_event_manager.h"
@@ -34,7 +35,6 @@
 
 #include "want.h"
 #include "uri.h"
-#include "parameters.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -73,7 +73,7 @@ int32_t SatelliteCallControl::IsAllowedSatelliteDialCall()
     int32_t satelliteConnected = std::atoi(is_satellite_connected.c_str());
     if (err == TELEPHONY_SUCCESS && satelliteConnected == SATELLITE_CONNECTED) {
         TELEPHONY_LOGI("satellite service is connected");
-        std::string tempLevel = OHOS::system::GetParameter("persist.thermal.log.satcomm", "-1");
+        std::string tempLevel = CallManagerUtils::GetSystemParameter("persist.thermal.log.satcomm", "-1");
         if (tempLevel != "-1") {
             int32_t temp = std::atoi(tempLevel.c_str());
             SetSatcommTempLevel(temp);
@@ -145,7 +145,7 @@ void SatelliteCallControl::HandleSatelliteCallStateUpdate(sptr<CallBase> &call,
             SetShowDialog(true);
         }
     }
-    std::string model = OHOS::system::GetParameter("const.build.product", "0");
+    std::string model = CallManagerUtils::GetSystemParameter("const.build.product", "0");
     if (model != "") {
         return;
     }

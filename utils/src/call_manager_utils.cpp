@@ -14,8 +14,13 @@
  */
 
 #include "call_manager_utils.h"
+
+#include "bundle_mgr_interface.h"
 #include "call_manager_base.h"
 #include "call_object_manager.h"
+#include "iservice_registry.h"
+#include "parameters.h"
+#include "system_ability_definition.h"
 #include "want_params_wrapper.h"
 
 namespace OHOS {
@@ -33,7 +38,8 @@ bool CallManagerUtils::IsForcedReportVoiceCall(const CallAttributeInfo &info)
     return call->IsForcedReportVoiceCall();
 }
 
-void CallManagerUtils::WriteCallAttributeInfo(const CallAttributeInfo &info, MessageParcel &messageParcel)
+__attribute__((noinline)) void CallManagerUtils::WriteCallAttributeInfo(
+    const CallAttributeInfo &info, MessageParcel &messageParcel)
 {
     messageParcel.WriteCString(info.accountNumber);
     messageParcel.WriteCString(info.bundleName);
@@ -73,7 +79,7 @@ void CallManagerUtils::WriteCallAttributeInfo(const CallAttributeInfo &info, Mes
     messageParcel.WriteInt32(static_cast<int32_t>(info.rttState));
 }
 
-bool CallManagerUtils::IsBundleInstalled(const std::string &bundleName, int32_t userId)
+__attribute__((noinline)) bool CallManagerUtils::IsBundleInstalled(const std::string &bundleName, int32_t userId)
 {
     bool isInstalled = false;
     sptr<ISystemAbilityManager> systemAbilityManager =
@@ -110,6 +116,12 @@ void CallManagerUtils::WriteVoipCallInfo(const CallAttributeInfo &info, MessageP
     messageParcel.WriteInt32(info.voipCallInfo.uid);
     messageParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
     }
+}
+
+__attribute__((noinline)) std::string CallManagerUtils::GetSystemParameter(
+    const std::string &key, const std::string &defaultVal)
+{
+    return system::GetParameter(key, defaultVal);
 }
 } // namespace Telephony
 } // namespace OHOS

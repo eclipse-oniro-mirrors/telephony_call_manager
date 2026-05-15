@@ -16,19 +16,20 @@
 #ifndef CALL_MANAGER_UTILS_H
 #define CALL_MANAGER_UTILS_H
 
-#include "call_manager_info.h"
-#include "message_parcel.h"
 #include "bundle_mgr_proxy.h"
-#include "bundle_mgr_interface.h"
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace Telephony {
+
+struct CallAttributeInfo;
+
 class CallManagerUtils {
 public:
-    static void WriteCallAttributeInfo(const CallAttributeInfo &info, MessageParcel &messageParcel);
-    static bool IsBundleInstalled(const std::string &bundleName, int32_t userId);
+    static __attribute__((noinline)) void WriteCallAttributeInfo(
+        const CallAttributeInfo &info, MessageParcel &messageParcel);
+    static __attribute__((noinline)) bool IsBundleInstalled(const std::string &bundleName, int32_t userId);
+    static __attribute__((noinline)) std::string GetSystemParameter(
+        const std::string &key, const std::string &defaultVal);
 
 private:
     static bool IsForcedReportVoiceCall(const CallAttributeInfo &info);
