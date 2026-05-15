@@ -21,6 +21,7 @@
 #include "antifraud_cloud_service.h"
 #include "anti_fraud_service_client.h"
 #include "common_type.h"
+#include "hitrace/tracechain.h"
 #include "telephony_log_wrapper.h"
 #include "iservice_registry.h"
  
@@ -206,6 +207,10 @@ int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int
             TELEPHONY_LOGI("call ending, no need to detect");
             return -1;
         }
+    }
+    OHOS::HiviewDFX::HiTraceId chainId = OHOS::HiviewDFX::HiTraceChain::GetId();
+    if (!chainId.IsValid()) {
+        chainId = OHOS::HiviewDFX::HiTraceChain::Begin("StartAntiFraudService", HiTraceFlag::HITRACE_FLAG_INCLUDE_ASYNC);
     }
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
     auto listener = std::make_shared<AntiFraudDetectResListenerImpl>(phoneNum, slotId, index);

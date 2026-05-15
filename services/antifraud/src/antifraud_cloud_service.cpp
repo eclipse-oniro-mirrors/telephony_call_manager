@@ -17,6 +17,7 @@
 
 #include <chrono>
 #include <cJSON.h>
+#include "hitrace/tracechain.h"
 #include <iomanip>
 #include <limits>
 #include <openssl/sha.h>
@@ -31,7 +32,6 @@
 namespace OHOS {
 namespace Telephony {
 constexpr size_t BOUNDARY_LENGTH = 32;
-constexpr size_t REQUEST_NO_LENGTH = 10;
 constexpr size_t SERIAL_NUM_LEN = 16;
 constexpr int BASE64_NUMBER2 = 2;
 constexpr int COMMON_TIME_OUT = 5000;
@@ -104,8 +104,9 @@ std::string AntiFraudCloudService::GeneratePayload(const OHOS::AntiFraudService:
         TELEPHONY_LOGE("Failed to create json object");
         return "";
     }
+    OHOS::HiviewDFX::HiTraceId chainId = OHOS::HiviewDFX::HiTraceChain::GetId();
     cJSON_AddStringToObject(root, "modelCaller", "com.hsdr");
-    cJSON_AddStringToObject(root, "reqNo", GenerateRandomString(REQUEST_NO_LENGTH).c_str());
+    cJSON_AddStringToObject(root, "reqNo", std::to_string(chainId.GetChainId()).c_str());
     cJSON_AddStringToObject(root, "calleeId", "15564984");
     cJSON_AddStringToObject(root, "osType", "1");
     cJSON_AddStringToObject(root, "serviceType", "00000002");
