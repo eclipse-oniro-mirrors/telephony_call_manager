@@ -1105,6 +1105,7 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
 
     if (call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
         OHOS::HiviewDFX::HiTraceId chainId = OHOS::HiviewDFX::HiTraceChain::GetId();
+        AAFwk::WantParams params = call->GetExtraParams();
         params.SetParam("traceChainId", AAFwk::String::Box(std::to_string(chainId.GetChainId())));
         params.SetParam("traceFlags", AAFwk::String::Box(std::to_string(chainId.GetFlags())));
         callPtr->SetExtraParams(params);
