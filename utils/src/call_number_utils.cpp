@@ -20,12 +20,12 @@
 #include "asyoutypeformatter.h"
 #include "call_ability_report_proxy.h"
 #include "call_manager_errors.h"
+#include "call_manager_utils.h"
 #include "call_voice_assistant_manager.h"
 #include "cellular_call_connection.h"
 #include "cellular_data_client.h"
 #include "core_service_client.h"
 #include "number_identity_data_base_helper.h"
-#include "parameters.h"
 #include "phonenumbers/phonenumber.pb.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_types.h"
@@ -323,7 +323,7 @@ void CallNumberUtils::NumberLocationUpdate(const sptr<CallBase> &callObjectPtr)
 
 void CallNumberUtils::YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPtr)
 {
-    if (OHOS::system::GetParameter("const.global.region", "CN") != "CN") {
+    if (CallManagerUtils::GetSystemParameter("const.global.region", "CN") != "CN") {
         TELEPHONY_LOGI("not the chinese version, no need to query markinfo.");
         return;
     }

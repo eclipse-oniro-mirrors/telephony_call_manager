@@ -14,9 +14,9 @@
  */
 
 #include "interoperable_communication_manager.h"
+#include "call_manager_utils.h"
 #include "interoperable_server_manager.h"
 #include "interoperable_client_manager.h"
-#include "parameters.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -40,7 +40,7 @@ void InteroperableCommunicationManager::OnDeviceOnline(const DistributedHardware
     uint16_t devType = deviceInfo.deviceTypeId;
     {
         std::lock_guard<ffrt::mutex> lock(mutex_);
-        std::string ownType = system::GetParameter("const.product.devicetype", "");
+        std::string ownType = CallManagerUtils::GetSystemParameter("const.product.devicetype", "");
         if (devType == DEV_PHONE && ownType == "wearable") {
             role_ = InteroperableRole::OTHERS;
         } else if (devType == DEV_WATCH) {
@@ -75,7 +75,7 @@ void InteroperableCommunicationManager::OnDeviceOffline(const DistributedHardwar
     std::string networkId = deviceInfo.networkId;
     std::string devName = deviceInfo.deviceName;
     uint16_t devType = deviceInfo.deviceTypeId;
-    std::string ownType = system::GetParameter("const.product.devicetype", "");
+    std::string ownType = CallManagerUtils::GetSystemParameter("const.product.devicetype", "");
     if (devType != DEV_WATCH && ownType != "wearable") {
         TELEPHONY_LOGE("not interoperable device");
         return;

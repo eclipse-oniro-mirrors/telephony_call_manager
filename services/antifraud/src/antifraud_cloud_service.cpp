@@ -22,10 +22,10 @@
 #include <openssl/sha.h>
 #include <openssl/hmac.h>
 #include <parameter.h>
-#include <parameters.h>
 #include <random>
 #include <sstream>
 #include "base64.h"
+#include "call_manager_utils.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -402,7 +402,7 @@ uint64_t AntiFraudCloudService::GenerateRandomLong()
 
 std::string AntiFraudCloudService::GetOsVersion()
 {
-    return system::GetParameter("const.ohos.fullname", "");
+    return CallManagerUtils::GetSystemParameter("const.ohos.fullname", "");
 }
 
 std::string AntiFraudCloudService::GetDeviceSerial()
@@ -418,7 +418,7 @@ std::string AntiFraudCloudService::GetDeviceSerial()
 
 std::string AntiFraudCloudService::GetRomVersion()
 {
-    std::string fullVersion = system::GetParameter("const.product.software.version", "");
+    std::string fullVersion = CallManagerUtils::GetSystemParameter("const.product.software.version", "");
     return GetSubstringBeforeSymbol(fullVersion, "(");
 }
 

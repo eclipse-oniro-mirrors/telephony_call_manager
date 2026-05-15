@@ -14,12 +14,12 @@
  */
 
 #include "audio_device_manager.h"
-#include "parameters.h"
 #include "audio_control_manager.h"
 #include "bluetooth_call_manager.h"
 #include "bluetooth_device_state.h"
 #include "call_ability_report_proxy.h"
 #include "call_manager_hisysevent.h"
+#include "call_manager_utils.h"
 #include "call_object_manager.h"
 #include "earpiece_device_state.h"
 #include "inactive_device_state.h"
@@ -88,7 +88,7 @@ void AudioDeviceManager::Init()
         .address = { 0 },
     };
     info_.audioDeviceList.push_back(earpiece);
-    if (system::GetParameter("const.product.devicetype", "") == "wearable") {
+    if (CallManagerUtils::GetSystemParameter("const.product.devicetype", "") == "wearable") {
         isEarpieceAvailable_ = false;
     }
     callAudioMode_.audioMode = static_cast<int32_t>(AudioMode::AUDIO_MODE_DEFAULT);

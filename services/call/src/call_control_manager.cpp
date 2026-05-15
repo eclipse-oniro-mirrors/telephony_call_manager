@@ -28,6 +28,7 @@
 #include "call_dialog.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
+#include "call_manager_utils.h"
 #include "call_number_utils.h"
 #include "call_records_manager.h"
 #include "call_manager_base.h"
@@ -1452,7 +1453,8 @@ int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::
 
 bool CallControlManager::IsSupportSetVoipInfo()
 {
-    std::string readSetVoipCallInfo = system::GetParameter(KEY_CONST_TELEPHONY_READ_SET_VOIP_CALL_INFO, "");
+    std::string readSetVoipCallInfo =
+        CallManagerUtils::GetSystemParameter(KEY_CONST_TELEPHONY_READ_SET_VOIP_CALL_INFO, "");
     if (readSetVoipCallInfo.compare("false") == 0) {
         return false;
     }
