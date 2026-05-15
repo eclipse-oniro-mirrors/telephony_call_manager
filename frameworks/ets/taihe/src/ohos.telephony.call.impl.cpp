@@ -852,7 +852,7 @@ static void GetCallWaitingStatusCallback(int32_t slotId, uintptr_t opq, ani_obje
 
     TaiheCallManager::GetInstance().RegisterCallBack();
     std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
-    if (nullptr == cb) {
+    if (cb == nullptr) {
         TELEPHONY_LOGE("AniCallbackInfo is null");
         ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
         return;
@@ -902,7 +902,7 @@ static void SetCallWaitingCallback(int32_t slotId, bool activate, uintptr_t opq,
 
     TaiheCallManager::GetInstance().RegisterCallBack();
     std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
-    if (nullptr == cb) {
+    if (cb == nullptr) {
         TELEPHONY_LOGE("AniCallbackInfo is null");
         ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
         return;
@@ -953,7 +953,7 @@ static void GetCallRestrictionStatusCallback(int32_t slotId, ::ohos::telephony::
 
     TaiheCallManager::GetInstance().RegisterCallBack();
     std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
-    if (nullptr == cb) {
+    if (cb == nullptr) {
         TELEPHONY_LOGE("AniCallbackInfo is null");
         ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
         return;
@@ -1008,7 +1008,7 @@ static void SetCallRestrictionCallback(int32_t slotId, ::ohos::telephony::call::
 
     TaiheCallManager::GetInstance().RegisterCallBack();
     std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
-    if (nullptr == cb) {
+    if (cb == nullptr) {
         TELEPHONY_LOGE("AniCallbackInfo is null");
         ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
         return;
@@ -1069,7 +1069,7 @@ static void SetCallRestrictionPasswordCallback(int32_t slotId, ::taihe::string_v
 
     TaiheCallManager::GetInstance().RegisterCallBack();
     std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
-    if (nullptr == cb) {
+    if (cb == nullptr) {
         TELEPHONY_LOGE("AniCallbackInfo is null");
         ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
         return;
@@ -1123,7 +1123,7 @@ static void GetCallTransferInfoCallback(int32_t slotId, ::ohos::telephony::call:
 
     TaiheCallManager::GetInstance().RegisterCallBack();
     std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
-    if (nullptr == cb) {
+    if (cb == nullptr) {
         TELEPHONY_LOGE("AniCallbackInfo is null");
         ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
         return;
@@ -1192,7 +1192,7 @@ static void SetCallTransferCallback(int32_t slotId, ::ohos::telephony::call::Cal
 
     TaiheCallManager::GetInstance().RegisterCallBack();
     std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
-    if (nullptr == cb) {
+    if (cb == nullptr) {
         TELEPHONY_LOGE("AniCallbackInfo is null");
         ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
         return;
@@ -1243,7 +1243,7 @@ static void CloseUnfinishedUssdCallback(int32_t slotId, uintptr_t opq, ani_objec
 
     TaiheCallManager::GetInstance().RegisterCallBack();
     std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();
-    if (nullptr == cb) {
+    if (cb == nullptr) {
         TELEPHONY_LOGE("AniCallbackInfo is null");
         ConvertErrorForBusinessError(TELEPHONY_ERR_LOCAL_PTR_NULL);
         return;
