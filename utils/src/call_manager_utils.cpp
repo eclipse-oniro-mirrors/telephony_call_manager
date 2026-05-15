@@ -39,7 +39,7 @@ bool CallManagerUtils::IsForcedReportVoiceCall(const CallAttributeInfo &info)
 }
 
 __attribute__((noinline)) void CallManagerUtils::WriteCallAttributeInfo(
-        const CallAttributeInfo &info, MessageParcel &messageParcel)
+    const CallAttributeInfo &info, MessageParcel &messageParcel)
 {
     messageParcel.WriteCString(info.accountNumber);
     messageParcel.WriteCString(info.bundleName);
