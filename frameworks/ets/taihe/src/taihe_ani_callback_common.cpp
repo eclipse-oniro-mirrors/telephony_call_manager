@@ -95,7 +95,7 @@ void AniCallbackInfo::DetachThread()
 
 ani_status AniCommonUtils::GetAniEnv(ani_vm* vm, ani_env** env)
 {
-    if (nullptr == vm) {
+    if (vm == nullptr) {
         TELEPHONY_LOGE("vm is null");
         return ANI_ERROR;
     }
@@ -106,11 +106,11 @@ ani_status AniCommonUtils::GetAniEnv(ani_vm* vm, ani_env** env)
 
 void AniCommonUtils::ExecAsyncCallbackPromise(ani_env *env, ani_resolver deferred, ani_ref data, ani_ref businessError)
 {
-    if (nullptr == env) {
+    if (env == nullptr) {
         TELEPHONY_LOGE("env is null");
         return;
     }
-    if (nullptr == deferred) {
+    if (deferred == nullptr) {
         TELEPHONY_LOGE("deferred is null");
         return;
     }
