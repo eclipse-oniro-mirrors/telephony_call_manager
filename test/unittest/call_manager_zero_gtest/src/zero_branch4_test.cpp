@@ -936,6 +936,7 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_003, TestSize.Level0)
     scenarioJson["Procedures"] = nullptr;
     callManagerHisysevent->voipProcedureCallInfo_[callId] = scenarioJson;
     callManagerHisysevent->RecordVoipProcedure(callId, VoipProcedureEvent::PUSH_REPORT_INCOMING_CALL, 100);
+    callManagerHisysevent->RecordVoipProcedure(-1, VoipProcedureEvent::PUSH_REPORT_INCOMING_CALL, 100);
     callId = "test_call_null_value";
     scenarioJson = nlohmann::json::value_t::null;
     callManagerHisysevent->voipProcedureCallInfo_[callId] = scenarioJson;
