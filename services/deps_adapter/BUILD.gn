@@ -1,0 +1,98 @@
+# Copyright (C) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+call_manager_path = "//base/telephony/call_manager"
+
+declare_args() {
+  isNeedCameraDep = defined(global_parts_info) &&
+    defined(global_parts_info.multimedia_camera_framework) &&
+    global_parts_info.multimedia_camera_framework
+
+  isNeedScreenLockDep = defined(global_parts_info) &&
+    defined(global_parts_info.theme_screenlock_mgr) &&
+    global_parts_info.theme_screenlock_mgr
+
+  isNeedSmsDep = defined(global_parts_info) &&
+    defined(global_parts_info.telephony_sms_mms) &&
+    global_parts_info.telephony_sms_mms
+}
+
+isNeedCompileCmAdapter = isNeedCameraDep ||
+  isNeedScreenLockDep ||
+  isNeedSmsDep
+
+if (isNeedCompileCmAdapter)
+{
+  ohos_shared_library("tel_cm_deps_adapter") {
+    sanitize = {
+      cfi = true
+      cfi_cross_dso = true
+      cfi_no_nvcall = true
+      debug = false
+    }
+    branch_protector_ret = "pac_ret"
+
+    include_dirs = [
+      "${call_manager_path}/services/deps_adapter/include",
+    ]
+
+    sources = [
+      "${call_manager_path}/services/deps_adapter/src/common_deps_adapter.cpp",
+    ]
+
+    external_deps = [
+      "ability_runtime:abilitykit_native",
+      "hilog:libhilog",
+      "c_utils:utils",
+      "graphic_surface:surface",
+      "core_service:libtel_common",
+    ]
+    cm_deps_adapter_defines = []
+
+    if (isNeedCameraDep) {
+      external_deps += [ "camera_framework:camera_framework" ]
+      cm_deps_adapter_defines += [ "ABILITY_CAMERA_FRAMEWORK_SUPPORT" ]
+    }
+
+    if (isNeedScreenLockDep) {
+      external_deps += [ "screenlock_mgr:screenlock_client" ]
+      cm_deps_adapter_defines += [ "ABILITY_SCREENLOCKMGR_SUPPORT" ]
+    }
+
+    if (isNeedSmsDep) {
+      external_deps += [ "sms_mms:tel_sms_mms_api" ]
+      cm_deps_adapter_defines += [ "ABILITY_SMS_SUPPORT" ]
+    }
+
+    cflags_cc = [
+      "-fno-asynchronous-unwind-tables",
+      "-fno-unwind-tables",
+      "-fvisibility=hidden",
+    ]
+    
+    ldflags = []
+
+    defines = [
+      "TELEPHONY_LOG_TAG = \"CallManager\"",
+      "LOG_DOMAIN = 0xD001F10",
+      "LOG_TAG = \"CallManager\"",
+    ]
+
+    defines += cm_deps_adapter_defines
+
+    part_name = "call_manager"
+    subsystem_name = "telephony"
+  }
+}

@@ -17,9 +17,6 @@
 #define TELEPHONY_REJECT_CALL_SMS_H
 
 #include "call_state_listener_base.h"
-#ifdef ABILITY_SMS_SUPPORT
-#include "sms_service_manager_client.h"
-#endif
 
 namespace OHOS {
 namespace Telephony {

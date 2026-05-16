@@ -15,11 +15,15 @@
 
 #include "reject_call_sms.h"
 
+#include "dlfcn.h"
+
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
+constexpr const char* LIB_TEL_CM_ADAPTER_PATH = "libtel_cm_deps_adapter.z.so";
+
 RejectCallSms::RejectCallSms() {}
 
 void RejectCallSms::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content)
@@ -35,9 +39,22 @@ void RejectCallSms::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSen
 void RejectCallSms::SendMessage(int32_t slotId, const std::u16string &desAddr, const std::u16string &text)
 {
 #ifdef ABILITY_SMS_SUPPORT
-    Singleton<SmsServiceManagerClient>::GetInstance()
-        .SendMessage(slotId, desAddr, ConvertToUtf16(""), text, nullptr, nullptr);
-    TELEPHONY_LOGI("reject call message sended");
+    using SendMessageFunc = int (*)(int, const char16_t*,
+        const char16_t*, unsigned int, unsigned int);
+
+    void *adapterHandler = dlopen(LIB_TEL_CM_ADAPTER_PATH, RTLD_LAZY);
+    if (adapterHandler == nullptr) {
+        return;
+    }
+
+    SendMessageFunc sendMsgFunc =
+        reinterpret_cast<SendMessageFunc>(dlsym(adapterHandler, "SendMessage"));
+    if (sendMsgFunc != nullptr) {
+        int ret = sendMsgFunc(slotId, desAddr.c_str(), text.c_str(), desAddr.size(), text.size());
+        TELEPHONY_LOGI("reject call message sended, ret=%{public}d", ret);
+    }
+
+    dlclose(adapterHandler);
 #endif
 }
 

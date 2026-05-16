@@ -2218,10 +2218,6 @@ void CallControlManager::StartFlashRemind()
             }
         );
     }
-    if (!incomingFlashReminder_->IsFlashRemindNecessary()) {
-        incomingFlashReminder_ = nullptr;
-        return;
-    }
     incomingFlashReminder_->StartFlashRemind();
 }
 
