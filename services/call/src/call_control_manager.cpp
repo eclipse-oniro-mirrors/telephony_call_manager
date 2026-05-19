@@ -1801,6 +1801,7 @@ void CallControlManager::SystemAbilityListener::OnAddSystemAbility(int32_t syste
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     CommonBroadcastSubscriber();
+    Nearlink
     ContactsBroadcastSubscriber();
     SatcommBroadcastSubscriber();
     SuperPrivacyModeBroadcastSubscriber();
@@ -1835,7 +1836,6 @@ void CallControlManager::SystemAbilityListener::CommonBroadcastSubscriber()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_REMOTEDEVICE_NAME_UPDATE);
-    matchingSkills.AddEvent("usual.event.nearlink.remotedevice.NAME_UPDATE");
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SHUTDOWN);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
@@ -1844,6 +1844,19 @@ void CallControlManager::SystemAbilityListener::CommonBroadcastSubscriber()
     subscriberPtrList_.emplace_back(subscriberPtr);
     bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberPtr);
     TELEPHONY_LOGI("CommonBroadcastSubscriber subscribeResult = %{public}d", subscribeResult);
+}
+
+void CallControlManager::SystemAbilityListener::NearlinkBroadcastSubscriber()
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent("usual.event.nearlink.remotedevice.NAME_UPDATE");
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    subscriberInfo.SetPermission("ohos.permission.MANAGE_NEARLINK");
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
+    subscriberPtrList_.emplace_back(subscriberPtr);
+    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberPtr);
+    TELEPHONY_LOGI("NearlinkBroadcastSubscriber subscribeResult = %{public}d", subscribeResult);
 }
 
 void CallControlManager::SystemAbilityListener::ContactsBroadcastSubscriber()
