@@ -375,6 +375,10 @@ bool AudioControlManager::PreHandleAnswerdState(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
     auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    if (audioDeviceManager == nullptr || callStateProcessor == nullptr) {
+        return false;
+    }
     auto callId = callObjectPtr->GetCallID();
     if (!callObjectPtr->GetAnsweredByPhone()) {
         if (nextState == TelCallState::CALL_STATUS_ANSWERED && priorState == TelCallState::CALL_STATUS_INCOMING) {
@@ -382,6 +386,7 @@ bool AudioControlManager::PreHandleAnswerdState(
             callStateProcessor->DeleteCall(callId, priorState);
             callObjectPtr->SetIsAnsweredByPhone(true);
             MuteRinger();
+            audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
             return true;
         }
     }

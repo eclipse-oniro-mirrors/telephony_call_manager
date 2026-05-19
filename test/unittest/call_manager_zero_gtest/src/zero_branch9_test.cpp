@@ -724,6 +724,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_SwitchIncoming_SelectDevice, Function | Medi
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
     auto audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     DialParaInfo dialParaInfo;
     dialParaInfo.callType = CallType::TYPE_IMS;
     dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
@@ -744,6 +745,12 @@ HWTEST_F(ZeroBranch9Test, Telephony_SwitchIncoming_SelectDevice, Function | Medi
     CallStateToApp tmpVoIPCallState = callControlManager->VoIPCallState_;
     callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_ANSWERED;
     audioSceneProcessor->SwitchIncoming();
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
+    audioControl->PreHandleAnswerdState(call, TelCallState::CALL_STATUS_INCOMING,
+        TelCallState::CALL_STATUS_ANSWERED);
+    call->SetIsAnsweredByPhone(false);
+    EXPECT_TRUE(audioControl->PreHandleAnswerdState(call, TelCallState::CALL_STATUS_INCOMING,
+        TelCallState::CALL_STATUS_ANSWERED));
     EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
     voicePtr->isQueryedBroadcastSwitch = tmpIsQueryedBroadcastSwitch;
     voicePtr->isBroadcastSwitchOn = tmpIsBroadcastSwitchOn;
