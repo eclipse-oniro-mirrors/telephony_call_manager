@@ -1801,7 +1801,7 @@ void CallControlManager::SystemAbilityListener::OnAddSystemAbility(int32_t syste
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     CommonBroadcastSubscriber();
-    Nearlink
+    NearlinkBroadcastSubscriber();
     ContactsBroadcastSubscriber();
     SatcommBroadcastSubscriber();
     SuperPrivacyModeBroadcastSubscriber();
