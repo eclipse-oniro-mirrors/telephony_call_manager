@@ -223,6 +223,7 @@ private:
 
     private:
         void CommonBroadcastSubscriber();
+        void NearlinkBroadcastSubscriber();
         void ContactsBroadcastSubscriber();
         void SatcommBroadcastSubscriber();
         void SuperPrivacyModeBroadcastSubscriber();
