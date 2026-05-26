@@ -523,9 +523,6 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
     OHOS::AntiFraudService::StartDetectionResult antiFraudResult;
     antiFraudResult.voiceDetectionResult.modelVersion = GetInt<int32_t>(data, size, index++);
     antiFraudResult.voiceDetectionResult.fraudType = GetInt<int32_t>(data, size, index++);
-    OHOS::AntiFraudService::AntiFraudResult antiFraudResult;
-    antiFraudResult.modelVersion = GetInt<int32_t>(data, size, index++);
-    antiFraudResult.fraudType = GetInt<int32_t>(data, size, index++);
     antiFraudService->RecordDetectResult(antiFraudResult, fdp.ConsumeRandomLengthString(), slotId, count);
     antiFraudService->StopAntiFraudService(slotId, count);
     antiFraudService->SetStoppedSlotId(slotId);
