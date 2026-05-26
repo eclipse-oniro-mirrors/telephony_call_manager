@@ -499,8 +499,13 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
     int32_t slotId = GetInt<int32_t>(data, size, index++);
     int32_t count = GetInt<int32_t>(data, size, index++);
     FuzzedDataProvider fdp(data, size);
-    antiFraudService->CheckAntiFraudService(fdp.ConsumeRandomLengthString(), slotId, count);
-    antiFraudService->StartAntiFraudService(fdp.ConsumeRandomLengthString(), slotId, count);
+    std::string phoneNum = fdp.ConsumeRandomLengthString();
+    OHOS::AntiFraudService::AfsDetectType detectType;
+    detectType.type_ = GetInt<int32_t>(data, size, index++);
+    detectType.isFirstTime_ = (GetInt<int32_t>(data, size, index++) != 0);
+    detectType.callNum_ = phoneNum;
+    detectType.voiceType_ = GetInt<int32_t>(data, size, index++);
+    antiFraudService->StartAntiFraudService(phoneNum, slotId, count, detectType);
     char temp[size + 1];
     for (size_t i = 0; i < size; ++i) {
         temp[i] = static_cast<char>(data[i]);
@@ -509,11 +514,15 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
     antiFraudService->CreateDataShareHelper(slotId, temp);
     antiFraudService->IsSwitchOn(fdp.ConsumeRandomLengthString());
     antiFraudService->IsAntiFraudSwitchOn();
+    antiFraudService->IsAntiFraudContactsEnabled();
     antiFraudService->IsUserImprovementPlanSwitchOn();
     antiFraudService->InitParams();
     antiFraudService->GetStoppedSlotId();
     antiFraudService->GetStoppedIndex();
     antiFraudService->AnonymizeText();
+    OHOS::AntiFraudService::StartDetectionResult antiFraudResult;
+    antiFraudResult.voiceDetectionResult.modelVersion = GetInt<int32_t>(data, size, index++);
+    antiFraudResult.voiceDetectionResult.fraudType = GetInt<int32_t>(data, size, index++);
     OHOS::AntiFraudService::AntiFraudResult antiFraudResult;
     antiFraudResult.modelVersion = GetInt<int32_t>(data, size, index++);
     antiFraudResult.fraudType = GetInt<int32_t>(data, size, index++);
@@ -523,10 +532,9 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
     antiFraudService->SetStoppedIndex(count);
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
     antiFraudAdapter->ReleaseAntiFraud();
-    std::string phoneNum = fdp.ConsumeRandomLengthString();
-    auto listener = std::make_shared<Telephony::AntiFraudService::AntiFraudDetectResListenerImpl>(
+    auto listener = std::make_shared<Telephony::AntiFraudService::AntiFraudStartDetectResListenerImpl>(
         phoneNum, slotId, index);
-    listener->HandleAntiFraudDetectRes(antiFraudResult);
+    listener->HandleAntiFraudStartDetectRes(antiFraudResult);
 }
 #ifdef SUPPORT_DSOFTBUS
 void InterOperableCommunicationManagerFunc(const uint8_t *data, size_t size)
