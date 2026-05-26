@@ -12,30 +12,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef ANTIFRAUD_ADAPTER_H
 #define ANTIFRAUD_ADAPTER_H
- 
+
 #include <securec.h>
 #include "antifraud_service.h"
 #include "errors.h"
- 
+
 namespace OHOS {
 namespace Telephony {
-typedef OHOS::ErrCode (*PfnAntiFraudVoiceCheck)(std::string phoneNum);
-typedef OHOS::ErrCode (*PfnAntiFraudVoiceDetect)(
-    const std::shared_ptr<OHOS::AntiFraudService::AntiFraudDetectResListener> &listener);
-typedef OHOS::ErrCode (*PfnStopAntiFraudVoiceDetect)();
+using PfnAntiFraudDetectCheck = OHOS::ErrCode (*)(const OHOS::AntiFraudService::AfsDetectType &detectType);
+using PfnAntiFraudStartDetect = OHOS::ErrCode (*)(
+    const std::shared_ptr<OHOS::AntiFraudService::AntiFraudStartDetectResListener> &listener,
+    const OHOS::AntiFraudService::AfsDetectType &detectType);
+using PfnStopAntiFraudVoiceDetect = OHOS::ErrCode (*)();
 class AntiFraudAdapter {
     DECLARE_DELAYED_SINGLETON(AntiFraudAdapter)
- 
+
 public:
     void *GetLibAntiFraud();
     void ReleaseAntiFraud();
-    int32_t CheckAntiFraud(std::string phoneNum);
-    int32_t DetectAntiFraud(const std::shared_ptr<OHOS::AntiFraudService::AntiFraudDetectResListener> &listener);
+    OHOS::ErrCode AntiFraudDetectCheck(const OHOS::AntiFraudService::AfsDetectType &detectType);
+    OHOS::ErrCode AntiFraudStartDetect(
+        const std::shared_ptr<OHOS::AntiFraudService::AntiFraudStartDetectResListener> &listener,
+        const OHOS::AntiFraudService::AfsDetectType &detectType);
+    OHOS::ErrCode StopAntiFraudVoiceDetect();
     int32_t StopAntiFraud();
- 
 private:
     void *libAntiFraud_ = nullptr;
 };
