@@ -18,7 +18,7 @@
 namespace OHOS::AntiFraudService {
 
 template <typename T>
-inline bool ReleaseIfFalse(bool expr, T*& obj)
+inline bool releaseIfFalse(bool expr, T*& obj)
 {
     if (!expr) {
         delete obj;
