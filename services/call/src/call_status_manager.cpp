@@ -1800,7 +1800,6 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
         callPtr->SetIsEccContact(true);
     }
     callPtr->SetOriginalCallType(info.originalCallType);
-    TELEPHONY_LOGD("originalCallType:%{public}d", info.originalCallType);
     SetCallParams(callPtr, info);
     return callPtr;
 }
@@ -1824,7 +1823,8 @@ void CallStatusManager::SetCallParams(const sptr<CallBase> &callPtr, const CallD
         callPtr->SetExtraParams(params);
     }
     if (info.state == TelCallState::CALL_STATUS_INCOMING || info.state == TelCallState::CALL_STATUS_WAITING ||
-        (info.state == TelCallState::CALL_STATUS_DIALING && (info.index == 0 || IsDcCallConneceted()))) {
+        (info.state == TelCallState::CALL_STATUS_DIALING && (info.index == 0 || IsDcCallConneceted() ||
+        (info.index > 0 && info.callType == CallType::TYPE_BLUETOOTH)))) {
         TELEPHONY_LOGI("NumberLocationUpdate start");
         wptr<CallBase> callBaseWeakPtr = callPtr;
         ffrt::submit([callBaseWeakPtr, info]() {
