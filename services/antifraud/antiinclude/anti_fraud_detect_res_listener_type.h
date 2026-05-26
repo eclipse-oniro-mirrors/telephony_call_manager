@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,30 +12,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-#ifndef ANTI_FRAUD_DETECT_RES_LISTENER_TYPE_H
-#define ANTI_FRAUD_DETECT_RES_LISTENER_TYPE_H
- 
+
+#ifndef AFS_DETECT_TYPE_H
+#define AFS_DETECT_TYPE_H
+
 #include <cstdint>
 #include <string>
+#include <vector>
  
 #include "parcel.h"
- 
+
 namespace OHOS::AntiFraudService {
-struct AntiFraudInnerResult final : public Parcelable {
+ 
+class AfsDetectType final : public Parcelable {
 public:
-    AntiFraudInnerResult() = default;
-    AntiFraudInnerResult(bool result, std::string text, float pvalue);
- 
+    AfsDetectType() = default;
+    AfsDetectType(uint32_t type, bool isFirstTime, std::string callNum, uint32_t voiceType);
+
     bool Marshalling(Parcel& out) const override;
- 
-    static AntiFraudInnerResult* Unmarshalling(Parcel& in);
- 
-    bool result_ = false;
-    std::string text_ = "";
-    float pvalue_ = 0.0f;
+    static AfsDetectType* Unmarshalling(Parcel& in);
+
+    uint32_t type_ = 0;
+    bool isFirstTime_ = 0;
+    std::string callNum_;
+    uint32_t voiceType_ = 0;
 };
-};
- 
- 
-#endif
+
+}  // namespace OHOS::AntiFraudService
+
+#endif  // AFS_DETECT_TYPE_H
