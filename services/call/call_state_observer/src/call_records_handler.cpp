@@ -46,7 +46,8 @@ int32_t CallRecordsHandler::AddCallLogInfo(const sptr<CallBase> &callObjectPtr, 
     }
 
     DataShare::DataShareValuesBucket bucket;
-    TELEPHONY_LOGI("callLog Insert begin.");
+    TELEPHONY_LOGI("callLog Insert begin, markType: %{public}d, displayName length: %{public}zu",
+        info.numberMarkInfo.markType, displayName.length());
     MakeCallLogInsertBucket(bucket, info, displayName, numberLocation);
     bool ret = callDataPtr_->Insert(bucket);
     if (!ret) {
