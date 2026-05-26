@@ -425,31 +425,6 @@ struct CallAttributeInfo {
      * - 2：vonr
      */
     int32_t imsDomain = 0;
-
-    /**
-     * Indicates the anti-fraud result of voice semantic detection.
-     * - 0：no risk
-     * - 1：riskVoiceSemantic
-     */
-    int32_t voiceSemanticDetectionResult = 0;
-    /**
-     * Indicates the anti-fraud result of speech synthesis detection.
-     * - 0：no risk
-     * - 1：risk
-     */
-    int32_t voiceSynthesisDetectionResult = 0;
-    /**
-     * Indicates the anti-fraud result of xoip call detection.
-     * - 0：no risk
-     * - 1：risk
-     */
-    int32_t XoipTransferDetectionResult = 0;
-    /**
-     * Indicates the probability of result of voice synthesis.
-     * - 0：no risk
-     * - 1：risk
-     */
-    std::string voiceSynthesisResultProb = "0.00";
 };
 
 /**
