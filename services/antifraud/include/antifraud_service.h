@@ -12,23 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef ANTIFRAUD_SERVICE_H
 #define ANTIFRAUD_SERVICE_H
  
 #include "ffrt.h"
 #include <queue>
 #include "call_status_manager.h"
-#include "anti_fraud_service_client.h"
 #include "anti_fraud_service_client_type.h"
-#include "anti_fraud_detect_res_listener.h"
+#include "anti_fraud_start_detect_res_listener.h"
 #include "singleton.h"
 #include "datashare_helper.h"
- 
+
 namespace OHOS {
 namespace Telephony {
 inline const std::string ANTIFRAUD_SWITCH = "spamshield_call_live_detection";
 inline const std::string USER_IMPROPLAN_SWITCH = "spamshield_call_live_report";
+inline const std::string ANTIFRAUD_CONTACTS_ENABLED = "SPAMSHIELD_IS_CONTACTS_VOICE_DETECT_ENABLED";
 inline const std::string USER_SETTINGSDATA_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100?Proxy=true";
 constexpr int32_t SELECT_RULE_LENGTH = 11;
@@ -51,21 +51,22 @@ enum class AntiFraudState {
      */
     ANTIFRAUD_STATE_FINISHED,
 };
- 
+
 class AntiFraudService {
     DECLARE_DELAYED_SINGLETON(AntiFraudService)
- 
+
 public:
     void SetCallStatusManager(std::shared_ptr<CallStatusManager> callStatusManager);
     bool IsSwitchOn(const std::string switchName);
     bool IsAntiFraudSwitchOn();
+    bool IsAntiFraudContactsEnabled();
     bool IsUserImprovementPlanSwitchOn();
-    void RecordDetectResult(const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult,
+    void RecordDetectResult(const OHOS::AntiFraudService::StartDetectionResult &antiFraudResult,
         std::string resultPhoneNum, int32_t slotId, int32_t index);
-    int32_t StartAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index);
+    int32_t StartAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index,
+        const OHOS::AntiFraudService::AfsDetectType &detectType);
     int32_t StopAntiFraudService(int32_t slotId, int32_t index);
-    std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(
-        int32_t systemAbilityId, const char *uri);
+    std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t systemAbilityId, const char *uri);
     void AddRuleToConfig(const std::string rulesName, void *config);
     int AnonymizeText();
 
@@ -74,32 +75,30 @@ private:
     int32_t GetStoppedIndex();
     void SetStoppedSlotId(int32_t slotId);
     void SetStoppedIndex(int32_t index);
-    int32_t CheckAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index);
- 
+    int32_t CheckAntiFraudService(const OHOS::AntiFraudService::AfsDetectType &detectType);
+
 private:
-    class AntiFraudDetectResListenerImpl : public OHOS::AntiFraudService::AntiFraudDetectResListener {
+    class AntiFraudStartDetectResListenerImpl : public OHOS::AntiFraudService::AntiFraudStartDetectResListener {
     public:
-        AntiFraudDetectResListenerImpl(std::string phoneNum, int slotId, int index) : AntiFraudDetectResListener(),
+        AntiFraudStartDetectResListenerImpl(std::string phoneNum, int slotId, int index):
             phoneNum_(phoneNum), slotId_(slotId), index_(index) {}
-        void HandleAntiFraudDetectRes(const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult) override;
+        void HandleAntiFraudStartDetectRes(
+            const OHOS::AntiFraudService::StartDetectionResult &detectionResult) override;
+
     private:
         std::string phoneNum_;
         int32_t slotId_;
         int32_t index_;
     };
- 
+
 private:
     void InitParams();
-    bool isResultFraud_ = false;
-    int fraudDetectErr_ = 0;
-    int fraudDetectVersion_ = 0;
-    int fraudDetectType_ = 0;
-    float fraudDetectProb_ = 0.0;
     std::string fraudDetectText_ = "";
- 
+
     int32_t antiFraudState_ = 0;
     int32_t stoppedSlotId_ = -1;
     int32_t stoppedIndex_ = -1;
+    OHOS::AntiFraudService::AntiFraudResultExt antiFraudResultExt_ {};
 
     ffrt::mutex mutex_;
     ffrt::mutex fraudMutex_;
