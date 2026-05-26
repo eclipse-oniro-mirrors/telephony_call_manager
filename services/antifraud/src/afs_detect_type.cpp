@@ -28,8 +28,8 @@ inline bool ReleaseIfFalse(bool expr, T*& obj)
     return false;
 }
 
-AfsDetectType::AfsDetectType(uint32_t type, bool isFirstTime, std::string callNum, uint32_t voiceType):
-    type_(type), isFirstTime_(isFirstTime), callNum_(callNum), voiceType_(voiceType) {}
+AfsDetectType::AfsDetectType(uint32_t type, bool isFirstTime, std::string callNum, uint32_t voiceType)
+    :type_(type), isFirstTime_(isFirstTime), callNum_(callNum), voiceType_(voiceType) {}
 
 bool AfsDetectType::Marshalling(Parcel& out) const
 {
