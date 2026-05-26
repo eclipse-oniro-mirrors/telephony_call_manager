@@ -25,6 +25,7 @@
 #include "call_incoming_filter_manager.h"
 #include "time_wait_helper.h"
 #include "voip_call_manager_info.h"
+#include "anti_fraud_service_client_type.h"
 #ifdef SUPPORT_RTT_CALL
 #include "ims_rtt_manager.h"
 #endif
@@ -69,7 +70,7 @@ public:
     void CallFilterCompleteResult(const CallDetailInfo &info);
     int32_t HandleVoipEventReportInfo(const VoipCallEventInfo &info);
     void HandleCeliaCall(sptr<CallBase> &call);
-    void TriggerAntiFraud(int32_t antiFraudState);
+    void TriggerAntiFraud(int32_t antiFraudState, const OHOS::AntiFraudService::AntiFraudResultExt &antiFraudResultExt);
     int32_t GetAntiFraudSlotId();
     int32_t GetAntiFraudIndex();
     static int32_t GetDevProvisioned();
