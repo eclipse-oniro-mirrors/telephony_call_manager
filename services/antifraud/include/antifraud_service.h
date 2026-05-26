@@ -80,8 +80,8 @@ private:
 private:
     class AntiFraudStartDetectResListenerImpl : public OHOS::AntiFraudService::AntiFraudStartDetectResListener {
     public:
-        AntiFraudStartDetectResListenerImpl(std::string phoneNum, int slotId, int index):
-            phoneNum_(phoneNum), slotId_(slotId), index_(index) {}
+        AntiFraudStartDetectResListenerImpl(std::string phoneNum, int slotId, int index)
+            :phoneNum_(phoneNum), slotId_(slotId), index_(index) {}
         void HandleAntiFraudStartDetectRes(
             const OHOS::AntiFraudService::StartDetectionResult &detectionResult) override;
 
