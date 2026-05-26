@@ -1856,13 +1856,17 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_012, TestSize.Level0)
     CallDetailInfo info;
     callStatusManager->callDetailsInfo_[0].callVec.push_back(info);
     callStatusManager->antiFraudSlotId_ = 0;
-    callStatusManager->TriggerAntiFraud(static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_DEFAULT));
+    OHOS::AntiFraudService::AntiFraudResultExt antiFraudResultExt;
+    callStatusManager->TriggerAntiFraud(
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_DEFAULT), antiFraudResultExt);
     callStatusManager->antiFraudIndex_ = -1;
     callStatusManager->antiFraudSlotId_ = 0;
-    callStatusManager->TriggerAntiFraud(static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK));
+    callStatusManager->TriggerAntiFraud(
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK), antiFraudResultExt);
     EXPECT_EQ(callStatusManager->antiFraudSlotId_, -1);
     callStatusManager->antiFraudSlotId_ = 0;
-    callStatusManager->TriggerAntiFraud(static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED));
+    callStatusManager->TriggerAntiFraud(
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED), antiFraudResultExt);
     EXPECT_EQ(callStatusManager->antiFraudSlotId_, -1);
     sleep(WAIT_TIME);
 }
