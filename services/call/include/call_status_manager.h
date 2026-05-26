@@ -126,7 +126,10 @@ private:
     void SetAntiFraudSlotId(int32_t slotId);
     void SetAntiFraudIndex(int32_t index);
     void SetupAntiFraudService(const sptr<CallBase> &call, const CallDetailInfo &info);
+    uint32_t GetAntiFraudDetectType(int32_t slotId);
     void StopAntiFraudDetect(sptr<CallBase> &call, const CallDetailInfo &info);
+    void UpdateAntiFraudState(sptr<CallBase> &call, int32_t antiFraudState,
+        const OHOS::AntiFraudService::AntiFraudResultExt &antiFraudResultExt);
     void UpdateAntiFraudState(sptr<CallBase> &call, int32_t antiFraudState);
     bool IsContactPhoneNum(const std::string &phoneNum);
     void HandleVideoCallInAdvsecMode(const sptr<CallBase> &call, const CallDetailInfo &info);
