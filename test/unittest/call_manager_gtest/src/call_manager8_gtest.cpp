@@ -1303,7 +1303,7 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, TestSize.Level0)
     EXPECT_FALSE(antiFraudService->IsSwitchOn(switchName));
     EXPECT_FALSE(antiFraudService->IsSwitchOn(ANTIFRAUD_SWITCH));
 
-    OHOS::AntiFraudService::AntiFraudResult fraudResult;
+    OHOS::AntiFraudService::StartDetectionResult fraudResult;
     std::string phoneNum = "123456";
     antiFraudService->stoppedSlotId_ = 0;
     antiFraudService->stoppedIndex_ = 0;
@@ -1311,18 +1311,21 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, TestSize.Level0)
     EXPECT_EQ(antiFraudService->antiFraudState_, 3);
     antiFraudService->RecordDetectResult(fraudResult, phoneNum, 0, 1);
     EXPECT_EQ(antiFraudService->antiFraudState_, 3);
-    fraudResult.result = true;
+    fraudResult.voiceDetectionResult.result = true;
     antiFraudService->RecordDetectResult(fraudResult, phoneNum, 1, 0);
     EXPECT_EQ(antiFraudService->antiFraudState_, 2);
     antiFraudService->RecordDetectResult(fraudResult, phoneNum, 0, 0);
     EXPECT_EQ(antiFraudService->stoppedIndex_, -1);
 
-    EXPECT_NE(antiFraudService->CheckAntiFraudService(phoneNum, 0, 0), 0);
-    EXPECT_NE(antiFraudService->StartAntiFraudService(phoneNum, 0, 0), 0);
+    OHOS::AntiFraudService::AfsDetectType detectType;
+    detectType.type_ = 0;
+    detectType.isFirstTime_ = true;
+    detectType.callNum_ = phoneNum;
+    detectType.voiceType_ = 0;
+    EXPECT_NE(antiFraudService->StartAntiFraudService(phoneNum, 0, 0, detectType), 0);
     EXPECT_NE(antiFraudService->StopAntiFraudService(0, 0), 0);
 
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
-    antiFraudAdapter->DetectAntiFraud(nullptr);
     antiFraudAdapter->ReleaseAntiFraud();
     EXPECT_EQ(antiFraudAdapter->libAntiFraud_, nullptr);
 }
