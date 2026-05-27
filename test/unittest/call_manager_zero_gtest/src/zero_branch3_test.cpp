@@ -849,8 +849,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_002, TestSize.Level0)
 HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_003, TestSize.Level0)
 {
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
-    callControlManager->UnInit();
-    callControlManager->CallStateObserve();
     callControlManager->Init();
     callControlManager->CallStateObserve();
     ASSERT_NE(callControlManager->GetCallWaiting(INVALID_CALLID), TELEPHONY_SUCCESS);

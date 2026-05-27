@@ -134,6 +134,7 @@ group("unittest") {
   if (call_manager_feature_support_dsoftbus) {
     deps += [ "distributed_communication_test:distributed_communication_test" ]
   }
+  deps += [ "call_manager_special_test:tel_call_manager_special0_test" ]
   deps += [ "call_manager_special_test:tel_call_manager_special1_test" ]
   deps += [ "call_manager_special_test:tel_call_manager_special2_test" ]
   deps += [ "call_manager_special_test:tel_call_manager_special3_test" ]
