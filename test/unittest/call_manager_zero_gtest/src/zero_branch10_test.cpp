@@ -78,6 +78,7 @@ void ZeroBranch10Test::SetUpTestCase()
     
 void ZeroBranch10Test::TearDownTestCase()
 {
+    DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
     sleep(WAIT_TIME);
 }
 
