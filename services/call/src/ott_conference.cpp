@@ -59,7 +59,7 @@ int32_t OttConference::LeaveFromConference(int32_t callId)
     std::lock_guard<ffrt::mutex> lock(conferenceMutex_);
     if (subCallIdSet_.find(callId) != subCallIdSet_.end()) {
         subCallIdSet_.erase(callId);
-        if (mainCallId_ == callId) {
+        if (mainCallId_ == callId && !subCallIdSet_.empty()) {
             mainCallId_ = *subCallIdSet_.begin();
         }
     } else {
