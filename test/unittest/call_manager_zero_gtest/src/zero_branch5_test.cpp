@@ -306,11 +306,11 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_006, TestSize.Level0)
 }
 
 /**
- * @tc.number   Telephony_CallStatusCallbackStub_006
+ * @tc.number   Telephony_CallStatusCallbackStub_OnSendMmiCodeResult
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_006, TestSize.Level0)
+HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_OnSendMmiCodeResult, TestSize.Level0)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     MessageParcel messageParcel;
