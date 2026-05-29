@@ -61,7 +61,6 @@ public:
     bool ShouldSwitchAlerting() const;
     bool ShouldSwitchIncoming() const;
     AudioDeviceType GetInitAudioDeviceType(const sptr<CallBase> &callObjectPtr = nullptr) const;
-    AudioDeviceType GetInitAudioDeviceType() const;
     std::set<sptr<CallBase>> GetCallList();
     sptr<CallBase> GetCurrentActiveCall();
     AudioInterruptState GetAudioInterruptState();
@@ -80,7 +79,6 @@ public:
     void CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState,
         VideoStateType nextVideoState, AudioDeviceType &initDeviceType, AudioDevice &device);
     void UpdateDeviceType(const sptr<CallBase> &callObjectPtr = nullptr);
-    void UpdateDeviceTypeForVideoOrSatelliteCall();
     void UpdateDeviceTypeForCrs(AudioDeviceType deviceType);
     void UpdateDeviceTypeForVideoDialing();
     void MuteNetWorkRingTone(bool isMute = true);
