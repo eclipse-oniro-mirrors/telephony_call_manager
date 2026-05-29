@@ -317,7 +317,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_OnSendMmiCodeResult, 
     MessageParcel reply;
     messageParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
     MmiCodeInfo info;
-    length = sizeof(MmiCodeInfo);
+    int32_t length = sizeof(MmiCodeInfo);
     messageParcel.WriteInt32(length — 1);
     info.result = 0;
     std::string msg("hello");
