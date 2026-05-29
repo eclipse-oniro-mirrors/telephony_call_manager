@@ -60,6 +60,7 @@ public:
     bool ShouldSwitchDialing() const;
     bool ShouldSwitchAlerting() const;
     bool ShouldSwitchIncoming() const;
+    AudioDeviceType GetInitAudioDeviceType(const sptr<CallBase> &callObjectPtr = nullptr) const;
     AudioDeviceType GetInitAudioDeviceType() const;
     std::set<sptr<CallBase>> GetCallList();
     sptr<CallBase> GetCurrentActiveCall();
@@ -78,6 +79,7 @@ public:
         sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState, VideoStateType nextVideoState);
     void CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState,
         VideoStateType nextVideoState, AudioDeviceType &initDeviceType, AudioDevice &device);
+    void UpdateDeviceType(const sptr<CallBase> &callObjectPtr = nullptr);
     void UpdateDeviceTypeForVideoOrSatelliteCall();
     void UpdateDeviceTypeForCrs(AudioDeviceType deviceType);
     void UpdateDeviceTypeForVideoDialing();
@@ -146,6 +148,7 @@ private:
     void PlayRingtone(const sptr<CallBase>& incomingCall,
         const CallAttributeInfo& info, const ContactInfo& contactInfo);
     void PlayRing(const sptr<CallBase>& incomingCall, const CallAttributeInfo& info, const ContactInfo& contactInfo);
+    AudioDeviceType GetInitAudioDeviceTypeOfRemote() const;
 
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
