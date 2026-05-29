@@ -318,7 +318,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_OnSendMmiCodeResult, 
     messageParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
     MmiCodeInfo info;
     int32_t length = sizeof(MmiCodeInfo);
-    messageParcel.WriteInt32(length — 1);
+    messageParcel.WriteInt32(length - 1);
     info.result = 0;
     std::string msg("hello");
     int32_t msgLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
