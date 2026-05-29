@@ -306,6 +306,29 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_006, TestSize.Level0)
 }
 
 /**
+ * @tc.number   Telephony_CallStatusCallbackStub_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_006, TestSize.Level0)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    MessageParcel messageParcel;
+    MessageParcel reply;
+    messageParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    MmiCodeInfo info;
+    length = sizeof(MmiCodeInfo);
+    messageParcel.WriteInt32(length — 1);
+    info.result = 0;
+    std::string msg("hello");
+    int32_t msgLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    memcpy_s(info.message, kMaxNumberLen, msg.c_str(), msgLength);
+    messageParcel.WriteRawData((const void *)&info, length);
+    messageParcel.RewindRead(0);
+    EXPECT_EQ(callStatusCallback->OnSendMmiCodeResult(messageParcel, reply), TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+/**
  * @tc.number   Telephony_CallStatusCallbackStub_007
  * @tc.name     test error branch
  * @tc.desc     Function test
