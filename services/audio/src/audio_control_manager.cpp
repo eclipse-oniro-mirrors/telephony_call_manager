@@ -315,10 +315,11 @@ void AudioControlManager::UpdateDeviceType(const sptr<CallBase> &callObjectPtr)
             TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
             SetAudioDevice(device);
         } else {
-            if (initDeviceType != audioDeviceManager->GetCurrentAudioDevice()) {
+            AudioDeviceType currentDeviceType = audioDeviceManager->GetCurrentAudioDevice();
+            if (initDeviceType != currentDeviceType) {
                 device.deviceType = initDeviceType;
-                TELEPHONY_LOGI("GetCurrentAudioDevice: %{public}d,set device type, type: %{public}d",
-                    audioDeviceManager->GetCurrentAudioDevice(), static_cast<int32_t>(device.deviceType));
+                TELEPHONY_LOGI("currentDeviceType: %{public}d,set device type, type: %{public}d",
+                    currentDeviceType, static_cast<int32_t>(device.deviceType));
                 SetAudioDevice(device);
             }
         }
@@ -1190,11 +1191,6 @@ bool AudioControlManager::StopForNoRing()
 
 AudioDeviceType AudioControlManager::GetInitAudioDeviceTypeOfRemote() const
 {
-    /**
-     * Init audio device type according to the priority in different call state:
-     * In voice call state, bluetooth sco > wired headset > earpiece > speaker
-     * In video call state, bluetooth sco > wired headset > speaker > earpiece
-     */
     if (AudioDeviceManager::IsDistributedCallConnected()) {
         return AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE;
     }
@@ -1234,6 +1230,11 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType(const sptr<CallBase>
             return device.deviceType;
         }
 #endif
+        /**
+         * Init audio device type according to the priority in different call state:
+         * In voice call state, bluetooth sco > wired headset > earpiece > speaker
+         * In video call state, bluetooth sco > wired headset > speaker > earpiece
+         */
         AudioDeviceType deviceType = GetInitAudioDeviceTypeOfRemote();
         if (deviceType != AudioDeviceType::DEVICE_UNKNOWN) {
             return deviceType;
