@@ -35,7 +35,7 @@ public:
     bool Query(std::string &numberLocation, DataShare::DataSharePredicates &predicates);
     bool QueryYellowPageAndMark(NumberMarkInfo &numberMarkInfo, DataShare::DataSharePredicates &predicates);
     bool SetMarkInfoValues(std::shared_ptr<DataShare::DataShareResultSet> &resultSet, NumberMarkInfo &numberMarkInfo);
-    static constexpr const char *NUMBER_IDENTITY_URI = "datashare:///numberlocationability";
+    static constexpr const char *NUMBER_IDENTITY_URI = "datashare:///com.ohos.numberlocationability";
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(std::string uri);
 };
