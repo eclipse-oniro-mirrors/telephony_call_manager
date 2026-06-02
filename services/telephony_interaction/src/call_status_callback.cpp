@@ -16,6 +16,7 @@
 #include "call_status_callback.h"
 
 #include "audio_control_manager.h"
+#include "call_manager_config.h"
 #include "call_ability_report_proxy.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
@@ -38,26 +39,31 @@ CallStatusCallback::CallStatusCallback() {}
 
 CallStatusCallback::~CallStatusCallback() {}
 
+void CallStatusCallback::FillVoipCallInfo(const CallReportInfo &info, CallDetailInfo &detailInfo)
+{
+    detailInfo.voipCallInfo.voipCallId = info.voipCallInfo.voipCallId;
+    detailInfo.voipCallInfo.userName = info.voipCallInfo.userName;
+    (detailInfo.voipCallInfo.userProfile).assign(
+        (info.voipCallInfo.userProfile).begin(), (info.voipCallInfo.userProfile).end());
+    detailInfo.voipCallInfo.extensionId = info.voipCallInfo.extensionId;
+    detailInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
+    detailInfo.voipCallInfo.abilityName = info.voipCallInfo.abilityName;
+    detailInfo.voipCallInfo.showBannerForIncomingCall = info.voipCallInfo.showBannerForIncomingCall;
+    detailInfo.voipCallInfo.isConferenceCall = info.voipCallInfo.isConferenceCall;
+    detailInfo.voipCallInfo.isVoiceAnswerSupported = info.voipCallInfo.isVoiceAnswerSupported;
+    detailInfo.voipCallInfo.isUserMuteRingToneAllowed = info.voipCallInfo.isUserMuteRingToneAllowed;
+    detailInfo.voipCallInfo.isDialingAllowedDuringCarrierCall =
+        info.voipCallInfo.isDialingAllowedDuringCarrierCall;
+    detailInfo.voipCallInfo.hasMicPermission = info.voipCallInfo.hasMicPermission;
+    detailInfo.voipCallInfo.isCapsuleSticky = info.voipCallInfo.isCapsuleSticky;
+    detailInfo.voipCallInfo.uid = info.voipCallInfo.uid;
+}
+
 int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
 {
     CallDetailInfo detailInfo;
     if (info.callType == CallType::TYPE_VOIP) {
-        detailInfo.voipCallInfo.voipCallId = info.voipCallInfo.voipCallId;
-        detailInfo.voipCallInfo.userName = info.voipCallInfo.userName;
-        (detailInfo.voipCallInfo.userProfile).assign(
-            (info.voipCallInfo.userProfile).begin(), (info.voipCallInfo.userProfile).end());
-        detailInfo.voipCallInfo.extensionId = info.voipCallInfo.extensionId;
-        detailInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
-        detailInfo.voipCallInfo.abilityName = info.voipCallInfo.abilityName;
-        detailInfo.voipCallInfo.showBannerForIncomingCall = info.voipCallInfo.showBannerForIncomingCall;
-        detailInfo.voipCallInfo.isConferenceCall = info.voipCallInfo.isConferenceCall;
-        detailInfo.voipCallInfo.isVoiceAnswerSupported = info.voipCallInfo.isVoiceAnswerSupported;
-        detailInfo.voipCallInfo.isUserMuteRingToneAllowed = info.voipCallInfo.isUserMuteRingToneAllowed;
-        detailInfo.voipCallInfo.isDialingAllowedDuringCarrierCall =
-            info.voipCallInfo.isDialingAllowedDuringCarrierCall;
-        detailInfo.voipCallInfo.hasMicPermission = info.voipCallInfo.hasMicPermission;
-        detailInfo.voipCallInfo.isCapsuleSticky = info.voipCallInfo.isCapsuleSticky;
-        detailInfo.voipCallInfo.uid = info.voipCallInfo.uid;
+        FillVoipCallInfo(info, detailInfo);
     }
     detailInfo.callType = info.callType;
     detailInfo.accountId = info.accountId;
@@ -66,7 +72,15 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
     detailInfo.callMode = info.callMode;
     detailInfo.voiceDomain = info.voiceDomain;
     detailInfo.mpty = info.mpty;
-    (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, info.accountNum, kMaxNumberLen);
+    if (info.callType == CallType::TYPE_VOIP &&
+        CallManagerConfig::ShouldConvertUsernameToPhoneNum(info.voipCallInfo.uid) &&
+        !info.voipCallInfo.userName.empty()) {
+        TELEPHONY_LOGW("UpdateCallReportInfo convert username to phone number");
+        (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, info.voipCallInfo.userName.c_str(),
+            std::min(static_cast<size_t>(kMaxNumberLen), info.voipCallInfo.userName.length()));
+    } else {
+        (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, info.accountNum, kMaxNumberLen);
+    }
     (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen, 0, kMaxBundleNameLen);
     sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndex(INIT_INDEX);
     if (callPtr != nullptr && callPtr->GetCallType() == CallType::TYPE_BLUETOOTH &&
