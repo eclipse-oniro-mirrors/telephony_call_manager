@@ -14,11 +14,9 @@
  */
 
 #include "call_manager_config.h"
-#include <cstdio>
 #include <securec.h>
 #include <unistd.h>
-#include <cstdlib>
-#include <cstring>
+#include <fstream>
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
@@ -27,9 +25,9 @@
 namespace OHOS {
 namespace Telephony {
 
-constexpr const char *PATH = "/system/etc/telephony/call_manager_config.json";
-constexpr const char *ITEM_HANG_UP_CELLULAR_CALL_BEFORE_ANSWER_LIST = "HangUpCellularCallBeforeAnswer";
-constexpr const char *ITEM_CONVERT_USERNAME_TO_PHONE_NUM_LIST = "ConvertUsernameToPhoneNum";
+constexpr const char PATH[] = "/system/etc/telephony/call_manager_config.json";
+constexpr const char ITEM_HANG_UP_CELLULAR_CALL_BEFORE_ANSWER_LIST[] = "HangUpCellularCallBeforeAnswer";
+constexpr const char ITEM_CONVERT_USERNAME_TO_PHONE_NUM_LIST[] = "ConvertUsernameToPhoneNum";
 constexpr int MAX_BYTE_LEN = 10 * 1024;
 constexpr int MAX_FEATURE_LIST_SIZE = 100;
 
@@ -57,16 +55,16 @@ void CallManagerConfig::Init()
     isInit_.store(true, std::memory_order_release);
 }
 
-std::string CallManagerConfig::BuildMatchKey(int32_t uid, const char *methodName)
+std::string CallManagerConfig::BuildMatchKey(int32_t uid, const std::string &methodName)
 {
     std::string bundleName = "";
     int32_t userId = 0;
     if (!TelephonyPermission::GetBundleNameByUid(uid, bundleName)) {
-        TELEPHONY_LOGW("%{public}s: GetBundleNameByUid failed, uid=%{public}d", methodName, uid);
+        TELEPHONY_LOGW("%{public}s: GetBundleNameByUid failed, uid=%{public}d", methodName.c_str(), uid);
         return "";
     }
     if (AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId) != 0) {
-        TELEPHONY_LOGW("%{public}s: GetOsAccountLocalIdFromUid failed, uid=%{public}d", methodName, uid);
+        TELEPHONY_LOGW("%{public}s: GetOsAccountLocalIdFromUid failed, uid=%{public}d", methodName.c_str(), uid);
         return "";
     }
     std::string appIdentifier = "";
@@ -78,35 +76,29 @@ std::string CallManagerConfig::BuildMatchKey(int32_t uid, const char *methodName
 bool CallManagerConfig::ShouldHangUpCellularCallBeforeAnswer(int32_t uid)
 {
     Init();
-    std::string matchKey = BuildMatchKey(uid, "HangUpCellularCallBeforeAnswer");
+    std::string matchKey = BuildMatchKey(uid, std::string("HangUpCellularCallBeforeAnswer"));
     if (matchKey.empty()) {
         return false;
     }
-    bool match = hangUpCellularCallBeforeAnswerList_.find(matchKey) != hangUpCellularCallBeforeAnswerList_.end();
-    return match;
+    return hangUpCellularCallBeforeAnswerList_.find(matchKey) != hangUpCellularCallBeforeAnswerList_.end();
 }
 
 bool CallManagerConfig::ShouldConvertUsernameToPhoneNum(int32_t uid)
 {
     Init();
-    std::string matchKey = BuildMatchKey(uid, "ConvertUsernameToPhoneNum");
+    std::string matchKey = BuildMatchKey(uid, std::string("ConvertUsernameToPhoneNum"));
     if (matchKey.empty()) {
         return false;
     }
-    bool match = convertUsernameToPhoneNumList_.find(matchKey) != convertUsernameToPhoneNumList_.end();
-    return match;
+    return convertUsernameToPhoneNumList_.find(matchKey) != convertUsernameToPhoneNumList_.end();
 }
 
 int32_t CallManagerConfig::ParserConfigJson()
 {
-    char *content = nullptr;
+    std::unique_ptr<char[]> content;
     int32_t ret = LoaderJsonFile(content, PATH);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("CallManagerConfig: load fail");
-        if (content != nullptr) {
-            free(content);
-            content = nullptr;
-        }
         return ret;
     }
     if (content == nullptr) {
@@ -114,9 +106,7 @@ int32_t CallManagerConfig::ParserConfigJson()
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
 
-    cJSON *root = cJSON_Parse(content);
-    free(content);
-    content = nullptr;
+    cJSON *root = cJSON_Parse(content.get());
     if (root == nullptr) {
         TELEPHONY_LOGW("CallManagerConfig: json root is error");
         return TELEPHONY_ERR_READ_DATA_FAIL;
@@ -131,14 +121,14 @@ int32_t CallManagerConfig::ParserConfigJson()
     return TELEPHONY_SUCCESS;
 }
 
-void CallManagerConfig::ParseFeatureList(const cJSON *root, const char *itemName,
+void CallManagerConfig::ParseFeatureList(const cJSON *root, const std::string &itemName,
     std::unordered_set<std::string> &featureList)
 {
-    cJSON *featureListItem = cJSON_GetObjectItem(root, itemName);
+    cJSON *featureListItem = cJSON_GetObjectItem(root, itemName.c_str());
     if (featureListItem != nullptr && cJSON_IsArray(featureListItem)) {
         int size = cJSON_GetArraySize(featureListItem);
         if (size <= 0 || size > MAX_FEATURE_LIST_SIZE) {
-            TELEPHONY_LOGW("CallManagerConfig: %{public}s size invalid, size=%{public}d", itemName, size);
+            TELEPHONY_LOGW("CallManagerConfig: %{public}s size invalid, size=%{public}d", itemName.c_str(), size);
             return;
         }
         for (int i = 0; i < size; i++) {
@@ -148,85 +138,51 @@ void CallManagerConfig::ParseFeatureList(const cJSON *root, const char *itemName
                 featureList.insert(bundleName);
             }
         }
-        TELEPHONY_LOGI("CallManagerConfig loaded %{public}s with %{public}zu items", itemName, featureList.size());
+        TELEPHONY_LOGI("CallManagerConfig loaded %{public}s with %{public}zu items", itemName.c_str(), featureList.size());
     } else {
-        TELEPHONY_LOGW("CallManagerConfig: %{public}s is invalid", itemName);
+        TELEPHONY_LOGW("CallManagerConfig: %{public}s is invalid", itemName.c_str());
     }
 }
 
-int32_t CallManagerConfig::LoaderJsonFile(char *&content, const char *path)
+int32_t CallManagerConfig::LoaderJsonFile(std::unique_ptr<char[]> &content, const std::string &path)
 {
-    long len = 0;
     char realPath[PATH_MAX] = { 0x00 };
-    if (realpath(path, realPath) == nullptr) {
+    if (realpath(path.c_str(), realPath) == nullptr) {
         TELEPHONY_LOGW("CallManagerConfig: realpath fail");
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
-    FILE *f = fopen(realPath, "rb");
-    if (f == nullptr) {
-        TELEPHONY_LOGW("CallManagerConfig: file is null");
+    std::ifstream file(realPath, std::ios::ate);
+    if (!file.is_open()) {
+        TELEPHONY_LOGW("CallManagerConfig: file open fail");
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
-    int ret_seek_end = fseek(f, 0, SEEK_END);
-    if (ret_seek_end != 0) {
-        TELEPHONY_LOGW("CallManagerConfig: fseek end fail");
-        CloseFile(f);
-        return TELEPHONY_ERR_READ_DATA_FAIL;
-    }
-    len = ftell(f);
-    int ret_seek_set = fseek(f, 0, SEEK_SET);
-    if (ret_seek_set != 0) {
-        TELEPHONY_LOGW("CallManagerConfig: fseek set fail");
-        CloseFile(f);
-        return TELEPHONY_ERR_READ_DATA_FAIL;
-    }
-    if (len == 0 || len > static_cast<long>(MAX_BYTE_LEN)) {
+    std::streamsize len = file.tellg();
+    if (len <= 0 || len > static_cast<std::streamsize>(MAX_BYTE_LEN)) {
         TELEPHONY_LOGW("CallManagerConfig: invalid file size");
-        CloseFile(f);
+        file.close();
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
-    int32_t ret = ReadFileContent(f, content, len);
-    if (ret != TELEPHONY_SUCCESS) {
-        CloseFile(f);
-        if (content != nullptr) {
-            free(content);
-            content = nullptr;
-        }
-        return ret;
-    }
-    CloseFile(f);
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerConfig::ReadFileContent(FILE *f, char *&content, long len)
-{
-    content = static_cast<char *>(malloc(len + 1));
-    if (f == nullptr || content == nullptr) {
-        TELEPHONY_LOGW("CallManagerConfig: file pointer is null or malloc fail");
+    file.seekg(0, std::ios::beg);
+    content = std::make_unique<char[]>(len + 1);
+    if (content == nullptr) {
+        TELEPHONY_LOGW("CallManagerConfig: malloc fail");
+        file.close();
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
-    if (memset_s(content, len + 1, 0, len + 1) != EOK) {
+    if (memset_s(content.get(), len + 1, 0, len + 1) != EOK) {
         TELEPHONY_LOGW("CallManagerConfig: memset_s fail");
-        free(content);
-        content = nullptr;
+        content.reset();
+        file.close();
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
-    size_t ret_read = fread(content, 1, len, f);
-    if (ret_read != static_cast<size_t>(len)) {
-        TELEPHONY_LOGW("CallManagerConfig: fread fail");
-        free(content);
-        content = nullptr;
+    if (!file.read(content.get(), len)) {
+        TELEPHONY_LOGW("CallManagerConfig: file read fail");
+        content.reset();
+        file.close();
         return TELEPHONY_ERR_READ_DATA_FAIL;
     }
+    file.close();
     return TELEPHONY_SUCCESS;
-}
-
-void CallManagerConfig::CloseFile(FILE *f)
-{
-    int ret_close = fclose(f);
-    if (ret_close != 0) {
-        TELEPHONY_LOGE("CallManagerConfig: fclose fail");
-    }
 }
 
 std::string CallManagerConfig::ParseString(const cJSON *value)
