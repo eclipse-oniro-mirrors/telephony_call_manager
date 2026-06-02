@@ -1016,20 +1016,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_ParseFeatureList_0400, Te
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_LoaderJsonFile_0200, TestSize.Level0)
 {
-    char *content = nullptr;
+    std::unique_ptr<char[]> content;
     int32_t result = CallManagerConfig::LoaderJsonFile(content, "/invalid/path/to/file.json");
-    EXPECT_NE(result, TELEPHONY_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_CallManagerConfig_ReadFileContent_0100
- * @tc.name     Test ReadFileContent with null file pointer
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_ReadFileContent_0100, TestSize.Level0)
-{
-    char *content = nullptr;
-    int32_t result = CallManagerConfig::ReadFileContent(nullptr, content, 100);
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 } // namespace Telephony
