@@ -37,7 +37,8 @@ private:
     static int32_t ParserConfigJson();
     static int32_t LoaderJsonFile(std::unique_ptr<char[]> &content, const std::string &path);
     static std::string ParseString(const cJSON *value);
-    static void ParseFeatureList(const cJSON *root, const std::string &itemName, std::unordered_set<std::string> &featureList);
+    static void ParseFeatureList(
+        const cJSON *root, const std::string &itemName, std::unordered_set<std::string> &featureList);
     static std::string BuildMatchKey(int32_t uid, const std::string &methodName);
 
     static std::unordered_set<std::string> hangUpCellularCallBeforeAnswerList_;
