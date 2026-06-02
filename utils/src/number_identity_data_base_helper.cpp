@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace Telephony {
-static constexpr const char *NUMBER_MARK_INFO_URI = "datashare:///numbermarkability/number_mark_info";
+static constexpr const char *NUMBER_MARK_INFO_URI = "datashare:///com.ohos.numbermarkability/number_mark_info";
 const char *NUMBER_LOCATION = "number_location";
 const char *MARK_TYPE = "markType";
 const char *MARK_CONTENT = "markContent";
