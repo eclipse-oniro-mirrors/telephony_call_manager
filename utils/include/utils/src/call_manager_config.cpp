@@ -138,7 +138,8 @@ void CallManagerConfig::ParseFeatureList(const cJSON *root, const std::string &i
                 featureList.insert(bundleName);
             }
         }
-        TELEPHONY_LOGI("CallManagerConfig loaded %{public}s with %{public}zu items", itemName.c_str(), featureList.size());
+        TELEPHONY_LOGI("CallManagerConfig loaded %{public}s with %{public}zu items",
+            itemName.c_str(), featureList.size());
     } else {
         TELEPHONY_LOGW("CallManagerConfig: %{public}s is invalid", itemName.c_str());
     }
