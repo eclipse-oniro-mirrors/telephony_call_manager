@@ -22,6 +22,7 @@
 #include <string>
 
 #include "bluetooth_hfp_ag.h"
+#include "call_manager_config.h"
 #include "call_manager_connect.h"
 #include "call_manager_service.h"
 #include "surface_utils.h"
@@ -854,6 +855,182 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumberToE164_0100, F
     std::u16string formatNumber = Str8ToStr16(formatBefore);
     EXPECT_EQ(CallManagerGtest::clientPtr_->FormatPhoneNumberToE164(phonyNumber, countryCode, formatNumber),
         RETURN_VALUE_IS_ZERO);
+}
+
+/******************************************** Test CallManagerConfig() **********************************************/
+
+/**
+ * @tc.number   Telephony_CallManagerConfig_Init_0100
+ * @tc.name     Test CallManagerConfig Init() function
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_Init_0100, TestSize.Level0)
+{
+    CallManagerConfig::Init();
+    EXPECT_TRUE(CallManagerConfig::isInit_.load());
+}
+
+/**
+ * @tc.number   Telephony_CallManagerConfig_ShouldHangUpCellularCallBeforeAnswer_0100
+ * @tc.name     Test ShouldHangUpCellularCallBeforeAnswer with invalid uid
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_ShouldHangUpCellularCallBeforeAnswer_0100, TestSize.Level0)
+{
+    bool result = CallManagerConfig::ShouldHangUpCellularCallBeforeAnswer(INVALID_NEGATIVE_ID);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerConfig_ShouldConvertUsernameToPhoneNum_0100
+ * @tc.name     Test ShouldConvertUsernameToPhoneNum with invalid uid
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_ShouldConvertUsernameToPhoneNum_0100, TestSize.Level0)
+{
+    bool result = CallManagerConfig::ShouldConvertUsernameToPhoneNum(INVALID_NEGATIVE_ID);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerConfig_BuildMatchKey_0100
+ * @tc.name     Test BuildMatchKey with invalid uid
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_BuildMatchKey_0100, TestSize.Level0)
+{
+    std::string result = CallManagerConfig::BuildMatchKey(INVALID_NEGATIVE_ID, "TestBuildMatchKey");
+    EXPECT_TRUE(result.empty());
+}
+
+/**
+ * @tc.number   Telephony_CallManagerConfig_ParseString_0100
+ * @tc.name     Test ParseString with null value
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_ParseString_0100, TestSize.Level0)
+{
+    std::string result = CallManagerConfig::ParseString(nullptr);
+    EXPECT_TRUE(result.empty());
+}
+
+/**
+ * @tc.number   Telephony_CallManagerConfig_ParseString_0200
+ * @tc.name     Test ParseString with valid cJSON string value
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_ParseString_0200, TestSize.Level0)
+{
+    cJSON *value = cJSON_CreateString("test_string");
+    std::string result = CallManagerConfig::ParseString(value);
+    EXPECT_EQ(result, "test_string");
+    cJSON_Delete(value);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerConfig_ParseString_0300
+ * @tc.name     Test ParseString with cJSON number value
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_ParseString_0300, TestSize.Level0)
+{
+    cJSON *value = cJSON_CreateNumber(123);
+    std::string result = CallManagerConfig::ParseString(value);
+    EXPECT_TRUE(result.empty());
+    cJSON_Delete(value);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerConfig_ParseFeatureList_0100
+ * @tc.name     Test ParseFeatureList with null root
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_ParseFeatureList_0100, TestSize.Level0)
+{
+    std::unordered_set<std::string> featureList;
+    CallManagerConfig::ParseFeatureList(nullptr, "TestItem", featureList);
+    EXPECT_TRUE(featureList.empty());
+}
+
+/**
+ * @tc.number   Telephony_CallManagerConfig_ParseFeatureList_0200
+ * @tc.name     Test ParseFeatureList with valid cJSON array
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_ParseFeatureList_0200, TestSize.Level0)
+{
+    cJSON *root = cJSON_CreateObject();
+    cJSON *array = cJSON_CreateArray();
+    cJSON_AddItemToArray(array, cJSON_CreateString("com.test.app1"));
+    cJSON_AddItemToArray(array, cJSON_CreateString("com.test.app2"));
+    cJSON_AddItemToObject(root, "TestItem", array);
+ 
+    std::unordered_set<std::string> featureList;
+    CallManagerConfig::ParseFeatureList(root, "TestItem", featureList);
+    EXPECT_EQ(featureList.size(), 2u);
+    EXPECT_TRUE(featureList.find("com.test.app1") != featureList.end());
+    EXPECT_TRUE(featureList.find("com.test.app2") != featureList.end());
+ 
+    cJSON_Delete(root);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerConfig_ParseFeatureList_0300
+ * @tc.name     Test ParseFeatureList with empty array
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_ParseFeatureList_0300, TestSize.Level0)
+{
+    cJSON *root = cJSON_CreateObject();
+    cJSON *array = cJSON_CreateArray();
+    cJSON_AddItemToObject(root, "TestItem", array);
+ 
+    std::unordered_set<std::string> featureList;
+    CallManagerConfig::ParseFeatureList(root, "TestItem", featureList);
+    EXPECT_TRUE(featureList.empty());
+ 
+    cJSON_Delete(root);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerConfig_ParseFeatureList_0400
+ * @tc.name     Test ParseFeatureList with non-array item
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_ParseFeatureList_0400, TestSize.Level0)
+{
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddItemToObject(root, "TestItem", cJSON_CreateString("not_an_array"));
+ 
+    std::unordered_set<std::string> featureList;
+    CallManagerConfig::ParseFeatureList(root, "TestItem", featureList);
+    EXPECT_TRUE(featureList.empty());
+ 
+    cJSON_Delete(root);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerConfig_LoaderJsonFile_0200
+ * @tc.name     Test LoaderJsonFile with invalid path
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_LoaderJsonFile_0200, TestSize.Level0)
+{
+    char *content = nullptr;
+    int32_t result = CallManagerConfig::LoaderJsonFile(content, "/invalid/path/to/file.json");
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerConfig_ReadFileContent_0100
+ * @tc.name     Test ReadFileContent with null file pointer
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerConfig_ReadFileContent_0100, TestSize.Level0)
+{
+    char *content = nullptr;
+    int32_t result = CallManagerConfig::ReadFileContent(nullptr, content, 100);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 } // namespace Telephony
 } // namespace OHOS
