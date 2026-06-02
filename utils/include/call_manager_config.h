@@ -21,6 +21,7 @@
 #include <cJSON.h>
 #include <atomic>
 #include <mutex>
+#include <memory>
 #include "ffrt.h"
 
 namespace OHOS {
@@ -34,12 +35,10 @@ public:
 private:
     static void Init();
     static int32_t ParserConfigJson();
-    static int32_t LoaderJsonFile(char *&content, const char *path);
-    static void CloseFile(FILE *f);
+    static int32_t LoaderJsonFile(std::unique_ptr<char[]> &content, const std::string &path);
     static std::string ParseString(const cJSON *value);
-    static void ParseFeatureList(const cJSON *root, const char *itemName, std::unordered_set<std::string> &featureList);
-    static int32_t ReadFileContent(FILE *f, char *&content, long len);
-    static std::string BuildMatchKey(int32_t uid, const char *methodName);
+    static void ParseFeatureList(const cJSON *root, const std::string &itemName, std::unordered_set<std::string> &featureList);
+    static std::string BuildMatchKey(int32_t uid, const std::string &methodName);
 
     static std::unordered_set<std::string> hangUpCellularCallBeforeAnswerList_;
     static std::unordered_set<std::string> convertUsernameToPhoneNumList_;
