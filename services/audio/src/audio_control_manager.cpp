@@ -293,8 +293,8 @@ void AudioControlManager::UpdateDeviceType(const sptr<CallBase> &callObjectPtr)
     if (foregroundCall == nullptr) {
         foregroundCall = CallObjectManager::GetForegroundCall();
     }
-    if (foregroundCall->GetCallType() != CallType::TYPE_IMS ||
-        foregroundCall->GetCallType() != CallType::TYPE_SATELLITE ||
+    if (foregroundCall->GetCallType() != CallType::TYPE_IMS &&
+        foregroundCall->GetCallType() != CallType::TYPE_SATELLITE &&
         foregroundCall->GetCallType() != CallType::TYPE_BLUETOOTH) {
         TELEPHONY_LOGE("other call not need control audio");
         return;
@@ -303,17 +303,17 @@ void AudioControlManager::UpdateDeviceType(const sptr<CallBase> &callObjectPtr)
         .deviceType = AudioDeviceType::DEVICE_SPEAKER,
         .address = { 0 },
     };
-    if (audioDeviceManager->IsSpeakerMode()) {
-        audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
+    AudioDeviceType initDeviceType = GetInitAudioDeviceType(foregroundCall);
+    if (IsVideoCall(foregroundCall->GetVideoStateType()) ||
+        foregroundCall->GetCallType() == CallType::TYPE_SATELLITE) {
+        if (IsExternalAudioDevice(initDeviceType)) {
+            device.deviceType = initDeviceType;
+        }
+        TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
+        SetAudioDevice(device);
     } else {
-        AudioDeviceType initDeviceType = GetInitAudioDeviceType(foregroundCall);
-        if (IsVideoCall(foregroundCall->GetVideoStateType()) ||
-            foregroundCall->GetCallType() == CallType::TYPE_SATELLITE) {
-            if (IsExternalAudioDevice(initDeviceType)) {
-                device.deviceType = initDeviceType;
-            }
-            TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
-            SetAudioDevice(device);
+        if (audioDeviceManager->IsSpeakerMode()) {
+            audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
         } else {
             AudioDeviceType currentDeviceType = audioDeviceManager->GetCurrentAudioDevice();
             TELEPHONY_LOGI("GetCurrentAudioDevice: %{public}d,initDeviceType: %{public}d",
