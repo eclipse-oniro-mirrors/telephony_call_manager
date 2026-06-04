@@ -29,11 +29,11 @@ int32_t FormatPhoneNumberToE164(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
+    FuzzedDataProvider provider(data, size);
     MessageParcel messageParcel;
-    FuzzedDataProvider fdp(data, size);
-    std::string number = fdp.ConsumeRandomLengthString();
+    std::string number = provider.ConsumeRandomLengthString();
     auto numberU16 = Str8ToStr16(number);
-    std::string countryCode = fdp.ConsumeRandomLengthString();
+    std::string countryCode = provider.ConsumeRandomLengthString();
     auto countryCodeU16 = Str8ToStr16(countryCode);
     messageParcel.WriteString16(numberU16);
     messageParcel.WriteString16(countryCodeU16);

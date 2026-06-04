@@ -20,19 +20,20 @@
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "call_manager_service_stub.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t CALL_ID_NUM = 10;
 
-void StartDtmf(const uint8_t *data, size_t size)
+void StartDtmf(FuzzedDataProvider &provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
-    int32_t callId = size % CALL_ID_NUM;
-    char str = *reinterpret_cast<const char *>(data);
+    int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
+    char str = *(provider.ConsumeRandomLengthString().c_str());
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     messageParcel.WriteInt8(str);
@@ -42,13 +43,13 @@ void StartDtmf(const uint8_t *data, size_t size)
 }
 
 #ifdef SUPPORT_RTT_CALL
-void StopRtt(const uint8_t *data, size_t size)
+void StopRtt(FuzzedDataProvider &provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
-    int32_t callId = *data % CALL_ID_NUM;
+    int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     messageParcel.WriteInt32(1);
@@ -58,7 +59,7 @@ void StopRtt(const uint8_t *data, size_t size)
 }
 #endif
 
-void SetMuted(const uint8_t *data, size_t size)
+void SetMuted(FuzzedDataProvider &provider)
 {
     if (!IsServiceInited()) {
         return;
@@ -67,20 +68,22 @@ void SetMuted(const uint8_t *data, size_t size)
     bool isMute = false;
     MessageParcel messageParcel;
     messageParcel.WriteBool(isMute);
-    messageParcel.WriteBuffer(data, size);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnSetMute(messageParcel, reply);
 }
 
-void MuteRinger(const uint8_t *data, size_t size)
+void MuteRinger(FuzzedDataProvider &provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnSetMute(messageParcel, reply);
@@ -92,12 +95,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    StartDtmf(data, size);
+    FuzzedDataProvider provider(data, size);
+    StartDtmf(provider);
 #ifdef SUPPORT_RTT_CALL
-    StopRtt(data, size);
+    StopRtt(provider);
 #endif
-    SetMuted(data, size);
-    MuteRinger(data, size);
+    SetMuted(provider);
+    MuteRinger(provider);
     DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
 }
 } // namespace OHOS

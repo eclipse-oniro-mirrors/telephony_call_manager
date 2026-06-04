@@ -20,23 +20,25 @@
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "audio_control_manager.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t AUDIO_DEVICE_NUM = 6;
 
-void SetAudioDevice(const uint8_t *data, size_t size)
+void SetAudioDevice(FuzzedDataProvider &provider)
 {
     if (!IsServiceInited()) {
         return;
     }
-    std::string address(reinterpret_cast<const char *>(data), size);
+    std::string address = provider.ConsumeRandomLengthString();
     AudioDevice audioDevice;
     if (memset_s(&audioDevice, sizeof(AudioDevice), 0, sizeof(AudioDevice)) != EOK) {
         TELEPHONY_LOGE("memset_s fail");
         return;
     }
-    audioDevice.deviceType = static_cast<AudioDeviceType>(size % AUDIO_DEVICE_NUM);
+    audioDevice.deviceType = static_cast<AudioDeviceType>(
+        provider.ConsumeIntegral<int32_t>() % AUDIO_DEVICE_NUM);
     if (address.length() > kMaxAddressLen) {
         TELEPHONY_LOGE("address is not too long");
         return;
@@ -57,10 +59,12 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
+
+    FuzzedDataProvider provider(data, size);
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMicStateChangeCallback();
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
-    SetAudioDevice(data, size);
+    SetAudioDevice(provider);
     DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
 }
 } // namespace OHOS

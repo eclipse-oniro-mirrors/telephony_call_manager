@@ -20,21 +20,22 @@
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "call_manager_service_stub.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t CHOICE_NUM = 2;
 
-void RejectCall(const uint8_t *data, size_t size)
+void RejectCall(FuzzedDataProvider &provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t rejectWithMessage = static_cast<int32_t>(size % CHOICE_NUM);
-    std::string message(reinterpret_cast<const char *>(data), size);
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t rejectWithMessage = provider.ConsumeIntegral<int32_t>() % CHOICE_NUM;
+    std::string message = provider.ConsumeRandomLengthString();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
     messageParcel.WriteInt32(rejectWithMessage);
@@ -50,7 +51,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    RejectCall(data, size);
+    FuzzedDataProvider provider(data, size);
+    RejectCall(provider);
     DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
 }
 } // namespace OHOS
