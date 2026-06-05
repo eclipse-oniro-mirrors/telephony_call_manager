@@ -258,13 +258,6 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState, bool 
     }
     auto ringCallId = call->GetCallID();
     call->SetAnsweredCall(true);
-    if (call->GetCrsType() == CRS_TYPE && static_cast<VideoStateType>(videoState) != VideoStateType::TYPE_VIDEO) {
-        auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
-        if (audioDeviceManager == nullptr) {
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
-        audioDeviceManager->SetSpeakerDeactive();
-    }
     ReportPhoneUEInSuperPrivacy(CALL_ANSWER_IN_SUPER_PRIVACY);
     if (CurrentIsSuperPrivacyMode(ringCallId, videoState)) {
         return TELEPHONY_SUCCESS;
