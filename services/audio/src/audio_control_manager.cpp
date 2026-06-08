@@ -290,8 +290,12 @@ void AudioControlManager::UpdateDeviceType(const sptr<CallBase> &callObjectPtr)
         return;
     }
     sptr<CallBase> foregroundCall = callObjectPtr;
-    if (foregroundCall == nullptr) {
+    if (callObjectPtr == nullptr) {
         foregroundCall = CallObjectManager::GetForegroundCall();
+        if (foregroundCall == nullptr) {
+            TELEPHONY_LOGI("call object nullptr");
+            return;
+        }
     }
     if (foregroundCall->GetCallType() != CallType::TYPE_IMS &&
         foregroundCall->GetCallType() != CallType::TYPE_SATELLITE &&
