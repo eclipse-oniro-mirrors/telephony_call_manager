@@ -82,7 +82,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_001, TestSize.Level0)
     audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
     callObjectPtr->SetCrsType(2);
     audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
-    audioControl->UpdateDeviceTypeForVideoOrSatelliteCall();
+    audioControl->UpdateDeviceType();
     audioControl->MuteNetWorkRingTone(true);
     ASSERT_FALSE(audioControl->IsVideoCall(VideoStateType::TYPE_RECEIVE_ONLY));
     sptr<CallBase> call = nullptr;
@@ -701,7 +701,6 @@ HWTEST_F(ZeroBranch9Test, Telephony_SwitchIncoming_SelectDevice, Function | Medi
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
     auto audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
-    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     DialParaInfo dialParaInfo;
     dialParaInfo.callType = CallType::TYPE_IMS;
     dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
@@ -723,14 +722,39 @@ HWTEST_F(ZeroBranch9Test, Telephony_SwitchIncoming_SelectDevice, Function | Medi
     callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_ANSWERED;
     audioSceneProcessor->SwitchIncoming();
     EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
-    audioControl->PreHandleAnswerdState(call, TelCallState::CALL_STATUS_INCOMING,
-        TelCallState::CALL_STATUS_ANSWERED);
-    call->SetIsAnsweredByPhone(false);
-    EXPECT_TRUE(audioControl->PreHandleAnswerdState(call, TelCallState::CALL_STATUS_INCOMING,
-        TelCallState::CALL_STATUS_ANSWERED));
-    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
     voicePtr->isQueryedBroadcastSwitch = tmpIsQueryedBroadcastSwitch;
     voicePtr->isBroadcastSwitchOn = tmpIsBroadcastSwitchOn;
+    callControlManager->VoIPCallState_ = tmpVoIPCallState;
+}
+
+HWTEST_F(ZeroBranch9Test, Telephony_SpeakerMode_SelectDevice, Function | MediumTest | Level3)
+{
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_IMS;
+    dialParaInfo.callState = TelCallState::CALL_STATUS_ACTIVE;
+    dialParaInfo.videoState = VideoStateType::TYPE_VOICE;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    CallObjectManager::callObjectPtrList_.emplace_back(call);
+    CallAudioMode callAudioMode;
+    callAudioMode.audioMode = 1;
+    callAudioMode.audioScene = 1;
+    audioDeviceManager->SetCallAudioMode(callAudioMode);
+    audioDeviceManager->isWiredHeadsetConnected_ = false;
+    CallStateToApp tmpVoIPCallState = callControlManager->VoIPCallState_;
+    callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_ANSWERED;
+    audioControlManager->UpdateDeviceType(call);
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
+    call->SetCallType(CallType::TYPE_IMS);
+    callAudioMode.audioMode = 0;
+    audioDeviceManager->SetCallAudioMode(callAudioMode);
+    audioControlManager->UpdateDeviceType(call);
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_EARPIECE);
+    call->SetVideoStateType(VideoStateType::TYPE_VIDEO);
+    audioControlManager->UpdateDeviceType(call);
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
     callControlManager->VoIPCallState_ = tmpVoIPCallState;
 }
 }

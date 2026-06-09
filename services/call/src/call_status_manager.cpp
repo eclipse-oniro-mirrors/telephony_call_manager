@@ -1628,9 +1628,6 @@ void CallStatusManager::SetVideoCallState(sptr<CallBase> &call, TelCallState nex
         priorVideoState_[slotId] = videoState;
     }
     if (nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
-        if (priorVideoState_[slotId] == VideoStateType::TYPE_VIDEO) {
-            audioControlManager->VideoStateUpdated(call, priorVideoState_[slotId], VideoStateType::TYPE_VOICE);
-        }
         priorVideoState_[slotId] = VideoStateType::TYPE_VOICE;
     }
 }
