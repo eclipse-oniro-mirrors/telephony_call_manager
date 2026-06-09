@@ -262,12 +262,10 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
         AddEarpiece();
     }
     sptr<CallBase> liveCall = CallObjectManager::GetAudioLiveCall();
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
     if (liveCall != nullptr && (liveCall->GetVideoStateType() == VideoStateType::TYPE_VIDEO ||
-        liveCall->GetCallType() == CallType::TYPE_SATELLITE)) {
-        auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
-        if (audioControlManager != nullptr) {
-            audioControlManager->UpdateDeviceType();
-        }
+        liveCall->GetCallType() == CallType::TYPE_SATELLITE) && audioControlManager != nullptr) {
+        audioControlManager->UpdateDeviceType();
     }
     ReportAudioDeviceInfo();
     TELEPHONY_LOGI("RemoveAudioDeviceList success");
