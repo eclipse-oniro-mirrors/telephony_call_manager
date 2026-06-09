@@ -88,6 +88,7 @@ ohos_unittest("tel_call_manager_special0_test") {
     "openssl:libssl_shared",
     "os_account:os_account_innerkits",
     "player_framework:system_sound_client",
+    "protobuf:protobuf_lite",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
