@@ -81,7 +81,8 @@
                 "libphonenumber",
                 "screenlock_mgr",
                 "watch_system_service",
-                "runtime_core"
+                "runtime_core",
+                "taihe_ffi_gen"
             ],
             "third_party": [
                 "libphonenumber",
