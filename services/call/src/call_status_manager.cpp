@@ -2108,7 +2108,7 @@ void CallStatusManager::PackParaInfo(
 {
     paraInfo.isEcc = false;
     paraInfo.dialType = DialType::DIAL_CARRIER_TYPE;
-    if (dir == CallDirection::CALL_DIRECTION_OUT) {
+    if (dir == CallDirection::CALL_DIRECTION_OUT && info.callType != CallType::TYPE_VOIP) {
         DelayedSingleton<CallControlManager>::GetInstance()->GetDialParaInfo(paraInfo, extras);
     }
     TELEPHONY_LOGI("is ecc: %{public}d", paraInfo.isEcc);
