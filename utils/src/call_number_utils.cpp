@@ -168,13 +168,8 @@ int32_t CallNumberUtils::IsCarrierVtConfig(const int32_t slotId, bool &enabled)
 
 bool CallNumberUtils::IsValidSlotId(int32_t slotId) const
 {
-    if (SIM_SLOT_COUNT == HAS_A_SLOT) {
-        return slotId == SIM_SLOT_0;
-    }
-    if (SIM_SLOT_COUNT == HAS_TWO_SLOT) {
-        if (slotId == SIM_SLOT_0 || slotId == SIM_SLOT_1) {
-            return true;
-        }
+    if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT)) {
+        return true;
     }
     return false;
 }
