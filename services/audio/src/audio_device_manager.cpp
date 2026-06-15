@@ -264,7 +264,7 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
     sptr<CallBase> liveCall = CallObjectManager::GetAudioLiveCall();
     if (liveCall != nullptr && (liveCall->GetVideoStateType() == VideoStateType::TYPE_VIDEO ||
         liveCall->GetCallType() == CallType::TYPE_SATELLITE)) {
-        DelayedSingleton<AudioControlManager>::GetInstance()->UpdateDeviceTypeForVideoOrSatelliteCall();
+        DelayedSingleton<AudioControlManager>::GetInstance()->UpdateDeviceType();
     }
     ReportAudioDeviceInfo();
     TELEPHONY_LOGI("RemoveAudioDeviceList success");

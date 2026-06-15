@@ -20,6 +20,8 @@
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "call_ability_callback.h"
+#include "fold_status_manager.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -31,7 +33,7 @@ constexpr int32_t DIAL_TYPE_NUM = 3;
 constexpr int32_t CALL_TYPE_NUM = 3;
 constexpr int32_t CALL_ID_NUM = 10;
 
-void OnRegisterVoipCallManagerCallback(const uint8_t *data, size_t size)
+void OnRegisterVoipCallManagerCallback(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
@@ -41,13 +43,20 @@ void OnRegisterVoipCallManagerCallback(const uint8_t *data, size_t size)
     if (callbackWrap == nullptr) {
         return;
     }
-    messageParcel.WriteBuffer(data, size);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterVoipCallManagerCallback(messageParcel, reply);
+    std::shared_ptr<FoldStatusManager> foldStatusManager = DelayedSingleton<FoldStatusManager>::GetInstance();
+    foldStatusManager->UnregisterFoldableListener();
+    foldStatusManager->RegisterFoldableListener();
+    foldStatusManager->RegisterFoldableListener();
+    foldStatusManager->UnregisterFoldableListener();
+    FoldStatusManager::IsSmallFoldDevice();
 }
 
-void OnRemoteRequest(const uint8_t *data, size_t size)
+void OnRemoteRequest(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
@@ -58,13 +67,13 @@ void OnRemoteRequest(const uint8_t *data, size_t size)
         return;
     }
     messageParcel.RewindRead(0);
-    uint32_t code = static_cast<uint32_t>(*data);
+    uint32_t code = provider.ConsumeIntegral<uint32_t>();
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<CallManagerService>::GetInstance()->OnRemoteRequest(code, messageParcel, reply, option);
 }
 
-int32_t OnRegisterCallBack(const uint8_t *data, size_t size)
+int32_t OnRegisterCallBack(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
@@ -75,86 +84,92 @@ int32_t OnRegisterCallBack(const uint8_t *data, size_t size)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     messageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
-    messageParcel.WriteBuffer(data, size);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterCallBack(messageParcel, reply);
 }
 
-bool HasCall(const uint8_t *data, size_t size)
+bool HasCall(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnHasCall(messageParcel, reply);
 }
 
-int32_t GetCallState(const uint8_t *data, size_t size)
+int32_t GetCallState(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallState(messageParcel, reply);
 }
 
-int32_t GetCallWaiting(const uint8_t *data, size_t size)
+int32_t GetCallWaiting(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
-    messageParcel.WriteBuffer(data, size);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallWaiting(messageParcel, reply);
 }
 
-bool IsRinging(const uint8_t *data, size_t size)
+bool IsRinging(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return false;
     }
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnIsRinging(messageParcel, reply);
 }
 
-bool IsInEmergencyCall(const uint8_t *data, size_t size)
+bool IsInEmergencyCall(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return false;
     }
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnIsInEmergencyCall(messageParcel, reply);
 }
 
-int32_t DialCall(const uint8_t *data, size_t size)
+int32_t DialCall(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    std::string number(reinterpret_cast<const char *>(data), size);
+    std::string number = provider.ConsumeRandomLengthString();
     auto numberU16 = Str8ToStr16(number);
-    int32_t accountId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t videoState = static_cast<int32_t>(size % VEDIO_STATE_NUM);
-    int32_t dialScene = static_cast<int32_t>(size % DIAL_SCENE_NUM);
-    int32_t dialType = static_cast<int32_t>(size % DIAL_TYPE_NUM);
-    int32_t callType = static_cast<int32_t>(size % CALL_TYPE_NUM);
+    int32_t accountId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t videoState = provider.ConsumeIntegral<int32_t>() % VEDIO_STATE_NUM;
+    int32_t dialScene = provider.ConsumeIntegral<int32_t>() % DIAL_SCENE_NUM;
+    int32_t dialType = provider.ConsumeIntegral<int32_t>() % DIAL_TYPE_NUM;
+    int32_t callType = provider.ConsumeIntegral<int32_t>() % CALL_TYPE_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteString16(numberU16);
     messageParcel.WriteInt32(accountId);
@@ -168,26 +183,27 @@ int32_t DialCall(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnDialCall(messageParcel, reply);
 }
 
-void RemoveMissedIncomingCallNotification(const uint8_t *data, size_t size)
+void RemoveMissedIncomingCallNotification(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnRemoveMissedIncomingCallNotification(
         messageParcel, reply);
 }
 
-int32_t SetCallWaiting(const uint8_t *data, size_t size)
+int32_t SetCallWaiting(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
-    int32_t activate = static_cast<int32_t>(*data % ACTIVE_NUM);
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t activate = provider.ConsumeIntegral<int32_t>() % ACTIVE_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
     messageParcel.WriteBool(activate);
@@ -196,14 +212,14 @@ int32_t SetCallWaiting(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallWaiting(messageParcel, reply);
 }
 
-int32_t SetCallRestriction(const uint8_t *data, size_t size)
+int32_t SetCallRestriction(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
     CallRestrictionInfo info;
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    std::string msg = provider.ConsumeRandomLengthString();
     int32_t length = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(info.password, kMaxNumberLen, msg.c_str(), length);
     MessageParcel messageParcel;
@@ -214,12 +230,12 @@ int32_t SetCallRestriction(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallRestriction(messageParcel, reply);
 }
 
-int32_t JoinConference(const uint8_t *data, size_t size)
+int32_t JoinConference(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = static_cast<int32_t>(*data % CALL_ID_NUM);
+    int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
     std::vector<std::u16string> numberList { u"0000000000" };
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
@@ -230,13 +246,13 @@ int32_t JoinConference(const uint8_t *data, size_t size)
 }
 
 #ifdef SUPPORT_RTT_CALL
-int32_t StartRtt(const uint8_t *data, size_t size)
+int32_t StartRtt(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
 
-    int32_t callId = static_cast<int32_t>(size % CALL_ID_NUM);
+    int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     messageParcel.WriteInt32(0);
@@ -246,12 +262,12 @@ int32_t StartRtt(const uint8_t *data, size_t size)
 }
 #endif
 
-int32_t InputDialerSpecialCode(const uint8_t *data, size_t size)
+int32_t InputDialerSpecialCode(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    std::string specialCode(reinterpret_cast<const char *>(data), size);
+    std::string specialCode = provider.ConsumeRandomLengthString();
     MessageParcel messageParcel;
     messageParcel.WriteString(specialCode);
     messageParcel.RewindRead(0);
@@ -259,27 +275,27 @@ int32_t InputDialerSpecialCode(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnInputDialerSpecialCode(messageParcel, reply);
 }
 
-int32_t CancelCallUpgrade(const uint8_t *data, size_t size)
+int32_t CancelCallUpgrade(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel messageParcel;
     MessageParcel replyParcel;
-    int32_t callId = static_cast<int32_t>(*data % CALL_ID_NUM);
+    int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
     messageParcel.WriteInt32(callId);
     messageParcel.RewindRead(0);
     return DelayedSingleton<CallManagerService>::GetInstance()->OnCancelCallUpgrade(messageParcel, replyParcel);
 }
 
-int32_t RequestCameraCapabilities(const uint8_t *data, size_t size)
+int32_t RequestCameraCapabilities(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel messageParcel;
     MessageParcel replyParcel;
-    int32_t callId = static_cast<int32_t>(*data % CALL_ID_NUM);
+    int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
     messageParcel.WriteInt32(callId);
     messageParcel.RewindRead(0);
     return DelayedSingleton<CallManagerService>::GetInstance()->OnRequestCameraCapabilities(messageParcel, replyParcel);
@@ -290,25 +306,27 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
-    OnRegisterVoipCallManagerCallback(data, size);
-    OnRemoteRequest(data, size);
-    OnRegisterCallBack(data, size);
-    HasCall(data, size);
-    GetCallState(data, size);
-    GetCallWaiting(data, size);
-    IsRinging(data, size);
-    IsInEmergencyCall(data, size);
-    DialCall(data, size);
-    RemoveMissedIncomingCallNotification(data, size);
-    SetCallWaiting(data, size);
-    SetCallRestriction(data, size);
-    JoinConference(data, size);
+
+    FuzzedDataProvider provider(data, size);
+    OnRegisterVoipCallManagerCallback(provider);
+    OnRemoteRequest(provider);
+    OnRegisterCallBack(provider);
+    HasCall(provider);
+    GetCallState(provider);
+    GetCallWaiting(provider);
+    IsRinging(provider);
+    IsInEmergencyCall(provider);
+    DialCall(provider);
+    RemoveMissedIncomingCallNotification(provider);
+    SetCallWaiting(provider);
+    SetCallRestriction(provider);
+    JoinConference(provider);
 #ifdef SUPPORT_RTT_CALL
-    StartRtt(data, size);
+    StartRtt(provider);
 #endif
-    InputDialerSpecialCode(data, size);
-    CancelCallUpgrade(data, size);
-    RequestCameraCapabilities(data, size);
+    InputDialerSpecialCode(provider);
+    CancelCallUpgrade(provider);
+    RequestCameraCapabilities(provider);
 }
 } // namespace OHOS
 

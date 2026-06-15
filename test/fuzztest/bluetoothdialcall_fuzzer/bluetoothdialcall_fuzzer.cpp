@@ -21,233 +21,249 @@
 #include "addcalltoken_fuzzer.h"
 #include "bluetooth_call_service.h"
 #include "message_parcel.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 3;
 
-void AnswerCall(const uint8_t *data, size_t size)
+void AnswerCall(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
-
+    
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnAnswerCall(messageParcel, reply);
 }
 
-void RejectCall(const uint8_t *data, size_t size)
+void RejectCall(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnRejectCall(messageParcel, reply);
 }
 
-void HangUpCall(const uint8_t *data, size_t size)
+void HangUpCall(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnHangUpCall(messageParcel, reply);
 }
 
-void GetBtCallState(const uint8_t *data, size_t size)
+void GetBtCallState(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnGetBtCallState(messageParcel, reply);
 }
 
-void HoldCall(const uint8_t *data, size_t size)
+void HoldCall(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnHoldCall(messageParcel, reply);
 }
 
-void UnHoldCall(const uint8_t *data, size_t size)
+void UnHoldCall(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnUnHoldCall(messageParcel, reply);
 }
 
-void SwitchCall(const uint8_t *data, size_t size)
+void SwitchCall(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnSwitchCall(messageParcel, reply);
 }
 
-void CombineConference(const uint8_t *data, size_t size)
+void CombineConference(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnCombineConference(messageParcel, reply);
 }
 
-void SeparateConference(const uint8_t *data, size_t size)
+void SeparateConference(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnSeparateConference(messageParcel, reply);
 }
 
-void KickOutFromConference(const uint8_t *data, size_t size)
+void KickOutFromConference(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnKickOutFromConference(messageParcel, reply);
 }
 
-void StartDtmf(const uint8_t *data, size_t size)
+void StartDtmf(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteInt8(*data);
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteInt8(provider.ConsumeIntegral<uint8_t>());
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnStartDtmf(messageParcel, reply);
 }
 
-void StopDtmf(const uint8_t *data, size_t size)
+void StopDtmf(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnStopDtmf(messageParcel, reply);
 }
 
-void GetCurrentCallList(const uint8_t *data, size_t size)
+void GetCurrentCallList(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = provider.ConsumeIntegralInRange<int32_t>(0, SLOT_NUM);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnGetCurrentCallList(messageParcel, reply);
 }
 #ifdef SUPPORT_HEARING_AID
-void AddAudioDeviceList(const uint8_t *data, size_t size)
+void AddAudioDeviceList(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
     MessageParcel messageParcel;
-    std::string str(reinterpret_cast<const char *>(data), size);
+    std::string str = provider.ConsumeRandomLengthString();
     messageParcel.WriteString(str);
-    messageParcel.WriteInt32(static_cast<int32_t>(data[0]));
+    messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>());
     messageParcel.WriteString(str);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnAddAudioDeviceList(messageParcel, reply);
 }
 
-void RemoveAudioDeviceList(const uint8_t *data, size_t size)
+void RemoveAudioDeviceList(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
     MessageParcel messageParcel;
-    std::string str(reinterpret_cast<const char *>(data), size);
+    std::string str = provider.ConsumeRandomLengthString();
     messageParcel.WriteString(str);
-    messageParcel.WriteInt32(static_cast<int32_t>(data[0]));
+    messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>());
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnRemoveAudioDeviceList(messageParcel, reply);
 }
 
-void ResetNearlinkDeviceList(const uint8_t *data, size_t size)
+void ResetNearlinkDeviceList(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnResetNearlinkDeviceList(messageParcel, reply);
 }
 
-void ResetBtHearingAidDeviceList(const uint8_t *data, size_t size)
+void ResetBtHearingAidDeviceList(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return;
     }
 
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     MessageParcel messageParcel;
-    messageParcel.WriteBuffer(data, size);
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnResetBtHearingAidDeviceList(messageParcel, reply);
@@ -259,24 +275,25 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    AnswerCall(data, size);
-    RejectCall(data, size);
-    HangUpCall(data, size);
-    GetBtCallState(data, size);
-    HoldCall(data, size);
-    UnHoldCall(data, size);
-    SwitchCall(data, size);
-    CombineConference(data, size);
-    SeparateConference(data, size);
-    KickOutFromConference(data, size);
-    StartDtmf(data, size);
-    StopDtmf(data, size);
-    GetCurrentCallList(data, size);
+    FuzzedDataProvider provider(data, size);
+    AnswerCall(provider);
+    RejectCall(provider);
+    HangUpCall(provider);
+    GetBtCallState(provider);
+    HoldCall(provider);
+    UnHoldCall(provider);
+    SwitchCall(provider);
+    CombineConference(provider);
+    SeparateConference(provider);
+    KickOutFromConference(provider);
+    StartDtmf(provider);
+    StopDtmf(provider);
+    GetCurrentCallList(provider);
 #ifdef SUPPORT_HEARING_AID
-    AddAudioDeviceList(data, size);
-    RemoveAudioDeviceList(data, size);
-    ResetNearlinkDeviceList(data, size);
-    ResetBtHearingAidDeviceList(data, size);
+    AddAudioDeviceList(provider);
+    RemoveAudioDeviceList(provider);
+    ResetNearlinkDeviceList(provider);
+    ResetBtHearingAidDeviceList(provider);
 #endif
 }
 } // namespace OHOS

@@ -1666,9 +1666,6 @@ void CallStatusManager::SetVideoCallState(sptr<CallBase> &call, TelCallState nex
         priorVideoState_[slotId] = videoState;
     }
     if (nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
-        if (priorVideoState_[slotId] == VideoStateType::TYPE_VIDEO) {
-            audioControlManager->VideoStateUpdated(call, priorVideoState_[slotId], VideoStateType::TYPE_VOICE);
-        }
         priorVideoState_[slotId] = VideoStateType::TYPE_VOICE;
     }
 }
@@ -1838,7 +1835,6 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
         callPtr->SetIsEccContact(true);
     }
     callPtr->SetOriginalCallType(info.originalCallType);
-    TELEPHONY_LOGD("originalCallType:%{public}d", info.originalCallType);
     SetCallParams(callPtr, info);
     return callPtr;
 }
@@ -1862,7 +1858,8 @@ void CallStatusManager::SetCallParams(const sptr<CallBase> &callPtr, const CallD
         callPtr->SetExtraParams(params);
     }
     if (info.state == TelCallState::CALL_STATUS_INCOMING || info.state == TelCallState::CALL_STATUS_WAITING ||
-        (info.state == TelCallState::CALL_STATUS_DIALING && (info.index == 0 || IsDcCallConneceted()))) {
+        (info.state == TelCallState::CALL_STATUS_DIALING && (info.index == 0 || IsDcCallConneceted() ||
+        (info.index > 0 && info.callType == CallType::TYPE_BLUETOOTH)))) {
         TELEPHONY_LOGI("NumberLocationUpdate start");
         wptr<CallBase> callBaseWeakPtr = callPtr;
         ffrt::submit([callBaseWeakPtr, info]() {
@@ -2149,7 +2146,7 @@ void CallStatusManager::PackParaInfo(
 {
     paraInfo.isEcc = false;
     paraInfo.dialType = DialType::DIAL_CARRIER_TYPE;
-    if (dir == CallDirection::CALL_DIRECTION_OUT) {
+    if (dir == CallDirection::CALL_DIRECTION_OUT && info.callType != CallType::TYPE_VOIP) {
         DelayedSingleton<CallControlManager>::GetInstance()->GetDialParaInfo(paraInfo, extras);
     }
     TELEPHONY_LOGI("is ecc: %{public}d", paraInfo.isEcc);

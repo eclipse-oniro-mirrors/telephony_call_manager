@@ -454,7 +454,6 @@ HWTEST_F(CallStateTest, Telephony_AudioPlayer_001, TestSize.Level0)
 HWTEST_F(CallStateTest, Telephony_AudioSceneProcessor_001, TestSize.Level0)
 {
     auto audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
-    audioSceneProcessor->SwitchState(CallStateType::DIALING_STATE);
     audioSceneProcessor->SwitchState(CallStateType::ALERTING_STATE);
     audioSceneProcessor->SwitchState(CallStateType::INCOMING_STATE);
     audioSceneProcessor->SwitchState(CallStateType::CS_CALL_STATE);

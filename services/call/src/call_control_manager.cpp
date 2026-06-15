@@ -63,7 +63,6 @@
 namespace OHOS {
 namespace Telephony {
 std::atomic<bool> CallControlManager::alarmSeted_ = false;
-constexpr int32_t CRS_TYPE = 2;
 const uint64_t DISCONNECT_DELAY_TIME = 1000000;
 const uint64_t PENDINGHANGUP_DELAY_TIME = 30000000;
 static const int32_t SATCOMM_UID = 1096;
@@ -258,13 +257,6 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState, bool 
     }
     auto ringCallId = call->GetCallID();
     call->SetAnsweredCall(true);
-    if (call->GetCrsType() == CRS_TYPE && static_cast<VideoStateType>(videoState) != VideoStateType::TYPE_VIDEO) {
-        auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
-        if (audioDeviceManager == nullptr) {
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
-        audioDeviceManager->SetSpeakerDeactive();
-    }
     ReportPhoneUEInSuperPrivacy(CALL_ANSWER_IN_SUPER_PRIVACY);
     if (CurrentIsSuperPrivacyMode(ringCallId, videoState)) {
         return TELEPHONY_SUCCESS;
@@ -1801,6 +1793,7 @@ void CallControlManager::SystemAbilityListener::OnAddSystemAbility(int32_t syste
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     CommonBroadcastSubscriber();
+    NearlinkBroadcastSubscriber();
     ContactsBroadcastSubscriber();
     SatcommBroadcastSubscriber();
     SuperPrivacyModeBroadcastSubscriber();
@@ -1835,7 +1828,6 @@ void CallControlManager::SystemAbilityListener::CommonBroadcastSubscriber()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_REMOTEDEVICE_NAME_UPDATE);
-    matchingSkills.AddEvent("usual.event.nearlink.remotedevice.NAME_UPDATE");
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SHUTDOWN);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
@@ -1844,6 +1836,19 @@ void CallControlManager::SystemAbilityListener::CommonBroadcastSubscriber()
     subscriberPtrList_.emplace_back(subscriberPtr);
     bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberPtr);
     TELEPHONY_LOGI("CommonBroadcastSubscriber subscribeResult = %{public}d", subscribeResult);
+}
+
+void CallControlManager::SystemAbilityListener::NearlinkBroadcastSubscriber()
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent("usual.event.nearlink.remotedevice.NAME_UPDATE");
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    subscriberInfo.SetPermission("ohos.permission.MANAGE_NEARLINK");
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
+    subscriberPtrList_.emplace_back(subscriberPtr);
+    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberPtr);
+    TELEPHONY_LOGI("NearlinkBroadcastSubscriber subscribeResult = %{public}d", subscribeResult);
 }
 
 void CallControlManager::SystemAbilityListener::ContactsBroadcastSubscriber()

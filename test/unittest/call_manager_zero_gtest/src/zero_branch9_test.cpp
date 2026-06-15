@@ -82,7 +82,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_001, TestSize.Level0)
     audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
     callObjectPtr->SetCrsType(2);
     audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
-    audioControl->UpdateDeviceTypeForVideoOrSatelliteCall();
+    audioControl->UpdateDeviceType();
     audioControl->MuteNetWorkRingTone(true);
     ASSERT_FALSE(audioControl->IsVideoCall(VideoStateType::TYPE_RECEIVE_ONLY));
     sptr<CallBase> call = nullptr;
@@ -573,29 +573,6 @@ HWTEST_F(ZeroBranch9Test, Telephony_DealVideoRingPath_001, TestSize.Level0)
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
-HWTEST_F(ZeroBranch9Test, Telephony_CallStateUpdated_RecoverMute, TestSize.Level1)
-{
-    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
-    audioControl->Init();
-    audioControl->recoverSysMuteAfterCall_ = true;
-    audioControl->recoverSysMuteState_ = true;
-    DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(true);
-    DialParaInfo mDialParaInfo;
-    mDialParaInfo.accountId = 0;
-    mDialParaInfo.callId = 1;
-    mDialParaInfo.index = 0;
-    mDialParaInfo.callType = CallType::TYPE_IMS;
-    sptr<CallBase> call = new IMSCall(mDialParaInfo);
-    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-    CallObjectManager::AddOneCallObject(call);
-    audioControl->HandleNextState(call, TelCallState::CALL_STATUS_ACTIVE);
-    audioControl->HandleNextState(call, TelCallState::CALL_STATUS_DISCONNECTED);
-    audioControl->RecoverSysMicrophoneMute();
-    EXPECT_EQ(audioControl->audioInterruptState_, AudioInterruptState::INTERRUPT_STATE_DEACTIVATED);
-    EXPECT_FALSE(audioControl->recoverSysMuteAfterCall_);
-    audioControl->UnInit();
-}
-
 /**
  * @tc.number   Telephony_PlayRingtone_001
  * @tc.name     test error branch
@@ -747,6 +724,37 @@ HWTEST_F(ZeroBranch9Test, Telephony_SwitchIncoming_SelectDevice, Function | Medi
     EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
     voicePtr->isQueryedBroadcastSwitch = tmpIsQueryedBroadcastSwitch;
     voicePtr->isBroadcastSwitchOn = tmpIsBroadcastSwitchOn;
+    callControlManager->VoIPCallState_ = tmpVoIPCallState;
+}
+
+HWTEST_F(ZeroBranch9Test, Telephony_SpeakerMode_SelectDevice, Function | MediumTest | Level3)
+{
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_IMS;
+    dialParaInfo.callState = TelCallState::CALL_STATUS_ACTIVE;
+    dialParaInfo.videoState = VideoStateType::TYPE_VOICE;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    CallObjectManager::callObjectPtrList_.emplace_back(call);
+    CallAudioMode callAudioMode;
+    callAudioMode.audioMode = 1;
+    callAudioMode.audioScene = 1;
+    audioDeviceManager->SetCallAudioMode(callAudioMode);
+    audioDeviceManager->isWiredHeadsetConnected_ = false;
+    CallStateToApp tmpVoIPCallState = callControlManager->VoIPCallState_;
+    callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_ANSWERED;
+    audioControlManager->UpdateDeviceType(call);
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
+    call->SetCallType(CallType::TYPE_IMS);
+    callAudioMode.audioMode = 0;
+    audioDeviceManager->SetCallAudioMode(callAudioMode);
+    audioControlManager->UpdateDeviceType(call);
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_EARPIECE);
+    call->SetVideoStateType(VideoStateType::TYPE_VIDEO);
+    audioControlManager->UpdateDeviceType(call);
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
     callControlManager->VoIPCallState_ = tmpVoIPCallState;
 }
 }

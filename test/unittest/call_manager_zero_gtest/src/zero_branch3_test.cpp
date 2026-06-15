@@ -195,8 +195,11 @@ HWTEST_F(ZeroBranch4Test, Telephony_Ott_Conference_001, TestSize.Level0)
     ASSERT_EQ(ottConference.CanCombineConference(), CALL_ERR_CONFERENCE_CALL_EXCEED_LIMIT);
     ottConference.subCallIdSet_.clear();
     ottConference.subCallIdSet_.insert(1);
+    ottConference.mainCallId_ = 1;
     ASSERT_EQ(ottConference.LeaveFromConference(-1), CALL_ERR_CONFERENCE_SEPERATE_FAILED);
     ASSERT_EQ(ottConference.LeaveFromConference(1), TELEPHONY_SUCCESS);
+    ottConference.subCallIdSet_.insert(2);
+    ASSERT_EQ(ottConference.LeaveFromConference(1), CALL_ERR_CONFERENCE_SEPERATE_FAILED);
     ottConference.subCallIdSet_.clear();
     ottConference.subCallIdSet_.insert(1);
     ASSERT_EQ(ottConference.HoldConference(-1), CALL_ERR_CONFERENCE_SEPERATE_FAILED);
@@ -849,8 +852,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_002, TestSize.Level0)
 HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_003, TestSize.Level0)
 {
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
-    callControlManager->UnInit();
-    callControlManager->CallStateObserve();
     callControlManager->Init();
     callControlManager->CallStateObserve();
     ASSERT_NE(callControlManager->GetCallWaiting(INVALID_CALLID), TELEPHONY_SUCCESS);

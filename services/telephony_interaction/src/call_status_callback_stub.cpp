@@ -755,7 +755,7 @@ int32_t CallStatusCallbackStub::OnSendMmiCodeResult(MessageParcel &data, Message
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
+    if (len < static_cast<int32_t>(sizeof(MmiCodeInfo)) || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }

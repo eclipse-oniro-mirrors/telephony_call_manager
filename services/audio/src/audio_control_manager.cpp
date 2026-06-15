@@ -88,24 +88,12 @@ void AudioControlManager::UnInit()
 #endif
 }
 
-void AudioControlManager::RecoverSysMicrophoneMute()
-{
-    if (recoverSysMuteAfterCall_) {
-        TELEPHONY_LOGI("recover sys mute");
-        auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
-        if (audioProxy != nullptr) {
-            audioProxy->SetMicrophoneMute(recoverSysMuteState_);
-        }
-    }
-    recoverSysMuteAfterCall_ = false;
-}
-
 void AudioControlManager::UpdateForegroundLiveCall()
 {
     int32_t callId = DelayedSingleton<CallStateProcessor>::GetInstance()->GetAudioForegroundLiveCall();
     if (callId == INVALID_CALLID) {
         frontCall_ = nullptr;
-        RecoverSysMicrophoneMute();
+        DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false);
         TELEPHONY_LOGE("callId is invalid");
         return;
     }
@@ -283,15 +271,22 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
     }
 }
 
-void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
+void AudioControlManager::UpdateDeviceType(const sptr<CallBase> &callObjectPtr)
 {
-    sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall();
-    if (foregroundCall == nullptr) {
-        TELEPHONY_LOGE("call object nullptr");
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    if (audioDeviceManager == nullptr) {
         return;
     }
-    if (foregroundCall->GetCallType() != CallType::TYPE_IMS ||
-        foregroundCall->GetCallType() != CallType::TYPE_SATELLITE ||
+    sptr<CallBase> foregroundCall = callObjectPtr;
+    if (callObjectPtr == nullptr) {
+        foregroundCall = CallObjectManager::GetForegroundCall();
+        if (foregroundCall == nullptr) {
+            TELEPHONY_LOGI("call object nullptr");
+            return;
+        }
+    }
+    if (foregroundCall->GetCallType() != CallType::TYPE_IMS &&
+        foregroundCall->GetCallType() != CallType::TYPE_SATELLITE &&
         foregroundCall->GetCallType() != CallType::TYPE_BLUETOOTH) {
         TELEPHONY_LOGE("other call not need control audio");
         return;
@@ -300,7 +295,7 @@ void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
         .deviceType = AudioDeviceType::DEVICE_SPEAKER,
         .address = { 0 },
     };
-    AudioDeviceType initDeviceType = GetInitAudioDeviceType();
+    AudioDeviceType initDeviceType = GetInitAudioDeviceType(foregroundCall);
     if (IsVideoCall(foregroundCall->GetVideoStateType()) ||
         foregroundCall->GetCallType() == CallType::TYPE_SATELLITE) {
         if (IsExternalAudioDevice(initDeviceType)) {
@@ -308,6 +303,18 @@ void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
         SetAudioDevice(device);
+    } else {
+        if (audioDeviceManager->IsSpeakerMode()) {
+            audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
+        } else {
+            AudioDeviceType currentDeviceType = audioDeviceManager->GetCurrentAudioDevice();
+            TELEPHONY_LOGI("GetCurrentAudioDevice: %{public}d,initDeviceType: %{public}d",
+                static_cast<int32_t>(currentDeviceType), static_cast<int32_t>(initDeviceType));
+            if (initDeviceType != currentDeviceType) {
+                device.deviceType = initDeviceType;
+                SetAudioDevice(device);
+            }
+        }
     }
 }
 
@@ -375,6 +382,9 @@ bool AudioControlManager::PreHandleAnswerdState(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
     auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+    if (callStateProcessor == nullptr) {
+        return false;
+    }
     auto callId = callObjectPtr->GetCallID();
     if (!callObjectPtr->GetAnsweredByPhone()) {
         if (nextState == TelCallState::CALL_STATUS_ANSWERED && priorState == TelCallState::CALL_STATUS_INCOMING) {
@@ -509,7 +519,6 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
                 StopVibrator();
             }
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
-            isSetAudioDeviceByUser_ = false;
             break;
         default:
             break;
@@ -585,7 +594,7 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
         callRunningState == CallRunningState::CALL_RUNNING_STATE_RINGING) {
         StopVibrator();
         ProcessSoundtone(callObjectPtr);
-        UpdateDeviceTypeForVideoOrSatelliteCall();
+        UpdateDeviceType(callObjectPtr);
     }
 }
 
@@ -1172,11 +1181,34 @@ bool AudioControlManager::StopForNoRing()
     return true;
 }
 
+AudioDeviceType AudioControlManager::GetInitAudioDeviceTypeOfRemote() const
+{
+    if (AudioDeviceManager::IsDistributedCallConnected()) {
+        return AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE;
+    }
+    AudioDevice device;
+    if (AudioDeviceManager::IsNearlinkActived(device)) {
+        return AudioDeviceType::DEVICE_NEARLINK;
+    }
+    if (AudioDeviceManager::IsBtActived()) {
+        return AudioDeviceType::DEVICE_BLUETOOTH_SCO;
+    }
+    if (AudioDeviceManager::IsWiredHeadsetConnected()) {
+        return AudioDeviceType::DEVICE_WIRED_HEADSET;
+    }
+#ifdef SUPPORT_HEARING_AID
+    if (AudioDeviceManager::IsBtHearingAidActived(device)) {
+        return AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID;
+    }
+#endif
+    return AudioDeviceType::DEVICE_UNKNOWN;
+}
+
 /**
  * while audio state changed , maybe need to reinitialize the audio device
  * in order to get the initialization status of audio device , need to consider varieties of  audio conditions
  */
-AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
+AudioDeviceType AudioControlManager::GetInitAudioDeviceType(const sptr<CallBase> &callObjectPtr) const
 {
     if (audioInterruptState_ == AudioInterruptState::INTERRUPT_STATE_DEACTIVATED) {
         return AudioDeviceType::DEVICE_DISABLE;
@@ -1195,25 +1227,14 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
          * In voice call state, bluetooth sco > wired headset > earpiece > speaker
          * In video call state, bluetooth sco > wired headset > speaker > earpiece
          */
-        if (AudioDeviceManager::IsDistributedCallConnected()) {
-            return AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE;
+        AudioDeviceType deviceType = GetInitAudioDeviceTypeOfRemote();
+        if (deviceType != AudioDeviceType::DEVICE_UNKNOWN) {
+            return deviceType;
         }
-        AudioDevice device;
-        if (AudioDeviceManager::IsNearlinkActived(device)) {
-            return AudioDeviceType::DEVICE_NEARLINK;
+        sptr<CallBase> liveCall = callObjectPtr;
+        if (liveCall == nullptr) {
+            liveCall = CallObjectManager::GetForegroundCall();
         }
-        if (AudioDeviceManager::IsBtActived()) {
-            return AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-        }
-        if (AudioDeviceManager::IsWiredHeadsetConnected()) {
-            return AudioDeviceType::DEVICE_WIRED_HEADSET;
-        }
-#ifdef SUPPORT_HEARING_AID
-        if (AudioDeviceManager::IsBtHearingAidActived(device)) {
-            return AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID;
-        }
-#endif
-        sptr<CallBase> liveCall = CallObjectManager::GetForegroundCall();
         if (liveCall != nullptr && (liveCall->GetVideoStateType() == VideoStateType::TYPE_VIDEO ||
             liveCall->GetCallType() == CallType::TYPE_SATELLITE ||
             liveCall->GetCallType() == CallType::TYPE_BLUETOOTH)) {
@@ -1247,11 +1268,6 @@ int32_t AudioControlManager::SetMute(bool isMute)
         TELEPHONY_LOGE("frontCall_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
-    if (audioProxy == nullptr) {
-        TELEPHONY_LOGE("audioProxy is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
     if (DelayedSingleton<CallControlManager>::GetInstance()->IsCallExist(CallType::TYPE_BLUETOOTH,
         TelCallState::CALL_STATUS_ACTIVE)) {
         std::string strMute = isMute ? "true" : "false";
@@ -1262,19 +1278,14 @@ int32_t AudioControlManager::SetMute(bool isMute)
         OHOS::AudioStandard::AudioSystemManager::GetInstance()->SetExtraParameters("hfp_extra", vec);
         currentCall->SetMicPhoneState(isMute);
     } else {
-        bool oldMute = audioProxy->IsMicrophoneMute();
-        if (!audioProxy->SetMicrophoneMute(isMute)) {
+        if (!DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(isMute)) {
             TELEPHONY_LOGE("set mute failed");
             return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
-        }
-        if (!recoverSysMuteAfterCall_ && (oldMute != isMute)) {
-            recoverSysMuteAfterCall_ = true;
-            recoverSysMuteState_ = oldMute;
         }
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
     if (currentCall->GetCallType() != CallType::TYPE_BLUETOOTH) {
-        bool muted = audioProxy->IsMicrophoneMute();
+        bool muted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
         currentCall->SetMicPhoneState(muted);
         TELEPHONY_LOGI("SetMute success callId:%{public}d, mute:%{public}d", currentCall->GetCallID(), muted);
     }

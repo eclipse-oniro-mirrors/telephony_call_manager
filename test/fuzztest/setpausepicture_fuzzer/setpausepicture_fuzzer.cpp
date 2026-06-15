@@ -20,17 +20,18 @@
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "call_manager_service_stub.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
 
-void SetPausePicture(const uint8_t *data, size_t size)
+void SetPausePicture(FuzzedDataProvider &provider)
 {
     if (!IsServiceInited()) {
         return;
     }
-    int32_t callId = static_cast<int32_t>(size);
-    std::string path(reinterpret_cast<const char *>(data), size);
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
+    std::string path = provider.ConsumeRandomLengthString();
     auto pathU16 = Str8ToStr16(path);
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
@@ -46,7 +47,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    SetPausePicture(data, size);
+    FuzzedDataProvider provider(data, size);
+    SetPausePicture(provider);
     DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
 }
 } // namespace OHOS

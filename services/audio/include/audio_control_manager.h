@@ -17,7 +17,6 @@
 #define TELEPHONY_AUDIO_MANAGER_H
 
 #include <set>
-#include <atomic>
 
 #include "audio_device_manager.h"
 #include "audio_scene_processor.h"
@@ -60,7 +59,7 @@ public:
     bool ShouldSwitchDialing() const;
     bool ShouldSwitchAlerting() const;
     bool ShouldSwitchIncoming() const;
-    AudioDeviceType GetInitAudioDeviceType() const;
+    AudioDeviceType GetInitAudioDeviceType(const sptr<CallBase> &callObjectPtr = nullptr) const;
     std::set<sptr<CallBase>> GetCallList();
     sptr<CallBase> GetCurrentActiveCall();
     AudioInterruptState GetAudioInterruptState();
@@ -78,7 +77,7 @@ public:
         sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState, VideoStateType nextVideoState);
     void CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState,
         VideoStateType nextVideoState, AudioDeviceType &initDeviceType, AudioDevice &device);
-    void UpdateDeviceTypeForVideoOrSatelliteCall();
+    void UpdateDeviceType(const sptr<CallBase> &callObjectPtr = nullptr);
     void UpdateDeviceTypeForCrs(AudioDeviceType deviceType);
     void UpdateDeviceTypeForVideoDialing();
     void MuteNetWorkRingTone(bool isMute = true);
@@ -121,7 +120,6 @@ private:
     bool ShouldPlayRingtone() const;
     bool DealCrsScene(const AudioStandard::AudioRingerMode &ringMode, int32_t accountId);
     bool IsEmergencyCallExists();
-    void RecoverSysMicrophoneMute();
     void UpdateForegroundLiveCall();
     void ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr);
     void ResumeCrsSoundTone();
@@ -146,6 +144,7 @@ private:
     void PlayRingtone(const sptr<CallBase>& incomingCall,
         const CallAttributeInfo& info, const ContactInfo& contactInfo);
     void PlayRing(const sptr<CallBase>& incomingCall, const CallAttributeInfo& info, const ContactInfo& contactInfo);
+    AudioDeviceType GetInitAudioDeviceTypeOfRemote() const;
 
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
@@ -171,8 +170,6 @@ private:
     bool isPlayForNoRing_ = false;
     static bool isIncomingConflict_;
     static ffrt::mutex incomingMutex_;
-    std::atomic<bool> recoverSysMuteAfterCall_ = false;
-    std::atomic<bool> recoverSysMuteState_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

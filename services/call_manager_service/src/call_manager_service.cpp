@@ -1563,6 +1563,10 @@ int32_t CallManagerService::GetVoIPCallInfo(int32_t &callId, int32_t &state, std
 
 sptr<IRemoteObject> CallManagerService::GetProxyObjectPtr(CallManagerProxyType proxyType)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return nullptr;
+    }
     std::lock_guard<ffrt::mutex> guard(lock_);
     auto it = proxyObjectPtrMap_.find(static_cast<uint32_t>(proxyType));
     if (it != proxyObjectPtrMap_.end()) {

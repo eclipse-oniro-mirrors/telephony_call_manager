@@ -20,17 +20,18 @@
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "surface_utils.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
 
-int32_t ControlCamera(const uint8_t *data, size_t size)
+int32_t ControlCamera(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = static_cast<int32_t>(size);
-    std::string cameraId(reinterpret_cast<const char *>(data), size);
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
+    std::string cameraId = provider.ConsumeRandomLengthString();
     auto cameraIdU16 = Str8ToStr16(cameraId);
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
@@ -40,13 +41,13 @@ int32_t ControlCamera(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnControlCamera(messageParcel, reply);
 }
 
-int32_t SetPreviewWindow(const uint8_t *data, size_t size)
+int32_t SetPreviewWindow(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = static_cast<int32_t>(size);
-    std::string surfaceId(reinterpret_cast<const char *>(data), size);
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
+    std::string surfaceId = provider.ConsumeRandomLengthString();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     int len = static_cast<int>(surfaceId.length());
@@ -72,13 +73,13 @@ int32_t SetPreviewWindow(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetPreviewWindow(messageParcel, reply);
 }
 
-int32_t SetDisplayWindow(const uint8_t *data, size_t size)
+int32_t SetDisplayWindow(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = static_cast<int32_t>(size);
-    std::string surfaceId(reinterpret_cast<const char *>(data), size);
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
+    std::string surfaceId = provider.ConsumeRandomLengthString();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     int len = static_cast<int>(surfaceId.length());
@@ -104,27 +105,28 @@ int32_t SetDisplayWindow(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetDisplayWindow(messageParcel, reply);
 }
 
-int32_t SetCameraZoom(const uint8_t *data, size_t size)
+int32_t SetCameraZoom(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    float zoomRatio = static_cast<float>(size);
+    float zoomRatio = provider.ConsumeFloatingPoint<float>();
     MessageParcel messageParcel;
     messageParcel.WriteFloat(zoomRatio);
-    messageParcel.WriteBuffer(data, size);
+    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCameraZoom(messageParcel, reply);
 }
 
-int32_t SetPausePicture(const uint8_t *data, size_t size)
+int32_t SetPausePicture(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = static_cast<int32_t>(size);
-    std::string path(reinterpret_cast<const char *>(data), size);
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
+    std::string path = provider.ConsumeRandomLengthString();
     auto pathU16 = Str8ToStr16(path);
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
@@ -134,13 +136,13 @@ int32_t SetPausePicture(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetPausePicture(messageParcel, reply);
 }
 
-int32_t SetDeviceDirection(const uint8_t *data, size_t size)
+int32_t SetDeviceDirection(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = static_cast<int32_t>(*data);
-    int32_t rotation = static_cast<int32_t>(*data);
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
+    int32_t rotation = provider.ConsumeIntegral<int32_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     messageParcel.WriteInt32(rotation);
@@ -148,24 +150,24 @@ int32_t SetDeviceDirection(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetDeviceDirection(messageParcel, reply);
 }
 
-int32_t CancelCallUpgrade(const uint8_t *data, size_t size)
+int32_t CancelCallUpgrade(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = static_cast<int32_t>(*data);
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnCancelCallUpgrade(messageParcel, reply);
 }
 
-int32_t RequestCameraCapabilities(const uint8_t *data, size_t size)
+int32_t RequestCameraCapabilities(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = static_cast<int32_t>(*data);
+    int32_t callId = provider.ConsumeIntegral<int32_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     MessageParcel reply;
@@ -177,14 +179,16 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
-    ControlCamera(data, size);
-    SetPreviewWindow(data, size);
-    SetDisplayWindow(data, size);
-    SetCameraZoom(data, size);
-    SetPausePicture(data, size);
-    SetDeviceDirection(data, size);
-    CancelCallUpgrade(data, size);
-    RequestCameraCapabilities(data, size);
+
+    FuzzedDataProvider provider(data, size);
+    ControlCamera(provider);
+    SetPreviewWindow(provider);
+    SetDisplayWindow(provider);
+    SetCameraZoom(provider);
+    SetPausePicture(provider);
+    SetDeviceDirection(provider);
+    CancelCallUpgrade(provider);
+    RequestCameraCapabilities(provider);
 }
 } // namespace OHOS
 
