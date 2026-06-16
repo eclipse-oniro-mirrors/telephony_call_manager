@@ -34,6 +34,7 @@ ohos_shared_library("tel_call_manager") {
     "cJSON:cjson",
     "libphonenumber:phonenumber_standard",
     "hilog:libhilog",
+    "protobuf:protobuf_lite",
   ]
 
   external_deps += call_manager_external_deps

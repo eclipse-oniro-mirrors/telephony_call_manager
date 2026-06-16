@@ -39,6 +39,7 @@ ohos_fuzztest("DialCallFuzzTest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf_lite",
   ]
   external_deps += call_manager_external_deps
 

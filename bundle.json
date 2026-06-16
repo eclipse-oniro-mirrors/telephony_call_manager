@@ -67,6 +67,7 @@
                 "os_account",
                 "player_framework",
                 "power_manager",
+                "protobuf",
                 "safwk",
                 "samgr",
                 "libuv",

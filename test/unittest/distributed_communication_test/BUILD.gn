@@ -53,6 +53,7 @@ ohos_unittest("distributed_communication_test") {
     "cJSON:cjson",
     "core_service:ffrt_mocked",
     "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf_lite",
   ]
   external_deps += call_manager_external_deps
   external_deps -= ["ffrt:libffrt"]
