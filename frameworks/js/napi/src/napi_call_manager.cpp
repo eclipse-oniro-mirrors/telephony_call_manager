@@ -3087,11 +3087,11 @@ napi_value NapiCallManager::ReportOttCallDetailsInfo(napi_env env, napi_callback
             return (napi_value) nullptr;
         }
         tmpStr = NapiCallManagerUtils::GetStringProperty(env, napiFormId, "bundleName");
-        if (tmpStr.length() > static_cast<size_t>(kMaxNumberLen)) {
+        if (tmpStr.length() > static_cast<size_t>(kMaxBundleNameLen)) {
             TELEPHONY_LOGE("Number out of limit!");
             return (napi_value) nullptr;
         }
-        if (memcpy_s(tmpOttVec.bundleName, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != EOK) {
+        if (memcpy_s(tmpOttVec.bundleName, kMaxBundleNameLen + 1, tmpStr.c_str(), tmpStr.length()) != EOK) {
             return (napi_value) nullptr;
         }
         int32_t tmpValue = NapiCallManagerUtils::GetIntProperty(env, napiFormId, "videoState");
@@ -3121,12 +3121,12 @@ napi_value NapiCallManager::ReportOttCallEventInfo(napi_env env, napi_callback_i
     (void)memset_s(&asyncContext->eventInfo, sizeof(OttCallEventInfo), 0, sizeof(OttCallEventInfo));
     int32_t eventId = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "eventId");
     std::string tmpStr = NapiCallManagerUtils::GetStringProperty(env, argv[ARRAY_INDEX_FIRST], "bundleName");
-    if (tmpStr.length() > static_cast<size_t>(kMaxNumberLen)) {
+    if (tmpStr.length() > static_cast<size_t>(kMaxBundleNameLen)) {
         TELEPHONY_LOGE("Number out of limit!");
         return (napi_value) nullptr;
     }
     asyncContext->eventInfo.ottCallEventId = static_cast<OttCallEventId>(eventId);
-    if (memcpy_s(asyncContext->eventInfo.bundleName, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != EOK) {
+    if (memcpy_s(asyncContext->eventInfo.bundleName, kMaxBundleNameLen + 1, tmpStr.c_str(), tmpStr.length()) != EOK) {
         return (napi_value) nullptr;
     }
     return HandleAsyncWork(
