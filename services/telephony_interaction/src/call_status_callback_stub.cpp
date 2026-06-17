@@ -293,7 +293,7 @@ int32_t CallStatusCallbackStub::OnUpdateEventReport(MessageParcel &data, Message
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
+    if (len < static_cast<int32_t>(sizeof(CellularCallEventInfo)) || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -332,7 +332,7 @@ int32_t CallStatusCallbackStub::OnUpdateGetWaitingResult(MessageParcel &data, Me
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
+    if (len < static_cast<int32_t>(sizeof(CallWaitResponse)) || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -371,7 +371,7 @@ int32_t CallStatusCallbackStub::OnUpdateGetRestrictionResult(MessageParcel &data
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
+    if (len < static_cast<int32_t>(sizeof(CallRestrictionResponse)) || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -427,7 +427,7 @@ int32_t CallStatusCallbackStub::OnUpdateGetTransferResult(MessageParcel &data, M
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
+    if (len < static_cast<int32_t>(sizeof(CallTransferResponse)) || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -467,7 +467,7 @@ int32_t CallStatusCallbackStub::OnUpdateGetCallClipResult(MessageParcel &data, M
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
+    if (len < static_cast<int32_t>(sizeof(ClipResponse)) || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -491,7 +491,7 @@ int32_t CallStatusCallbackStub::OnUpdateGetCallClirResult(MessageParcel &data, M
     }
     const ClirResponse *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
+    if (len < static_cast<int32_t>(sizeof(ClirResponse)) || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -563,7 +563,7 @@ int32_t CallStatusCallbackStub::OnGetImsConfigResult(MessageParcel &data, Messag
     }
     const GetImsConfigResponse *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
+    if (len < static_cast<int32_t>(sizeof(GetImsConfigResponse)) || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -603,7 +603,7 @@ int32_t CallStatusCallbackStub::OnGetImsFeatureValueResult(MessageParcel &data, 
     }
     const GetImsFeatureValueResponse *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
+    if (len < static_cast<int32_t>(sizeof(GetImsFeatureValueResponse)) || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -643,7 +643,7 @@ int32_t CallStatusCallbackStub::OnReceiveImsCallModeRequest(MessageParcel &data,
     }
     const CallModeReportInfo *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
+    if (len < static_cast<int32_t>(sizeof(CallModeReportInfo)) || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -667,7 +667,7 @@ int32_t CallStatusCallbackStub::OnReceiveImsCallModeResponse(MessageParcel &data
     }
     const CallModeReportInfo *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
+    if (len < static_cast<int32_t>(sizeof(CallModeReportInfo)) || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -842,7 +842,7 @@ int32_t CallStatusCallbackStub::OnCallSessionEventChange(MessageParcel &data, Me
     }
     const CallSessionReportInfo *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
+    if (len < static_cast<int32_t>(sizeof(CallSessionReportInfo)) || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -866,7 +866,7 @@ int32_t CallStatusCallbackStub::OnPeerDimensionsChange(MessageParcel &data, Mess
     }
     const PeerDimensionsReportInfo *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
+    if (len < static_cast<int32_t>(sizeof(PeerDimensionsReportInfo)) || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -905,7 +905,7 @@ int32_t CallStatusCallbackStub::OnCameraCapabilitiesChange(MessageParcel &data, 
     }
     const CameraCapabilitiesReportInfo *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
+    if (len < static_cast<int32_t>(sizeof(CameraCapabilitiesReportInfo)) || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
