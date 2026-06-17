@@ -162,7 +162,8 @@ public:
     void ReleaseIncomingLock();
     void AcquireDisconnectedLock();
     void ReleaseDisconnectedLock();
-    void DisconnectAllCalls(bool isIncludeEmergencyCall = true, bool isFromThermalProtection = false, bool isLocaly = false);
+    void DisconnectAllCalls(bool isIncludeEmergencyCall = true,
+        bool isFromThermalProtection = false, bool isLocaly = false);
     void StartFlashRemind();
     void StopFlashRemind();
     void ClearFlashReminder();
