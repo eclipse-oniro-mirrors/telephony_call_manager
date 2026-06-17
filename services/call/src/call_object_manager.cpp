@@ -1019,7 +1019,12 @@ CellularCallInfo CallObjectManager::GetDialCallInfo()
 
 int32_t CallObjectManager::DealFailDial(sptr<CallBase> call)
 {
-    TELEPHONY_LOGI("DealFailDial");
+    return DisconnectCallLocaly(call);
+}
+ 
+int32_t CallObjectManager::DisconnectCallLocaly(sptr<CallBase> call)
+{
+    TELEPHONY_LOGI("DisconnectCallLocaly");
     if (call == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1031,6 +1036,7 @@ int32_t CallObjectManager::DealFailDial(sptr<CallBase> call)
     std::string number = call->GetAccountNumber();
     callDetatilInfo.callType = call->GetCallType();
     callDetatilInfo.accountId = call->GetSlotId();
+    callDetatilInfo.index = call->GetCallIndex();
     callDetatilInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
     callDetatilInfo.callMode = call->GetVideoStateType();
     callDetatilInfo.voiceDomain = static_cast<int32_t>(call->GetCallType());
