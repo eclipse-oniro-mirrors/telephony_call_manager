@@ -130,7 +130,6 @@ private:
     void StopAntiFraudDetect(sptr<CallBase> &call, const CallDetailInfo &info);
     void UpdateAntiFraudState(sptr<CallBase> &call, int32_t antiFraudState,
         const OHOS::AntiFraudService::AntiFraudResultExt &antiFraudResultExt);
-    void UpdateAntiFraudState(sptr<CallBase> &call, int32_t antiFraudState);
     bool IsContactPhoneNum(const std::string &phoneNum);
     void HandleVideoCallInAdvsecMode(const sptr<CallBase> &call, const CallDetailInfo &info);
     bool IsTrustedNumber(MarkType markType, std::string phoneNumber);
