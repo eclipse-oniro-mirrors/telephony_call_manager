@@ -1143,7 +1143,7 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState,
         }
     }
     if (antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK) ||
-        antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPE)) {
+        antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED)) {
         SetAntiFraudSlotId(-1);
         SetAntiFraudIndex(-1);
         TELEPHONY_LOGI("detect finish, can begin a new antifraud");
