@@ -35,21 +35,21 @@ constexpr int32_t SELECT_RULE_LENGTH = 11;
  
 enum class AntiFraudState {
     /**
-     * Indicates the default antifraud state.
+     * Indicates the default antifraud state
      */
     ANTIFRAUD_STATE_DEFAULT = 0,
     /**
-     * Indicates the antifraud is started.
+     * Indicates the antifraud is started
      */
     ANTIFRAUD_STATE_STARTED,
     /**
-     * Indicates the call is fraud risk call.
+     * Indicates the call is fraud risk call
      */
     ANTIFRAUD_STATE_RISK,
     /**
-     * Indicates the call is not fraud call or antifraud is stopped.
+     * Indicates the antifraud is finished and the call is not fraud call
      */
-    ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED,
+    ANTIFRAUD_STATE_FINISHED,
 };
 
 class AntiFraudService {
