@@ -1867,7 +1867,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_012, TestSize.Level0)
     EXPECT_EQ(callStatusManager->antiFraudSlotId_, -1);
     callStatusManager->antiFraudSlotId_ = 0;
     callStatusManager->TriggerAntiFraud(
-        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED), antiFraudResultExt);
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED), antiFraudResultExt);
     EXPECT_EQ(callStatusManager->antiFraudSlotId_, -1);
     sleep(WAIT_TIME);
 }
