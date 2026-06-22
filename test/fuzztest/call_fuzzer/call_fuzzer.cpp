@@ -537,34 +537,37 @@ void AntiFraudServiceFunc(FuzzedDataProvider& provider)
 {
     int index = 0;
     auto antiFraudService = DelayedSingleton<Telephony::AntiFraudService>::GetInstance();
-    int32_t slotId = GetInt<int32_t>(data, size, index++);
-    int32_t count = GetInt<int32_t>(data, size, index++);
-    FuzzedDataProvider fdp(data, size);
-    std::string phoneNum = fdp.ConsumeRandomLengthString();
+    int32_t slotId = provider.ConsumeIntegral<int32_t>();
+    int32_t count = provider.ConsumeIntegral<int32_t>();
+    std::string phoneNum = provider.ConsumeRandomLengthString();
     OHOS::AntiFraudService::AfsDetectType detectType;
-    detectType.type_ = GetInt<int32_t>(data, size, index++);
-    detectType.isFirstTime_ = (GetInt<int32_t>(data, size, index++) != 0);
+    detectType.type_ = provider.ConsumeIntegral<int32_t>();
+    detectType.isFirstTime_ = (provider.ConsumeIntegral<int32_t>() != 0);
     detectType.callNum_ = phoneNum;
-    detectType.voiceType_ = GetInt<int32_t>(data, size, index++);
-    antiFraudService->StartAntiFraudService(phoneNum, slotId, count, detectType);
+    detectType.voiceType_ = provider.ConsumeIntegral<int32_t>();
+    TelCallState priorState = static_cast<TelCallState>(
+        provider.ConsumeIntegralInRange<int32_t>(0, TEL_CALL_STATE_NUM));
+    antiFraudService->StartAntiFraudService(phoneNum, slotId, count, detectType, priorState);
+    uint8_t size = provider.ConsumeIntegral<uint8_t>();
     char temp[size + 1];
     for (size_t i = 0; i < size; ++i) {
         temp[i] = static_cast<char>(provider.ConsumeIntegral<uint8_t>());
     }
     temp[size] = '\0';
+    VideoStateType videoState = static_cast<VideoStateType>(
+        provider.ConsumeIntegralInRange<int32_t>(0, VIDIO_TYPE_NUM));
     antiFraudService->CreateDataShareHelper(slotId, temp);
     antiFraudService->IsSwitchOn(provider.ConsumeRandomLengthString());
-    antiFraudService->IsAntiFraudSwitchOn();
-    antiFraudService->IsAntiFraudContactsEnabled();
+    antiFraudService->IsAntiFraudSwitchOn(videoState);
     antiFraudService->IsUserImprovementPlanSwitchOn();
     antiFraudService->InitParams();
     antiFraudService->GetStoppedSlotId();
     antiFraudService->GetStoppedIndex();
     antiFraudService->AnonymizeText();
     OHOS::AntiFraudService::StartDetectionResult antiFraudResult;
-    antiFraudResult.voiceDetectionResult.modelVersion = GetInt<int32_t>(data, size, index++);
-    antiFraudResult.voiceDetectionResult.fraudType = GetInt<int32_t>(data, size, index++);
-    antiFraudService->RecordDetectResult(antiFraudResult, fdp.ConsumeRandomLengthString(), slotId, count);
+    antiFraudResult.voiceDetectionResult.modelVersion = provider.ConsumeIntegral<int32_t>();
+    antiFraudResult.voiceDetectionResult.fraudType = provider.ConsumeIntegral<int32_t>();
+    antiFraudService->RecordDetectResult(antiFraudResult, provider.ConsumeRandomLengthString(), slotId, count);
     antiFraudService->StopAntiFraudService(slotId, count);
     antiFraudService->SetStoppedSlotId(slotId);
     antiFraudService->SetStoppedIndex(count);
