@@ -35,25 +35,4 @@ bool AfsDetectType::Marshalling(Parcel& out) const
     }
     return true;
 }
-
-AfsDetectType* AfsDetectType::Unmarshalling(Parcel& in)
-{
-    auto* afsDetectType = new (std::nothrow) AfsDetectType();
-    if (afsDetectType == nullptr) {
-        return nullptr;
-    }
-    if (releaseIfFalse(in.ReadUint32(afsDetectType->type_), afsDetectType)) {
-        return nullptr;
-    }
-    if (releaseIfFalse(in.ReadBool(afsDetectType->isFirstTime_), afsDetectType)) {
-        return nullptr;
-    }
-    if (releaseIfFalse(in.ReadString(afsDetectType->callNum_), afsDetectType)) {
-        return nullptr;
-    }
-    if (releaseIfFalse(in.ReadUint32(afsDetectType->voiceType_), afsDetectType)) {
-        return nullptr;
-    }
-    return afsDetectType;
-}
 }
