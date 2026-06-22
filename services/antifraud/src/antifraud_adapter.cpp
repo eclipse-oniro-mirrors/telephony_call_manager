@@ -90,8 +90,8 @@ int32_t AntiFraudAdapter::StopAntiFraud()
         return -1;
     }
 
-    PfnStopAntiFraudVoiceDetect func =
-        reinterpret_cast<PfnStopAntiFraudVoiceDetect>(dlsym(libAntiFraud_, "StopAntiFraudVoiceDetect"));
+    PfnAntiFraudStopDetect func =
+        reinterpret_cast<PfnAntiFraudStopDetect>(dlsym(libAntiFraud_, "AntiFraudStopDetect"));
     if (func == nullptr) {
         TELEPHONY_LOGE("func is NULL");
         return -1;
