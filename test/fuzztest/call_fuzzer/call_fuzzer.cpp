@@ -554,11 +554,9 @@ void AntiFraudServiceFunc(FuzzedDataProvider& provider)
         temp[i] = static_cast<char>(provider.ConsumeIntegral<uint8_t>());
     }
     temp[size] = '\0';
-    VideoStateType videoState = static_cast<VideoStateType>(
-        provider.ConsumeIntegralInRange<int32_t>(0, VIDIO_TYPE_NUM));
     antiFraudService->CreateDataShareHelper(slotId, temp);
     antiFraudService->IsSwitchOn(provider.ConsumeRandomLengthString());
-    antiFraudService->IsAntiFraudSwitchOn(videoState);
+    antiFraudService->IsAntiFraudSwitchOn();
     antiFraudService->IsUserImprovementPlanSwitchOn();
     antiFraudService->InitParams();
     antiFraudService->GetStoppedSlotId();
