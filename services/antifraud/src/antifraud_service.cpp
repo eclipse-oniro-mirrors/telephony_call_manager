@@ -199,16 +199,9 @@ int32_t AntiFraudService::CheckAntiFraudService(const OHOS::AntiFraudService::Af
     return 0;
 }
 
-int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index,
-    const OHOS::AntiFraudService::AfsDetectType &detectType, const TelCallState priorState)
+int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index)
 {
-    if (priorState == TelCallState::CALL_STATUS_HOLDING &&
-        (antiFraudState_ == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK) ||
-        antiFraudState_ == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED))) {
-        TELEPHONY_LOGI("antifraud state is finished or stopped, no need to detect");
-        return -1;
-    }
-    int32_t antiFraudErrCode = CheckAntiFraudService(detectType);
+    int32_t antiFraudErrCode = CheckAntiFraudService(phoneNum, slotId, index);
     if (antiFraudErrCode != 0) {
         return antiFraudErrCode;
     }
