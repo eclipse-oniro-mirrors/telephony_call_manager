@@ -928,9 +928,10 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     std::vector<sptr<CallBase>> conferenceCallList = GetConferenceCallList(call->GetSlotId());
     if (info.mpty == 1 && conferenceCallList.size() > 1) {
         SetConferenceCall(conferenceCallList);
-} else {
+    } else {
         TELEPHONY_LOGI("SubCallSeparateFromConference %{public}d", call->ExitConference());
     }
+
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
@@ -981,51 +982,63 @@ void CallStatusManager::SetAntiFraudIndex(int32_t index)
 void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const CallDetailInfo &info)
 {
     auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
-    NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
-    std::string tmpStr(info.phoneNum);
-    int32_t slotId = call->GetSlotId();
-    if (slotId == -1) {
+    if (!antiFraudService->IsAntiFraudSwitchOn() || !antiFraudService->IsAntiFraudContactsEnabled()) {
         return;
     }
-
     std::vector<int> activedOsAccountIds;
     OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
     if (activedOsAccountIds.empty() || activedOsAccountIds[0] != MAIN_USER_SPACE) {
-        TELEPHONY_LOGI("SetupAntiFraudService not in main user space");
+        TELEPHONY_LOGI("No antifraud detection needed: not in main user space now");
         return;
     }
-    if (numberMarkInfo.markType != MarkType::MARK_TYPE_FRAUD &&
-        numberMarkInfo.markType != MarkType::MARK_TYPE_YELLOW_PAGE &&
-        numberMarkInfo.markType != MarkType::MARK_TYPE_ENTERPRISE &&
-        !IsContactPhoneNum(tmpStr) && antiFraudService->IsAntiFraudSwitchOn() &&
-        antiFraudService->IsAntiFraudContactsEnabled()) {
-        if (GetAntiFraudSlotId() != -1 || GetAntiFraudIndex() != -1) {
+
+    std::string tmpStr(info.phoneNum);
+    NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
+    if (call->IsFraudRiskMark() || IsContactPhoneNum(tmpStr) ||
+        numberMarkInfo.markType == MarkType::MARK_TYPE_FRAUD ||
+        numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE ||
+        numberMarkInfo.markType == MarkType::MARK_TYPE_ENTERPRISE) {
+        TELEPHONY_LOGI("No antifraud detection needed:"
+            "the call was previously identified as fraud, is a contact number, or has a marked type.");
+        return;
+    }
+    int32_t slotId = call->GetSlotId();
+    if (slotId == -1 || GetAntiFraudSlotId() != -1 || GetAntiFraudIndex() != -1) {
+        return;
+    }
+    SetAntiFraudSlotId(slotId);
+    SetAntiFraudIndex(info.index);
+    wptr<CallBase> callBaseWeakPtr = call;
+    OHOS::AntiFraudService::AfsDetectType detectType;
+    CallDirection callDirection = call->GetCallDirection();
+    detectType.type_ = GetAntiFraudDetectType(slotId, callDirection);
+    detectType.isFirstTime_ = true;
+    detectType.callNum_ = info.phoneNum;
+    detectType.voiceType_ = static_cast<int32_t>(OHOS::AntiFraudService::VoiceType::VOICE_CALL);
+    ffrt::submit([tmpStr, slotId, info, callBaseWeakPtr, this, detectType]() {
+        auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+        if (antiFraudService == nullptr) {
             return;
         }
-        SetAntiFraudSlotId(slotId);
-        SetAntiFraudIndex(info.index);
-        OHOS::AntiFraudService::AfsDetectType detectType;
-        detectType.type_ = GetAntiFraudDetectType(slotId);
-        detectType.isFirstTime_ = true;
-        detectType.callNum_ = info.phoneNum;
-        detectType.voiceType_ = static_cast<int32_t>(OHOS::AntiFraudService::VoiceType::VOICE_CALL);
-        ffrt::submit([tmpStr, slotId, info, callBaseWeakPtr, this, detectType]() {
-            int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
-                StartAntiFraudService(tmpStr, slotId, info.index, detectType);
-            if (ret != 0) {
-                SetAntiFraudSlotId(-1);
-                SetAntiFraudIndex(-1);
-            }
-        });
-    }
+        int32_t ret = antiFraudService->StartAntiFraudService(tmpStr, slotId, info.index, detectType);
+        sptr<CallBase> callBasePtr = callBaseWeakPtr.promote();
+        if (callBasePtr == nullptr) {
+            return;
+        }
+        if (ret != 0) {
+            TELEPHONY_LOGE("StartAntiFraudService failed, stop detect");
+            StopAntiFraudDetect(callBasePtr, info);
+        }
+    });
 }
 
-uint32_t CallStatusManager::GetAntiFraudDetectType(int32_t slotId)
+uint32_t CallStatusManager::GetAntiFraudDetectType(int32_t slotId, const CallDirection callDirection)
 {
     sptr<NetworkState> networkState = nullptr;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkState(slotId, networkState);
     uint32_t type;
-    if (networkState != nullptr && networkState->IsRoaming()) {
+    TELEPHONY_LOGI("antifraud call direction: %{public}d", static_cast<int32_t>(callDirection));
+    if ((networkState != nullptr && networkState->IsRoaming()) || callDirection == CallDirection::CALL_DIRECTION_OUT) {
         type = OHOS::AntiFraudService::VOICE_MODEL_BIT |
                OHOS::AntiFraudService::SPEECH_SYNTHESIS_MODEL_BIT;
     } else {
@@ -1033,7 +1046,7 @@ uint32_t CallStatusManager::GetAntiFraudDetectType(int32_t slotId)
                OHOS::AntiFraudService::SPEECH_SYNTHESIS_MODEL_BIT |
                OHOS::AntiFraudService::VOIP_CALL_TRANSFER_MODEL_BIT;
     }
-    TELEPHONY_LOGI("using anti-fraud detect type = %{public}u", type);
+    TELEPHONY_LOGI("using antifraud detect type = %{public}u", type);
     return type;
 }
 
@@ -1047,7 +1060,8 @@ void CallStatusManager::StopAntiFraudDetect(sptr<CallBase> &call, const CallDeta
     SetAntiFraudIndex(-1);
     TELEPHONY_LOGI("call ending, can begin a new antifraud");
     OHOS::AntiFraudService::AntiFraudResultExt antiFraudResultExt;
-    UpdateAntiFraudState(call, static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED), antiFraudResultExt);
+    UpdateAntiFraudState(call, static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED),
+        antiFraudResultExt);
 }
 
 void CallStatusManager::HandleCeliaCall(sptr<CallBase> &call)
@@ -1063,7 +1077,8 @@ void CallStatusManager::HandleCeliaCall(sptr<CallBase> &call)
     SetAntiFraudIndex(-1);
     TELEPHONY_LOGI("celia call begin, recover AntiFraud SlotId and Index");
     OHOS::AntiFraudService::AntiFraudResultExt antiFraudResultExt;
-    UpdateAntiFraudState(call, static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED), antiFraudResultExt);
+    UpdateAntiFraudState(call, static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED),
+        antiFraudResultExt);
 
     if (call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
         int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
@@ -1128,7 +1143,7 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState,
         }
     }
     if (antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK) ||
-        antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED)) {
+        antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPE)) {
         SetAntiFraudSlotId(-1);
         SetAntiFraudIndex(-1);
         TELEPHONY_LOGI("detect finish, can begin a new antifraud");
