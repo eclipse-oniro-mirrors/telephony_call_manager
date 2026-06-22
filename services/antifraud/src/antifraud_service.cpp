@@ -170,7 +170,7 @@ void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::StartDet
         antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK);
     } else {
         TELEPHONY_LOGI("AntiFraud detect finish, is not fraud call");
-        antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED);
+        antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED);
     }
     if (callStatusManagerPtr_ != nullptr) {
         callStatusManagerPtr_->TriggerAntiFraud(antiFraudState_, antiFraudResultExt_);
@@ -199,16 +199,17 @@ int32_t AntiFraudService::CheckAntiFraudService(const OHOS::AntiFraudService::Af
     return 0;
 }
 
-int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index)
+int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index,
+    const OHOS::AntiFraudService::AfsDetectType &detectType)
 {
-    int32_t antiFraudErrCode = CheckAntiFraudService(phoneNum, slotId, index);
+    int32_t antiFraudErrCode = CheckAntiFraudService(detectType);
     if (antiFraudErrCode != 0) {
         return antiFraudErrCode;
     }
     if (callStatusManagerPtr_ != nullptr) {
         if (callStatusManagerPtr_->GetAntiFraudSlotId() != slotId ||
             callStatusManagerPtr_->GetAntiFraudIndex() != index) {
-            TELEPHONY_LOGI("call ending, no need to antifraud detect");
+            TELEPHONY_LOGI("call ending, no need to detect");
             return -1;
         }
     }
