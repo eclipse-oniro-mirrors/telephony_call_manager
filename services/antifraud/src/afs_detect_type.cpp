@@ -16,18 +16,6 @@
 #include "afs_detect_type.h"
 
 namespace OHOS::AntiFraudService {
-
-template <typename T>
-inline bool releaseIfFalse(bool expr, T*& obj)
-{
-    if (!expr) {
-        delete obj;
-        obj = nullptr;
-        return true;
-    }
-    return false;
-}
-
 AfsDetectType::AfsDetectType(uint32_t type, bool isFirstTime, std::string callNum, uint32_t voiceType)
     :type_(type), isFirstTime_(isFirstTime), callNum_(callNum), voiceType_(voiceType) {}
 
