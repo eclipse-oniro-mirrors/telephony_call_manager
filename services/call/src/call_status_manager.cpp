@@ -994,7 +994,7 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
 
     std::string tmpStr(info.phoneNum);
     NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
-    if (call->IsFraudRiskMark() || IsContactPhoneNum(tmpStr) ||
+    if (IsContactPhoneNum(tmpStr) ||
         numberMarkInfo.markType == MarkType::MARK_TYPE_FRAUD ||
         numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE ||
         numberMarkInfo.markType == MarkType::MARK_TYPE_ENTERPRISE) {
