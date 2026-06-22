@@ -2905,7 +2905,7 @@ napi_value NapiCallManager::SetDeviceDirection(napi_env env, napi_callback_info 
     napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
     napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->rotation);
     if (argc == THREE_VALUE_MAXIMUM_LIMIT) {
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     return HandleAsyncWork(
         env, asyncContext.release(), "SetDeviceDirection", NativeSetDeviceDirection, NativeVoidCallBackWithErrorCode);
