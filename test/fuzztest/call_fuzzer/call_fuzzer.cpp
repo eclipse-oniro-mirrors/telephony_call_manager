@@ -545,9 +545,7 @@ void AntiFraudServiceFunc(FuzzedDataProvider& provider)
     detectType.isFirstTime_ = (provider.ConsumeIntegral<int32_t>() != 0);
     detectType.callNum_ = phoneNum;
     detectType.voiceType_ = provider.ConsumeIntegral<int32_t>();
-    TelCallState priorState = static_cast<TelCallState>(
-        provider.ConsumeIntegralInRange<int32_t>(0, TEL_CALL_STATE_NUM));
-    antiFraudService->StartAntiFraudService(phoneNum, slotId, count, detectType, priorState);
+    antiFraudService->StartAntiFraudService(phoneNum, slotId, count, detectType);
     uint8_t size = provider.ConsumeIntegral<uint8_t>();
     char temp[size + 1];
     for (size_t i = 0; i < size; ++i) {
