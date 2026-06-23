@@ -16,30 +16,10 @@
 #ifndef TELEPHONY_DISTRIBUTED_COMMUNICATION_SINK_SWITCH_CONTROLLER_H
 #define TELEPHONY_DISTRIBUTED_COMMUNICATION_SINK_SWITCH_CONTROLLER_H
 
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-#include "bluetooth_hfp_ag.h"
-#endif
 #include "distributed_device_switch_controller.h"
 
 namespace OHOS {
 namespace Telephony {
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-constexpr int32_t INVALID_BT_ACTION = -1;
-class DcCallHfpListener : public Bluetooth::HandsFreeAudioGatewayObserver {
-public:
-    DcCallHfpListener() = default;
-    ~DcCallHfpListener() override = default;
-    void OnHfpStackChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t action) override;
-    void SetPreAction(int32_t action);
-
-private:
-    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(DcCallHfpListener);
-    void SwitchToBtHeadset(const Bluetooth::BluetoothRemoteDevice &device);
-
-private:
-    std::atomic<int32_t> preAction_{INVALID_BT_ACTION};
-};
-#endif
 
 class DistributedSinkSwitchController : public DistributedDeviceSwitchController {
 public:
@@ -50,12 +30,6 @@ public:
     void OnDistributedAudioDeviceChange(const std::string &devId, const std::string &devName,
         AudioDeviceType devType, int32_t devRole) override;
     void OnRemoveSystemAbility() override;
-    static void TrySwitchToBtHeadset();
-
-private:
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-    std::shared_ptr<DcCallHfpListener> hfpListener_{nullptr};
-#endif
 };
 } // namespace Telephony
 } // namespace OHOS

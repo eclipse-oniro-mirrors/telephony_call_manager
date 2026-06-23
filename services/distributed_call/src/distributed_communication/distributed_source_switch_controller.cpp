@@ -177,11 +177,6 @@ bool DcCallSourceHfpListener::IsNeedSwitchToSource(const Bluetooth::BluetoothRem
     int32_t majorMinorClass = DEFAULT_HFP_FLAG_VALUE;
     device.GetDeviceProductType(cod, majorClass, majorMinorClass);
     TELEPHONY_LOGI("device major %{public}d, minor %{public}d", majorClass, majorMinorClass);
-    if (action == WEAR_ACTION && majorClass == Bluetooth::BluetoothDevice::MAJOR_AUDIO_VIDEO &&
-        (majorMinorClass == Bluetooth::BluetoothDevice::AUDIO_VIDEO_HEADPHONES ||
-        majorMinorClass == Bluetooth::BluetoothDevice::AUDIO_VIDEO_WEARABLE_HEADSET)) {
-        return true;
-    }
     if (action == USER_SELECTION_ACTION && majorClass == Bluetooth::BluetoothDevice::MAJOR_WEARABLE &&
         majorMinorClass == Bluetooth::BluetoothDevice::WEARABLE_WRIST_WATCH) {
         return true;

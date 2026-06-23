@@ -20,9 +20,6 @@
 #include "audio_device_manager.h"
 #include "audio_control_manager.h"
 #include "bluetooth_connection.h"
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-#include "bluetooth_device.h"
-#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -30,25 +27,11 @@ using namespace std::chrono;
 void DistributedSinkSwitchController::OnDeviceOnline(const std::string &devId, const std::string &devName,
     AudioDeviceType devType)
 {
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    if (hfpListener_ == nullptr) {
-        hfpListener_ = std::make_shared<DcCallHfpListener>();
-        Bluetooth::HandsFreeAudioGateway::GetProfile()->RegisterObserver(hfpListener_);
-    }
-#endif
 }
 
 void DistributedSinkSwitchController::OnDeviceOffline(const std::string &devId, const std::string &devName,
     AudioDeviceType devType)
 {
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    if (hfpListener_ != nullptr) {
-        Bluetooth::HandsFreeAudioGateway::GetProfile()->DeregisterObserver(hfpListener_);
-        hfpListener_ = nullptr;
-    }
-#endif
 }
 
 void DistributedSinkSwitchController::OnDistributedAudioDeviceChange(const std::string &devId,
@@ -59,96 +42,13 @@ void DistributedSinkSwitchController::OnDistributedAudioDeviceChange(const std::
         isAudioOnSink_ = (devRole == static_cast<int32_t>(DistributedRole::SINK));
         TELEPHONY_LOGI("OnDistributedAudioDeviceChange isAudioOnSink[%{public}d]", isAudioOnSink_);
     }
-    if (devRole == static_cast<int32_t>(DistributedRole::SINK)) {
-        TrySwitchToBtHeadset();
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-        if (hfpListener_ != nullptr &&
-            !DelayedSingleton<BluetoothConnection>::GetInstance()->GetWearBtHeadsetAddress().empty()) {
-            hfpListener_->SetPreAction(WEAR_ACTION);
-        }
-#endif
-    }
 }
 
 void DistributedSinkSwitchController::OnRemoveSystemAbility()
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
     isAudioOnSink_ = false;
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-    if (hfpListener_ != nullptr) {
-        Bluetooth::HandsFreeAudioGateway::GetProfile()->DeregisterObserver(hfpListener_);
-        hfpListener_ = nullptr;
-    }
-#endif
 }
-
-void DistributedSinkSwitchController::TrySwitchToBtHeadset()
-{
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-    auto address = DelayedSingleton<BluetoothConnection>::GetInstance()->GetWearBtHeadsetAddress();
-    if (address.empty()) {
-        return;
-    }
-
-    AudioDevice audioDevice;
-    audioDevice.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-    if (memcpy_s(audioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
-        TELEPHONY_LOGE("memcpy_s fail");
-        return;
-    }
-    auto ret = DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(audioDevice);
-    TELEPHONY_LOGI("set bt headset ret[%{public}d]", ret);
-#endif
-}
-
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-void DcCallHfpListener::OnHfpStackChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t action)
-{
-    TELEPHONY_LOGI("dc call hfp stack changed, action[%{public}d], preAction_[%{public}d]",
-        action, preAction_.load());
-    int32_t cod = DEFAULT_HFP_FLAG_VALUE;
-    int32_t majorClass = DEFAULT_HFP_FLAG_VALUE;
-    int32_t majorMinorClass = DEFAULT_HFP_FLAG_VALUE;
-    device.GetDeviceProductType(cod, majorClass, majorMinorClass);
-    bool isBtHeadset = (majorClass == Bluetooth::BluetoothDevice::MAJOR_AUDIO_VIDEO &&
-                        (majorMinorClass == Bluetooth::BluetoothDevice::AUDIO_VIDEO_HEADPHONES ||
-                         majorMinorClass == Bluetooth::BluetoothDevice::AUDIO_VIDEO_WEARABLE_HEADSET));
-    if (!isBtHeadset) {
-        return;
-    }
-    if (!DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsConnected() ||
-        !DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink()) {
-        TELEPHONY_LOGI("dc not connected or audio not on sink");
-        preAction_.store(action);
-        return;
-    }
-    if ((action == WEAR_ACTION) || (action == DISABLE_FROM_REMOTE_ACTION && preAction_.load() == WEAR_ACTION)) {
-        // Forcibly switch to the bt headset in either of the following situations:
-        // case 1: At the moment, the user wears the headset
-        // case 2: The headset is preempted by the peer device when the user wears the headset
-        SwitchToBtHeadset(device);
-    }
-    preAction_.store(action);
-}
-
-void DcCallHfpListener::SetPreAction(int32_t action)
-{
-    preAction_.store(action);
-}
-
-void DcCallHfpListener::SwitchToBtHeadset(const Bluetooth::BluetoothRemoteDevice &device)
-{
-    AudioDevice audioDevice;
-    audioDevice.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-    if (memcpy_s(audioDevice.address, kMaxAddressLen, device.GetDeviceAddr().c_str(),
-        device.GetDeviceAddr().length()) != EOK) {
-        TELEPHONY_LOGE("memcpy_s address fail");
-        return;
-    }
-    auto ret = DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(audioDevice);
-    TELEPHONY_LOGI("switch to bt headset, ret[%{public}d]", ret);
-}
-#endif
 
 } // namespace Telephony
 } // namespace OHOS
