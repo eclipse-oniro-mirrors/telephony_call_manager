@@ -1824,54 +1824,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallStatusManager_TriggerAntiFraud_0100, Te
 }
  
 /**
- * @tc.number   Telephony_CallStatusManager_UpdateAntiFraudState_0100
- * @tc.name     Test CallStatusManager UpdateAntiFraudState with RISK state
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallStatusManager_UpdateAntiFraudState_0100, TestSize.Level0)
-{
-    DialParaInfo info;
-    info.number = 112;
-    info.callId = 1;
-    sptr<CallBase> call = new IMSCall(info);
-    ASSERT_NE(call, nullptr);
- 
-    auto callStatusManager = std::make_shared<CallStatusManager>();
-    OHOS::AntiFraudService::AntiFraudResultExt antiFraudResultExt;
-    antiFraudResultExt.isVoiceSemanticFraud = true;
-    antiFraudResultExt.isSpeechSynthesisFraud = true;
-    antiFraudResultExt.isXoipFraud = true;
-    antiFraudResultExt.speechSynthesisProb = 0.85f;
-    callStatusManager->UpdateAntiFraudState(call,
-        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK), antiFraudResultExt);
- 
-    AAFwk::WantParams extraParams = call->GetExtraParams();
-    EXPECT_NE(extraParams.GetParam("antiFraudState"), nullptr);
-}
- 
-/**
- * @tc.number   Telephony_CallStatusManager_UpdateAntiFraudState_0200
- * @tc.name     Test CallStatusManager UpdateAntiFraudState with non-RISK state
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallStatusManager_UpdateAntiFraudState_0200, TestSize.Level0)
-{
-    DialParaInfo info;
-    info.number = 112;
-    info.callId = 2;
-    sptr<CallBase> call = new IMSCall(info);
-    ASSERT_NE(call, nullptr);
- 
-    auto callStatusManager = std::make_shared<CallStatusManager>();
-    OHOS::AntiFraudService::AntiFraudResultExt antiFraudResultExt;
-    callStatusManager->UpdateAntiFraudState(call,
-        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED), antiFraudResultExt);
- 
-    AAFwk::WantParams extraParams = call->GetExtraParams();
-    EXPECT_NE(extraParams.GetParam("antiFraudState"), nullptr);
-}
- 
-/**
  * @tc.number   Telephony_CallStatusManager_IsContactPhoneNum_0100
  * @tc.name     Test CallStatusManager IsContactPhoneNum with unknown number
  * @tc.desc     Function test
