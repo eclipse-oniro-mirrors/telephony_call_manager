@@ -99,5 +99,22 @@ int32_t AntiFraudAdapter::StopAntiFraud()
 
     return func();
 }
+
+int32_t AntiFraudAdapter::StopAntiFraudByType(const OHOS::AntiFraudService::AfsDetectType &detectType)
+{
+    libAntiFraud_ = GetLibAntiFraud();
+    if (libAntiFraud_ == nullptr) {
+        return -1;
+    }
+ 
+    PfnAntiFraudStopDetectByType func =
+        reinterpret_cast<PfnAntiFraudStopDetectByType>(dlsym(libAntiFraud_, "AntiFraudStopDetectByType"));
+    if (func == nullptr) {
+        TELEPHONY_LOGE("func is NULL");
+        return -1;
+    }
+ 
+    return func(detectType);
+}
 }
 }
