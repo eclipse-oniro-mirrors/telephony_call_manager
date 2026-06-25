@@ -1957,7 +1957,9 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_014, TestSize.Level0)
     markInfo.markType = MarkType::MARK_TYPE_TAXI;
     call->SetNumberMarkInfo(markInfo);
     manager->SetupAntiFraudService(call, info);
-    EXPECT_EQ(manager->antiFraudIndex_, 0);
+    EXPECT_EQ(manager->antiFraudIndex_, 0); 
+    call->SetAntiFraudState(2);
+    manager->SetupAntiFraudService(call, info);
 }
 
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_015, TestSize.Level0)
