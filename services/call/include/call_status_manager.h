@@ -130,6 +130,7 @@ private:
         int32_t slotId, const CallDirection callDirection, const VideoStateType videoStateType);
     uint32_t GetAntiFraudDetectType(int32_t slotId, const CallDirection callDirection);
     void StopAntiFraudDetect(sptr<CallBase> &call, const CallDetailInfo &info);
+    void PauseAntiFraudDetect(sptr<CallBase> &call, const CallDetailInfo &info);
     void UpdateAntiFraudState(sptr<CallBase> &call, int32_t antiFraudState,
         const OHOS::AntiFraudService::AntiFraudResultExt &antiFraudResultExt);
     bool IsContactPhoneNum(const std::string &phoneNum);
