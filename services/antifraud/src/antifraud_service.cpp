@@ -84,14 +84,15 @@ bool AntiFraudService::IsSwitchOn(const std::string switchName)
     result->Close();
     settingHelper->Release();
     if (resultValue.empty()) {
-        TELEPHONY_LOGE("resultValue of %{public}s is empty", switchName.c_str());
-        if (switchName == ANTIFRAUD_CONTACTS_ENABLED) {
+        TELEPHONY_LOGE("Antifraud switch query: result value of %{public}s is empty", switchName.c_str());
+        if (switchName == ANTIFRAUD_CONTACTS_ENABLED_VOICE || switchName == ANTIFRAUD_CONTACTS_ENABLED_VIDEO) {
             return true;
         }
         return false;
     }
 
-    TELEPHONY_LOGI("%{public}s query end, resultValue is %{public}s", switchName.c_str(), resultValue.c_str());
+    TELEPHONY_LOGI("Antifraud switch: %{public}s query end, the result value is %{public}s",
+        switchName.c_str(), resultValue.c_str());
     if (resultValue == "1" || resultValue == "true") {
         return true;
     } else {
@@ -99,14 +100,20 @@ bool AntiFraudService::IsSwitchOn(const std::string switchName)
     }
 }
 
-bool AntiFraudService::IsAntiFraudSwitchOn()
+bool AntiFraudService::IsAntiFraudSwitchOn(const VideoStateType videoStateType)
 {
-    return IsSwitchOn(ANTIFRAUD_SWITCH);
+    if (videoStateType == VideoStateType::TYPE_VIDEO) {
+        return IsSwitchOn(ANTIFRAUD_SWITCH_VIDEO);
+    }
+    return IsSwitchOn(ANTIFRAUD_SWITCH_VOICE);
 }
 
-bool AntiFraudService::IsAntiFraudContactsEnabled()
+bool AntiFraudService::IsAntiFraudContactsEnabled(const VideoStateType videoStateType)
 {
-    return IsSwitchOn(ANTIFRAUD_CONTACTS_ENABLED);
+    if (videoStateType == VideoStateType::TYPE_VIDEO) {
+        return IsSwitchOn(ANTIFRAUD_CONTACTS_ENABLED_VIDEO);
+    }
+    return IsSwitchOn(ANTIFRAUD_CONTACTS_ENABLED_VOICE);
 }
 
 bool AntiFraudService::IsUserImprovementPlanSwitchOn()
@@ -202,11 +209,6 @@ int32_t AntiFraudService::CheckAntiFraudService(const OHOS::AntiFraudService::Af
 int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index,
     const OHOS::AntiFraudService::AfsDetectType &detectType)
 {
-    if (antiFraudState_ == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK) ||
-        antiFraudState_ == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED)) {
-        TELEPHONY_LOGI("antifraud state is finished or stopped, no need to detect");
-        return -1;
-    }
     int32_t antiFraudErrCode = CheckAntiFraudService(detectType);
     if (antiFraudErrCode != 0) {
         return antiFraudErrCode;
@@ -240,6 +242,16 @@ int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int
     return 0;
 }
 
+void AntiFraudService::UpdateVideoState(VideoStateType priorVideoState, VideoStateType nextVideoState)
+{
+    if (priorVideoState == VideoStateType::TYPE_VOICE && nextVideoState == VideoStateType::TYPE_VIDEO) {
+        TELEPHONY_LOGI("cellular voice call upgrade to video call, stop xoip transfer antifraud detect");
+        OHOS::AntiFraudService::AfsDetectType detectType(
+            OHOS::AntiFraudService::VOIP_CALL_TRANSFER_MODEL_BIT, false, "", 0);
+        StopAntiFraudDetectByType(detectType);
+    }
+}
+
 int32_t AntiFraudService::StopAntiFraudService(int32_t slotId, int32_t index)
 {
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
@@ -251,6 +263,21 @@ int32_t AntiFraudService::StopAntiFraudService(int32_t slotId, int32_t index)
     TELEPHONY_LOGI("AntiFraud stop detect, slotId=%{public}d, index=%{public}d", slotId, index);
     SetStoppedSlotId(slotId);
     SetStoppedIndex(index);
+    return 0;
+}
+
+int32_t AntiFraudService::StopAntiFraudDetectByType(const OHOS::AntiFraudService::AfsDetectType &detectType)
+{
+    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
+    if (antiFraudAdapter == nullptr) {
+        return -1;
+    }
+    int32_t antiFraudErrCode = antiFraudAdapter->StopAntiFraudByType(detectType);
+    if (antiFraudErrCode != 0) {
+        TELEPHONY_LOGE("Stop AntiFraud by type failed, ErrCode=%{public}d", antiFraudErrCode);
+        return antiFraudErrCode;
+    }
+    TELEPHONY_LOGI("AntiFraud stop detect by type, type=%{public}u", detectType.type_);
     return 0;
 }
 
