@@ -1301,7 +1301,7 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, TestSize.Level0)
 
     std::string switchName = "noswitch";
     EXPECT_FALSE(antiFraudService->IsSwitchOn(switchName));
-    EXPECT_FALSE(antiFraudService->IsSwitchOn(ANTIFRAUD_SWITCH));
+    EXPECT_FALSE(antiFraudService->IsSwitchOn(ANTIFRAUD_SWITCH_VOICE));
 
     OHOS::AntiFraudService::StartDetectionResult fraudResult;
     std::string phoneNum = "123456";
@@ -1846,10 +1846,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallStatusManager_GetAntiFraudDetectType_01
 {
     auto callStatusManager = std::make_shared<CallStatusManager>();
     CallDirection callDirection = CallDirection::CALL_DIRECTION_OUT;
-    uint32_t type = callStatusManager->GetAntiFraudDetectType(0, callDirection);
+    VideoStateType videoStateType = VideoStateType::TYPE_VOICE;
+    uint32_t type = callStatusManager->GetAntiFraudDetectType(0, callDirection, videoStateType);
     EXPECT_EQ(type, OHOS::AntiFraudService::VOICE_MODEL_BIT | OHOS::AntiFraudService::SPEECH_SYNTHESIS_MODEL_BIT);
     callDirection = CallDirection::CALL_DIRECTION_IN;
-    type = callStatusManager->GetAntiFraudDetectType(0, callDirection);
+    type = callStatusManager->GetAntiFraudDetectType(0, callDirection, videoStateType);
     EXPECT_EQ(type, OHOS::AntiFraudService::VOICE_MODEL_BIT | OHOS::AntiFraudService::SPEECH_SYNTHESIS_MODEL_BIT|
         OHOS::AntiFraudService::VOIP_CALL_TRANSFER_MODEL_BIT);
 }
