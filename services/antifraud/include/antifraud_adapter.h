@@ -27,6 +27,7 @@ using PfnAntiFraudStartDetect = OHOS::ErrCode (*)(
     const std::shared_ptr<OHOS::AntiFraudService::AntiFraudStartDetectResListener> &listener,
     const OHOS::AntiFraudService::AfsDetectType &detectType);
 using PfnAntiFraudStopDetect = OHOS::ErrCode (*)();
+using PfnAntiFraudStopDetectByType = OHOS::ErrCode (*)(const OHOS::AntiFraudService::AfsDetectType &detectType);
 class AntiFraudAdapter {
     DECLARE_DELAYED_SINGLETON(AntiFraudAdapter)
 
@@ -39,6 +40,7 @@ public:
         const OHOS::AntiFraudService::AfsDetectType &detectType);
     OHOS::ErrCode AntiFraudStopDetect();
     int32_t StopAntiFraud();
+    int32_t StopAntiFraudByType(const OHOS::AntiFraudService::AfsDetectType &detectType);
 private:
     void *libAntiFraud_ = nullptr;
 };
