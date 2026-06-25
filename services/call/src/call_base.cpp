@@ -202,7 +202,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
             TELEPHONY_LOGE("memcpy_s contact name fail");
         }
         info.numberMarkInfo = numberMarkInfo_;
-        if (info.antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK)) {
+        if (antiFraudState_ == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK)) {
             info.numberMarkInfo.markType = MarkType::MARK_TYPE_FRAUD_RISK;
             TELEPHONY_LOGI("mark fraud risk success");
         }
@@ -798,6 +798,18 @@ void CallBase::SetBtCallSlotId(int32_t slotId)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
     btCallSlotId_ = slotId;
+}
+
+int32_t CallBase::GetAntiFraudState()
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    return antiFraudState_;
+}
+
+void CallBase::SetAntiFraudState(int32_t antiFraudState)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    antiFraudState_ = antiFraudState;
 }
 
 bool CallBase::isNonVirtualCall()
