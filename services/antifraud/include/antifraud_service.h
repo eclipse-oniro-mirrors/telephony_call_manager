@@ -26,31 +26,14 @@
 
 namespace OHOS {
 namespace Telephony {
-inline const std::string ANTIFRAUD_SWITCH = "spamshield_call_live_detection";
+inline const std::string ANTIFRAUD_SWITCH_VOICE = "spamshield_call_live_detection";
+inline const std::string ANTIFRAUD_SWITCH_VIDEO = "spamshield_live_stream_image_detection";
 inline const std::string USER_IMPROPLAN_SWITCH = "spamshield_call_live_report";
-inline const std::string ANTIFRAUD_CONTACTS_ENABLED = "SPAMSHIELD_IS_CONTACTS_VOICE_DETECT_ENABLED";
+inline const std::string ANTIFRAUD_CONTACTS_ENABLED_VOICE = "SPAMSHIELD_IS_CONTACTS_VOICE_DETECT_ENABLED";
+inline const std::string ANTIFRAUD_CONTACTS_ENABLED_VIDEO = "SPAMSHIELD_IS_CONTACTS_LIVE_DETECT_ENABLED";
 inline const std::string USER_SETTINGSDATA_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100?Proxy=true";
 constexpr int32_t SELECT_RULE_LENGTH = 11;
- 
-enum class AntiFraudState {
-    /**
-     * Indicates the default antifraud state.
-     */
-    ANTIFRAUD_STATE_DEFAULT = 0,
-    /**
-     * Indicates the antifraud is started.
-     */
-    ANTIFRAUD_STATE_STARTED,
-    /**
-     * Indicates the call is fraud risk call.
-     */
-    ANTIFRAUD_STATE_RISK,
-    /**
-     * Indicates the call is not fraud call or antifraud is stopped.
-     */
-    ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED,
-};
 
 class AntiFraudService {
     DECLARE_DELAYED_SINGLETON(AntiFraudService)
@@ -58,17 +41,19 @@ class AntiFraudService {
 public:
     void SetCallStatusManager(std::shared_ptr<CallStatusManager> callStatusManager);
     bool IsSwitchOn(const std::string switchName);
-    bool IsAntiFraudSwitchOn();
-    bool IsAntiFraudContactsEnabled();
+    bool IsAntiFraudSwitchOn(const VideoStateType videoStateType);
+    bool IsAntiFraudContactsEnabled(const VideoStateType videoStateType);
     bool IsUserImprovementPlanSwitchOn();
     void RecordDetectResult(const OHOS::AntiFraudService::StartDetectionResult &antiFraudResult,
         std::string resultPhoneNum, int32_t slotId, int32_t index);
     int32_t StartAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index,
         const OHOS::AntiFraudService::AfsDetectType &detectType);
     int32_t StopAntiFraudService(int32_t slotId, int32_t index);
+    int32_t StopAntiFraudDetectByType(const OHOS::AntiFraudService::AfsDetectType &detectType);
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t systemAbilityId, const char *uri);
     void AddRuleToConfig(const std::string rulesName, void *config);
     int AnonymizeText();
+    void UpdateVideoState(VideoStateType priorVideoState, VideoStateType nextVideoState);
 
 private:
     int32_t GetStoppedSlotId();
