@@ -699,6 +699,32 @@ enum class MarkType {
 };
 
 /**
+ * @brief Indicates the type of the antifraud detection state.
+ */
+enum class AntiFraudState {
+    /**
+     * Indicates the default antifraud state.
+     */
+    ANTIFRAUD_STATE_DEFAULT = 0,
+    /**
+     * Indicates the antifraud detection is started.
+     */
+    ANTIFRAUD_STATE_STARTED,
+    /**
+     * Indicates the call is a risk call.
+     */
+    ANTIFRAUD_STATE_RISK,
+    /**
+     * Indicates the call is not a fraud call or detection is stopped.
+     */
+    ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED,
+    /**
+     * Indicates the call is in holding state and pause antifrad detect.
+     */
+    ANTIFRAUD_STATE_HOLDING_PAUSE,
+};
+
+/**
  * @brief Indicates the call event type.
  */
 enum class CellularCallEventType {
