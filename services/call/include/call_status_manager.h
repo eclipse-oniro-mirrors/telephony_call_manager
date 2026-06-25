@@ -126,6 +126,8 @@ private:
     void SetAntiFraudSlotId(int32_t slotId);
     void SetAntiFraudIndex(int32_t index);
     void SetupAntiFraudService(const sptr<CallBase> &call, const CallDetailInfo &info);
+    uint32_t GetAntiFraudDetectType(
+        int32_t slotId, const CallDirection callDirection, const VideoStateType videoStateType);
     uint32_t GetAntiFraudDetectType(int32_t slotId, const CallDirection callDirection);
     void StopAntiFraudDetect(sptr<CallBase> &call, const CallDetailInfo &info);
     void UpdateAntiFraudState(sptr<CallBase> &call, int32_t antiFraudState,
@@ -136,6 +138,8 @@ private:
     int32_t UpdateDialingCallInfo(const CallDetailInfo &info);
     void SetContactInfo(sptr<CallBase> &call, std::string phoneNum);
     bool SetBluetoothCallContactInfo(sptr<CallBase> &call, ContactInfo &contactInfo, std::string phoneNum);
+    void StartAntiFraudDetectTask(const sptr<CallBase> &call, const CallDetailInfo &info,
+        const std::string &phoneNum, const VideoStateType videoStateType);
     int32_t HandleRejectCall(sptr<CallBase> &call, bool isBlock);
     bool ShouldRejectIncomingCall();
     bool ShouldBlockIncomingCall(const sptr<CallBase> &call, const CallDetailInfo &info);
