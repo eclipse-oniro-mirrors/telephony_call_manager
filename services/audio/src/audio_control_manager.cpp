@@ -359,7 +359,7 @@ void AudioControlManager::AdjustDeviceForNonNormalRingMode(AudioDevice &device, 
             TELEPHONY_LOGI("SetVoiceRingtoneMute when AdjustDeviceForNonNormalRingMode");
             audioProxy->SetVoiceRingtoneMute(true);
         }
-    }   
+    }
 }
 
 void AudioControlManager::UpdateDeviceTypeForVideoDialing()
