@@ -206,8 +206,15 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_005, TestSize.Level0)
     audioControl->ExcludeBluetoothSco();
     audioControl->UnexcludeBluetoothSco();
     AudioDeviceType deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
+    AudioDevice device = {
+        .deviceType = AudioDeviceType::DEVICE_SPEAKER,
+        .address = { 0 },
+    };
     audioControl->UpdateDeviceTypeForCrs(deviceType);
+    audioControl->AdjustDeviceForNonNormalRingMode(device, deviceType);
     EXPECT_TRUE(audioControl->IsRingingVibrateModeOn());
+    deviceType = AudioDeviceType::DEVICE_EARPIECE;
+    audioControl->AdjustDeviceForNonNormalRingMode(device, deviceType);
     auto callControl = DelayedSingleton<CallControlManager>::GetInstance();
     callControl->SetVoIPCallState(1);
     EXPECT_TRUE(audioControl->IsVoIPCallActived());

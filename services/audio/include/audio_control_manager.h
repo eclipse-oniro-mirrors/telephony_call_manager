@@ -138,6 +138,7 @@ private:
     void PostProcessRingtone();
     bool IsExternalAudioDevice(AudioDeviceType initDeviceType);
     bool IsInEarAudioDevice(AudioDeviceType initDeviceType);
+    void AdjustDeviceForNonNormalRingMode(AudioDevice &device, AudioDeviceType deviceType);
     void UnmuteSoundTone();
     void ProcessSoundtone(sptr<CallBase> &callObjectPtr);
     void MuteWaitingTone();
