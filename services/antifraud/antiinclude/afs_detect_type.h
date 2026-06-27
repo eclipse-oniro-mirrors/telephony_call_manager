@@ -24,7 +24,7 @@
 
 namespace OHOS::AntiFraudService {
  
-class AfsDetectType final : public Parcelable {
+struct AfsDetectType final : public Parcelable {
 public:
     AfsDetectType() = default;
     AfsDetectType(uint32_t type, bool isFirstTime, std::string callNum, uint32_t voiceType);
