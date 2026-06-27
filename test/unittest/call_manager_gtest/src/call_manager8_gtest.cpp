@@ -1848,13 +1848,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallStatusManager_GetAntiFraudDetectType_01
     CallDirection callDirection = CallDirection::CALL_DIRECTION_OUT;
     VideoStateType videoStateType = VideoStateType::TYPE_VOICE;
     uint32_t type = callStatusManager->GetAntiFraudDetectType(0, callDirection, videoStateType);
-    EXPECT_EQ(type, OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_VOICE |
+    EXPECT_EQ(type, OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_VOICE_SEMANTIC |
         OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_SPEECH_SYNTHESIS);
     callDirection = CallDirection::CALL_DIRECTION_IN;
     type = callStatusManager->GetAntiFraudDetectType(0, callDirection, videoStateType);
-    EXPECT_EQ(type, OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_VOICE |
+    EXPECT_EQ(type, OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_VOICE_SEMANTIC |
         OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_SPEECH_SYNTHESIS |
-        OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_XOIP);
+        OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_XOIP_TRANSFER);
 }
 } // namespace Telephony
 } // namespace OHOS
