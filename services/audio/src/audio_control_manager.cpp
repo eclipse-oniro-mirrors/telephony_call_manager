@@ -329,13 +329,7 @@ void AudioControlManager::UpdateDeviceTypeForCrs(AudioDeviceType deviceType)
             .deviceType = AudioDeviceType::DEVICE_SPEAKER,
             .address = { 0 },
         };
-        AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
-        if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
-            AudioDeviceType initDeviceType = GetInitAudioDeviceType();
-            if (IsInEarAudioDevice(initDeviceType)) {
-                device.deviceType = initDeviceType;
-            }
-        }
+        AdjustDeviceForCrs(device, deviceType);
         HILOG_COMM_INFO("update deviceType = %{public}d,initCrsDeviceType_ %{public}d",
             deviceType, initCrsDeviceType_);
         initCrsDeviceType_ = deviceType;
@@ -344,6 +338,28 @@ void AudioControlManager::UpdateDeviceTypeForCrs(AudioDeviceType deviceType)
         }
         TELEPHONY_LOGI("crs ring tone should be speaker");
         SetAudioDevice(device);
+    }
+}
+
+void AudioControlManager::AdjustDeviceForCrs(AudioDevice &device, AudioDeviceType deviceType)
+{
+    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
+    if (audioProxy == nullptr) {
+        return;
+    }
+    AudioStandard::AudioRingerMode ringMode = audioProxy->GetRingerMode();
+    if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
+        return;
+    }
+    AudioDeviceType initDeviceType = GetInitAudioDeviceType();
+    TELEPHONY_LOGI("InitAudioDeviceType is %{public}d", initDeviceType);
+    if (IsInEarAudioDevice(initDeviceType)) {
+        device.deviceType = initDeviceType;
+        return;
+    }
+    if (deviceType == AudioDeviceType::DEVICE_EARPIECE && soundState_ == SoundState::SOUNDING) {
+        TELEPHONY_LOGI("SetVoiceRingtoneMute when AdjustDeviceForNonNormalRingMode");
+        audioProxy->SetVoiceRingtoneMute(true);
     }
 }
 
