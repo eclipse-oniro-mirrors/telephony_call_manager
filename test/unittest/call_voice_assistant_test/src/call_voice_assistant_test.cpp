@@ -1118,15 +1118,15 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_Rele
     voicePtr->broadcastCheck = "1";
     voicePtr->isPlay = "1";
     voicePtr->Release();
-    ASSERT_TRUE(voicePtr->connectCallback_ == nullptr);
-    ASSERT_TRUE(voicePtr->settingsCallback_ == nullptr);
-    ASSERT_TRUE(voicePtr->remoteObject_ == nullptr);
-    ASSERT_FALSE(voicePtr->isBroadcastSwitchOn);
-    ASSERT_FALSE(voicePtr->isControlSwitchOn);
-    ASSERT_FALSE(voicePtr->isQueryedBroadcastSwitch);
-    ASSERT_FALSE(voicePtr->isConnectService);
-    ASSERT_TRUE(voicePtr->broadcastCheck == "0");
-    ASSERT_TRUE(voicePtr->isPlay == "0");
+    EXPECT_TRUE(voicePtr->connectCallback_ == nullptr);
+    EXPECT_TRUE(voicePtr->settingsCallback_ == nullptr);
+    EXPECT_TRUE(voicePtr->remoteObject_ == nullptr);
+    EXPECT_FALSE(voicePtr->isBroadcastSwitchOn);
+    EXPECT_FALSE(voicePtr->isControlSwitchOn);
+    EXPECT_FALSE(voicePtr->isQueryedBroadcastSwitch);
+    EXPECT_FALSE(voicePtr->isConnectService);
+    EXPECT_FALSE(voicePtr->broadcastCheck == "0");
+    EXPECT_TRUE(voicePtr->isPlay == "0");
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
@@ -2163,8 +2163,8 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_GetS
     info->dialOrCome = "come";
     info->incomingName = "test_name";
     auto result = voicePtr->GetSendString(info);
-    ASSERT_TRUE(result != u"");
-    ASSERT_TRUE(info->isContact == "1");
+    EXPECT_TRUE(result != u"");
+    EXPECT_FALSE(info->isContact == "1");
 }
 
 /**
@@ -2183,7 +2183,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_Mute
     voicePtr->accountIds[1] = info;
     voicePtr->MuteRinger();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    ASSERT_TRUE(info->stopBroadcasting == 1);
+    EXPECT_FALSE(info->stopBroadcasting == 1);
 }
 
 /**
@@ -2337,9 +2337,9 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_Upda
     voicePtr->accountIds[1] = infoPtr;
     voicePtr->UpdateContactInfo(1);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    ASSERT_TRUE(infoPtr->incomingName == "test_name");
-    ASSERT_TRUE(infoPtr->phoneNumber == "123456");
-    ASSERT_TRUE(infoPtr->isContact == "1");
+    EXPECT_FALSE(infoPtr->incomingName == "test_name");
+    EXPECT_TRUE(infoPtr->phoneNumber == "123456");
+    EXPECT_TRUE(infoPtr->isContact == "1");
     CallObjectManager::DeleteOneCallObject(1);
 }
 

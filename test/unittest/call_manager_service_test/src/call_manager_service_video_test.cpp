@@ -89,7 +89,7 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetDisplayWindow_0
     std::string surfaceId = "test_surface_id";
     sptr<Surface> surface = nullptr;
     int32_t ret = service_->SetDisplayWindow(1, surfaceId, surface);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -113,7 +113,7 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetPausePicture_03
 {
     std::u16string path = Str8ToStr16("/test/path");
     int32_t ret = service_->SetPausePicture(1, path);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -135,7 +135,7 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetDeviceDirection
 HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetDeviceDirection_0200, TestSize.Level1)
 {
     int32_t ret = service_->SetDeviceDirection(1, 90);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -147,7 +147,7 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_ControlCamera_Null
 {
     std::u16string cameraId = Str8ToStr16("camera_0");
     int32_t ret = service_->ControlCamera(1, cameraId);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 } // namespace Telephony

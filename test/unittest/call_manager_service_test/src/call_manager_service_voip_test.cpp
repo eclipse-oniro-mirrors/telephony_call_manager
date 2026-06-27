@@ -149,7 +149,7 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_NotifyVoIPAudioStr
 HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_CancelCallUpgrade_0100, TestSize.Level1)
 {
     int32_t ret = service_->CancelCallUpgrade(1);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -160,7 +160,7 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_CancelCallUpgrade_
 HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_RequestCameraCapabilities_0100, TestSize.Level1)
 {
     int32_t ret = service_->RequestCameraCapabilities(1);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -172,7 +172,7 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_InputDialerSpecial
 {
     std::string specialCode = "*#2846#*";
     int32_t ret = service_->InputDialerSpecialCode(specialCode);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**

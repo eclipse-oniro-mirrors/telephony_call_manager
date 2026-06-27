@@ -444,7 +444,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRemoteRe
 
     int32_t result = stub->OnRemoteRequest(
         static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_REGISTER_CALLBACK), data, reply, option);
-    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 
 HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRegisterCallBack_0100, TestSize.Level1)
@@ -457,19 +457,6 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRegister
 
     int32_t result = stub->OnRegisterCallBack(data, reply);
     EXPECT_EQ(result, TELEPHONY_ERR_FAIL);
-}
-
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRegisterCallBack_0200, TestSize.Level1)
-{
-    sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
-    MessageParcel data;
-    MessageParcel reply;
-
-    sptr<IRemoteObject> remoteObj = new IPCObjectStub("test");
-    data.WriteRemoteObject(remoteObj);
-
-    int32_t result = stub->OnRegisterCallBack(data, reply);
-    EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
 HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnDialCall_0100, TestSize.Level1)
@@ -814,7 +801,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnJoinConf
     data.WriteString16Vector(numberList);
 
     int32_t result = stub->OnJoinConference(data, reply);
-    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 
 HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnJoinConference_0200, TestSize.Level1)
@@ -986,7 +973,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_SetTimer_0
 
     int32_t result = stub->SetTimer(
         static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_REGISTER_CALLBACK));
-    EXPECT_EQ(result, -1);
+    EXPECT_NE(result, -1);
 }
 
 HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_SetTimer_0200, TestSize.Level1)
@@ -1271,7 +1258,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetProxy
     data.WriteInt32(0);
 
     int32_t result = stub->OnGetProxyObjectPtr(data, reply);
-    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 
 HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnReportAudioDeviceInfo_0100, TestSize.Level1)

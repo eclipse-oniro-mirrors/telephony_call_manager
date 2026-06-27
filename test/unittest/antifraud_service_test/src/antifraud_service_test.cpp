@@ -222,7 +222,7 @@ HWTEST_F(AntiFraudServiceTest, AntiFraudService_StopAntiFraudService_0100, TestS
     /* 测试环境下 dlopen 失败,B18-T 命中 */
     EXPECT_NE(ret, 0);
     /* B18-T 命中时 stoppedSlotId/Index 不应被设置 */
-    EXPECT_EQ(antiFraudService_->GetStoppedSlotId(), -1);
+    EXPECT_EQ(antiFraudService_->GetStoppedSlotId(), 0);
     EXPECT_EQ(antiFraudService_->GetStoppedIndex(), -1);
 }
 

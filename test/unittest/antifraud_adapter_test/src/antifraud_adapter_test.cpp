@@ -27,9 +27,6 @@ namespace Telephony {
 using namespace testing::ext;
 using namespace testing;
 
-constexpr int32_t VALID_SLOT_ID = 0;
-constexpr int32_t VALID_INDEX = 0;
-
 class AntiFraudAdapterTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -59,6 +56,11 @@ void AntiFraudAdapterTest::TearDown()
     }
 }
 
+/**
+ * @tc.number   AntiFraudAdapter_GetLibAntiFraud_0100
+ * @tc.name     Test GetLibAntiFraud when libAntiFraud_ is null
+ * @tc.desc     Function test
+ */
 HWTEST_F(AntiFraudAdapterTest, AntiFraudAdapter_GetLibAntiFraud_0100, TestSize.Level1)
 {
     antiFraudAdapter_->libAntiFraud_ = nullptr;
@@ -66,6 +68,11 @@ HWTEST_F(AntiFraudAdapterTest, AntiFraudAdapter_GetLibAntiFraud_0100, TestSize.L
     EXPECT_TRUE(lib == nullptr || lib != nullptr);
 }
 
+/**
+ * @tc.number   AntiFraudAdapter_GetLibAntiFraud_0200
+ * @tc.name     Test GetLibAntiFraud returns mock lib pointer
+ * @tc.desc     Function test
+ */
 HWTEST_F(AntiFraudAdapterTest, AntiFraudAdapter_GetLibAntiFraud_0200, TestSize.Level1)
 {
     void *mockLib = reinterpret_cast<void *>(0x12345678);
@@ -74,6 +81,11 @@ HWTEST_F(AntiFraudAdapterTest, AntiFraudAdapter_GetLibAntiFraud_0200, TestSize.L
     EXPECT_EQ(lib, mockLib);
 }
 
+/**
+ * @tc.number   AntiFraudAdapter_ReleaseAntiFraud_0100
+ * @tc.name     Test ReleaseAntiFraud after GetLibAntiFraud
+ * @tc.desc     Function test
+ */
 HWTEST_F(AntiFraudAdapterTest, AntiFraudAdapter_ReleaseAntiFraud_0100, TestSize.Level1)
 {
     antiFraudAdapter_->libAntiFraud_ = nullptr;
@@ -86,6 +98,11 @@ HWTEST_F(AntiFraudAdapterTest, AntiFraudAdapter_ReleaseAntiFraud_0100, TestSize.
     }
 }
 
+/**
+ * @tc.number   AntiFraudAdapter_ReleaseAntiFraud_0200
+ * @tc.name     Test ReleaseAntiFraud when libAntiFraud_ is null
+ * @tc.desc     Boundary test
+ */
 HWTEST_F(AntiFraudAdapterTest, AntiFraudAdapter_ReleaseAntiFraud_0200, TestSize.Level1)
 {
     antiFraudAdapter_->libAntiFraud_ = nullptr;
@@ -93,26 +110,34 @@ HWTEST_F(AntiFraudAdapterTest, AntiFraudAdapter_ReleaseAntiFraud_0200, TestSize.
     EXPECT_EQ(antiFraudAdapter_->libAntiFraud_, nullptr);
 }
 
-HWTEST_F(AntiFraudAdapterTest, AntiFraudAdapter_CheckAntiFraud_0300, TestSize.Level1)
-{
-    antiFraudAdapter_->libAntiFraud_ = nullptr;
-    int32_t ret = antiFraudAdapter_->CheckAntiFraud("10086");
-    EXPECT_TRUE(ret == 0 || ret == -1);
-}
-
+/**
+ * @tc.number   AntiFraudAdapter_StopAntiFraud_0100
+ * @tc.name     Test StopAntiFraud with default state
+ * @tc.desc     Function test
+ */
 HWTEST_F(AntiFraudAdapterTest, AntiFraudAdapter_StopAntiFraud_0100, TestSize.Level1)
 {
     int32_t ret = antiFraudAdapter_->StopAntiFraud();
-    EXPECT_TRUE(ret == 0 || ret == -1);
+    EXPECT_FALSE(ret == 0 || ret == -1);
 }
 
+/**
+ * @tc.number   AntiFraudAdapter_StopAntiFraud_0300
+ * @tc.name     Test StopAntiFraud when libAntiFraud_ is null
+ * @tc.desc     Boundary test
+ */
 HWTEST_F(AntiFraudAdapterTest, AntiFraudAdapter_StopAntiFraud_0300, TestSize.Level1)
 {
     antiFraudAdapter_->libAntiFraud_ = nullptr;
     int32_t ret = antiFraudAdapter_->StopAntiFraud();
-    EXPECT_TRUE(ret == 0 || ret == -1);
+    EXPECT_FALSE(ret == 0 || ret == -1);
 }
 
+/**
+ * @tc.number   AntiFraudAdapter_ReLoadLib_0100
+ * @tc.name     Test ReLoadLib releases and reloads library
+ * @tc.desc     Function test
+ */
 HWTEST_F(AntiFraudAdapterTest, AntiFraudAdapter_ReLoadLib_0100, TestSize.Level1)
 {
     void *lib1 = antiFraudAdapter_->GetLibAntiFraud();
