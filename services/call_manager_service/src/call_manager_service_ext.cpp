@@ -15,11 +15,15 @@
 
 #include "call_manager_service.h"
 
+#include "accesstoken_kit.h"
+#include "ability_manager_client.h"
 #include "call_object_manager.h"
 #include "call_manager_errors.h"
 #include "ipc_skeleton.h"
+#include "string_wrapper.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
+#include "want_params_wrapper.h"
 #include <openssl/rand.h>
 
 namespace OHOS {
