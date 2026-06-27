@@ -211,10 +211,10 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_005, TestSize.Level0)
         .address = { 0 },
     };
     audioControl->UpdateDeviceTypeForCrs(deviceType);
-    audioControl->AdjustDeviceForNonNormalRingMode(device, deviceType);
+    audioControl->AdjustDeviceForCrs(device, deviceType);
     EXPECT_TRUE(audioControl->IsRingingVibrateModeOn());
     deviceType = AudioDeviceType::DEVICE_EARPIECE;
-    audioControl->AdjustDeviceForNonNormalRingMode(device, deviceType);
+    audioControl->AdjustDeviceForCrs(device, deviceType);
     auto callControl = DelayedSingleton<CallControlManager>::GetInstance();
     callControl->SetVoIPCallState(1);
     EXPECT_TRUE(audioControl->IsVoIPCallActived());
