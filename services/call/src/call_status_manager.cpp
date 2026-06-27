@@ -1048,16 +1048,15 @@ uint32_t CallStatusManager::GetAntiFraudDetectType(
     sptr<NetworkState> networkState = nullptr;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkState(slotId, networkState);
     uint32_t type;
-    TELEPHONY_LOGI("antifraud call direction: %{public}d", static_cast<int32_t>(callDirection));
     if (callDirection == CallDirection::CALL_DIRECTION_OUT ||
         (callDirection == CallDirection::CALL_DIRECTION_IN && videoStateType == VideoStateType::TYPE_VIDEO) ||
         (networkState != nullptr && networkState->IsRoaming())) {
-        type = OHOS::AntiFraudService::VOICE_MODEL_BIT |
-               OHOS::AntiFraudService::SPEECH_SYNTHESIS_MODEL_BIT;
+        type = OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_VOICE |
+               OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_SPEECH_SYNTHESIS;
     } else {
-        type = OHOS::AntiFraudService::VOICE_MODEL_BIT |
-               OHOS::AntiFraudService::SPEECH_SYNTHESIS_MODEL_BIT |
-               OHOS::AntiFraudService::VOIP_CALL_TRANSFER_MODEL_BIT;
+        type = OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_VOICE |
+               OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_SPEECH_SYNTHESIS |
+               OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_XOIP;
     }
     TELEPHONY_LOGI("using antifraud detect type = %{public}u", type);
     return type;
@@ -1085,11 +1084,9 @@ void CallStatusManager::PauseAntiFraudDetect(sptr<CallBase> &call, const CallDet
     DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(call->GetSlotId(), info.index);
     SetAntiFraudSlotId(-1);
     SetAntiFraudIndex(-1);
-    TELEPHONY_LOGI("call holding, pause antifraud detection");
     AAFwk::WantParams extraParams = call->GetExtraParams();
     int32_t antiFraudState = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED);
     extraParams.SetParam("antiFraudState", AAFwk::Integer::Box(antiFraudState));
-    TELEPHONY_LOGI("Report AntiFraudState: %{public}d", antiFraudState);
     call->SetExtraParams(extraParams);
 }
 
