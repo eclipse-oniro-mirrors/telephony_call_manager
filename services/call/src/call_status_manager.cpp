@@ -1051,12 +1051,12 @@ uint32_t CallStatusManager::GetAntiFraudDetectType(
     if (callDirection == CallDirection::CALL_DIRECTION_OUT ||
         (callDirection == CallDirection::CALL_DIRECTION_IN && videoStateType == VideoStateType::TYPE_VIDEO) ||
         (networkState != nullptr && networkState->IsRoaming())) {
-        type = OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_VOICE |
+        type = OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_VOICE_SEMANTIC |
                OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_SPEECH_SYNTHESIS;
     } else {
-        type = OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_VOICE |
+        type = OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_VOICE_SEMANTIC |
                OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_SPEECH_SYNTHESIS |
-               OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_XOIP;
+               OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_XOIP_TRANSFER;
     }
     TELEPHONY_LOGI("using antifraud detect type = %{public}u", type);
     return type;
