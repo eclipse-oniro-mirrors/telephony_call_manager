@@ -245,7 +245,7 @@ void AntiFraudService::UpdateVideoState(VideoStateType priorVideoState, VideoSta
 {
     if (priorVideoState == VideoStateType::TYPE_VOICE && nextVideoState == VideoStateType::TYPE_VIDEO) {
         OHOS::AntiFraudService::AfsDetectType detectType(
-            OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_XOIP, false, "", 0);
+            OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_XOIP_TRANSFER, false, "", 0);
         StopAntiFraudDetectByType(detectType);
     }
 }
