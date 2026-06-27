@@ -84,7 +84,6 @@ bool AntiFraudService::IsSwitchOn(const std::string switchName)
     result->Close();
     settingHelper->Release();
     if (resultValue.empty()) {
-        TELEPHONY_LOGE("Antifraud switch query: result value of %{public}s is empty", switchName.c_str());
         if (switchName == ANTIFRAUD_CONTACTS_ENABLED_VOICE || switchName == ANTIFRAUD_CONTACTS_ENABLED_VIDEO) {
             return true;
         }
@@ -245,9 +244,8 @@ int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int
 void AntiFraudService::UpdateVideoState(VideoStateType priorVideoState, VideoStateType nextVideoState)
 {
     if (priorVideoState == VideoStateType::TYPE_VOICE && nextVideoState == VideoStateType::TYPE_VIDEO) {
-        TELEPHONY_LOGI("cellular voice call upgrade to video call, stop xoip transfer antifraud detect");
         OHOS::AntiFraudService::AfsDetectType detectType(
-            OHOS::AntiFraudService::VOIP_CALL_TRANSFER_MODEL_BIT, false, "", 0);
+            OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_XOIP, false, "", 0);
         StopAntiFraudDetectByType(detectType);
     }
 }
