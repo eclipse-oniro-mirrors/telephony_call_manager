@@ -67,6 +67,7 @@ napi_value NapiCallManager::DeclareCallBasisInterface(napi_env env, napi_value e
         DECLARE_NAPI_WRITABLE_FUNCTION("dial", Dial),
         DECLARE_NAPI_WRITABLE_FUNCTION("dialCall", DialCall),
         DECLARE_NAPI_WRITABLE_FUNCTION("makeCall", MakeCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("makeCallWithToken", MakeCallWithToken),
         DECLARE_NAPI_WRITABLE_FUNCTION("answer", AnswerCall),
         DECLARE_NAPI_WRITABLE_FUNCTION("reject", RejectCall),
         DECLARE_NAPI_WRITABLE_FUNCTION("hangup", HangUpCall),
@@ -1237,6 +1238,70 @@ napi_value NapiCallManager::MakeCall(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     return HandleAsyncWork(env, asyncContext.release(), "MakeCall", NativeMakeCall, NativeVoidCallBackWithErrorCode);
+}
+
+napi_value NapiCallManager::MakeCallWithToken(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
+    if (argc < ONLY_ONE_VALUE || argc > TWO_VALUE_LIMIT) {
+        TELEPHONY_LOGE("NapiCallManager::MakeCallWithToken argc is invalid.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    if (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string)) {
+        TELEPHONY_LOGE("NapiCallManager::MakeCallWithToken first param is not string.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_value optionsObj = nullptr;
+    if (argc == TWO_VALUE_LIMIT) {
+        napi_valuetype valueType = napi_undefined;
+        napi_typeof(env, argv[ARRAY_INDEX_SECOND], &valueType);
+        if (valueType != napi_object && valueType != napi_undefined) {
+            TELEPHONY_LOGE("NapiCallManager::MakeCallWithToken second param is not object or undefined.");
+            NapiUtil::ThrowParameterError(env);
+            return nullptr;
+        }
+        if (valueType == napi_object) {
+            optionsObj = argv[ARRAY_INDEX_SECOND];
+        }
+    }
+    auto asyncContext = std::make_unique<MakeCallWithTokenAsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::MakeCallWithToken asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_status status = napi_get_value_string_utf8(
+        env, argv[ARRAY_INDEX_FIRST], asyncContext->number, PHONE_NUMBER_MAXIMUM_LIMIT, &(asyncContext->numberLen));
+    if (status != napi_ok) {
+        TELEPHONY_LOGE("napi_get_value_string_utf8 failed");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    if (optionsObj != nullptr) {
+        GetMakeCallWithTokenOptions(env, optionsObj, *asyncContext);
+    }
+    return HandleAsyncWork(
+        env, asyncContext.release(), "MakeCallWithToken", NativeMakeCallWithToken, NativeMakeCallWithTokenCallBack);
+}
+ 
+void NapiCallManager::GetMakeCallWithTokenOptions(
+    napi_env env, napi_value optionsObj, MakeCallWithTokenAsyncContext &asyncContext)
+{
+    bool hasProperty = false;
+    napi_has_named_property(env, optionsObj, "isCustomAccessibility", &hasProperty);
+    if (hasProperty) {
+        napi_value isCustomAccessibilityVal = nullptr;
+        napi_get_named_property(env, optionsObj, "isCustomAccessibility", &isCustomAccessibilityVal);
+        napi_valuetype valueTypeBool = napi_undefined;
+        napi_typeof(env, isCustomAccessibilityVal, &valueTypeBool);
+        if (valueTypeBool == napi_boolean) {
+            bool isCustomAccessibility = false;
+            napi_get_value_bool(env, isCustomAccessibilityVal, &isCustomAccessibility);
+            asyncContext.options.PutBooleanValue("isCustomAccessibility", isCustomAccessibility);
+        }
+    }
 }
 
 napi_value NapiCallManager::DialCall(napi_env env, napi_callback_info info)
@@ -4119,6 +4184,51 @@ void NapiCallManager::NativeMakeCall(napi_env env, void *data)
     }
 }
 
+void NapiCallManager::NativeMakeCallWithToken(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeMakeCallWithToken data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (MakeCallWithTokenAsyncContext *)data;
+    std::string phoneNumber(asyncContext->number, asyncContext->numberLen);
+    auto callManagerClient = DelayedSingleton<CallManagerClient>::GetInstance();
+    if (callManagerClient == nullptr) {
+        TELEPHONY_LOGE("callManagerClient is nullptr!");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    asyncContext->errorCode = callManagerClient->MakeCallWithToken(phoneNumber,
+        asyncContext->options, asyncContext->token);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
+}
+ 
+void NapiCallManager::NativeMakeCallWithTokenCallBack(napi_env env, napi_status status, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeMakeCallWithTokenCallBack data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (MakeCallWithTokenAsyncContext *)data;
+    if (asyncContext->resolved == TELEPHONY_SUCCESS) {
+        napi_value promiseValue = nullptr;
+        napi_create_string_utf8(env, asyncContext->token.data(),
+            asyncContext->token.length(), &promiseValue);
+        napi_status ret = napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
+    } else {
+        JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
+        napi_status ret = napi_reject_deferred(env, asyncContext->deferred,
+            NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, error.errorMessage, error.errorCode));
+        TELEPHONY_LOGE("MakeCallWithToken promise failed result = %{public}d", ret);
+    }
+    napi_delete_async_work(env, asyncContext->work);
+    delete asyncContext;
+    asyncContext = nullptr;
+}
 
 void NapiCallManager::NativeAnswerCall(napi_env env, void *data)
 {

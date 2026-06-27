@@ -1132,5 +1132,357 @@ HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_DetectSpamCall, Function 
     ASSERT_TRUE(spamCallAdapter_->DetectSpamCall(phoneNumber, slotId));
 }
 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_OnMakeCallWithToken_001, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data.WriteString("");
+    data.WriteBool(true);
+    int32_t ret = callManagerService->OnMakeCallWithToken(data, reply);
+    EXPECT_EQ(ret, CALL_ERR_NUMBER_OUT_OF_RANGE);
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_OnMakeCallWithToken_002, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    std::string longNumber(ACCOUNT_NUMBER_MAX_LENGTH + 1, '1');
+    data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data.WriteString(longNumber);
+    data.WriteBool(false);
+    int32_t ret = callManagerService->OnMakeCallWithToken(data, reply);
+    EXPECT_EQ(ret, CALL_ERR_NUMBER_OUT_OF_RANGE);
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_OnMakeCallWithToken_003, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->challengeTokenList_.clear();
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data.WriteString("12345678910");
+    data.WriteBool(false);
+    int32_t ret = callManagerService->OnMakeCallWithToken(data, reply);
+    int32_t replyResult = reply.ReadInt32();
+    EXPECT_EQ(replyResult, TELEPHONY_SUCCESS);
+    callManagerService->challengeTokenList_.clear();
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_OnCheckCallRecordingPermission_001, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo info;
+    info.number = "12345678910";
+    info.token = "valid_token";
+    sptr<CallBase> call = new CSCall(info);
+    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    CallObjectManager::AddOneCallObject(call);
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data.WriteString("12345678910");
+    data.WriteString("valid_token");
+    int32_t ret = callManagerService->OnCheckCallRecordingPermission(data, reply);
+    EXPECT_EQ(ret, 83951619);
+    CallObjectManager::callObjectPtrList_.clear();
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_OnCheckCallRecordingPermission_002, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data.WriteString("");
+    data.WriteString("token123");
+    int32_t ret = callManagerService->OnCheckCallRecordingPermission(data, reply);
+    EXPECT_EQ(ret, CALL_ERR_NUMBER_OUT_OF_RANGE);
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_OnCheckCallRecordingPermission_003, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    std::string longNumber(ACCOUNT_NUMBER_MAX_LENGTH + 1, '1');
+    data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data.WriteString(longNumber);
+    data.WriteString("token123");
+    int32_t ret = callManagerService->OnCheckCallRecordingPermission(data, reply);
+    EXPECT_EQ(ret, CALL_ERR_NUMBER_OUT_OF_RANGE);
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_CheckCallRecordingPermission_001, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    bool ret = callManagerService->CheckCallRecordingPermission("12345678910", "token123");
+    EXPECT_FALSE(ret);
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_CheckCallRecordingPermission_002, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo info;
+    info.number = "12345678910";
+    sptr<CallBase> call = new CSCall(info);
+    call->SetTelCallState(TelCallState::CALL_STATUS_HOLDING);
+    CallObjectManager::AddOneCallObject(call);
+    bool ret = callManagerService->CheckCallRecordingPermission("12345678910", "token123");
+    EXPECT_FALSE(ret);
+    CallObjectManager::callObjectPtrList_.clear();
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_CheckCallRecordingPermission_003, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo info;
+    info.number = "12345678910";
+    sptr<CallBase> call = new CSCall(info);
+    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    CallObjectManager::AddOneCallObject(call);
+    bool ret = callManagerService->CheckCallRecordingPermission("12345678910", "valid_token");
+    EXPECT_FALSE(ret);
+    CallObjectManager::callObjectPtrList_.clear();
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_CheckCallRecordingPermission_004, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo info;
+    info.number = "12345678910";
+    info.token = "valid_token";
+    sptr<CallBase> call = new CSCall(info);
+    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    CallObjectManager::AddOneCallObject(call);
+    bool ret = callManagerService->CheckCallRecordingPermission("12345678910", "wrong_token");
+    EXPECT_FALSE(ret);
+    CallObjectManager::callObjectPtrList_.clear();
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_CheckCallRecordingPermission_005, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo info;
+    info.number = "12345678910";
+    info.token = "valid_token";
+    sptr<CallBase> call = new CSCall(info);
+    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    CallObjectManager::AddOneCallObject(call);
+    bool ret = callManagerService->CheckCallRecordingPermission("12345678910", "valid_token");
+    EXPECT_FALSE(ret);
+    CallObjectManager::callObjectPtrList_.clear();
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_GenerateToken_001, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    std::string token = callManagerService->GenerateToken();
+    EXPECT_EQ(token.length(), 64);
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_UpdateChallengeToken_001, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->challengeTokenList_.clear();
+    CallManagerService::ChallengeToken challenge;
+    challenge.token = "token1";
+    challenge.phoneNumber = "12345678910";
+    challenge.uid = 1000;
+    challenge.isCustomAccessibility = true;
+    challenge.createTime = std::chrono::steady_clock::now();
+    callManagerService->TryUpdateChallengeTokenList("12345", challenge);
+    EXPECT_EQ(callManagerService->challengeTokenList_.size(), 1);
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_UpdateChallengeToken_002, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->challengeTokenList_.clear();
+    CallManagerService::ChallengeToken challenge1;
+    challenge1.token = "token1";
+    challenge1.phoneNumber = "12345";
+    challenge1.uid = 1000;
+    challenge1.isCustomAccessibility = true;
+    challenge1.createTime = std::chrono::steady_clock::now();
+    callManagerService->TryUpdateChallengeTokenList("12345", challenge1);
+    CallManagerService::ChallengeToken challenge2;
+    challenge2.token = "token2";
+    challenge2.phoneNumber = "67890";
+    challenge2.uid = 1000;
+    challenge2.isCustomAccessibility = false;
+    challenge2.createTime = std::chrono::steady_clock::now();
+    callManagerService->TryUpdateChallengeTokenList("67890", challenge2);
+    EXPECT_EQ(callManagerService->challengeTokenList_.size(), 1);
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_UpdateChallengeToken_003, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->challengeTokenList_.clear();
+    for (size_t i = 0; i < CallManagerService::MAX_CHALLENGE_TOKEN_COUNT; ++i) {
+        CallManagerService::ChallengeToken challenge;
+        challenge.token = "token" + std::to_string(i);
+        challenge.phoneNumber = "phone" + std::to_string(i);
+        challenge.uid = 1000 + static_cast<int32_t>(i);
+        challenge.isCustomAccessibility = false;
+        callManagerService->TryUpdateChallengeTokenList("phone" + std::to_string(i), challenge);
+    }
+    CallManagerService::ChallengeToken overflowChallenge;
+    overflowChallenge.token = "overflow";
+    overflowChallenge.phoneNumber = "overflowPhone";
+    overflowChallenge.uid = 9999;
+    overflowChallenge.isCustomAccessibility = false;
+    callManagerService->TryUpdateChallengeTokenList("overflowPhone", overflowChallenge);
+    EXPECT_EQ(callManagerService->challengeTokenList_.size(), 1);
+    callManagerService->challengeTokenList_.clear();
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_PopChallengeTokenByPhone_001, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->challengeTokenList_.clear();
+    auto result = callManagerService->PopChallengeTokenByPhone("12345");
+    EXPECT_FALSE(result.has_value());
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_PopChallengeTokenByPhone_002, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->challengeTokenList_.clear();
+    CallManagerService::ChallengeToken challenge;
+    challenge.token = "token1";
+    challenge.phoneNumber = "12345";
+    challenge.uid = 1000;
+    challenge.isCustomAccessibility = false;
+    challenge.createTime = std::chrono::steady_clock::now();
+    callManagerService->challengeTokenList_.push_back(challenge);
+    auto result = callManagerService->PopChallengeTokenByPhone("12345");
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->token, "token1");
+    EXPECT_EQ(callManagerService->challengeTokenList_.size(), 0);
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_FillExtrasFromChallengeToken_001, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->challengeTokenList_.clear();
+    AppExecFwk::PacMap extras;
+    callManagerService->FillExtrasFromChallengeToken("12345", extras);
+    EXPECT_FALSE(extras.HasKey("isCustomAccessibility"));
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_FillExtrasFromChallengeToken_002, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->challengeTokenList_.clear();
+    CallManagerService::ChallengeToken challenge;
+    challenge.token = "token1";
+    challenge.phoneNumber = "12345";
+    challenge.uid = 1000;
+    challenge.isCustomAccessibility = true;
+    challenge.createTime = std::chrono::steady_clock::now();
+    callManagerService->challengeTokenList_.push_back(challenge);
+    AppExecFwk::PacMap extras;
+    callManagerService->FillExtrasFromChallengeToken("12345", extras);
+    EXPECT_TRUE(extras.GetBooleanValue("isCustomAccessibility", false));
+    EXPECT_EQ(extras.GetStringValue("token"), "token1");
+    EXPECT_EQ(callManagerService->challengeTokenList_.size(), 0);
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_MakeCallWithToken_001, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    AppExecFwk::PacMap options;
+    std::string token;
+    int32_t ret = callManagerService->MakeCallWithToken("", options, token);
+    EXPECT_EQ(ret, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_MakeCallWithToken_002, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    AppExecFwk::PacMap options;
+    std::string token;
+    std::string longNumber(256, '1');
+    int32_t ret = callManagerService->MakeCallWithToken(longNumber, options, token);
+    EXPECT_EQ(ret, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_MakeCallWithToken_003, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->challengeTokenList_.clear();
+    AppExecFwk::PacMap options;
+    options.PutBooleanValue("isCustomAccessibility", true);
+    std::string token;
+    int32_t ret = callManagerService->MakeCallWithToken("12345", options, token);
+    EXPECT_NE(ret, TELEPHONY_SUCCESS);
+    callManagerService->challengeTokenList_.clear();
+}
+ 
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_MakeCallWithToken_004, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->challengeTokenList_.clear();
+    CallManagerService::ChallengeToken challenge1;
+    challenge1.token = "token1";
+    challenge1.phoneNumber = "111";
+    challenge1.uid = 1000;
+    challenge1.isCustomAccessibility = false;
+    challenge1.createTime = std::chrono::steady_clock::now();
+    callManagerService->challengeTokenList_.push_back(challenge1);
+    CallManagerService::ChallengeToken challenge2;
+    challenge2.token = "token2";
+    challenge2.phoneNumber = "222";
+    challenge2.uid = 1001;
+    challenge2.isCustomAccessibility = false;
+    challenge2.createTime = std::chrono::steady_clock::now();
+    callManagerService->challengeTokenList_.push_back(challenge2);
+    CallManagerService::ChallengeToken challenge3;
+    challenge3.token = "token3";
+    challenge3.phoneNumber = "333";
+    challenge3.uid = 1002;
+    challenge3.isCustomAccessibility = false;
+    challenge3.createTime = std::chrono::steady_clock::now();
+    callManagerService->challengeTokenList_.push_back(challenge3);
+    AppExecFwk::PacMap options;
+    std::string token;
+    int32_t ret = callManagerService->MakeCallWithToken("12345678910", options, token);
+    EXPECT_EQ(ret, TELEPHONY_ERR_UNINIT);
+    callManagerService->challengeTokenList_.clear();
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -103,6 +103,7 @@ call_manager_sources = [
   "${call_manager_path}/services/call_earthquake_alarm/src/call_earthquake_alarm_locator.cpp",
   "${call_manager_path}/services/call_earthquake_alarm/src/call_earthquake_alarm_subscriber.cpp",
   "${call_manager_path}/services/call_manager_service/src/call_manager_service.cpp",
+  "${call_manager_path}/services/call_manager_service/src/call_manager_service_ext.cpp",
   "${call_manager_path}/services/call_manager_service/src/call_manager_service_stub.cpp",
   "${call_manager_path}/services/call_manager_service/src/telephony_cust_wrapper.cpp",
   "${call_manager_path}/services/call_report/src/app_state_observer.cpp",

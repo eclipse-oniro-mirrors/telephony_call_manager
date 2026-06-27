@@ -54,7 +54,9 @@ struct DialParaInfo {
     VoipCallReportInfo voipCallInfo;
     AAFwk::WantParams extraParams;
     int32_t phoneOrWatch = 0;
+    bool isCustomAccessibility = false;
     int32_t newCallUseBox = 0;
+    std::string token = "";
 };
 
 enum PolicyFlag : uint64_t {

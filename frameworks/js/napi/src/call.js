@@ -55,7 +55,6 @@ async function makeCallFunc(...args) {
         console.log('[call] makeCall callback invalid');
         throw Error('invalid callback');
     }
-    
 }
 
 async function startAbility(args, context) {
@@ -108,6 +107,7 @@ async function startAbility(args, context) {
 
 export default {
     makeCall: makeCallFunc,
+    makeCallWithToken: call.makeCallWithToken,
     dialCall: call.dialCall,
     muteRinger: call.muteRinger,
     answerCall: call.answerCall,

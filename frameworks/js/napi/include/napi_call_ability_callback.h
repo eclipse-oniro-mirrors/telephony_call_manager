@@ -110,6 +110,7 @@ private:
     static void ReportCallStateWork(uv_work_t *work, int32_t status);
     static void ReportMeeTimeStateWork(uv_work_t *work, int32_t status);
     static int32_t ReportCallState(CallAttributeInfo &info, EventCallback stateCallback);
+    static void SetBaseCallStateProperties(napi_env env, napi_value &callStateObj, const CallAttributeInfo &info);
     static void ReportCallAttribute(napi_env &env, napi_value callbackValues[],
         const size_t callbackValuesCount, CallAttributeInfo &info);
     static void CreateVoipNapiValue(napi_env &env, napi_value &voipObject, CallAttributeInfo &info);
