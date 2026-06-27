@@ -75,7 +75,6 @@ static constexpr int32_t IS_CELIA_CALL = 1;
 static constexpr int32_t EDM_UID = 3057;
 static constexpr int32_t AUDIO_UID = 1041;
 static std::unordered_map<std::string, std::chrono::steady_clock::time_point> lastGetCallTransferInfoTimes_;
-
 static const int32_t MIN_GET_CALL_TRANSFER_TIME = 30;
 
 const bool g_registerResult =
@@ -356,8 +355,6 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
     }
 }
 
-
-
 void CallManagerService::BtCallWaitSlotId(AppExecFwk::PacMap &dialInfo, const std::u16string &number)
 {
 #ifdef SUPPORT_DSOFTBUS
@@ -395,8 +392,6 @@ int32_t CallManagerService::MakeCall(std::string number)
     }
     return TELEPHONY_SUCCESS;
 }
-
-
 
 int32_t CallManagerService::AnswerCall(int32_t callId, int32_t videoState, bool isRTT)
 {
@@ -2054,7 +2049,5 @@ int32_t CallManagerService::GetCallTransferInfo(const std::string number, CallTr
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
-
-
 } // namespace Telephony
 } // namespace OHOS
