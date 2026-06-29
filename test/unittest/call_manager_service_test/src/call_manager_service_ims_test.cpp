@@ -110,7 +110,8 @@ HWTEST_F(CallManagerServiceTest, CallManagerService_SetCallRestriction_0100, Tes
 HWTEST_F(CallManagerServiceTest, CallManagerService_SetCallRestrictionPassword_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
-    int32_t ret = service_->SetCallRestrictionPassword(0, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING, "old", "new");
+    int32_t ret = service_->SetCallRestrictionPassword(0,
+        CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING, "old", "new");
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 

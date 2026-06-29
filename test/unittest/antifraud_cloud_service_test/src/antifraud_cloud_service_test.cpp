@@ -234,7 +234,8 @@ HWTEST_F(AntiFraudCloudServiceTest, AntiFraudCloudService_GetDeviceSerial_1200, 
 
 HWTEST_F(AntiFraudCloudServiceTest, AntiFraudCloudService_GenerateHeadersMap_1300, TestSize.Level1)
 {
-    std::map<std::string, std::string> headers = cloudService_->GenerateHeadersMap("test_auth", "test_content", "test_boundary");
+    std::map<std::string, std::string> headers =
+        cloudService_->GenerateHeadersMap("test_auth", "test_content", "test_boundary");
     EXPECT_FALSE(headers.empty());
     EXPECT_TRUE(headers.find("Authorization") != headers.end());
     EXPECT_TRUE(headers.find("Content-Type") != headers.end());

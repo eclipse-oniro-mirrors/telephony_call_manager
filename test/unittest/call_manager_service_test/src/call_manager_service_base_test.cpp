@@ -25,7 +25,8 @@ namespace Telephony {
  */
 HWTEST_F(CallManagerServiceTest, CallManagerService_GetServiceRunningState_0100, TestSize.Level1)
 {
-    EXPECT_EQ(service_->GetServiceRunningState(), static_cast<int32_t>(CallManagerService::ServiceRunningState::STATE_STOPPED));
+    EXPECT_EQ(service_->GetServiceRunningState(),
+        static_cast<int32_t>(CallManagerService::ServiceRunningState::STATE_STOPPED));
 }
 
 /**

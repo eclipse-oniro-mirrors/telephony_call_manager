@@ -202,7 +202,7 @@ HWTEST_F(CallManagerServiceTest, CallManagerService_IsNewCallAllowed_0100, TestS
 
 /**
  * @tc.number   CallManagerService_HoldCall_0100
- * @tc.name     test HoldCall with null callControlManagerPtr_  
+ * @tc.name     test HoldCall with null callControlManagerPtr_
  * @tc.desc     Branch coverage: callControlManagerPtr_  == nullprt path
  */
 HWTEST_F(CallManagerServiceTest, CallManagerService_HoldCall_0100, TestSize.Level1)

@@ -406,7 +406,7 @@ public:
     }
 };
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRemoteRequest_0100, TestSize.Level0)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRemoteRequest_0100, TestSize.Level0)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -420,7 +420,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRemoteRe
     EXPECT_EQ(result, TELEPHONY_ERR_DESCRIPTOR_MISMATCH);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRemoteRequest_0200, TestSize.Level0)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRemoteRequest_0200, TestSize.Level0)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -433,7 +433,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRemoteRe
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRemoteRequest_0300, TestSize.Level0)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRemoteRequest_0300, TestSize.Level0)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -447,7 +447,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRemoteRe
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRegisterCallBack_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRegisterCallBack_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -459,7 +459,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRegister
     EXPECT_EQ(result, TELEPHONY_ERR_FAIL);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnDialCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnDialCall_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -481,7 +481,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnDialCall
     EXPECT_EQ(result, CALL_ERR_NUMBER_OUT_OF_RANGE);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnDialCall_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnDialCall_0200, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -503,7 +503,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnDialCall
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnMakeCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnMakeCall_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -516,7 +516,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnMakeCall
     EXPECT_EQ(result, CALL_ERR_NUMBER_OUT_OF_RANGE);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnMakeCall_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnMakeCall_0200, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -529,7 +529,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnMakeCall
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnAcceptCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnAcceptCall_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -543,7 +543,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnAcceptCa
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRejectCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRejectCall_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -557,7 +557,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRejectCa
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnHangUpCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnHangUpCall_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -569,7 +569,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnHangUpCa
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetCallState_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetCallState_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -579,7 +579,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetCallS
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnHoldCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnHoldCall_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -591,7 +591,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnHoldCall
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnUnHoldCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnUnHoldCall_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -603,7 +603,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnUnHoldCa
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSwitchCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSwitchCall_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -615,7 +615,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSwitchCa
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnHasCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnHasCall_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -627,7 +627,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnHasCall_
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnIsNewCallAllowed_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnIsNewCallAllowed_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -637,7 +637,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnIsNewCal
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetMute_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetMute_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -649,7 +649,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetMute_
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnMuteRinger_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnMuteRinger_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -659,7 +659,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnMuteRing
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetAudioDevice_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetAudioDevice_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -673,7 +673,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetAudio
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetAudioDevice_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetAudioDevice_0200, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -683,7 +683,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetAudio
     EXPECT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnIsRinging_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnIsRinging_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -693,7 +693,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnIsRingin
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnIsInEmergencyCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnIsInEmergencyCall_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -703,7 +703,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnIsInEmer
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnStartDtmf_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnStartDtmf_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -716,7 +716,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnStartDtm
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnStopDtmf_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnStopDtmf_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -728,7 +728,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnStopDtmf
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetCallWaiting_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetCallWaiting_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -740,7 +740,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetCallW
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCallWaiting_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetCallWaiting_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -753,7 +753,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCallW
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnCombineConference_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnCombineConference_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -765,7 +765,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnCombineC
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSeparateConference_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSeparateConference_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -777,7 +777,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSeparate
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnKickOutFromConference_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnKickOutFromConference_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -789,7 +789,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnKickOutF
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnJoinConference_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnJoinConference_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -804,7 +804,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnJoinConf
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnJoinConference_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnJoinConference_0200, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -816,7 +816,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnJoinConf
     EXPECT_EQ(result, TELEPHONY_ERR_WRITE_DATA_FAIL);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnIsEmergencyPhoneNumber_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnIsEmergencyPhoneNumber_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -829,7 +829,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnIsEmerge
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnFormatPhoneNumber_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnFormatPhoneNumber_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -842,7 +842,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnFormatPh
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnFormatPhoneNumberToE164_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnFormatPhoneNumberToE164_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -855,7 +855,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnFormatPh
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetMainCallId_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetMainCallId_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -867,7 +867,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetMainC
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetSubCallIdList_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetSubCallIdList_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -879,7 +879,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetSubCa
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetCallIdListForConference_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetCallIdListForConference_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -891,7 +891,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetCallI
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnEnableVoLte_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnEnableVoLte_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -903,7 +903,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnEnableVo
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnDisableVoLte_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnDisableVoLte_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -915,7 +915,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnDisableV
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnIsVoLteEnabled_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnIsVoLteEnabled_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -927,7 +927,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnIsVoLteE
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRegisterVoipCallManagerCallback_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRegisterVoipCallManagerCallback_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -937,7 +937,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRegister
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnUnRegisterVoipCallManagerCallback_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnUnRegisterVoipCallManagerCallback_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -947,7 +947,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnUnRegist
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnEndCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnEndCall_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -957,7 +957,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnEndCall_
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnHasDistributedCommunicationCapability_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnHasDistributedCommunicationCapability_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -967,7 +967,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnHasDistr
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_SetTimer_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_SetTimer_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
 
@@ -976,7 +976,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_SetTimer_0
     EXPECT_NE(result, -1);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_SetTimer_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_SetTimer_0200, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
 
@@ -984,14 +984,14 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_SetTimer_0
     EXPECT_EQ(result, -1);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_CancelTimer_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_CancelTimer_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
 
     stub->CancelTimer(-1);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnReportOttCallDetailsInfo_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnReportOttCallDetailsInfo_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1003,7 +1003,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnReportOt
     EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnReportOttCallDetailsInfo_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnReportOttCallDetailsInfo_0200, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1015,7 +1015,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnReportOt
     EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnReportOttCallDetailsInfo_0300, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnReportOttCallDetailsInfo_0300, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1030,7 +1030,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnReportOt
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnReportOttCallEventInfo_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnReportOttCallEventInfo_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1044,7 +1044,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnReportOt
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnReportOttCallEventInfo_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnReportOttCallEventInfo_0200, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1054,7 +1054,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnReportOt
     EXPECT_EQ(result, TELEPHONY_ERR_FAIL);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRegisterBluetoothCallManagerCallbackPtr_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRegisterBluetoothCallManagerCallbackPtr_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1066,7 +1066,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRegister
     EXPECT_EQ(result, TELEPHONY_ERR_FAIL);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnAcceptCallNoParam_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnAcceptCallNoParam_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1076,7 +1076,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnAcceptCa
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRejectCallNoParam_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRejectCallNoParam_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1086,7 +1086,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRejectCa
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnHangUpCallNoParam_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnHangUpCallNoParam_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1096,7 +1096,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnHangUpCa
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCallAudioMode_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetCallAudioMode_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1109,7 +1109,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCallA
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnNotifyVoIPAudioStreamStart_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnNotifyVoIPAudioStreamStart_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1121,7 +1121,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnNotifyVo
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetTransferNumberByNumber_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetTransferNumberByNumber_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1134,7 +1134,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetTrans
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSendUssdResponse_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSendUssdResponse_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1147,7 +1147,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSendUssd
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCallPolicyInfo_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetCallPolicyInfo_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1166,7 +1166,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCallP
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSendCallUiEvent_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSendCallUiEvent_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1179,7 +1179,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSendCall
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnPreloadCallUi_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnPreloadCallUi_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1191,7 +1191,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnPreloadC
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnCancelCallUpgrade_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnCancelCallUpgrade_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1203,7 +1203,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnCancelCa
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRequestCameraCapabilities_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRequestCameraCapabilities_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1215,7 +1215,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRequestC
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRemoveMissedIncomingCallNotification_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRemoveMissedIncomingCallNotification_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1225,7 +1225,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnRemoveMi
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnInputDialerSpecialCode_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnInputDialerSpecialCode_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1237,7 +1237,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnInputDia
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnCloseUnFinishedUssd_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnCloseUnFinishedUssd_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1249,7 +1249,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnCloseUnF
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetProxyObjectPtr_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetProxyObjectPtr_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1261,7 +1261,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetProxy
     EXPECT_NE(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnReportAudioDeviceInfo_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnReportAudioDeviceInfo_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1271,7 +1271,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnReportAu
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetVoIPCallState_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetVoIPCallState_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1283,7 +1283,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetVoIPC
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetVoIPCallState_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetVoIPCallState_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1293,7 +1293,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetVoIPC
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetVoIPCallInfo_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetVoIPCallInfo_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1307,7 +1307,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetVoIPC
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetVoIPCallInfo_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetVoIPCallInfo_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1317,7 +1317,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetVoIPC
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCallPreferenceMode_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetCallPreferenceMode_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1330,7 +1330,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCallP
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnControlCamera_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnControlCamera_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1343,7 +1343,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnControlC
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetPreviewWindow_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetPreviewWindow_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1357,7 +1357,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetPrevi
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetDisplayWindow_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetDisplayWindow_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1371,7 +1371,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetDispl
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCameraZoom_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetCameraZoom_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1383,7 +1383,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCamer
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetPausePicture_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetPausePicture_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1396,7 +1396,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetPause
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetDeviceDirection_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetDeviceDirection_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1409,7 +1409,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetDevic
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetImsConfig_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetImsConfig_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1422,7 +1422,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetImsCo
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetImsConfig_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetImsConfig_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1436,7 +1436,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetImsCo
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetImsFeatureValue_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetImsFeatureValue_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1449,7 +1449,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetImsFe
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetImsFeatureValue_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetImsFeatureValue_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1463,7 +1463,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetImsFe
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnUpdateCallMediaMode_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnUpdateCallMediaMode_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1476,7 +1476,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnUpdateCa
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetVoNRState_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetVoNRState_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1489,7 +1489,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetVoNRS
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetVoNRState_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetVoNRState_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1501,7 +1501,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetVoNRS
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetTransferNumber_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetTransferNumber_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1514,7 +1514,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetTrans
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetTransferNumber_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetTransferNumber_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1529,7 +1529,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetTrans
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetTransferNumber_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetTransferNumber_0200, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1541,7 +1541,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetTrans
     EXPECT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnCanSetCallTransferTime_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnCanSetCallTransferTime_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1554,7 +1554,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnCanSetCa
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetCallRestriction_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetCallRestriction_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1567,7 +1567,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnGetCallR
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCallRestriction_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetCallRestriction_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1582,7 +1582,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCallR
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCallRestriction_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetCallRestriction_0200, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1594,7 +1594,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCallR
     EXPECT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCallRestrictionPassword_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetCallRestrictionPassword_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1609,7 +1609,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnSetCallR
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnPostDialProceed_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnPostDialProceed_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1622,7 +1622,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnPostDial
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnObserverOnCallDetailsChange_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnObserverOnCallDetailsChange_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1632,7 +1632,7 @@ HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnObserver
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, Telephony_CallManagerServiceStub_OnUnRegisterCallBack_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnUnRegisterCallBack_0100, TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;

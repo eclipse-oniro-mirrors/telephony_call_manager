@@ -662,7 +662,8 @@ HWTEST_F(CallVoiceAssistantManagerTest, CallVoiceAssistantManager_UpdateReplyDat
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     ASSERT_FALSE(voicePtr == nullptr);
-    std::string reply = "{\"incomingCallVoiceControlCheckResult\":\"1\",\"incomingCallVoiceBroadcastCheckResult\":\"1\"}";
+    std::string reply =
+        "{\"incomingCallVoiceControlCheckResult\":\"1\",\"incomingCallVoiceBroadcastCheckResult\":\"1\"}";
     voicePtr->UpdateReplyData(reply);
 }
 
@@ -783,7 +784,8 @@ HWTEST_F(CallVoiceAssistantManagerTest, CallVoiceAssistantManager_CallStateUpdat
     callObjectPtr->SetCallType(CallType::TYPE_CS);
     callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
     CallObjectManager::AddOneCallObject(callObjectPtr);
-    voicePtr->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_DISCONNECTED);
+    voicePtr->CallStateUpdated(callObjectPtr,
+        TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_DISCONNECTED);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     CallObjectManager::DeleteOneCallObject(1);
 }

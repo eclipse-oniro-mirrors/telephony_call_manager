@@ -83,7 +83,7 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_KickOutConference_
  */
 HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_KickOutConference_0200, TestSize.Level1)
 {
-    int32_t ret = service_->KickOutConference(1);   
+    int32_t ret = service_->KickOutConference(1);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
