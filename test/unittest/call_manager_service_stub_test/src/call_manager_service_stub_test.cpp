@@ -1023,7 +1023,6 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnReportOttCallDetai
 
     data.WriteInt32(1);
     OttCallDetailsInfo info;
-    memset(&info, 0, sizeof(info));
     data.WriteRawData(&info, sizeof(info));
 
     int32_t result = stub->OnReportOttCallDetailsInfo(data, reply);
