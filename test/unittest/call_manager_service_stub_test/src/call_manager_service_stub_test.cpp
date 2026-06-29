@@ -1524,7 +1524,6 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetTransferNumber_
 
     data.WriteInt32(VALID_SLOT_ID);
     CallTransferInfo info;
-    memset(&info, 0, sizeof(info));
     data.WriteRawData(&info, sizeof(info));
 
     int32_t result = stub->OnSetTransferNumber(data, reply);
