@@ -142,7 +142,7 @@ group("unittest") {
   if (call_manager_feature_support_rtt) {
     deps += [ "rtt_test:rtt_call_test" ]
   }
-  deps += [ "call_manager_service_stub_test:tel_call_manager_service_stub1_gtest" ]
+  deps += [ "call_manager_service_stub_test:tel_call_manager_service_stub_gtest" ]
   deps += [ "call_manager_service_test:tel_call_manager_service1_gtest" ]
   deps += [ "call_manager_service_test:tel_call_manager_service2_gtest" ]
   deps += [ "call_manager_service_test:tel_call_manager_service3_gtest" ]
