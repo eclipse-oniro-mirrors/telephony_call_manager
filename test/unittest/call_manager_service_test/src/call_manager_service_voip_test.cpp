@@ -18,11 +18,11 @@ namespace OHOS {
 namespace Telephony {
 
 /**
- * @tc.number   Telephony_CallManagerService_SetVoIPCallState_0100
+ * @tc.number   CallManagerService_SetVoIPCallState_0100
  * @tc.name     test SetVoIPCallState with null callControlManagerPtr_
  * @tc.desc     Branch coverage: callControlManagerPtr_ == nullptr path
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetVoIPCallState_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SetVoIPCallState_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->SetVoIPCallState(0);
@@ -30,22 +30,22 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetVoIPCallState_0
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_SetVoIPCallState_0200
+ * @tc.number   CallManagerService_SetVoIPCallState_0200
  * @tc.name     test SetVoIPCallState with valid callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetVoIPCallState_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SetVoIPCallState_0200, TestSize.Level1)
 {
     int32_t ret = service_->SetVoIPCallState(0);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_GetVoipCallState_0100
+ * @tc.number   CallManagerService_GetVoipCallState_0100
  * @tc.name     test GetVoipCallState with null callControlManagerPtr_
  * @tc.desc     Branch coverage: callControlManagerPtr_ == nullptr path
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetVoipCallState_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_GetVoipCallState_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t state = 0;
@@ -54,11 +54,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetVoipCallState_0
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_GetVoipCallState_0200
+ * @tc.number   CallManagerService_GetVoipCallState_0200
  * @tc.name     test GetVoipCallState with valid callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetVoipCallState_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_GetVoipCallState_0200, TestSize.Level1)
 {
     int32_t state = 0;
     int32_t ret = service_->GetVoipCallState(state);
@@ -66,11 +66,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetVoipCallState_0
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_SetVoIPCallInfo_0100
+ * @tc.number   CallManagerService_SetVoIPCallInfo_0100
  * @tc.name     test SetVoIPCallInfo with null callControlManagerPtr_
  * @tc.desc     Branch coverage: callControlManagerPtr_ == nullptr path
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetVoIPCallInfo_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SetVoIPCallInfo_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->SetVoIPCallInfo(0);
@@ -78,22 +78,22 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetVoIPCallInfo_01
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_SetVoIPCallInfo_0200
+ * @tc.number   CallManagerService_SetVoIPCallInfo_0200
  * @tc.name     test SetVoIPCallInfo with valid callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetVoIPCallInfo_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SetVoIPCallInfo_0200, TestSize.Level1)
 {
     int32_t ret = service_->SetVoIPCallInfo(0);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_GetVoIPCallInfo_0100
+ * @tc.number   CallManagerService_GetVoIPCallInfo_0100
  * @tc.name     test GetVoIPCallInfo with null callControlManagerPtr_
  * @tc.desc     Branch coverage: callControlManagerPtr_ == nullptr path
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetVoIPCallInfo_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_GetVoIPCallInfo_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t callId = 0;
@@ -104,11 +104,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetVoIPCallInfo_01
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_GetVoIPCallInfo_0200
+ * @tc.number   CallManagerService_GetVoIPCallInfo_0200
  * @tc.name     test GetVoIPCallInfo with valid callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetVoIPCallInfo_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_GetVoIPCallInfo_0200, TestSize.Level1)
 {
     int32_t callId = 0;
     int32_t state = 0;
@@ -118,11 +118,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetVoIPCallInfo_02
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_PreloadCallUi_0100
+ * @tc.number   CallManagerService_PreloadCallUi_0100
  * @tc.name     test PrereloadCallUi with valid callControlManagerPtr_
  * @tc.desc     Branch coverage: callControlManagerPtr_ == nullptr path
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_PreloadCallUi_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_PreloadCallUi_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->PreloadCallUi(true);
@@ -130,11 +130,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_PreloadCallUi_0100
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_NotifyVoIPAudioStreamStart_0100
+ * @tc.number   CallManagerService_NotifyVoIPAudioStreamStart_0100
  * @tc.name     test NotifyVoIPAudioStreamStart with invalid caller UID
  * @tc.desc     Branch coverage: IPCSkeleton::GetCallingUid() == AUDIO_UID_INVALID
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_NotifyVoIPAudioStreamStart_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_NotifyVoIPAudioStreamStart_0100, TestSize.Level1)
 {
     int32_t testdata = 9999;
     int32_t ret = service_->NotifyVoIPAudioStreamStart(testdata);
@@ -142,33 +142,33 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_NotifyVoIPAudioStr
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_CancelCallUpgrade_0100
+ * @tc.number   CallManagerService_CancelCallUpgrade_0100
  * @tc.name     test CancelCallUpgrade with null videoControlManager
  * @tc.desc     Branch coverage: videoControlManager == nullptr path
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_CancelCallUpgrade_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_CancelCallUpgrade_0100, TestSize.Level1)
 {
     int32_t ret = service_->CancelCallUpgrade(1);
     EXPECT_NE(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_RequestCameraCapabilities_0100
+ * @tc.number   CallManagerService_RequestCameraCapabilities_0100
  * @tc.name     test RequestCameraCapabilities with valid videoControlManager
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_RequestCameraCapabilities_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_RequestCameraCapabilities_0100, TestSize.Level1)
 {
     int32_t ret = service_->RequestCameraCapabilities(1);
     EXPECT_NE(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_InputDialerSpecialCode_0100
+ * @tc.number   CallManagerService_InputDialerSpecialCode_0100
  * @tc.name     test InputDialerSpecialCode with supported code
  * @tc.desc     Function test for InputDialerSpecialCode
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_InputDialerSpecialCode_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_InputDialerSpecialCode_0100, TestSize.Level1)
 {
     std::string specialCode = "*#2846#*";
     int32_t ret = service_->InputDialerSpecialCode(specialCode);
@@ -176,11 +176,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_InputDialerSpecial
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_InputDialerSpecialCode_0200
+ * @tc.number   CallManagerService_InputDialerSpecialCode_0200
  * @tc.name     test InputDialerSpecialCode with unsupported code
  * @tc.desc     Branch coverage: specialCode is supportSpecialCode_ list
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_InputDialerSpecialCode_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_InputDialerSpecialCode_0200, TestSize.Level1)
 {
     std::string specialCode = "invalid_code";
     int32_t ret = service_->InputDialerSpecialCode(specialCode);
@@ -188,11 +188,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_InputDialerSpecial
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_RemoveMissedIncomingCallNotfication_0100
+ * @tc.number   CallManagerService_RemoveMissedIncomingCallNotfication_0100
  * @tc.name     test RemoveMissedIncomingCallNotfication with valid callControlManagerPtr_
  * @tc.desc     Branch coverage: callControlManagerPtr_ == nullptr path
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_RemoveMissedIncomingCallNotfication_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_RemoveMissedIncomingCallNotfication_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->RemoveMissedIncomingCallNotfication();

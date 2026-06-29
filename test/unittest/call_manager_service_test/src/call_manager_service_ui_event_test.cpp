@@ -19,11 +19,11 @@ namespace OHOS {
 namespace Telephony {
 
 /**
- * @tc.number   Telephony_CallManagerService_SendCallUiEvent_0100
+ * @tc.number   CallManagerService_SendCallUiEvent_0100
  * @tc.name     test SendCallUiEvent with various events
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SendCallUiEvent_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SendCallUiEvent_0100, TestSize.Level1)
 {
     std::string eventName = "EVENT_IS_CELIA_CALL";
     int32_t ret = service_->SendCallUiEvent(1, eventName);
@@ -52,11 +52,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SendCallUiEvent_01
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_SendCallUiEvent_0200
+ * @tc.number   CallManagerService_SendCallUiEvent_0200
  * @tc.name     test SendCallUiEvent with more events
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SendCallUiEvent_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SendCallUiEvent_0200, TestSize.Level1)
 {
     std::string eventName = "DISPLAY_SPECIFIED_CALL_PAGE_BY_CALL_ID";
     int32_t ret = service_->SendCallUiEvent(999, eventName);
@@ -88,11 +88,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SendCallUiEvent_02
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_HandleVoIPCallEvent_0100
+ * @tc.number   CallManagerService_HandleVoIPCallEvent_0100
  * @tc.name     test HandleVoIPCallEvent with null call
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_HandleVoIPCallEvent_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_HandleVoIPCallEvent_0100, TestSize.Level1)
 {
     std::string eventName = "EVENT_VOIP_CALL_SUCCESS";
     int32_t ret = service_->HandleVoIPCallEvent(999, eventName);
@@ -104,55 +104,55 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_HandleVoIPCallEven
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_HandleDisplaySpecifiedCallPage_0100
+ * @tc.number   CallManagerService_HandleDisplaySpecifiedCallPage_0100
  * @tc.name     test HandleDisplaySpecifiedCallPage with null call
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_HandleDisplaySpecifiedCallPage_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_HandleDisplaySpecifiedCallPage_0100, TestSize.Level1)
 {
     int32_t ret = service_->HandleDisplaySpecifiedCallPage(999);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_HandleCeliaAutoAnswerCall_0100
+ * @tc.number   CallManagerService_HandleCeliaAutoAnswerCall_0100
  * @tc.name     test HandleCeliaAutoAnswerCall with null call
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_HandleCeliaAutoAnswerCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_HandleCeliaAutoAnswerCall_0100, TestSize.Level1)
 {
     int32_t ret = service_->HandleCeliaAutoAnswerCall(999, true);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_dealCeliaCallEvent_0100
+ * @tc.number   CallManagerService_dealCeliaCallEvent_0100
  * @tc.name     test dealCeliaCallEvent with null call
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_dealCeliaCallEvent_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_dealCeliaCallEvent_0100, TestSize.Level1)
 {
     int32_t ret = service_->dealCeliaCallEvent(999);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_SendUssdResponse_0100
+ * @tc.number   CallManagerService_SendUssdResponse_0100
  * @tc.name     test SendUssdResponse
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SendUssdResponse_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SendUssdResponse_0100, TestSize.Level1)
 {
     int32_t ret = service_->SendUssdResponse(0, "1");
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_SetCallAudioMode_0100
+ * @tc.number   CallManagerService_SetCallAudioMode_0100
  * @tc.name     test SetCallAudioMode with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallAudioMode_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SetCallAudioMode_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->SetCallAudioMode(0, 0);
@@ -160,11 +160,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallAudioMode_0
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_CloseUnFinishedUssd_0100
+ * @tc.number   CallManagerService_CloseUnFinishedUssd_0100
  * @tc.name     test CloseUnFinishedUssd with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_CloseUnFinishedUssd_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_CloseUnFinishedUssd_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->CloseUnFinishedUssd(0);
@@ -172,11 +172,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_CloseUnFinishedUss
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_ReportOttCallEventInfo_0100
+ * @tc.number   CallManagerService_ReportOttCallEventInfo_0100
  * @tc.name     test ReportOttCallEventInfo
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_ReportOttCallEventInfo_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_ReportOttCallEventInfo_0100, TestSize.Level1)
 {
     OttCallEventInfo eventInfo;
     int32_t ret = service_->ReportOttCallEventInfo(eventInfo);

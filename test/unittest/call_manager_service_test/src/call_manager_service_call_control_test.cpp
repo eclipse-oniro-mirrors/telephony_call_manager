@@ -19,11 +19,11 @@ namespace OHOS {
 namespace Telephony {
 
 /**
- * @tc.number   Telephony_CallManagerService_DialCall_0100
+ * @tc.number   CallManagerService_DialCall_0100
  * @tc.name     test DialCall with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_DialCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_DialCall_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     std::u16string number = Str8ToStr16("10086");
@@ -35,11 +35,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_DialCall_0100, Tes
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_DialCall_0200
+ * @tc.number   CallManagerService_DialCall_0200
  * @tc.name     test DialCall with valid callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_DialCall_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_DialCall_0200, TestSize.Level1)
 {
     std::u16string number = Str8ToStr16("10086");
     AppExecFwk::PacMap extras;
@@ -51,11 +51,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_DialCall_0200, Tes
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_DialCall_0300
+ * @tc.number   CallManagerService_DialCall_0300
  * @tc.name     test DialCall with btSlotIdUnknown flag
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_DialCall_0300, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_DialCall_0300, TestSize.Level1)
 {
     std::u16string number = Str8ToStr16("10086");
     AppExecFwk::PacMap extras;
@@ -67,11 +67,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_DialCall_0300, Tes
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_AnswerCall_0100
+ * @tc.number   CallManagerService_AnswerCall_0100
  * @tc.name     test AnswerCall with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_AnswerCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_AnswerCall_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->AnswerCall(1, 0, false);
@@ -79,33 +79,33 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_AnswerCall_0100, T
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_AnswerCall_0200
+ * @tc.number   CallManagerService_AnswerCall_0200
  * @tc.name     test AnswerCall with valid callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_AnswerCall_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_AnswerCall_0200, TestSize.Level1)
 {
     int32_t ret = service_->AnswerCall(1, 0, false);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_AnswerCall_0300
+ * @tc.number   CallManagerService_AnswerCall_0300
  * @tc.name     test AnswerCall without callId
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_AnswerCall_0300, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_AnswerCall_0300, TestSize.Level1)
 {
     int32_t ret = service_->AnswerCall();
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_RejectCall_0100
+ * @tc.number   CallManagerService_RejectCall_0100
  * @tc.name     test RejectCall with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_RejectCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_RejectCall_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     std::u16string textMessage = Str8ToStr16("test");
@@ -114,22 +114,22 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_RejectCall_0100, T
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_RejectCall_0200
+ * @tc.number   CallManagerService_RejectCall_0200
  * @tc.name     test RejectCall without parameters
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_RejectCall_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_RejectCall_0200, TestSize.Level1)
 {
     int32_t ret = service_->RejectCall();
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_HangUpCall_0100
+ * @tc.number   CallManagerService_HangUpCall_0100
  * @tc.name     test HangUpCall with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_HangUpCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_HangUpCall_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->HangUpCall(1);
@@ -137,22 +137,22 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_HangUpCall_0100, T
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_HangUpCall_0200
+ * @tc.number   CallManagerService_HangUpCall_0200
  * @tc.name     test HangUpCall without callId
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_HangUpCall_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_HangUpCall_0200, TestSize.Level1)
 {
     int32_t ret = service_->HangUpCall();
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_EndCall_0100
+ * @tc.number   CallManagerService_EndCall_0100
  * @tc.name     test EndCall with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_EndCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_EndCall_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     bool ret = service_->EndCall();
@@ -160,22 +160,22 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_EndCall_0100, Test
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_EndCall_0200
+ * @tc.number   CallManagerService_EndCall_0200
  * @tc.name     test EndCall with valid callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_EndCall_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_EndCall_0200, TestSize.Level1)
 {
     bool ret = service_->EndCall();
     EXPECT_FALSE(ret);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_MakeCall_0100
+ * @tc.number   CallManagerService_MakeCall_0100
  * @tc.name     test MakeCall
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_MakeCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_MakeCall_0100, TestSize.Level1)
 {
     int32_t ret = service_->MakeCall("10086");
     EXPECT_NE(ret, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);

@@ -19,11 +19,11 @@ namespace OHOS {
 namespace Telephony {
 
 /**
- * @tc.number   Telephony_CallManagerService_GetImsConfig_0100
+ * @tc.number   CallManagerService_GetImsConfig_0100
  * @tc.name     test GetImsConfig with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetImsConfig_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_GetImsConfig_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->GetImsConfig(0, ImsConfigItem::ITEM_VIDEO_QUALITY);
@@ -31,22 +31,22 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetImsConfig_0100,
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_UpdateImsCallMode_0100
+ * @tc.number   CallManagerService_UpdateImsCallMode_0100
  * @tc.name     test UpdateImsCallMode
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_UpdateImsCallMode_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_UpdateImsCallMode_0100, TestSize.Level1)
 {
     int32_t ret = service_->UpdateImsCallMode(1, ImsCallMode::CALL_MODE_AUDIO_ONLY);
     EXPECT_NE(ret, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_SetCallPreferenceMode_0100
+ * @tc.number   CallManagerService_SetCallPreferenceMode_0100
  * @tc.name     test SetCallPreferenceMode with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallPreferenceMode_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SetCallPreferenceMode_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->SetCallPreferenceMode(0, 0);
@@ -54,11 +54,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallPreferenceM
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_GetCallWaiting_0100
+ * @tc.number   CallManagerService_GetCallWaiting_0100
  * @tc.name     test GetCallWaiting with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetCallWaiting_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_GetCallWaiting_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->GetCallWaiting(0);
@@ -66,11 +66,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetCallWaiting_010
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_SetCallWaiting_0100
+ * @tc.number   CallManagerService_SetCallWaiting_0100
  * @tc.name     test SetCallWaiting with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallWaiting_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SetCallWaiting_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->SetCallWaiting(0, true);
@@ -78,11 +78,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallWaiting_010
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_GetCallRestriction_0100
+ * @tc.number   CallManagerService_GetCallRestriction_0100
  * @tc.name     test GetCallRestriction with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetCallRestriction_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_GetCallRestriction_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->GetCallRestriction(0, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING);
@@ -90,11 +90,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetCallRestriction
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_SetCallRestriction_0100
+ * @tc.number   CallManagerService_SetCallRestriction_0100
  * @tc.name     test SetCallRestriction with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallRestriction_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SetCallRestriction_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     CallRestrictionInfo info;
@@ -103,11 +103,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallRestriction
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_SetCallRestrictionPassword_0100
+ * @tc.number   CallManagerService_SetCallRestrictionPassword_0100
  * @tc.name     test SetCallRestrictionPassword with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallRestrictionPassword_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SetCallRestrictionPassword_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->SetCallRestrictionPassword(0, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING, "old", "new");
@@ -115,11 +115,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallRestriction
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_GetCallTransferInfo_0100
+ * @tc.number   CallManagerService_GetCallTransferInfo_0100
  * @tc.name     test GetCallTransferInfo with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetCallTransferInfo_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_GetCallTransferInfo_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->GetCallTransferInfo(0, CallTransferType::TRANSFER_TYPE_UNCONDITIONAL);
@@ -127,11 +127,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetCallTransferInf
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_SetCallTransferInfo_0100
+ * @tc.number   CallManagerService_SetCallTransferInfo_0100
  * @tc.name     test SetCallTransferInfo with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallTransferInfo_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SetCallTransferInfo_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     CallTransferInfo info;
@@ -140,11 +140,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallTransferInf
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_CanSetCallTransferTime_0100
+ * @tc.number   CallManagerService_CanSetCallTransferTime_0100
  * @tc.name     test CanSetCallTransferTime with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_CanSetCallTransferTime_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_CanSetCallTransferTime_0100, TestSize.Level1)
 {
     SetCallControlManagerNull();
     bool result = false;
@@ -153,22 +153,22 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_CanSetCallTransfer
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_GetCallTransferInfo_ByNumber_0100
+ * @tc.number   CallManagerService_GetCallTransferInfo_ByNumber_0100
  * @tc.name     test GetCallTransferInfo by number with invalid number
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetCallTransferInfo_ByNumber_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_GetCallTransferInfo_ByNumber_0100, TestSize.Level1)
 {
     int32_t ret = service_->GetCallTransferInfo("invalid_number", CallTransferType::TRANSFER_TYPE_UNCONDITIONAL);
     EXPECT_EQ(ret, CALL_ERR_INVALID_CALL_NUMBER);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_GetCallTransferInfo_ByNumber_0200
+ * @tc.number   CallManagerService_GetCallTransferInfo_ByNumber_0200
  * @tc.name     test GetCallTransferInfo by number with null callControlManagerPtr_
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetCallTransferInfo_ByNumber_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_GetCallTransferInfo_ByNumber_0200, TestSize.Level1)
 {
     SetCallControlManagerNull();
     int32_t ret = service_->GetCallTransferInfo("10086", CallTransferType::TRANSFER_TYPE_UNCONDITIONAL);

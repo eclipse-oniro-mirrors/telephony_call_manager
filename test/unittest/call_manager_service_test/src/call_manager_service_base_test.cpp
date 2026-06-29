@@ -19,43 +19,43 @@ namespace OHOS {
 namespace Telephony {
 
 /**
- * @tc.number   Telephony_CallManagerService_GetServiceRunningState_0100
+ * @tc.number   CallManagerService_GetServiceRunningState_0100
  * @tc.name     test GetServiceRunningState when stopped
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetServiceRunningState_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_GetServiceRunningState_0100, TestSize.Level1)
 {
     EXPECT_EQ(service_->GetServiceRunningState(), static_cast<int32_t>(CallManagerService::ServiceRunningState::STATE_STOPPED));
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_GetBindTime_0100
+ * @tc.number   CallManagerService_GetBindTime_0100
  * @tc.name     test GetBindTime returns non-empty string
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetBindTime_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_GetBindTime_0100, TestSize.Level1)
 {
     std::string bindTime = service_->GetBindTime();
     EXPECT_FALSE(bindTime.empty());
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_GetStartServiceSpent_0100
+ * @tc.number   CallManagerService_GetStartServiceSpent_0100
  * @tc.name     test GetStartServiceSpent returns non-empty string
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetStartServiceSpent_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_GetStartServiceSpent_0100, TestSize.Level1)
 {
     std::string spentTime = service_->GetStartServiceSpent();
     EXPECT_FALSE(spentTime.empty());
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_Dump_0100
+ * @tc.number   CallManagerService_Dump_0100
  * @tc.name     test Dump with invalid fd
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_Dump_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_Dump_0100, TestSize.Level1)
 {
     std::vector<std::u16string> args;
     int32_t ret = service_->Dump(-1, args);
@@ -63,52 +63,52 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_Dump_0100, TestSiz
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_GetBundleInfo_0100
+ * @tc.number   CallManagerService_GetBundleInfo_0100
  * @tc.name     test GetBundleInfo returns non-empty string
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetBundleInfo_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_GetBundleInfo_0100, TestSize.Level1)
 {
     std::string bundleInfo = service_->GetBundleInfo();
     EXPECT_FALSE(bundleInfo.empty());
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_OnAddSystemAbility_0100
+ * @tc.number   CallManagerService_OnAddSystemAbility_0100
  * @tc.name     test OnAddSystemAbility with AUDIO_POLICY_SERVICE_ID
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_OnAddSystemAbility_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_OnAddSystemAbility_0100, TestSize.Level1)
 {
     service_->OnAddSystemAbility(AUDIO_POLICY_SERVICE_ID, "");
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_OnAddSystemAbility_0200
+ * @tc.number   CallManagerService_OnAddSystemAbility_0200
  * @tc.name     test OnAddSystemAbility with DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_OnAddSystemAbility_0200, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_OnAddSystemAbility_0200, TestSize.Level1)
 {
     service_->OnAddSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, "");
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_OnAddSystemAbility_0300
+ * @tc.number   CallManagerService_OnAddSystemAbility_0300
  * @tc.name     test OnAddSystemAbility with unknown id
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_OnAddSystemAbility_0300, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_OnAddSystemAbility_0300, TestSize.Level1)
 {
     service_->OnAddSystemAbility(9999, "");
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_OnAddSystemAbility_0400
+ * @tc.number   CallManagerService_OnAddSystemAbility_0400
  * @tc.name     test OnAddSystemAbility with various system abilities
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_OnAddSystemAbility_0400, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_OnAddSystemAbility_0400, TestSize.Level1)
 {
     service_->OnAddSystemAbility(AUDIO_POLICY_SERVICE_ID, "");
     service_->OnAddSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, "");
@@ -118,22 +118,22 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_OnAddSystemAbility
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_HasDistributedCommunicationCapability_0100
+ * @tc.number   CallManagerService_HasDistributedCommunicationCapability_0100
  * @tc.name     test HasDistributedCommunicationCapability
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_HasDistributedCommunicationCapability_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_HasDistributedCommunicationCapability_0100, TestSize.Level1)
 {
     bool ret = service_->HasDistributedCommunicationCapability();
     EXPECT_FALSE(ret);
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_SetCallPolicyInfo_0100
+ * @tc.number   CallManagerService_SetCallPolicyInfo_0100
  * @tc.name     test SetCallPolicyInfo with non-EDM UID
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallPolicyInfo_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SetCallPolicyInfo_0100, TestSize.Level1)
 {
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
@@ -142,11 +142,11 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallPolicyInfo_
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_SetCallStatusManager_0100
+ * @tc.number   CallManagerService_SetCallStatusManager_0100
  * @tc.name     test SetCallStatusManager
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetCallStatusManager_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_SetCallStatusManager_0100, TestSize.Level1)
 {
     auto callStatusManager = std::make_shared<CallStatusManager>();
     service_->SetCallStatusManager(callStatusManager);
