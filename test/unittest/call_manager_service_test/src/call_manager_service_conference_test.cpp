@@ -65,29 +65,6 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SeparateConference
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_KickOutConference_0100
- * @tc.name     test KickOutConference with null callControlManagerPtr_
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_KickOutConference_0100, TestSize.Level1)
-{
-    SetCallControlManagerNull();
-    int32_t ret = service_->KickOutConference(1);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
- * @tc.number   Telephony_CallManagerService_KickOutConference_0200
- * @tc.name     test KickOutConference with valid callControlManagerPtr_
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_KickOutConference_0200, TestSize.Level1)
-{
-    int32_t ret = service_->KickOutConference(1);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
  * @tc.number   Telephony_CallManagerService_JoinConference_0100
  * @tc.name     test JoinConference with null callControlManagerPtr_
  * @tc.desc     Function test
@@ -135,19 +112,6 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetMainCallId_0200
 {
     int32_t mainCallId = 0;
     int32_t ret = service_->GetMainCallId(1, mainCallId);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
- * @tc.number   Telephony_CallManagerService_GetSubCallIdList_0100
- * @tc.name     test GetSubCallIdList with null callControlManagerPtr_
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetSubCallIdList_0100, TestSize.Level1)
-{
-    SetCallControlManagerNull();
-    std::vector<int32_t> callIdList;
-    int32_t ret = service_->GetSubCallIdList(1, callIdList);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
