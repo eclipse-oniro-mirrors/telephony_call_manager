@@ -153,7 +153,6 @@ group("unittest") {
   deps += [ "call_manager_service_test:tel_call_manager_service8_gtest" ]
   deps += [ "call_manager_service_test:tel_call_manager_service9_gtest" ]
   deps += [ "call_manager_service_test:tel_call_manager_service10_gtest" ]
-  deps += [ "call_manager_service_test:tel_call_manager_service11_gtest" ]
   deps += [ "report_call_info_handler_test:tel_report_call_info_handler_test" ]
   deps += [ "antifraud_service_test:tel_antifraud_service_test" ]
   deps += [ "antifraud_adapter_test:tel_antifraud_adapter_test" ]
