@@ -32,6 +32,7 @@
 #include "system_ability.h"
 #include "system_ability_definition.h"
 #include "bluetooth_call_state.h"
+#include "challenge_token_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -933,32 +934,18 @@ public:
         const std::string& cellularRecordToken) override;
 
 private:
-    struct ChallengeToken {
-        std::string token;
-        std::string phoneNumber;
-        int32_t uid;
-        bool isCustomAccessibility;
-        std::chrono::steady_clock::time_point createTime;
-    };
     std::string GetBundleInfo();
     int32_t dealCeliaCallEvent(int32_t callId);
     int32_t HandleDisplaySpecifiedCallPage(int32_t callId);
     int32_t HandleCeliaAutoAnswerCall(int32_t callId, bool enable);
     int32_t HandleVoIPCallEvent(int32_t callId, std::string &eventName);
     void BtCallWaitSlotId(AppExecFwk::PacMap &dialInfo, const std::u16string &number);
-    std::string GenerateToken();
-    bool TryUpdateChallengeTokenList(const std::string &phoneNumber, const ChallengeToken &challenge);
-    std::optional<ChallengeToken> PopChallengeTokenByPhone(const std::string &phoneNumber);
-    void CleanupExpiredChallengeTokensUnsafe();
-    void FillExtrasFromChallengeToken(const std::string &phoneNumber, AppExecFwk::PacMap &extras);
 
 private:
     enum ServiceRunningState {
         STATE_STOPPED = 0,
         STATE_RUNNING,
     };
-    static constexpr size_t MAX_CHALLENGE_TOKEN_COUNT = 3;
-    static constexpr int32_t CHALLENGE_TOKEN_EXPIRE_MINUTES = 10;
     const std::string SOS_PULL_CALL_PAGE = "2";
 
     ServiceRunningState state_ { ServiceRunningState::STATE_STOPPED };
@@ -981,8 +968,7 @@ private:
     std::shared_ptr<BluetoothCallState> bluetoothCallObserver_ = nullptr;
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_ = nullptr;
     ffrt::mutex callTransferLock_;
-    std::list<ChallengeToken> challengeTokenList_{};
-    ffrt::mutex tokenMutex_;
+    ChallengeTokenManager challengeTokenMgr_;
 };
 } // namespace Telephony
 } // namespace OHOS

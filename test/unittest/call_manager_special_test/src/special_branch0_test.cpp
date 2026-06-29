@@ -81,6 +81,7 @@
 #include "call_superprivacy_control_manager.h"
 #include "bluetooth_hfp_ag.h"
 #include "call_manager_service.h"
+#include "challenge_token_manager.h"
 #include "telephony_types.h"
 #include "telephony_permission.h"
 #include "voip_call_connection.h"
@@ -1163,7 +1164,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_OnMakeCallWithToke
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
-    callManagerService->challengeTokenList_.clear();
+    callManagerService->challengeTokenMgr_.challengeTokenList_.clear();
     MessageParcel data;
     MessageParcel reply;
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
@@ -1172,7 +1173,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_OnMakeCallWithToke
     int32_t ret = callManagerService->OnMakeCallWithToken(data, reply);
     int32_t replyResult = reply.ReadInt32();
     EXPECT_EQ(replyResult, TELEPHONY_SUCCESS);
-    callManagerService->challengeTokenList_.clear();
+    callManagerService->challengeTokenMgr_.challengeTokenList_.clear();
 }
  
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_OnCheckCallRecordingPermission_001, TestSize.Level0)
@@ -1298,7 +1299,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_GenerateToken_001, Tes
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
-    std::string token = callManagerService->GenerateToken();
+    std::string token = callManagerService->challengeTokenMgr_.GenerateToken();
     EXPECT_EQ(token.length(), 64);
 }
  
@@ -1306,68 +1307,68 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_UpdateChallengeToken_0
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
-    callManagerService->challengeTokenList_.clear();
-    CallManagerService::ChallengeToken challenge;
+    callManagerService->challengeTokenMgr_.challengeTokenList_.clear();
+    ChallengeToken challenge;
     challenge.token = "token1";
     challenge.phoneNumber = "12345678910";
     challenge.uid = 1000;
     challenge.isCustomAccessibility = true;
     challenge.createTime = std::chrono::steady_clock::now();
-    callManagerService->TryUpdateChallengeTokenList("12345", challenge);
-    EXPECT_EQ(callManagerService->challengeTokenList_.size(), 1);
+    callManagerService->challengeTokenMgr_.TryUpdateChallengeTokenList("12345", challenge);
+    EXPECT_EQ(callManagerService->challengeTokenMgr_.challengeTokenList_.size(), 1);
 }
  
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_UpdateChallengeToken_002, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
-    callManagerService->challengeTokenList_.clear();
-    CallManagerService::ChallengeToken challenge1;
+    callManagerService->challengeTokenMgr_.challengeTokenList_.clear();
+    ChallengeToken challenge1;
     challenge1.token = "token1";
     challenge1.phoneNumber = "12345";
     challenge1.uid = 1000;
     challenge1.isCustomAccessibility = true;
     challenge1.createTime = std::chrono::steady_clock::now();
-    callManagerService->TryUpdateChallengeTokenList("12345", challenge1);
-    CallManagerService::ChallengeToken challenge2;
+    callManagerService->challengeTokenMgr_.TryUpdateChallengeTokenList("12345", challenge1);
+    ChallengeToken challenge2;
     challenge2.token = "token2";
     challenge2.phoneNumber = "67890";
     challenge2.uid = 1000;
     challenge2.isCustomAccessibility = false;
     challenge2.createTime = std::chrono::steady_clock::now();
-    callManagerService->TryUpdateChallengeTokenList("67890", challenge2);
-    EXPECT_EQ(callManagerService->challengeTokenList_.size(), 1);
+    callManagerService->challengeTokenMgr_.TryUpdateChallengeTokenList("67890", challenge2);
+    EXPECT_EQ(callManagerService->challengeTokenMgr_.challengeTokenList_.size(), 1);
 }
  
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_UpdateChallengeToken_003, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
-    callManagerService->challengeTokenList_.clear();
-    for (size_t i = 0; i < CallManagerService::MAX_CHALLENGE_TOKEN_COUNT; ++i) {
-        CallManagerService::ChallengeToken challenge;
+    callManagerService->challengeTokenMgr_.challengeTokenList_.clear();
+    for (size_t i = 0; i < ChallengeTokenManager::MAX_CHALLENGE_TOKEN_COUNT; ++i) {
+        ChallengeToken challenge;
         challenge.token = "token" + std::to_string(i);
         challenge.phoneNumber = "phone" + std::to_string(i);
         challenge.uid = 1000 + static_cast<int32_t>(i);
         challenge.isCustomAccessibility = false;
-        callManagerService->TryUpdateChallengeTokenList("phone" + std::to_string(i), challenge);
+        callManagerService->challengeTokenMgr_.TryUpdateChallengeTokenList("phone" + std::to_string(i), challenge);
     }
-    CallManagerService::ChallengeToken overflowChallenge;
+    ChallengeToken overflowChallenge;
     overflowChallenge.token = "overflow";
     overflowChallenge.phoneNumber = "overflowPhone";
     overflowChallenge.uid = 9999;
     overflowChallenge.isCustomAccessibility = false;
-    callManagerService->TryUpdateChallengeTokenList("overflowPhone", overflowChallenge);
-    EXPECT_EQ(callManagerService->challengeTokenList_.size(), 1);
-    callManagerService->challengeTokenList_.clear();
+    callManagerService->challengeTokenMgr_.TryUpdateChallengeTokenList("overflowPhone", overflowChallenge);
+    EXPECT_EQ(callManagerService->challengeTokenMgr_.challengeTokenList_.size(), 1);
+    callManagerService->challengeTokenMgr_.challengeTokenList_.clear();
 }
  
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_PopChallengeTokenByPhone_001, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
-    callManagerService->challengeTokenList_.clear();
-    auto result = callManagerService->PopChallengeTokenByPhone("12345");
+    callManagerService->challengeTokenMgr_.challengeTokenList_.clear();
+    auto result = callManagerService->challengeTokenMgr_.PopChallengeTokenByPhone("12345");
     EXPECT_FALSE(result.has_value());
 }
  
@@ -1375,27 +1376,27 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_PopChallengeTokenByPho
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
-    callManagerService->challengeTokenList_.clear();
-    CallManagerService::ChallengeToken challenge;
+    callManagerService->challengeTokenMgr_.challengeTokenList_.clear();
+    ChallengeToken challenge;
     challenge.token = "token1";
     challenge.phoneNumber = "12345";
     challenge.uid = 1000;
     challenge.isCustomAccessibility = false;
     challenge.createTime = std::chrono::steady_clock::now();
-    callManagerService->challengeTokenList_.push_back(challenge);
-    auto result = callManagerService->PopChallengeTokenByPhone("12345");
+    callManagerService->challengeTokenMgr_.challengeTokenList_.push_back(challenge);
+    auto result = callManagerService->challengeTokenMgr_.PopChallengeTokenByPhone("12345");
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->token, "token1");
-    EXPECT_EQ(callManagerService->challengeTokenList_.size(), 0);
+    EXPECT_EQ(callManagerService->challengeTokenMgr_.challengeTokenList_.size(), 0);
 }
  
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_FillExtrasFromChallengeToken_001, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
-    callManagerService->challengeTokenList_.clear();
+    callManagerService->challengeTokenMgr_.challengeTokenList_.clear();
     AppExecFwk::PacMap extras;
-    callManagerService->FillExtrasFromChallengeToken("12345", extras);
+    callManagerService->challengeTokenMgr_.FillExtrasFromChallengeToken("12345", extras);
     EXPECT_FALSE(extras.HasKey("isCustomAccessibility"));
 }
  
@@ -1403,19 +1404,19 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_FillExtrasFromChalleng
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
-    callManagerService->challengeTokenList_.clear();
-    CallManagerService::ChallengeToken challenge;
+    callManagerService->challengeTokenMgr_.challengeTokenList_.clear();
+    ChallengeToken challenge;
     challenge.token = "token1";
     challenge.phoneNumber = "12345";
     challenge.uid = 1000;
     challenge.isCustomAccessibility = true;
     challenge.createTime = std::chrono::steady_clock::now();
-    callManagerService->challengeTokenList_.push_back(challenge);
+    callManagerService->challengeTokenMgr_.challengeTokenList_.push_back(challenge);
     AppExecFwk::PacMap extras;
-    callManagerService->FillExtrasFromChallengeToken("12345", extras);
+    callManagerService->challengeTokenMgr_.FillExtrasFromChallengeToken("12345", extras);
     EXPECT_TRUE(extras.GetBooleanValue("isCustomAccessibility", false));
     EXPECT_EQ(extras.GetStringValue("token"), "token1");
-    EXPECT_EQ(callManagerService->challengeTokenList_.size(), 0);
+    EXPECT_EQ(callManagerService->challengeTokenMgr_.challengeTokenList_.size(), 0);
 }
  
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_MakeCallWithToken_001, TestSize.Level0)
@@ -1443,46 +1444,46 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_MakeCallWithToken_003,
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
-    callManagerService->challengeTokenList_.clear();
+    callManagerService->challengeTokenMgr_.challengeTokenList_.clear();
     AppExecFwk::PacMap options;
     options.PutBooleanValue("isCustomAccessibility", true);
     std::string token;
     int32_t ret = callManagerService->MakeCallWithToken("12345", options, token);
     EXPECT_NE(ret, TELEPHONY_SUCCESS);
-    callManagerService->challengeTokenList_.clear();
+    callManagerService->challengeTokenMgr_.challengeTokenList_.clear();
 }
  
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_MakeCallWithToken_004, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
-    callManagerService->challengeTokenList_.clear();
-    CallManagerService::ChallengeToken challenge1;
+    callManagerService->challengeTokenMgr_.challengeTokenList_.clear();
+    ChallengeToken challenge1;
     challenge1.token = "token1";
     challenge1.phoneNumber = "111";
     challenge1.uid = 1000;
     challenge1.isCustomAccessibility = false;
     challenge1.createTime = std::chrono::steady_clock::now();
-    callManagerService->challengeTokenList_.push_back(challenge1);
-    CallManagerService::ChallengeToken challenge2;
+    callManagerService->challengeTokenMgr_.challengeTokenList_.push_back(challenge1);
+    ChallengeToken challenge2;
     challenge2.token = "token2";
     challenge2.phoneNumber = "222";
     challenge2.uid = 1001;
     challenge2.isCustomAccessibility = false;
     challenge2.createTime = std::chrono::steady_clock::now();
-    callManagerService->challengeTokenList_.push_back(challenge2);
-    CallManagerService::ChallengeToken challenge3;
+    callManagerService->challengeTokenMgr_.challengeTokenList_.push_back(challenge2);
+    ChallengeToken challenge3;
     challenge3.token = "token3";
     challenge3.phoneNumber = "333";
     challenge3.uid = 1002;
     challenge3.isCustomAccessibility = false;
     challenge3.createTime = std::chrono::steady_clock::now();
-    callManagerService->challengeTokenList_.push_back(challenge3);
+    callManagerService->challengeTokenMgr_.challengeTokenList_.push_back(challenge3);
     AppExecFwk::PacMap options;
     std::string token;
     int32_t ret = callManagerService->MakeCallWithToken("12345678910", options, token);
     EXPECT_EQ(ret, TELEPHONY_ERR_UNINIT);
-    callManagerService->challengeTokenList_.clear();
+    callManagerService->challengeTokenMgr_.challengeTokenList_.clear();
 }
 } // namespace Telephony
 } // namespace OHOS
