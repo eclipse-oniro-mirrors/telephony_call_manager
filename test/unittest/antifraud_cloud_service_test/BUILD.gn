@@ -51,6 +51,7 @@ ohos_unittest("tel_antifraud_cloud_service_gtest") {
     "libphonenumber:phonenumber_standard",
     "ipc:ipc_single",
     "openssl:libcrypto_shared",
+    "protobuf:protobuf",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

@@ -56,6 +56,7 @@ ohos_unittest("tel_report_call_info_handler_test") {
     "hisysevent:libhisysevent",
     "libphonenumber:phonenumber_standard",
     "ipc:ipc_single",
+    "protobuf:protobuf",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

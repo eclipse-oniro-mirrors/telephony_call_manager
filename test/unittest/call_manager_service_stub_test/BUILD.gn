@@ -50,6 +50,7 @@ ohos_unittest("tel_call_manager_service_stub_gtest") {
     "cJSON:cjson",
     "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
   ]
   external_deps += call_manager_external_deps
   external_deps -= ["ffrt:libffrt"]

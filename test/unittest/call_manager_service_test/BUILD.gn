@@ -48,6 +48,7 @@ ohos_unittest("tel_call_manager_service1_gtest") {
     "core_service:ffrt_mocked",
     "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
   ]
   external_deps += call_manager_external_deps
   external_deps -= [ "ffrt:libffrt" ]
@@ -96,6 +97,7 @@ ohos_unittest("tel_call_manager_service2_gtest") {
     "core_service:ffrt_mocked",
     "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
   ]
   external_deps += call_manager_external_deps
   external_deps -= [ "ffrt:libffrt" ]
@@ -144,6 +146,7 @@ ohos_unittest("tel_call_manager_service3_gtest") {
     "core_service:ffrt_mocked",
     "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
   ]
   external_deps += call_manager_external_deps
   external_deps -= [ "ffrt:libffrt" ]
@@ -241,6 +244,7 @@ ohos_unittest("tel_call_manager_service5_gtest") {
     "core_service:ffrt_mocked",
     "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
   ]
   external_deps += call_manager_external_deps
   external_deps -= [ "ffrt:libffrt" ]
@@ -289,6 +293,7 @@ ohos_unittest("tel_call_manager_service6_gtest") {
     "core_service:ffrt_mocked",
     "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
   ]
   external_deps += call_manager_external_deps
   external_deps -= [ "ffrt:libffrt" ]
@@ -337,6 +342,7 @@ ohos_unittest("tel_call_manager_service7_gtest") {
     "core_service:ffrt_mocked",
     "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
   ]
   external_deps += call_manager_external_deps
   external_deps -= [ "ffrt:libffrt" ]
@@ -385,6 +391,7 @@ ohos_unittest("tel_call_manager_service8_gtest") {
     "core_service:ffrt_mocked",
     "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
   ]
   external_deps += call_manager_external_deps
   external_deps -= [ "ffrt:libffrt" ]
@@ -433,6 +440,7 @@ ohos_unittest("tel_call_manager_service9_gtest") {
     "core_service:ffrt_mocked",
     "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
   ]
   external_deps += call_manager_external_deps
   external_deps -= [ "ffrt:libffrt" ]
@@ -481,6 +489,7 @@ ohos_unittest("tel_call_manager_service10_gtest") {
     "core_service:ffrt_mocked",
     "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
   ]
   external_deps += call_manager_external_deps
   external_deps -= [ "ffrt:libffrt" ]
@@ -529,6 +538,7 @@ ohos_unittest("tel_call_manager_service11_gtest") {
     "core_service:ffrt_mocked",
     "googletest:gmock_main",
     "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
   ]
   external_deps += call_manager_external_deps
   external_deps -= [ "ffrt:libffrt" ]

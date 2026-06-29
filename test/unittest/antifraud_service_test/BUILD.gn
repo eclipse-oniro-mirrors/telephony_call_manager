@@ -50,6 +50,7 @@ ohos_unittest("tel_antifraud_service_test") {
     "hitrace:libhitracechain",
     "libphonenumber:phonenumber_standard",
     "ipc:ipc_single",
+    "protobuf:protobuf",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

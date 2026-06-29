@@ -59,6 +59,7 @@ ohos_unittest("tel_motion_recognition_test") {
     "hisysevent:libhisysevent",
     "libphonenumber:phonenumber_standard",
     "ipc:ipc_single",
+    "protobuf:protobuf",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
