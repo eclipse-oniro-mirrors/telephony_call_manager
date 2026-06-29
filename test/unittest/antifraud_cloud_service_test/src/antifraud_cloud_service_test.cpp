@@ -58,7 +58,8 @@ HWTEST_F(AntiFraudCloudServiceTest, AntiFraudCloudService_GetSubstringBeforeSymb
     EXPECT_EQ(result, "version");
 }
 
-HWTEST_F(AntiFraudCloudServiceTest, AntiFraudCloudService_GetSubstringBeforeSymbol_SymbolNotExists_0101, TestSize.Level1)
+HWTEST_F(AntiFraudCloudServiceTest, AntiFraudCloudService_GetSubstringBeforeSymbol_SymbolNotExists_0101,
+        TestSize.Level1)
 {
     std::string result = cloudService_->GetSubstringBeforeSymbol("version1.0.0", "(");
     EXPECT_EQ(result, "version1.0.0");

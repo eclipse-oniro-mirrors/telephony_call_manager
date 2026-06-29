@@ -666,7 +666,6 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetAudioDevice_010
     MessageParcel reply;
 
     AudioDevice audioDevice;
-    memset(&audioDevice, 0, sizeof(audioDevice));
     data.WriteRawData(&audioDevice, sizeof(audioDevice));
 
     int32_t result = stub->OnSetAudioDevice(data, reply);
@@ -957,7 +956,8 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnEndCall_0100, Test
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnHasDistributedCommunicationCapability_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnHasDistributedCommunicationCapability_0100,
+        TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1054,7 +1054,8 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnReportOttCallEvent
     EXPECT_EQ(result, TELEPHONY_ERR_FAIL);
 }
 
-HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRegisterBluetoothCallManagerCallbackPtr_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRegisterBluetoothCallManagerCallbackPtr_0100,
+        TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1215,7 +1216,8 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRequestCameraCapab
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRemoveMissedIncomingCallNotification_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRemoveMissedIncomingCallNotification_0100,
+        TestSize.Level1)
 {
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
@@ -1575,7 +1577,6 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnSetCallRestriction
 
     data.WriteInt32(VALID_SLOT_ID);
     CallRestrictionInfo info;
-    memset(&info, 0, sizeof(info));
     data.WriteRawData(&info, sizeof(info));
 
     int32_t result = stub->OnSetCallRestriction(data, reply);
