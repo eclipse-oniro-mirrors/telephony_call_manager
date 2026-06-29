@@ -326,7 +326,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, CallVoiceAssistantManager_ConnectAbility
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     ASSERT_FALSE(voicePtr == nullptr);
     voicePtr->connectCallback_ = nullptr;
-    bool result = voicePtr->ConnectAbility(1);
+    voicePtr->ConnectAbility(1);
     EXPECT_TRUE(voicePtr->connectCallback_ != nullptr);
 }
 
@@ -340,7 +340,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, CallVoiceAssistantManager_ConnectAbility
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     ASSERT_FALSE(voicePtr == nullptr);
     voicePtr->connectCallback_ = sptr<VoiceAssistantConnectCallback>::MakeSptr(1);
-    bool result = voicePtr->ConnectAbility(1);
+    voicePtr->ConnectAbility(1);
     EXPECT_TRUE(voicePtr->connectCallback_ != nullptr);
 }
 
