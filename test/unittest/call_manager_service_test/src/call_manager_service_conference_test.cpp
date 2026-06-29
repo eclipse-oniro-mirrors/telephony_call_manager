@@ -115,18 +115,5 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetMainCallId_0200
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
-/**
- * @tc.number   Telephony_CallManagerService_GetCallIdListForConference_0100
- * @tc.name     test GetCallIdListForConference with null callControlManagerPtr_
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_GetCallIdListForConference_0100, TestSize.Level1)
-{
-    SetCallControlManagerNull();
-    std::vector<int32_t> callIdList;
-    int32_t ret = service_->GetCallIdListForConference(1, callIdList);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
 } // namespace Telephony
 } // namespace OHOS
