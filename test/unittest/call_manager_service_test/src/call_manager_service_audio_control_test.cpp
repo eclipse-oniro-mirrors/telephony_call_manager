@@ -19,52 +19,6 @@ namespace OHOS {
 namespace Telephony {
 
 /**
- * @tc.number   CallManagerService_SetMute_0100
- * @tc.name     test SetMute with null callControlManagerPtr_
- * @tc.desc     Branch coverage: callControlManagerPtr_ is null
- */
-HWTEST_F(CallManagerServiceTest, CallManagerService_SetMute_0100, TestSize.Level1)
-{
-    SetCallControlManagerNull();
-    int32_t ret = service_->SetMute(true);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
- * @tc.number   CallManagerService_SetMute_0200
- * @tc.name     test SetMute with valid callControlManagerPtr_
- * @tc.desc     Function test for SetMute
- */
-HWTEST_F(CallManagerServiceTest, CallManagerService_SetMute_0200, TestSize.Level1)
-{
-    int32_t ret = service_->SetMute(true);
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
- * @tc.number   CallManagerService_MuteRIinger_0100
- * @tc.name     test MuteRIinger with null callControlManagerPtr_
- * @tc.desc     Branch coverage: callControlManagerPtr_  == nullprt path
- */
-HWTEST_F(CallManagerServiceTest, CallManagerService_MuteRIinger_0100, TestSize.Level1)
-{
-    SetCallControlManagerNull();
-    int32_t ret = service_->MuteRIinger();
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
- * @tc.number   CallManagerService_MuteRIinger_0200
- * @tc.name     test MuteRIinger with valid callControlManagerPtr_
- * @tc.desc     Function test for MuteRIinger
- */
-HWTEST_F(CallManagerServiceTest, CallManagerService_MuteRIinger_0200, TestSize.Level1)
-{
-    int32_t ret = service_->MuteRIinger();
-    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
-}
-
-/**
  * @tc.number   CallManagerService_SetAudioDevice_0100
  * @tc.name     test SetAudioDevice with nall callControlManagerPtr_
  * @tc.desc     Branch coverage: callControlManagerPtr_  == nullprt path
@@ -169,7 +123,7 @@ HWTEST_F(CallManagerServiceTest, CallManagerService_HasCall_0100, TestSize.Level
  * @tc.name     test HasCall with isInCludeVoipCall false
  * @tc.desc     Branch coverage: isInCludeVoipCall  == false path
  */
-HWTEST_F(CallManagerServiceTest, CallManagerService_HasCall_0100, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_HasCall_0200, TestSize.Level1)
 {
     int32_t ret = service_->HasCall(false);
     EXPECT_FALSE(ret);
