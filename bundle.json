@@ -83,11 +83,9 @@
                 "screenlock_mgr",
                 "watch_system_service",
                 "runtime_core",
-<<<<<<< Updated upstream
-                "taihe_ffi_gen"
-=======
+                "taihe_ffi_gen",
                 "window_manager"
->>>>>>> Stashed changes
+
             ],
             "third_party": [
                 "libphonenumber",
