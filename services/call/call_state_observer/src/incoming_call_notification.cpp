@@ -107,7 +107,7 @@ int32_t IncomingCallNotification::CancelIncomingCallNotification()
 bool IncomingCallNotification::IsFullScreen()
 {
 #ifdef ABILITY_DISPLAY_SUPPORT
-    return DisplayManager::IsFullScreen();
+    return DisplayManagerLite::IsFullScreen();
 #endif
     return false;
 }

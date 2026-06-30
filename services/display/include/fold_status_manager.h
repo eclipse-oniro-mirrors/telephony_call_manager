@@ -17,7 +17,7 @@
 #define FOLD_STATUS_MANAGER
 
 #include "singleton.h"
-#include "display_manager.h"
+#include "display_manager_lite.h"
 #include "display_info.h"
 
 namespace OHOS {
@@ -28,7 +28,7 @@ public:
     void RegisterFoldableListener();
     void UnregisterFoldableListener();
     static bool IsSmallFoldDevice();
-    class FoldStatusListener : public Rosen::DisplayManager::IFoldStatusListener {
+    class FoldStatusListener : public Rosen::DisplayManagerLite::IFoldStatusListener {
         public:
             FoldStatusListener() = default;
             ~FoldStatusListener() override = default;
@@ -41,7 +41,7 @@ public:
     };
 
 private:
-    sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_;
+    sptr<Rosen::DisplayManagerLite::IFoldStatusListener> foldStatusListener_;
     std::atomic<Rosen::FoldStatus> oldFoldStatus_;
 };
 } // namespace Telephony
