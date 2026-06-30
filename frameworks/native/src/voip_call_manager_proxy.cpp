@@ -152,12 +152,24 @@ int32_t VoipCallManagerProxy::ReportOutgoingCall(
 
 int32_t VoipCallManagerProxy::RegisterCallBack(const sptr<IVoipCallManagerCallback> &callback)
 {
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("callback is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    dataParcel.WriteRemoteObject(callback->AsObject().GetRefPtr());
+    auto remoteObj = callback->AsObject();
+    if (remoteObj == nullptr) {
+        TELEPHONY_LOGE("callback->AsObject() returns nullptr");
+        return TELEPHONY_ERR_ARGUMENT_NULL;
+    }
+    if (!dataParcel.WriteRemoteObject(remoteObj.GetRefPtr())) {
+        TELEPHONY_LOGE("WriteRemoteObject fail");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
     MessageOption option;
     MessageParcel replyParcel;
     int32_t error =
@@ -313,7 +325,15 @@ int32_t VoipCallManagerProxy::RegisterCallManagerCallBack(const sptr<ICallStatus
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
 
-    dataParcel.WriteRemoteObject(callback->AsObject().GetRefPtr());
+    auto remoteObj = callback->AsObject();
+    if (remoteObj == nullptr) {
+        TELEPHONY_LOGE("callback->AsObject() returns nullptr");
+        return TELEPHONY_ERR_ARGUMENT_NULL;
+    }
+    if (!dataParcel.WriteRemoteObject(remoteObj.GetRefPtr())) {
+        TELEPHONY_LOGE("WriteRemoteObject fail");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
 
     MessageOption option;
     MessageParcel replyParcel;
