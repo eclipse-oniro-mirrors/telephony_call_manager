@@ -83,7 +83,8 @@
                 "screenlock_mgr",
                 "watch_system_service",
                 "runtime_core",
-                "taihe_ffi_gen"
+                "taihe_ffi_gen",
+                "window_manager"
             ],
             "third_party": [
                 "libphonenumber",

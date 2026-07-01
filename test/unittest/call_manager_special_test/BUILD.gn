@@ -91,6 +91,7 @@ ohos_unittest("tel_call_manager_special0_test") {
     "protobuf:protobuf_lite",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
   ]
 
   if (call_manager_feature_support_dsoftbus) {
@@ -236,6 +237,7 @@ ohos_unittest("tel_call_manager_special1_test") {
     "protobuf:protobuf_lite",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
   ]
 
   if (call_manager_feature_support_dsoftbus) {
@@ -381,6 +383,7 @@ ohos_unittest("tel_call_manager_special2_test") {
     "protobuf:protobuf_lite",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
   ]
 
   if (call_manager_feature_support_dsoftbus) {
@@ -527,6 +530,7 @@ ohos_unittest("tel_call_manager_special3_test") {
     "protobuf:protobuf_lite",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
   ]
 
   if (call_manager_feature_support_dsoftbus) {

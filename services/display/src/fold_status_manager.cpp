@@ -44,13 +44,13 @@ void FoldStatusManager::RegisterFoldableListener()
         TELEPHONY_LOGE("RegisterFoldableListener new listener failed");
         return;
     }
-    auto ret = Rosen::DisplayManager::GetInstance().RegisterFoldStatusListener(foldStatusListener_);
+    auto ret = Rosen::DisplayManagerLite::GetInstance().RegisterFoldStatusListener(foldStatusListener_);
     if (ret != Rosen::DMError::DM_OK) {
-        TELEPHONY_LOGE("Rosen::DisplayManager::RegisterFoldStatusListener failed");
+        TELEPHONY_LOGE("RegisterFoldStatusListener failed");
         foldStatusListener_ = nullptr;
     } else {
-        oldFoldStatus_ = Rosen::DisplayManager::GetInstance().GetFoldStatus();
-        TELEPHONY_LOGI("Rosen::DisplayManager::RegisterFoldStatusListener success");
+        oldFoldStatus_ = Rosen::DisplayManagerLite::GetInstance().GetFoldStatus();
+        TELEPHONY_LOGI("RegisterFoldStatusListener success");
     }
 }
 
@@ -60,13 +60,13 @@ void FoldStatusManager::UnregisterFoldableListener()
         TELEPHONY_LOGI("UnregisterFoldableListener listener is nullptr");
         return;
     }
-    auto ret = Rosen::DisplayManager::GetInstance().UnregisterFoldStatusListener(foldStatusListener_);
+    auto ret = Rosen::DisplayManagerLite::GetInstance().UnregisterFoldStatusListener(foldStatusListener_);
     if (ret != Rosen::DMError::DM_OK) {
-        TELEPHONY_LOGE("Rosen::DisplayManager::UnregisterFoldStatusListener failed");
+        TELEPHONY_LOGE("UnregisterFoldStatusListener failed");
     } else {
         oldFoldStatus_ = Rosen::FoldStatus::UNKNOWN;
         foldStatusListener_ = nullptr;
-        TELEPHONY_LOGI("Rosen::DisplayManager::UnregisterFoldStatusListener success");
+        TELEPHONY_LOGI("UnregisterFoldStatusListener success");
     }
 }
 

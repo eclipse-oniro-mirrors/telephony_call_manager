@@ -20,7 +20,7 @@
 #include "nlohmann/json.hpp"
 #include "telephony_log_wrapper.h"
 #include <securec.h>
-#include "display_manager.h"
+#include "display_manager_lite.h"
 #include "fold_status_manager.h"
 #include "call_object_manager.h"
 #include "call_superprivacy_control_manager.h"
@@ -182,7 +182,7 @@ std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogR
     root["isAnswer"] = false;
     root["isVideo"] = isVideo;
     root["isFold"] = FoldStatusManager::IsSmallFoldDevice()
-        && Rosen::DisplayManager::GetInstance().GetFoldStatus() == Rosen::FoldStatus::FOLDED;
+        && Rosen::DisplayManagerLite::GetInstance().GetFoldStatus() == Rosen::FoldStatus::FOLDED;
     std::string startCommand = root.dump();
     TELEPHONY_LOGI("BuildStartPrivpacyModeCommand success startCommand is: xxx");
     return startCommand;
@@ -201,7 +201,7 @@ std::string CallDialog::BuildStartAnswerPrivpacyModeCommand(const std::string &d
     root["isAnswer"] = true;
     root["isVideo"] = isVideo;
     root["isFold"] = FoldStatusManager::IsSmallFoldDevice()
-        && Rosen::DisplayManager::GetInstance().GetFoldStatus() == Rosen::FoldStatus::FOLDED;
+        && Rosen::DisplayManagerLite::GetInstance().GetFoldStatus() == Rosen::FoldStatus::FOLDED;
     std::string startCommand = root.dump();
     TELEPHONY_LOGI("startCommand is: %{public}s", startCommand.c_str());
     return startCommand;

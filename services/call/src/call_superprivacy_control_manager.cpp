@@ -21,7 +21,7 @@
 #include "call_control_manager.h"
 #include "call_manager_hisysevent.h"
 #include "call_number_utils.h"
-#include "display_manager.h"
+#include "display_manager_lite.h"
 #include "display_info.h"
 #include "super_privacy_manager_client.h"
 
@@ -189,7 +189,7 @@ bool CallSuperPrivacyControlManager::GetCurrentIsSuperPrivacyMode()
     if (privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
         return true;
     }
-    Rosen::FoldStatus foldStatus = Rosen::DisplayManager::GetInstance().GetFoldStatus();
+    Rosen::FoldStatus foldStatus = Rosen::DisplayManagerLite::GetInstance().GetFoldStatus();
     if (privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ON_WHEN_FOLDED)
         && foldStatus == Rosen::FoldStatus::FOLDED) {
         TELEPHONY_LOGI("GetCurrentIsSuperPrivacyMode ON_WHEN_FOLDED");
