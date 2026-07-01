@@ -1754,7 +1754,8 @@ void CallControlManager::ReleaseDisconnectedLock()
 #endif
 }
 
-void CallControlManager::DisconnectAllCalls(bool isIncludeEmergencyCall, bool isFromThermalProtection, bool isWaitingForResponse)
+void CallControlManager::DisconnectAllCalls(bool isIncludeEmergencyCall, bool isFromThermalProtection,
+    bool isWaitingForResponse)
 {
     std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
     int32_t ret = -1;
