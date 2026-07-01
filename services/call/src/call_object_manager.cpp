@@ -1019,12 +1019,12 @@ CellularCallInfo CallObjectManager::GetDialCallInfo()
 
 int32_t CallObjectManager::DealFailDial(sptr<CallBase> call)
 {
-    return DisconnectCallLocaly(call);
+    return ReportCallDisconnected(call);
 }
  
-int32_t CallObjectManager::DisconnectCallLocaly(sptr<CallBase> call)
+int32_t CallObjectManager::ReportCallDisconnected(sptr<CallBase> call)
 {
-    TELEPHONY_LOGI("DisconnectCallLocaly");
+    TELEPHONY_LOGI("ReportCallDisconnected");
     if (call == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
