@@ -86,7 +86,7 @@ public:
     static std::vector<CallAttributeInfo> GetAllCallInfoList(bool isIncludeVoipCall = true);
     static std::vector<CallAttributeInfo> GetVoipCallInfoList();
     int32_t DealFailDial(sptr<CallBase> call);
-    int32_t DisconnectCallLocaly(sptr<CallBase> call);
+    int32_t ReportCallDisconnected(sptr<CallBase> call);
     static bool HasVideoCall();
     static std::list<sptr<CallBase>> GetAllCallList();
     static bool HasCellularCallExist();
