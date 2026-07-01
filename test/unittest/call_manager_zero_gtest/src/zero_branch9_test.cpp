@@ -767,11 +767,11 @@ HWTEST_F(ZeroBranch9Test, Telephony_CallManager_DisconnectCallLocaly_ImsCall, Te
     sptr<CallBase> call = nullptr;
     auto callObjectManager = DelayedSingleton<CallObjectManager>::GetInstance();
     auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
-    int32_t ret = callObjectManager->DisconnectCallLocaly(call);
+    int32_t ret = callObjectManager->ReportCallDisconnected(call);
     EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
     call = new IMSCall(dialInfo);
     CallObjectManager::callObjectPtrList_.emplace_back(call);
-    callControlManager->DisconnectAllCalls(true, false, true);
-    callObjectManager->DisconnectCallLocaly(call);
+    callControlManager->DisconnectAllCalls(true, false, false);
+    callObjectManager->ReportCallDisconnected(call);
 }
 }
