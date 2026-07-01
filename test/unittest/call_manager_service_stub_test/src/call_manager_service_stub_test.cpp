@@ -404,6 +404,15 @@ public:
     {
         return TELEPHONY_SUCCESS;
     }
+    int32_t MakeCallWithToken(std::string number, AppExecFwk::PacMap &options, std::string &token) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+    bool CheckCallRecordingPermission(const std::string& cellularRecordPhoneNum,
+        const std::string& cellularRecordToken) override
+    {
+        return false;
+    }
 };
 
 HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRemoteRequest_0100, TestSize.Level0)

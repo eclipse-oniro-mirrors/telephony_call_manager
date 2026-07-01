@@ -109,6 +109,33 @@ int32_t CallManagerServiceProxy::MakeCall(std::string number)
     return replyParcel.ReadInt32();
 }
 
+int32_t CallManagerServiceProxy::MakeCallWithToken(std::string number, AppExecFwk::PacMap &options, std::string &token)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (number.empty()) {
+        TELEPHONY_LOGE("number is empty");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    dataParcel.WriteString(number);
+    bool isCustomAccessibility = options.GetBooleanValue("isCustomAccessibility", false);
+    dataParcel.WriteBool(isCustomAccessibility);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_MAKE_CALL_WITH_TOKEN, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function MakeCallWithToken call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = replyParcel.ReadInt32();
+    if (result == TELEPHONY_SUCCESS) {
+        token = replyParcel.ReadString();
+    }
+    return result;
+}
+
 int32_t CallManagerServiceProxy::AnswerCall(int32_t callId, int32_t videoState, bool isRTT)
 {
     MessageParcel dataParcel;
@@ -1634,6 +1661,25 @@ int32_t CallManagerServiceProxy::GetCallTransferInfo(const std::string number, C
         return error;
     }
     return replyParcel.ReadInt32();
+}
+
+bool CallManagerServiceProxy::CheckCallRecordingPermission(const std::string& cellularRecordPhoneNum,
+    const std::string& cellularRecordToken)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return false;
+    }
+    dataParcel.WriteString(cellularRecordPhoneNum);
+    dataParcel.WriteString(cellularRecordToken);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_CHECK_CALL_RECORDING_PERMISSION, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("CheckCallRecordingPermission failed! errCode:%{public}d", error);
+        return false;
+    }
+    return replyParcel.ReadBool();
 }
 } // namespace Telephony
 } // namespace OHOS

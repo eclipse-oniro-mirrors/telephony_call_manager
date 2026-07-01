@@ -17,6 +17,7 @@
 #define CALL_MANAGER_SERVICE_H
 
 #include <memory>
+#include <optional>
 
 #include "bluetooth_call_manager.h"
 #include "call_control_manager.h"
@@ -31,6 +32,7 @@
 #include "system_ability.h"
 #include "system_ability_definition.h"
 #include "bluetooth_call_state.h"
+#include "challenge_token_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -125,6 +127,15 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t MakeCall(std::string number) override;
+
+    /**
+     * @brief Make a phone call with options, generate a token for the call
+     * @param number[in], phone number to call
+     * @param options[in], call options including isCustomAccessibility flag
+     * @param token[out], generated token for the call
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t MakeCallWithToken(std::string number, AppExecFwk::PacMap &options, std::string &token) override;
 
     /**
      * AnswerCall
@@ -913,6 +924,15 @@ public:
      */
     int32_t GetCallTransferInfo(const std::string number, CallTransferType type) override;
 
+    /**
+     * @brief Check if recording permission is allowed for the call
+     * @param cellularRecordPhoneNum[in], phone number of the call to check
+     * @param cellularRecordToken[in], token of the call to verify
+     * @return Returns true if permission is allowed, false otherwise.
+     */
+    bool CheckCallRecordingPermission(const std::string& cellularRecordPhoneNum,
+        const std::string& cellularRecordToken) override;
+
 private:
     std::string GetBundleInfo();
     int32_t dealCeliaCallEvent(int32_t callId);
@@ -948,6 +968,7 @@ private:
     std::shared_ptr<BluetoothCallState> bluetoothCallObserver_ = nullptr;
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_ = nullptr;
     ffrt::mutex callTransferLock_;
+    ChallengeTokenManager challengeTokenMgr_;
 };
 } // namespace Telephony
 } // namespace OHOS

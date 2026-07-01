@@ -148,6 +148,9 @@ public:
     void SetAnsweredCall(bool isAnswered);
     AAFwk::WantParams GetExtraParams();
     void SetPhoneOrWatchDial(int32_t phoneOrWatch);
+    void SetIsCustomAccessibility(bool isCustomAccessibility);
+    bool GetIsCustomAccessibility();
+    std::string GetToken();
     bool IsAiAutoAnswer();
     void SetAiAutoAnswer(bool isAiAutoAnswer);
     bool IsForcedReportVoiceCall();
@@ -212,6 +215,8 @@ private:
     bool isAnswered_;
     std::string detectDetails_;
     int32_t phoneOrWatch_ = 0;
+    bool isCustomAccessibility_ = false;
+    std::string token_;
     bool isAiAutoAnswer_;
     bool isForcedReportVoiceCall_{false};
     bool isAnsweredByPhone_{false};

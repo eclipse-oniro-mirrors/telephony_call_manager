@@ -383,6 +383,25 @@ int32_t CallManagerProxy::MakeCall(std::string number)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallManagerProxy::MakeCallWithToken(std::string number, AppExecFwk::PacMap &options, std::string &token)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::shared_lock<ffrt::shared_mutex> lock(clientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t errCode = callManagerServicePtr_->MakeCallWithToken(number, options, token);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("MakeCallWithToken failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerProxy::AnswerCall(int32_t callId, int32_t videoState, bool isRTT)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
@@ -1782,6 +1801,21 @@ int32_t CallManagerProxy::NotifyVoIPAudioStreamStart(int32_t uid)
         return errCode;
     }
     return TELEPHONY_SUCCESS;
+}
+
+bool CallManagerProxy::CheckCallRecordingPermission(const std::string& cellularRecordPhoneNum,
+    const std::string& cellularRecordToken)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return false;
+    }
+    std::shared_lock<ffrt::shared_mutex> lock(clientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return false;
+    }
+    return callManagerServicePtr_->CheckCallRecordingPermission(cellularRecordPhoneNum, cellularRecordToken);
 }
 
 #ifdef SUPPORT_RTT_CALL

@@ -562,6 +562,26 @@ int32_t NapiCallAbilityCallback::UpdateMeeTimeStateInfo(const CallAttributeInfo 
     return TELEPHONY_SUCCESS;
 }
 
+void NapiCallAbilityCallback::SetBaseCallStateProperties(
+    napi_env env, napi_value &callStateObj, const CallAttributeInfo &info)
+{
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, callStateObj, "accountNumber", info.accountNumber);
+    NapiCallManagerUtils::SetPropertyInt32(env, callStateObj, "accountId", info.accountId);
+    NapiCallManagerUtils::SetPropertyInt32(env, callStateObj, "videoState", static_cast<int32_t>(info.videoState));
+    NapiCallManagerUtils::SetPropertyInt64(env, callStateObj, "startTime", info.startTime);
+    NapiCallManagerUtils::SetPropertyBoolean(env, callStateObj, "isEcc", info.isEcc);
+    NapiCallManagerUtils::SetPropertyInt32(env, callStateObj, "callType", static_cast<int32_t>(info.callType));
+    NapiCallManagerUtils::SetPropertyInt32(env, callStateObj, "callId", info.callId);
+    NapiCallManagerUtils::SetPropertyInt32(env, callStateObj, "callState", static_cast<int32_t>(info.callState));
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callStateObj, "conferenceState", static_cast<int32_t>(info.conferenceState));
+    NapiCallManagerUtils::SetPropertyInt32(env, callStateObj, "crsType", info.crsType);
+    NapiCallManagerUtils::SetPropertyInt32(env, callStateObj, "originalCallType", info.originalCallType);
+    NapiCallManagerUtils::SetPropertyInt32(env, callStateObj, "phoneOrWatch", info.phoneOrWatch);
+    NapiCallManagerUtils::SetPropertyBoolean(env, callStateObj, "isCustomAccessibility", info.isCustomAccessibility);
+    NapiCallManagerUtils::SetPropertyInt32(env, callStateObj, "rttState", static_cast<int32_t>(info.rttState));
+}
+
 /**
  * To notify an application of a call status change, register a callback with on() first.
  */
@@ -578,28 +598,7 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
     napi_value callbackFunc = nullptr;
     napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
     napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
-    NapiCallManagerUtils::SetPropertyStringUtf8(
-        env, callbackValues[ARRAY_INDEX_FIRST], "accountNumber", info.accountNumber);
-    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "accountId", info.accountId);
-    NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_FIRST], "videoState", static_cast<int32_t>(info.videoState));
-    NapiCallManagerUtils::SetPropertyInt64(env, callbackValues[ARRAY_INDEX_FIRST], "startTime", info.startTime);
-    NapiCallManagerUtils::SetPropertyBoolean(env, callbackValues[ARRAY_INDEX_FIRST], "isEcc", info.isEcc);
-    NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_FIRST], "callType", static_cast<int32_t>(info.callType));
-    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "callId", info.callId);
-    NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_FIRST], "callState", static_cast<int32_t>(info.callState));
-    NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_FIRST], "conferenceState", static_cast<int32_t>(info.conferenceState));
-    NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_FIRST], "crsType", info.crsType);
-    NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_FIRST], "originalCallType", info.originalCallType);
-    NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_FIRST], "phoneOrWatch", info.phoneOrWatch);
-    NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_FIRST], "rttState", static_cast<int32_t>(info.rttState));
+    SetBaseCallStateProperties(env, callbackValues[ARRAY_INDEX_FIRST], info);
     napi_set_named_property(env, callbackValues[ARRAY_INDEX_FIRST], std::string("extraParams").c_str(),
         AppExecFwk::WrapWantParams(env, AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString)));
     ReportCallAttribute(env, callbackValues, ARRAY_INDEX_THIRD, info);

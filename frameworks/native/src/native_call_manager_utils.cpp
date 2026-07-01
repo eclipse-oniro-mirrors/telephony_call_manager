@@ -91,6 +91,7 @@ CallAttributeInfo NativeCallManagerUtils::ReadCallAttributeInfo(MessageParcel &m
     }
     info.phoneOrWatch = messageParcel.ReadInt32();
     info.rttState = static_cast<RttCallState>(messageParcel.ReadInt32());
+    info.isCustomAccessibility = messageParcel.ReadBool();
     return info;
 }
 

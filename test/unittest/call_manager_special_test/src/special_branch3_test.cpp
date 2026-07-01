@@ -395,4 +395,71 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_002, TestSize.Level1)
     EXPECT_NE(Proxy->RequestCameraCapabilities(slotId, index), TELEPHONY_SUCCESS);
     EXPECT_FALSE(Proxy->IsMmiCode(slotId, number));
 }
+
+HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_MakeCallWithToken_001, TestSize.Level0)
+{
+    sptr<IRemoteObject> impl;
+    CallManagerServiceProxy proxy(impl);
+    AppExecFwk::PacMap options;
+    std::string token;
+    EXPECT_EQ(proxy.MakeCallWithToken("", options, token), TELEPHONY_ERR_ARGUMENT_INVALID);
+    EXPECT_EQ(proxy.MakeCallWithToken("12345", options, token), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+ 
+HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_CheckCallRecordingPermission_001, TestSize.Level0)
+{
+    sptr<IRemoteObject> impl;
+    CallManagerServiceProxy proxy(impl);
+    EXPECT_FALSE(proxy.CheckCallRecordingPermission("12345", "token123"));
+}
+ 
+HWTEST_F(SpecialBranch3Test, Telephony_CallManagerProxy_MakeCallWithToken_001, TestSize.Level0)
+{
+    auto callManagerProxyPtr = DelayedSingleton<CallManagerProxy>::GetInstance();
+    ASSERT_TRUE(callManagerProxyPtr != nullptr);
+    auto originalService = callManagerProxyPtr->callManagerServicePtr_;
+    callManagerProxyPtr->callManagerServicePtr_ = nullptr;
+    AppExecFwk::PacMap options;
+    std::string token;
+    int32_t ret = callManagerProxyPtr->MakeCallWithToken("12345", options, token);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    callManagerProxyPtr->callManagerServicePtr_ = originalService;
+}
+ 
+HWTEST_F(SpecialBranch3Test, Telephony_CallManagerProxy_MakeCallWithToken_002, TestSize.Level0)
+{
+    auto callManagerProxyPtr = DelayedSingleton<CallManagerProxy>::GetInstance();
+    ASSERT_TRUE(callManagerProxyPtr != nullptr);
+    AppExecFwk::PacMap options;
+    std::string token;
+    int32_t ret = callManagerProxyPtr->MakeCallWithToken("12345", options, token);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+ 
+HWTEST_F(SpecialBranch3Test, Telephony_CallManagerProxy_MakeCallWithToken_003, TestSize.Level0)
+{
+    auto callManagerProxyPtr = DelayedSingleton<CallManagerProxy>::GetInstance();
+    ASSERT_TRUE(callManagerProxyPtr != nullptr);
+    AppExecFwk::PacMap options;
+    std::string token;
+    int32_t ret = callManagerProxyPtr->MakeCallWithToken("", options, token);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+ 
+HWTEST_F(SpecialBranch3Test, Telephony_CallManagerProxy_CheckCallRecordingPermission_001, TestSize.Level0)
+{
+    auto callManagerProxyPtr = DelayedSingleton<CallManagerProxy>::GetInstance();
+    EXPECT_FALSE(callManagerProxyPtr->CheckCallRecordingPermission("12345", "token123"));
+}
+ 
+HWTEST_F(SpecialBranch3Test, Telephony_CallManagerProxy_CheckCallRecordingPermission_002, TestSize.Level0)
+{
+    auto callManagerProxyPtr = DelayedSingleton<CallManagerProxy>::GetInstance();
+    ASSERT_TRUE(callManagerProxyPtr != nullptr);
+    auto originalService = callManagerProxyPtr->callManagerServicePtr_;
+    callManagerProxyPtr->callManagerServicePtr_ = nullptr;
+    bool ret = callManagerProxyPtr->CheckCallRecordingPermission("12345", "token123");
+    EXPECT_FALSE(ret);
+    callManagerProxyPtr->callManagerServicePtr_ = originalService;
+}
 } // namespace OHOS::Telephony

@@ -315,6 +315,7 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
     std::string bundleName = "";
     TelephonyPermission::GetBundleNameByUid(uid, bundleName);
     extras.PutStringValue("bundleName", bundleName);
+    challengeTokenMgr_.FillExtrasFromChallengeToken(Str16ToStr8(number), extras);
     if (extras.GetBooleanValue("btSlotIdUnknown", false)) {
         BtCallWaitSlotId(extras, number);
     }
@@ -2047,6 +2048,88 @@ int32_t CallManagerService::GetCallTransferInfo(const std::string number, CallTr
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+}
+
+int32_t CallManagerService::MakeCallWithToken(std::string number, AppExecFwk::PacMap &options, std::string &token)
+{
+    std::string hexToken = challengeTokenMgr_.GenerateToken();
+    if (hexToken.empty()) {
+        TELEPHONY_LOGE("Fail to generate token");
+        return TELEPHONY_ERR_UNINIT;
+    }
+    bool isCustomAccessibility = options.GetBooleanValue("isCustomAccessibility", false);
+    if (number.empty() || number.length() > ACCOUNT_NUMBER_MAX_LENGTH) {
+        TELEPHONY_LOGE("MakeCallWithToken number is invalid");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    ChallengeToken challenge;
+    challenge.token = hexToken;
+    challenge.phoneNumber = number;
+    challenge.uid = uid;
+    challenge.isCustomAccessibility = isCustomAccessibility;
+    challenge.createTime = std::chrono::steady_clock::now();
+    if (!challengeTokenMgr_.TryUpdateChallengeTokenList(number, challenge)) {
+        TELEPHONY_LOGE("Fail to store token, token list is full");
+        return TELEPHONY_ERR_UNINIT;
+    }
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    AAFwk::Want want;
+    AppExecFwk::ElementName element("", "com.ohos.contacts", "com.ohos.contacts.MainAbility");
+    want.SetElement(element);
+    AAFwk::WantParams wantParams;
+    wantParams.SetParam("phoneNumber", AAFwk::String::Box(number));
+    wantParams.SetParam("pageFlag", AAFwk::String::Box("page_flag_edit_before_calling"));
+    want.SetParams(wantParams);
+    ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+    IPCSkeleton::SetCallingIdentity(identity);
+    if (err != ERR_OK) {
+        TELEPHONY_LOGE("Fail to make call with token, err:%{public}d", err);
+        challengeTokenMgr_.PopChallengeTokenByPhone(number);
+        return TELEPHONY_ERR_UNINIT;
+    }
+    TELEPHONY_LOGI("Stored hex token length: %{public}zu", hexToken.length());
+    token = hexToken;
+    return TELEPHONY_SUCCESS;
+}
+
+bool CallManagerService::CheckCallRecordingPermission(const std::string& cellularRecordPhoneNum,
+    const std::string& cellularRecordToken)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return false;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return false;
+    }
+    std::string phoneNumber = cellularRecordPhoneNum;
+    sptr<CallBase> call = CallObjectManager::GetOneCallObject(phoneNumber);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("Call not found phoneNumber");
+        return false;
+    }
+
+    TelCallState state = call->GetTelCallState();
+    if (state != TelCallState::CALL_STATUS_ACTIVE) {
+        TELEPHONY_LOGE("Call is not active, state: %{public}d", state);
+        return false;
+    }
+
+    std::string callToken = call->GetToken();
+    if (callToken.empty()) {
+        TELEPHONY_LOGE("Token is empty for phoneNumber");
+        return false;
+    }
+
+    if (callToken != cellularRecordToken) {
+        TELEPHONY_LOGE("Token mismatch");
+        return false;
+    }
+
+    TELEPHONY_LOGI("Call recording permission check passed");
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS

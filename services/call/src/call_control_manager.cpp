@@ -223,6 +223,8 @@ void CallControlManager::PackageDialInformation(AppExecFwk::PacMap &extras, std:
     dialSrcInfo_.videoState = (VideoStateType)extras.GetIntValue("videoState");
     dialSrcInfo_.originalCallType = (int32_t)extras.GetIntValue("videoState");
     dialSrcInfo_.bundleName = extras.GetStringValue("bundleName");
+    dialSrcInfo_.isCustomAccessibility = extras.GetBooleanValue("isCustomAccessibility", false);
+    dialSrcInfo_.token = extras.GetStringValue("token");
     extras_.Clear();
     extras_ = extras;
 }
