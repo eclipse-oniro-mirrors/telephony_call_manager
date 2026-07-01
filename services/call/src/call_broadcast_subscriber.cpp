@@ -208,7 +208,7 @@ void CallBroadcastSubscriber::ConnectCallUiUserSwitchedBroadcast(const EventFwk:
 void CallBroadcastSubscriber::ShutdownBroadcast(const EventFwk::CommonEventData &data)
 {
     TELEPHONY_LOGI("system is shutdown.");
-    DelayedSingleton<CallControlManager>::GetInstance()->DisconnectAllCalls(true, false, true);
+    DelayedSingleton<CallControlManager>::GetInstance()->DisconnectAllCalls(true, false, false);
     DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
 }
 
