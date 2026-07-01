@@ -164,7 +164,7 @@ int32_t VoipCallManagerProxy::RegisterCallBack(const sptr<IVoipCallManagerCallba
     auto remoteObj = callback->AsObject();
     if (remoteObj == nullptr) {
         TELEPHONY_LOGE("callback->AsObject() returns nullptr");
-        return TELEPHONY_ERR_ARGUMENT_NULL;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (!dataParcel.WriteRemoteObject(remoteObj.GetRefPtr())) {
         TELEPHONY_LOGE("WriteRemoteObject fail");
@@ -328,7 +328,7 @@ int32_t VoipCallManagerProxy::RegisterCallManagerCallBack(const sptr<ICallStatus
     auto remoteObj = callback->AsObject();
     if (remoteObj == nullptr) {
         TELEPHONY_LOGE("callback->AsObject() returns nullptr");
-        return TELEPHONY_ERR_ARGUMENT_NULL;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (!dataParcel.WriteRemoteObject(remoteObj.GetRefPtr())) {
         TELEPHONY_LOGE("WriteRemoteObject fail");
