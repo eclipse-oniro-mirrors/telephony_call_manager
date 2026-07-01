@@ -1,0 +1,555 @@
+# Copyright (C) 2021-2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("../../../callmanager.gni")
+CALL_MANAGER_PATH = "../../.."
+
+ohos_unittest("tel_call_manager_service1_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+  test_module = "tel_call_manager_service_gtest"
+  module_out_path = part_name + "/" + part_name + "/" + test_module
+  sanitize = {
+    cfi = false
+    cfi_cross_dso = false
+    debug = false
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/call_manager_service_base_test.cpp",
+  ]
+  sources += call_manager_sources
+
+  include_dirs = [
+    "${CALL_MANAGER_PATH}/interfaces/innerkits",
+    "${CALL_MANAGER_PATH}/services/call_manager_service/include",
+    "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
+  ]
+  include_dirs += call_manager_include_dirs
+
+  external_deps = [
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "core_service:ffrt_mocked",
+    "googletest:gmock_main",
+    "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
+  ]
+  external_deps += call_manager_external_deps
+  external_deps -= [ "ffrt:libffrt" ]
+
+  deps = [
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerServiceTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += call_manager_defines
+}
+
+ohos_unittest("tel_call_manager_service2_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+  test_module = "tel_call_manager_service_gtest"
+  module_out_path = part_name + "/" + part_name + "/" + test_module
+  sanitize = {
+    cfi = false
+    cfi_cross_dso = false
+    debug = false
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/call_manager_service_call_control_test.cpp",
+  ]
+  sources += call_manager_sources
+
+  include_dirs = [
+    "${CALL_MANAGER_PATH}/interfaces/innerkits",
+    "${CALL_MANAGER_PATH}/services/call_manager_service/include",
+    "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
+  ]
+  include_dirs += call_manager_include_dirs
+
+  external_deps = [
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "core_service:ffrt_mocked",
+    "googletest:gmock_main",
+    "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
+  ]
+  external_deps += call_manager_external_deps
+  external_deps -= [ "ffrt:libffrt" ]
+
+  deps = [
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerServiceTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += call_manager_defines
+}
+
+ohos_unittest("tel_call_manager_service3_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+  test_module = "tel_call_manager_service_gtest"
+  module_out_path = part_name + "/" + part_name + "/" + test_module
+  sanitize = {
+    cfi = false
+    cfi_cross_dso = false
+    debug = false
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/call_manager_service_call_status_test.cpp",
+  ]
+  sources += call_manager_sources
+
+  include_dirs = [
+    "${CALL_MANAGER_PATH}/interfaces/innerkits",
+    "${CALL_MANAGER_PATH}/services/call_manager_service/include",
+    "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
+  ]
+  include_dirs += call_manager_include_dirs
+
+  external_deps = [
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "core_service:ffrt_mocked",
+    "googletest:gmock_main",
+    "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
+  ]
+  external_deps += call_manager_external_deps
+  external_deps -= [ "ffrt:libffrt" ]
+
+  deps = [
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerServiceTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += call_manager_defines
+}
+
+ohos_unittest("tel_call_manager_service4_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+  test_module = "tel_call_manager_service_gtest"
+  module_out_path = part_name + "/" + part_name + "/" + test_module
+  sanitize = {
+    cfi = false
+    cfi_cross_dso = false
+    debug = false
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/call_manager_service_conference_test.cpp",
+  ]
+  sources += call_manager_sources
+
+  include_dirs = [
+    "${CALL_MANAGER_PATH}/interfaces/innerkits",
+    "${CALL_MANAGER_PATH}/services/call_manager_service/include",
+    "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
+  ]
+  include_dirs += call_manager_include_dirs
+
+  external_deps = [
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "core_service:ffrt_mocked",
+    "googletest:gmock_main",
+    "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
+  ]
+  external_deps += call_manager_external_deps
+  external_deps -= [ "ffrt:libffrt" ]
+
+  deps = [
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerServiceTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += call_manager_defines
+}
+
+ohos_unittest("tel_call_manager_service5_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+  test_module = "tel_call_manager_service_gtest"
+  module_out_path = part_name + "/" + part_name + "/" + test_module
+  sanitize = {
+    cfi = false
+    cfi_cross_dso = false
+    debug = false
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/call_manager_service_dtmf_test.cpp",
+  ]
+  sources += call_manager_sources
+
+  include_dirs = [
+    "${CALL_MANAGER_PATH}/interfaces/innerkits",
+    "${CALL_MANAGER_PATH}/services/call_manager_service/include",
+    "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
+  ]
+  include_dirs += call_manager_include_dirs
+
+  external_deps = [
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "core_service:ffrt_mocked",
+    "googletest:gmock_main",
+    "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
+  ]
+  external_deps += call_manager_external_deps
+  external_deps -= [ "ffrt:libffrt" ]
+
+  deps = [
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerServiceTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += call_manager_defines
+}
+
+ohos_unittest("tel_call_manager_service6_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+  test_module = "tel_call_manager_service_gtest"
+  module_out_path = part_name + "/" + part_name + "/" + test_module
+  sanitize = {
+    cfi = false
+    cfi_cross_dso = false
+    debug = false
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/call_manager_service_ims_test.cpp",
+  ]
+  sources += call_manager_sources
+
+  include_dirs = [
+    "${CALL_MANAGER_PATH}/interfaces/innerkits",
+    "${CALL_MANAGER_PATH}/services/call_manager_service/include",
+    "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
+  ]
+  include_dirs += call_manager_include_dirs
+
+  external_deps = [
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "core_service:ffrt_mocked",
+    "googletest:gmock_main",
+    "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
+  ]
+  external_deps += call_manager_external_deps
+  external_deps -= [ "ffrt:libffrt" ]
+
+  deps = [
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerServiceTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += call_manager_defines
+}
+
+ohos_unittest("tel_call_manager_service7_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+  test_module = "tel_call_manager_service_gtest"
+  module_out_path = part_name + "/" + part_name + "/" + test_module
+  sanitize = {
+    cfi = false
+    cfi_cross_dso = false
+    debug = false
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/call_manager_service_callback_test.cpp",
+  ]
+  sources += call_manager_sources
+
+  include_dirs = [
+    "${CALL_MANAGER_PATH}/interfaces/innerkits",
+    "${CALL_MANAGER_PATH}/services/call_manager_service/include",
+    "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
+  ]
+  include_dirs += call_manager_include_dirs
+
+  external_deps = [
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "core_service:ffrt_mocked",
+    "googletest:gmock_main",
+    "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
+  ]
+  external_deps += call_manager_external_deps
+  external_deps -= [ "ffrt:libffrt" ]
+
+  deps = [
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerServiceTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += call_manager_defines
+}
+
+ohos_unittest("tel_call_manager_service8_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+  test_module = "tel_call_manager_service_gtest"
+  module_out_path = part_name + "/" + part_name + "/" + test_module
+  sanitize = {
+    cfi = false
+    cfi_cross_dso = false
+    debug = false
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/call_manager_service_ui_event_test.cpp",
+  ]
+  sources += call_manager_sources
+
+  include_dirs = [
+    "${CALL_MANAGER_PATH}/interfaces/innerkits",
+    "${CALL_MANAGER_PATH}/services/call_manager_service/include",
+    "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
+  ]
+  include_dirs += call_manager_include_dirs
+
+  external_deps = [
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "core_service:ffrt_mocked",
+    "googletest:gmock_main",
+    "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
+  ]
+  external_deps += call_manager_external_deps
+  external_deps -= [ "ffrt:libffrt" ]
+
+  deps = [
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerServiceTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += call_manager_defines
+}
+
+ohos_unittest("tel_call_manager_service9_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+  test_module = "tel_call_manager_service_gtest"
+  module_out_path = part_name + "/" + part_name + "/" + test_module
+  sanitize = {
+    cfi = false
+    cfi_cross_dso = false
+    debug = false
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/call_manager_service_video_test.cpp",
+  ]
+  sources += call_manager_sources
+
+  include_dirs = [
+    "${CALL_MANAGER_PATH}/interfaces/innerkits",
+    "${CALL_MANAGER_PATH}/services/call_manager_service/include",
+    "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
+  ]
+  include_dirs += call_manager_include_dirs
+
+  external_deps = [
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "core_service:ffrt_mocked",
+    "googletest:gmock_main",
+    "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
+  ]
+  external_deps += call_manager_external_deps
+  external_deps -= [ "ffrt:libffrt" ]
+
+  deps = [
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerServiceTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += call_manager_defines
+}
+
+ohos_unittest("tel_call_manager_service10_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+  test_module = "tel_call_manager_service_gtest"
+  module_out_path = part_name + "/" + part_name + "/" + test_module
+  sanitize = {
+    cfi = false
+    cfi_cross_dso = false
+    debug = false
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/call_manager_service_audio_control_test.cpp",
+  ]
+  sources += call_manager_sources
+
+  include_dirs = [
+    "${CALL_MANAGER_PATH}/interfaces/innerkits",
+    "${CALL_MANAGER_PATH}/services/call_manager_service/include",
+    "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
+  ]
+  include_dirs += call_manager_include_dirs
+
+  external_deps = [
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "core_service:ffrt_mocked",
+    "googletest:gmock_main",
+    "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
+  ]
+  external_deps += call_manager_external_deps
+  external_deps -= [ "ffrt:libffrt" ]
+
+  deps = [
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerServiceTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += call_manager_defines
+}
+
+ohos_unittest("tel_call_manager_service11_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+  test_module = "tel_call_manager_service_gtest"
+  module_out_path = part_name + "/" + part_name + "/" + test_module
+  sanitize = {
+    cfi = false
+    cfi_cross_dso = false
+    debug = false
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/call_manager_service_voip_test.cpp",
+  ]
+  sources += call_manager_sources
+
+  include_dirs = [
+    "${CALL_MANAGER_PATH}/interfaces/innerkits",
+    "${CALL_MANAGER_PATH}/services/call_manager_service/include",
+    "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
+  ]
+  include_dirs += call_manager_include_dirs
+
+  external_deps = [
+    "access_token:libnativetoken_shared",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "core_service:ffrt_mocked",
+    "googletest:gmock_main",
+    "libphonenumber:phonenumber_standard",
+    "protobuf:protobuf",
+  ]
+  external_deps += call_manager_external_deps
+  external_deps -= [ "ffrt:libffrt" ]
+
+  deps = [
+    "${CALL_MANAGER_PATH}/test/unittest:call_manager_test_base",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerServiceTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += call_manager_defines
+}

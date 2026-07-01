@@ -1371,10 +1371,8 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIPOrRestart();
     CallVoiceAssistantManager::GetInstance()->UpdateVoipCallState(state);
-    if (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE ||
-        VoIPCallState_ == CallStateToApp::CALL_STATE_UNKNOWN) {
-        UnregisterAppStateObserver();
-    } else {
+    if (VoIPCallState_ != CallStateToApp::CALL_STATE_IDLE &&
+        VoIPCallState_ != CallStateToApp::CALL_STATE_UNKNOWN) {
         RegisterAppStateObserver();
     }
     IPCSkeleton::SetCallingIdentity(identity);
@@ -2196,7 +2194,6 @@ void CallControlManager::PreloadCallUi(bool enable, int32_t callingPid)
         if (preloadedCallUiRequestPids_.empty()) {
             TELEPHONY_LOGI("UnloadCallUi pid: %{public}d", callingPid);
             ConnectCallUiService(enable);
-            UnregisterAppStateObserver();
         }
     }
     IPCSkeleton::SetCallingIdentity(identity);

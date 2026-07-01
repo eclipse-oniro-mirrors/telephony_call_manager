@@ -1267,11 +1267,6 @@ napi_value NapiCallManager::MakeCallWithToken(napi_env env, napi_callback_info i
         }
     }
     auto asyncContext = std::make_unique<MakeCallWithTokenAsyncContext>();
-    if (asyncContext == nullptr) {
-        TELEPHONY_LOGE("NapiCallManager::MakeCallWithToken asyncContext is nullptr.");
-        NapiUtil::ThrowParameterError(env);
-        return nullptr;
-    }
     napi_status status = napi_get_value_string_utf8(
         env, argv[ARRAY_INDEX_FIRST], asyncContext->number, PHONE_NUMBER_MAXIMUM_LIMIT, &(asyncContext->numberLen));
     if (status != napi_ok) {

@@ -131,6 +131,7 @@ group("unittest") {
   deps += [ "ui_client:tel_call_manager_ui_test" ]
   deps += [ "call_earthquake_alarm_test:tel_call_earthquake_alarm_test" ]
   deps += [ "call_voice_assistant_test:tel_call_voice_assistant_test" ]
+  deps += [ "call_voice_assistant_test:tel_call_voice_assistant1_test" ]
   if (call_manager_feature_support_dsoftbus) {
     deps += [ "distributed_communication_test:distributed_communication_test" ]
   }
@@ -141,4 +142,20 @@ group("unittest") {
   if (call_manager_feature_support_rtt) {
     deps += [ "rtt_test:rtt_call_test" ]
   }
+  deps += [ "call_manager_service_stub_test:tel_call_manager_service_stub_gtest" ]
+  deps += [ "call_manager_service_test:tel_call_manager_service1_gtest" ]
+  deps += [ "call_manager_service_test:tel_call_manager_service2_gtest" ]
+  deps += [ "call_manager_service_test:tel_call_manager_service3_gtest" ]
+  deps += [ "call_manager_service_test:tel_call_manager_service4_gtest" ]
+  deps += [ "call_manager_service_test:tel_call_manager_service5_gtest" ]
+  deps += [ "call_manager_service_test:tel_call_manager_service6_gtest" ]
+  deps += [ "call_manager_service_test:tel_call_manager_service7_gtest" ]
+  deps += [ "call_manager_service_test:tel_call_manager_service8_gtest" ]
+  deps += [ "call_manager_service_test:tel_call_manager_service9_gtest" ]
+  deps += [ "call_manager_service_test:tel_call_manager_service10_gtest" ]
+  deps += [ "report_call_info_handler_test:tel_report_call_info_handler_test" ]
+  deps += [ "antifraud_service_test:tel_antifraud_service_test" ]
+  deps += [ "antifraud_adapter_test:tel_antifraud_adapter_test" ]
+  deps += [ "antifraud_cloud_service_test:tel_antifraud_cloud_service_gtest" ]
+  deps += [ "motion_recognition_test:tel_motion_recognition_test" ]
 }

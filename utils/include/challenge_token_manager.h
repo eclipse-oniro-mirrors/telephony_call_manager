@@ -51,8 +51,8 @@ private:
     static constexpr int32_t TOKEN_BYTES_LENGTH = 32;
     static constexpr int32_t HEX_STRING_RATIO = 2;
 
-    std::list<ChallengeToken> challengeTokenList_{};
-    ffrt::mutex tokenMutex_;
+    static std::list<ChallengeToken> challengeTokenList_;
+    static ffrt::mutex tokenMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -23,6 +23,9 @@
 namespace OHOS {
 namespace Telephony {
 
+std::list<ChallengeToken> ChallengeTokenManager::challengeTokenList_;
+ffrt::mutex ChallengeTokenManager::tokenMutex_;
+
 bool ChallengeTokenManager::TryUpdateChallengeTokenList(
     const std::string &phoneNumber, const ChallengeToken &challenge)
 {
