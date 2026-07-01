@@ -1754,7 +1754,7 @@ void CallControlManager::ReleaseDisconnectedLock()
 #endif
 }
 
-void CallControlManager::DisconnectAllCalls(bool isIncludeEmergencyCall, bool isFromThermalProtection, bool isLocaly)
+void CallControlManager::DisconnectAllCalls(bool isIncludeEmergencyCall, bool isFromThermalProtection, bool isWaitingForResponse)
 {
     std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
     int32_t ret = -1;
@@ -1780,8 +1780,8 @@ void CallControlManager::DisconnectAllCalls(bool isIncludeEmergencyCall, bool is
             TELEPHONY_LOGI("one call is disconnected. call state: %{public}d, callId: %{public}d",
                 call->GetCallRunningState(), call->GetCallID());
         }
-        if (isLocaly) {
-            DisconnectCallLocaly(call);
+        if (!isWaitingForResponse) {
+            ReportCallDisconnected(call);
         }
     }
 }
