@@ -15,7 +15,6 @@
 
 #include "number_identity_data_base_helper.h"
 
-#include "ability_context.h"
 #include "call_manager_errors.h"
 #include "call_number_utils.h"
 #include "iservice_registry.h"
