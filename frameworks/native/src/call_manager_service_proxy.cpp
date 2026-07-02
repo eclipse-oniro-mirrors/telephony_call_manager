@@ -27,12 +27,24 @@ CallManagerServiceProxy::CallManagerServiceProxy(const sptr<IRemoteObject> &impl
 
 int32_t CallManagerServiceProxy::RegisterCallBack(const sptr<ICallAbilityCallback> &callback)
 {
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("callback is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    dataParcel.WriteRemoteObject(callback->AsObject().GetRefPtr());
+    auto remoteObj = callback->AsObject();
+    if (remoteObj == nullptr) {
+        TELEPHONY_LOGE("callback->AsObject() returns nullptr");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if (!dataParcel.WriteRemoteObject(remoteObj.GetRefPtr())) {
+        TELEPHONY_LOGE("WriteRemoteObject fail");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
     MessageParcel replyParcel;
     
     int32_t error = SendRequest(INTERFACE_REGISTER_CALLBACK, dataParcel, replyParcel);
