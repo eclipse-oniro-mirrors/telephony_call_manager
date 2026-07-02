@@ -29,7 +29,7 @@
 #include "common_event_support.h"
 #include "telephony_permission.h"
 #ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
-#include "watch_lite_impl.h"
+#include "watch_lite_call_manager_node.h"
 #endif
 
 namespace OHOS {
@@ -74,17 +74,22 @@ SpamCallAdapter::~SpamCallAdapter()
     TELEPHONY_LOGW("~SpamCallAdapter");
 }
 
-bool SpamCallAdapter::DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId)
+bool SpamCallAdapter::DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId,
+    IWatchTelephonyNode *watchTelephonyNode)
 {
     TELEPHONY_LOGW("DetectSpamCall start");
     phoneNumber_ = phoneNumber;
 #ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    if (watchTelephonyNode == nullptr) {
+        TELEPHONY_LOGE("node nullptr");
+        return false;
+    }
     uint64_t startCallerStatusTime = GetCurrentTimeMs();
     std::unique_lock<ffrt::mutex> lock(spamMutex_);
     result_ = "";
     isQueryComplete_ = false;
     lock.unlock();
-    SubmitCallerStatusQuery(phoneNumber);
+    SubmitCallerStatusQuery(phoneNumber, watchTelephonyNode);
     std::unique_lock<ffrt::mutex> lockForWait(spamMutex_);
     if (!spamCv_.wait_for(lockForWait, std::chrono::milliseconds(WAIT_TIME_FIVE_SECOND),
         [this]() { return isQueryComplete_; })) {
@@ -202,16 +207,17 @@ uint64_t SpamCallAdapter::GetCurrentTimeMs()
     return std::chrono::duration_cast<std::chrono::milliseconds>(timeNow.time_since_epoch()).count();
 }
 
-void SpamCallAdapter::SubmitCallerStatusQuery(const std::string &phoneNumber)
+void SpamCallAdapter::SubmitCallerStatusQuery(const std::string &phoneNumber, IWatchTelephonyNode *watchTelephonyNode)
 {
     auto weak = weak_from_this();
-    ffrt::submit_h([weak, phoneNumber] {
+    ffrt::submit_h([weak, phoneNumber, watchTelephonyNode] {
         auto strong = weak.lock();
         if (strong == nullptr) {
             return;
         }
         std::string dispositionJson = "";
-        int32_t res = WatchSystemService::WatchLiteImpl::GetInstance().GetCallerStatus(phoneNumber, dispositionJson);
+        // watchTelephonyNode already check nullptr
+        int32_t res = watchTelephonyNode->GetCallerStatus(phoneNumber, dispositionJson);
         TELEPHONY_LOGI("query result[%{public}d]", res);
         std::unique_lock<ffrt::mutex> lock(strong->spamMutex_);
         strong->isQueryComplete_ = true;

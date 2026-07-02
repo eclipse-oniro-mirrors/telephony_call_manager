@@ -28,6 +28,7 @@
 
 namespace OHOS {
 namespace Telephony {
+class IWatchTelephonyNode;
 #ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
 enum class CallDisposition {
     AUTO_ANSWER,
@@ -56,7 +57,8 @@ class SpamCallAdapter : public std::enable_shared_from_this<SpamCallAdapter> {
 public:
     SpamCallAdapter();
     ~SpamCallAdapter();
-    bool DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId);
+    bool DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId,
+        IWatchTelephonyNode *watchTelephonyNode = nullptr);
     void GetDetectResult(int32_t &errCode, std::string &result);
     void SetDetectResult(int32_t &errCode, std::string &result);
     void GetParseResult(bool &isBlock, NumberMarkInfo &info, int32_t &blockReason, std::string &detectDetails);
@@ -85,7 +87,7 @@ private:
     bool ParseNumberMarkInfo(cJSON *root, NumberMarkInfo &numberMarkInfo);
     bool ParseCallerResult(const std::string &dispositionJson, CallDisposition &callDisposition,
         NumberMarkInfo &numberMarkInfo);
-    void SubmitCallerStatusQuery(const std::string &phoneNumber);
+    void SubmitCallerStatusQuery(const std::string &phoneNumber, IWatchTelephonyNode *watchTelephonyNode);
 #endif
 
     int32_t errCode_ = -1;

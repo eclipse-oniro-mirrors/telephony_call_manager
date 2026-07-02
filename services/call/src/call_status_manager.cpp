@@ -59,6 +59,9 @@
 #include "uri.h"
 #include "voip_call.h"
 #include "want_params_wrapper.h"
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+#include "watch_lite_call_manager_node.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -80,7 +83,12 @@ CallStatusManager::CallStatusManager()
     }
 }
 
-CallStatusManager::~CallStatusManager() {}
+CallStatusManager::~CallStatusManager()
+{
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    DeInitWatchSystemServiceWrapper();
+#endif
+}
 
 int32_t CallStatusManager::Init()
 {
@@ -95,6 +103,9 @@ int32_t CallStatusManager::Init()
     mOttEventIdTransferMap_.clear();
     InitCallBaseEvent();
     CallIncomingFilterManagerPtr_ = (std::make_unique<CallIncomingFilterManager>()).release();
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    InitWatchSystemServiceWrapper();
+#endif
     return TELEPHONY_SUCCESS;
 }
 
@@ -1979,7 +1990,12 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
     }
     // make_shared no need to check nullptr.
     std::shared_ptr<SpamCallAdapter> spamCallAdapterPtr = std::make_shared<SpamCallAdapter>();
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    bool isDetectedSpamCall = spamCallAdapterPtr->DetectSpamCall(
+        std::string(info.phoneNum), info.accountId, watchTelephonyNode_);
+#else
     bool isDetectedSpamCall = spamCallAdapterPtr->DetectSpamCall(std::string(info.phoneNum), info.accountId);
+#endif
     if (!isDetectedSpamCall) {
         TELEPHONY_LOGE("DetectSpamCall failed!");
         return false;
@@ -2761,6 +2777,39 @@ void CallStatusManager::HandleRttEventInfo(const ImsRTTEventType &eventType)
             break;
         default:
             break;
+    }
+}
+#endif
+
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+void CallStatusManager::InitWatchSystemServiceWrapper()
+{
+    if (watchSystemServiceHandler_ != nullptr) {
+        return; // already open
+    }
+    watchSystemServiceHandler_ = dlopen("libwatch_system_native.z.so", RTLD_LAZY);
+    if (watchSystemServiceHandler_ == nullptr) {
+        TELEPHONY_LOGE("open hws so failed[%{public}s]", dlerror());
+        return;
+    }
+    auto getNodeFunc = (CreateWatchTelephonyNodeFuncPtr)dlsym(watchSystemServiceHandler_,
+        "GetWatchSystemServiceNode");
+    if (getNodeFunc != nullptr) {
+        watchTelephonyNode_ = getNodeFunc();
+    }
+}
+
+void CallStatusManager::DeInitWatchSystemServiceWrapper()
+{
+    if (watchTelephonyNode_ != nullptr) {
+        watchTelephonyNode_ = nullptr;
+    }
+    if (watchSystemServiceHandler_ != nullptr) {
+        if (dlclose(watchSystemServiceHandler_) != 0) {
+            TELEPHONY_LOGE("unload hws sdk failed");
+            return;
+        }
+        watchSystemServiceHandler_ = nullptr;
     }
 }
 #endif

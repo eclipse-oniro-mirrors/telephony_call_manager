@@ -40,6 +40,7 @@
 namespace OHOS {
 namespace Telephony {
 class SpamCallAdapter;
+class IWatchTelephonyNode;
 const int32_t SLOT_NUM = 2;
 constexpr int32_t DEVICE_PROVISION_UNDEF = -1;
 constexpr int32_t DEVICE_PROVISION_INVALID = 0;
@@ -177,6 +178,10 @@ private:
     bool UpdateDialingHandle(const CallDetailInfo &info, bool &isDistributedDeviceDialing);
     bool RefreshDialingStateByOtherState(sptr<CallBase> &call, const CallDetailInfo &info);
     void PackVoipCallInfo(DialParaInfo &paraInfo, const CallDetailInfo &info);
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    void InitWatchSystemServiceWrapper();
+    void DeInitWatchSystemServiceWrapper();
+#endif
 
 private:
     CallDetailInfo callReportInfo_;
@@ -201,6 +206,10 @@ private:
     ffrt::mutex mutex_;
     static sptr<OOBEStatusObserver> oobeStatusObserver_;
     static int32_t deviceProvisioned_;
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    void *watchSystemServiceHandler_{nullptr};
+    IWatchTelephonyNode *watchTelephonyNode_{nullptr};
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS
