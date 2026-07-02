@@ -764,4 +764,21 @@ HWTEST_F(ZeroBranch9Test, Telephony_SpeakerMode_SelectDevice, Function | MediumT
     EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
     callControlManager->VoIPCallState_ = tmpVoIPCallState;
 }
+
+HWTEST_F(ZeroBranch9Test, Telephony_CallManager_DisconnectCallLocaly_ImsCall, TestSize.Level0)
+{
+    DialParaInfo dialInfo;
+    dialInfo.callType = CallType::TYPE_IMS;
+    dialInfo.callState = TelCallState::CALL_STATUS_INCOMING;
+    dialInfo.videoState = VideoStateType::TYPE_VIDEO;
+    sptr<CallBase> call = nullptr;
+    auto callObjectManager = DelayedSingleton<CallObjectManager>::GetInstance();
+    auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    int32_t ret = callObjectManager->ReportCallDisconnected(call);
+    EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
+    call = new IMSCall(dialInfo);
+    CallObjectManager::callObjectPtrList_.emplace_back(call);
+    callControlManager->DisconnectAllCalls(true, false, false);
+    callObjectManager->ReportCallDisconnected(call);
+}
 }
