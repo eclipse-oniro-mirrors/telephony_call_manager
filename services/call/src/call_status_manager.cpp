@@ -1925,10 +1925,13 @@ sptr<CallBase> CallStatusManager::CreateNewCallByCallTypeEx(
     return callPtr;
 }
 
-bool CallStatusManager::ShouldRejectIncomingCall()
+bool CallStatusManager::ShouldRejectIncomingCall(sptr<CallBase> &call)
 {
     bool hasEcc = false;
     if (HasEmergencyCall(hasEcc) == TELEPHONY_SUCCESS && hasEcc) {
+        CallManagerHisysevent::ReportCallDropChrEvent(call->GetSlotId(), call->GetCallIndex(),
+            DROP_CALL_BY_EMC_CALL_EXIST);
+        call->SetApCauseReported(true);
         TELEPHONY_LOGI("HasEmergencyCall reject incoming call.");
         return true;
     }
@@ -1944,6 +1947,9 @@ bool CallStatusManager::ShouldRejectIncomingCall()
 #else
 
     if (CallStatusManager::GetDevProvisioned() != DEVICE_PROVISION_VALID) {
+        CallManagerHisysevent::ReportCallDropChrEvent(call->GetSlotId(), call->GetCallIndex(),
+            DROP_CALL_BY_INVALID_DEVICE_PROPERTY);
+        call->SetApCauseReported(true);
         TELEPHONY_LOGW("ShouldRejectIncomingCall: device_provisioned = 0");
         return true;
     }
@@ -1961,6 +1967,8 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         + std::to_string(userId) + "?Proxy=true&key=user_setup_complete");
     int resp_userSetup = datashareHelper->Query(uri_setup, "user_setup_complete", user_setup_complete);
     if (resp_userSetup == TELEPHONY_SUCCESS && (user_setup_complete == "0" || user_setup_complete.empty())) {
+        CallManagerHisysevent::ReportCallDropChrEvent(call->GetSlotId(), call->GetCallIndex(), DROP_CALL_BY_OOBE);
+        call->SetApCauseReported(true);
         TELEPHONY_LOGW("ShouldRejectIncomingCall: user_setup_complete = 0");
         return true;
     }
@@ -2002,6 +2010,9 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
         params.SetParam("blockReason", AAFwk::Integer::Box(blockReason));
         call->SetExtraParams(params);
         if (isBlock) {
+            CallManagerHisysevent::ReportCallDropChrEvent(call->GetSlotId(), call->GetCallIndex(),
+                DROP_CALL_BY_CALL_BLOCKING);
+            call->SetApCauseReported(true);
             return true;
         }
     }
@@ -2021,6 +2032,9 @@ bool CallStatusManager::HandleWatchCallDisposition(std::shared_ptr<SpamCallAdapt
     CallDisposition disposition = spamCallAdapterPtr->GetCallDisposition();
     if (disposition == CallDisposition::INTERCEPTED) {
         TELEPHONY_LOGI("reject call");
+        CallManagerHisysevent::ReportCallDropChrEvent(call->GetSlotId(), call->GetCallIndex(),
+            DROP_CALL_BY_WATCH_CALL_BLOCKING);
+        call->SetApCauseReported(true);
         return true;
     }
 
@@ -2166,7 +2180,7 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
 {
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
-    if (ShouldRejectIncomingCall() || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
+    if (ShouldRejectIncomingCall(call) || state == static_cast<int32_t>(CallStateToApp::CALL_STATE_RINGING)) {
         CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
             CALL_INCOMING_REJECT_BY_SYSTEM, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "",
             ACTION_TYPE, REJECT_BY_OOBE);
@@ -2185,6 +2199,9 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
         int ret = Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum, 0);
         TELEPHONY_LOGI("IsNeedSilentInDoNotDisturbMode ret:%{public}d", ret);
         if (ret == 0) {
+            CallManagerHisysevent::ReportCallDropChrEvent(call->GetSlotId(), call->GetCallIndex(),
+                DROP_CALL_BY_FOCUS_MODE);
+            call->SetApCauseReported(true);
             CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
                 CALL_INCOMING_REJECT_BY_SYSTEM, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "",
                 ACTION_TYPE, REJECT_IN_FOCUSMODE);

@@ -134,7 +134,7 @@ private:
     void SetContactInfo(sptr<CallBase> &call, std::string phoneNum);
     bool SetBluetoothCallContactInfo(sptr<CallBase> &call, ContactInfo &contactInfo, std::string phoneNum);
     int32_t HandleRejectCall(sptr<CallBase> &call, bool isBlock);
-    bool ShouldRejectIncomingCall();
+    bool ShouldRejectIncomingCall(sptr<CallBase> &call);
     bool ShouldBlockIncomingCall(const sptr<CallBase> &call, const CallDetailInfo &info);
     bool IsRingOnceCall(const sptr<CallBase> &call, const CallDetailInfo &info);
     int32_t HandleRingOnceCall(sptr<CallBase> &call);
