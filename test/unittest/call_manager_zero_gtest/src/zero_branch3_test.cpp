@@ -2049,6 +2049,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_019, TestSize.Level0)
     audioControl->HandleCallStateUpdated(
         call, TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_DISCONNECTED);
     ASSERT_FALSE(audioControl->IsScoTemporarilyDisabled());
+    audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_WAITING, TelCallState::CALL_STATUS_WAITING);
+    ASSERT_TRUE(audioControl->IsScoTemporarilyDisabled());
     CallObjectManager::callObjectPtrList_.clear();
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
