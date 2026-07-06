@@ -1217,6 +1217,10 @@ int32_t CallStatusManager::AlertHandle(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     ClearPendingState(call);
+    if (call->GetTelCallState() == TelCallState::CALL_STATUS_DISCONNECTING) {
+        TELEPHONY_LOGE("call is disconnecting.");
+        return CALL_ERR_CALL_STATE_MISMATCH_OPERATION;
+    }
     TELEPHONY_LOGI("refresh call.");
     call = RefreshCallIfNecessary(call, info);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ALERTING);
