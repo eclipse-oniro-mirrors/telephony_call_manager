@@ -45,6 +45,7 @@ ohos_shared_library("cj_telephony_call_ffi") {
     "libuv:uv",
     "napi:ace_napi",
     "napi:cj_bind_ffi",
+    "node:node_header_notice",
   ]
 
   part_name = "call_manager"
