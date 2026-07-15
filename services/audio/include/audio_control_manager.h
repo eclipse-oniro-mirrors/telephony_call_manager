@@ -138,6 +138,7 @@ private:
     void PostProcessRingtone();
     bool IsExternalAudioDevice(AudioDeviceType initDeviceType);
     bool IsInEarAudioDevice(AudioDeviceType initDeviceType);
+    void UpdateDeviceForForegroundCall(const sptr<CallBase> &foregroundCall);
     void AdjustDeviceForCrs(AudioDevice &device, AudioDeviceType deviceType);
     void UnmuteSoundTone();
     void ProcessSoundtone(sptr<CallBase> &callObjectPtr);

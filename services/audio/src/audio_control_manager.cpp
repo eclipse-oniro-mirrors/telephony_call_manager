@@ -273,10 +273,6 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
 
 void AudioControlManager::UpdateDeviceType(const sptr<CallBase> &callObjectPtr)
 {
-    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
-    if (audioDeviceManager == nullptr) {
-        return;
-    }
     sptr<CallBase> foregroundCall = callObjectPtr;
     if (callObjectPtr == nullptr) {
         foregroundCall = CallObjectManager::GetForegroundCall();
@@ -291,6 +287,11 @@ void AudioControlManager::UpdateDeviceType(const sptr<CallBase> &callObjectPtr)
         TELEPHONY_LOGE("other call not need control audio");
         return;
     }
+    UpdateDeviceForForegroundCall(foregroundCall);
+}
+
+void AudioControlManager::UpdateDeviceForForegroundCall(const sptr<CallBase> &foregroundCall)
+{
     AudioDevice device = {
         .deviceType = AudioDeviceType::DEVICE_SPEAKER,
         .address = { 0 },
@@ -303,18 +304,32 @@ void AudioControlManager::UpdateDeviceType(const sptr<CallBase> &callObjectPtr)
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
         SetAudioDevice(device);
-    } else {
-        if (audioDeviceManager->IsSpeakerMode()) {
-            audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
-        } else {
-            AudioDeviceType currentDeviceType = audioDeviceManager->GetCurrentAudioDevice();
-            TELEPHONY_LOGI("GetCurrentAudioDevice: %{public}d,initDeviceType: %{public}d",
-                static_cast<int32_t>(currentDeviceType), static_cast<int32_t>(initDeviceType));
-            if (initDeviceType != currentDeviceType) {
-                device.deviceType = initDeviceType;
-                SetAudioDevice(device);
-            }
-        }
+        return;
+    }
+#ifdef SUPPORT_DSOFTBUS
+    auto dcMgrInstance = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    if (dcMgrInstance != nullptr && dcMgrInstance->IsAudioOnSink()) {
+        return;
+    }
+#endif
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    auto distributedCallManager = DelayedSingleton<DistributedCallManager>::GetInstance();
+    if (audioDeviceManager == nullptr || distributedCallManager == nullptr) {
+        return;
+    }
+    if (!foregroundCall->GetAnsweredByPhone() || distributedCallManager->IsDistributedCarDeviceOnline()) {
+        return;
+    }
+    if (audioDeviceManager->IsSpeakerMode()) {
+        audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
+        return;
+    }
+    AudioDeviceType currentDeviceType = audioDeviceManager->GetCurrentAudioDevice();
+    TELEPHONY_LOGI("GetCurrentAudioDevice: %{public}d,initDeviceType: %{public}d",
+        static_cast<int32_t>(currentDeviceType), static_cast<int32_t>(initDeviceType));
+    if (initDeviceType != currentDeviceType) {
+        device.deviceType = initDeviceType;
+        SetAudioDevice(device);
     }
 }
 
