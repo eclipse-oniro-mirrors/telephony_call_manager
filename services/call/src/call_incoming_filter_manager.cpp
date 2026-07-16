@@ -35,11 +35,11 @@ int32_t CallIncomingFilterManager::PackCellularCallInfo(CellularCallInfo &callIn
     callInfo.index = info.index;
     callInfo.slotId = info.accountId;
     callInfo.accountId = info.accountId;
-    if (memset_s(callInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
+    if (memset_s(callInfo.phoneNum, kMaxNumberLen + 1, 0, kMaxNumberLen + 1) != EOK) {
         TELEPHONY_LOGW("memset_s failed!");
         return TELEPHONY_ERR_MEMSET_FAIL;
     }
-    if (memcpy_s(callInfo.phoneNum, kMaxNumberLen, info.phoneNum, kMaxNumberLen) != EOK) {
+    if (memcpy_s(callInfo.phoneNum, kMaxNumberLen + 1, info.phoneNum, kMaxNumberLen + 1) != EOK) {
         TELEPHONY_LOGW("memcpy_s failed!");
         return TELEPHONY_ERR_MEMCPY_FAIL;
     }

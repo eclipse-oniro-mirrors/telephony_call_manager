@@ -1208,6 +1208,7 @@ static void SetCallTransferCallback(int32_t slotId, ::ohos::telephony::call::Cal
         ConvertErrorForBusinessError(TELEPHONY_ERR_ARGUMENT_INVALID);
         return;
     }
+    information.transferNum[info.transferNum.size()] = '\0';
 
     TaiheCallManager::GetInstance().RegisterCallBack();
     std::shared_ptr<AniCallbackInfo> cb = std::make_shared<AniCallbackInfo>();

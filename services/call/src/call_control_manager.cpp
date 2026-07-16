@@ -2184,6 +2184,7 @@ void CallControlManager::PreloadCallUi(bool enable, int32_t callingPid)
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     if (enable) {
         if (it != preloadedCallUiRequestPids_.end()) {
+            IPCSkeleton::SetCallingIdentity(identity);
             return;
         }
         TELEPHONY_LOGI("PreloadCallUi pid: %{public}d", callingPid);
@@ -2192,6 +2193,7 @@ void CallControlManager::PreloadCallUi(bool enable, int32_t callingPid)
         ConnectCallUiService(enable);
     } else {
         if (it == preloadedCallUiRequestPids_.end()) {
+            IPCSkeleton::SetCallingIdentity(identity);
             return;
         }
         preloadedCallUiRequestPids_.erase(it);

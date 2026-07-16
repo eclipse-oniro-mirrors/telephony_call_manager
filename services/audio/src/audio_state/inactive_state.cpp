@@ -29,43 +29,43 @@ bool InActiveState::ProcessEvent(int32_t event)
     switch (event) {
         case AudioEvent::NEW_DIALING_CALL:
             // should switch alerting state while only one alerting call exists
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+            if (CallStateProcessor::GetInstance()->
                 ShouldSwitchState(TelCallState::CALL_STATUS_DIALING)) {
-                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                result = AudioSceneProcessor::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_DIALING_STATE);
             }
             break;
         case AudioEvent::NEW_ACTIVE_CS_CALL:
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+            if (CallStateProcessor::GetInstance()->
                 ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 TELEPHONY_LOGI("inactive state switch cs call to active state");
-                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                result = AudioSceneProcessor::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_CS_CALL_STATE);
             }
             break;
         case AudioEvent::NEW_ACTIVE_IMS_CALL:
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+            if (CallStateProcessor::GetInstance()->
                 ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 TELEPHONY_LOGI("inactive state switch ims call to active state");
-                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                result = AudioSceneProcessor::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_IMS_CALL_STATE);
             }
             break;
         case AudioEvent::NEW_ALERTING_CALL:
             // should switch alerting state while only one alerting call exists
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+            if (CallStateProcessor::GetInstance()->
                 ShouldSwitchState(TelCallState::CALL_STATUS_ALERTING)) {
                 TELEPHONY_LOGI("inactive state switch call to alerting state");
-                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                result = AudioSceneProcessor::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_ALERTING_STATE);
             }
             break;
         case AudioEvent::NEW_INCOMING_CALL:
             // should switch incoming state while only one incoming call exists
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+            if (CallStateProcessor::GetInstance()->
                 ShouldSwitchState(TelCallState::CALL_STATUS_INCOMING)) {
                 TELEPHONY_LOGI("inactive state switch call to incoming state");
-                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                result = AudioSceneProcessor::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_INCOMING_STATE);
             }
             break;

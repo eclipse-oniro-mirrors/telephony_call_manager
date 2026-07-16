@@ -65,7 +65,7 @@ AudioControlManager::~AudioControlManager()
 void AudioControlManager::Init()
 {
     DelayedSingleton<AudioDeviceManager>::GetInstance()->Init();
-    DelayedSingleton<AudioSceneProcessor>::GetInstance()->Init();
+    AudioSceneProcessor::GetInstance()->Init();
     std::lock_guard<ffrt::recursive_mutex> lock(ringMutex_);
     ring_ = std::make_shared<Ring>();
 #ifdef OHOS_SUBSCRIBE_USER_STATUS_ENABLE
@@ -90,7 +90,7 @@ void AudioControlManager::UnInit()
 
 void AudioControlManager::UpdateForegroundLiveCall()
 {
-    int32_t callId = DelayedSingleton<CallStateProcessor>::GetInstance()->GetAudioForegroundLiveCall();
+    int32_t callId = CallStateProcessor::GetInstance()->GetAudioForegroundLiveCall();
     if (callId == INVALID_CALLID) {
         frontCall_ = nullptr;
         DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false);
@@ -168,7 +168,7 @@ void AudioControlManager::CallStateUpdated(
     if (nextState == TelCallState::CALL_STATUS_DISCONNECTED && totalCalls_.count(callObjectPtr) > 0) {
         totalCalls_.erase(callObjectPtr);
     }
-    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+    auto callStateProcessor = CallStateProcessor::GetInstance();
     if (callStateProcessor == nullptr) {
         return;
     }
@@ -397,7 +397,7 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
 bool AudioControlManager::PreHandleAnswerdState(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
-    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+    auto callStateProcessor = CallStateProcessor::GetInstance();
     if (callStateProcessor == nullptr) {
         return false;
     }
@@ -508,7 +508,7 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
 {
     TELEPHONY_LOGI("handle next state.");
     AudioEvent event = AudioEvent::UNKNOWN_EVENT;
-    DelayedSingleton<CallStateProcessor>::GetInstance()->AddCall(callObjectPtr->GetCallID(), nextState);
+    CallStateProcessor::GetInstance()->AddCall(callObjectPtr->GetCallID(), nextState);
     switch (nextState) {
         case TelCallState::CALL_STATUS_DIALING:
             event = AudioEvent::NEW_DIALING_CALL;
@@ -544,7 +544,7 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
         return;
     }
     TELEPHONY_LOGI("handle next state, event: %{public}d.", event);
-    DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
+    AudioSceneProcessor::GetInstance()->ProcessEvent(event);
 }
 
 void AudioControlManager::ApplyFocusForBlueToothCall(TelCallState nextState)
@@ -564,8 +564,8 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
 {
     TELEPHONY_LOGI("handle prior state.");
     AudioEvent event = AudioEvent::UNKNOWN_EVENT;
-    DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(callObjectPtr->GetCallID(), priorState);
-    int32_t stateNumber = DelayedSingleton<CallStateProcessor>::GetInstance()->GetCallNumber(priorState);
+    CallStateProcessor::GetInstance()->DeleteCall(callObjectPtr->GetCallID(), priorState);
+    int32_t stateNumber = CallStateProcessor::GetInstance()->GetCallNumber(priorState);
     switch (priorState) {
         case TelCallState::CALL_STATUS_DIALING:
             if (stateNumber == EMPTY_VALUE) {
@@ -600,7 +600,7 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
         return;
     }
     TELEPHONY_LOGI("handle prior state, event: %{public}d.", event);
-    DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
+    AudioSceneProcessor::GetInstance()->ProcessEvent(event);
 }
 
 void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr)
@@ -685,7 +685,7 @@ void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)
     if (event == AudioEvent::UNKNOWN_EVENT) {
         return;
     }
-    DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
+    AudioSceneProcessor::GetInstance()->ProcessEvent(event);
 }
 
 /**
@@ -1042,6 +1042,10 @@ bool AudioControlManager::DealCrsScene(const AudioStandard::AudioRingerMode &rin
         HILOG_COMM_ERROR("play soundtone fail.");
         return false;
     } else {
+        if (ring_ == nullptr) {
+            TELEPHONY_LOGE("ring_ is nullptr");
+            return false;
+        }
         ring_->Play(accountId, "", Media::HapticStartupMode::DEFAULT);
         TELEPHONY_LOGI("type_crs palyRingTone in silent and vibrat mode");
         return true;
@@ -1430,7 +1434,7 @@ std::set<sptr<CallBase>> AudioControlManager::GetCallList()
 
 sptr<CallBase> AudioControlManager::GetCurrentActiveCall()
 {
-    int32_t callId = DelayedSingleton<CallStateProcessor>::GetInstance()->GetCurrentActiveCall();
+    int32_t callId = CallStateProcessor::GetInstance()->GetCurrentActiveCall();
     if (callId != INVALID_CALLID) {
         return GetCallBase(callId);
     }
@@ -1503,7 +1507,7 @@ bool AudioControlManager::IsNumberAllowed(const std::string &phoneNum)
 
 bool AudioControlManager::ShouldPlayRingtone() const
 {
-    auto processor = DelayedSingleton<CallStateProcessor>::GetInstance();
+    auto processor = CallStateProcessor::GetInstance();
     int32_t alertingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_ALERTING);
     int32_t incomingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING);
     if (incomingCallNum == EMPTY_VALUE || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING

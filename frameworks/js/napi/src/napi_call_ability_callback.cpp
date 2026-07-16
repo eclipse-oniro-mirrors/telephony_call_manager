@@ -2215,7 +2215,6 @@ int32_t NapiCallAbilityCallback::ReportPeerDimensions(
     napi_open_handle_scope(env, &PeerDimensionsDetailScope);
     if (PeerDimensionsDetailScope == nullptr) {
         TELEPHONY_LOGE("CallMediaModeInfoScope is nullptr");
-        napi_close_handle_scope(env, PeerDimensionsDetailScope);
         return TELEPHONY_ERROR;
     }
     napi_value callbackFunc = nullptr;

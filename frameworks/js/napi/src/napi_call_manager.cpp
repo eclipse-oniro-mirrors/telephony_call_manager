@@ -1193,7 +1193,8 @@ napi_value NapiCallManager::Dial(napi_env env, napi_callback_info info)
             GetDialInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
         }
     } else if (argc == VALUE_MAXIMUM_LIMIT &&
-        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_object)) {
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_object) &&
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_THIRD], napi_function)) {
         GetDialInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
@@ -2431,7 +2432,11 @@ napi_value NapiCallManager::IsRinging(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::HasCall(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, TWO_VALUE_LIMIT);
-    NAPI_ASSERT(env, argc < TWO_VALUE_LIMIT, "parameter error!");
+    if (!MatchEmptyParameter(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::HasCall MatchEmptyParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
@@ -2863,7 +2868,7 @@ napi_value NapiCallManager::SetPreviewWindow(napi_env env, napi_callback_info in
     char tmpStr[kMaxNumberLen + 1] = { 0 };
     size_t strLen = 0;
     napi_get_value_string_utf8(env, argv[ARRAY_INDEX_SECOND], tmpStr, MESSAGE_CONTENT_MAXIMUM_LIMIT, &strLen);
-    std::string tmpCode(tmpStr, strLen);
+    std::string tmpCode(tmpStr);
     previwWindowContext->surfaceId = tmpCode;
     if (argc == THREE_VALUE_MAXIMUM_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(previwWindowContext->callbackRef));
@@ -3341,7 +3346,7 @@ napi_value NapiCallManager::SendCallUiEvent(napi_env env, napi_callback_info inf
     char tmpStr[kMaxNumberLen + 1] = { 0 };
     size_t strLen = 0;
     napi_get_value_string_utf8(env, argv[ARRAY_INDEX_SECOND], tmpStr, MESSAGE_CONTENT_MAXIMUM_LIMIT, &strLen);
-    std::string tmpName(tmpStr, strLen);
+    std::string tmpName(tmpStr);
     asyncContext->eventName = tmpName;
     return HandleAsyncWork(
         env, asyncContext.release(), "SendCallUiEvent", NativeSendCallUiEvent, NativeVoidCallBackWithErrorCode);

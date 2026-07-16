@@ -732,7 +732,7 @@ int32_t CallManagerServiceStub::OnSetCallRestriction(MessageParcel &data, Messag
     }
     int32_t slotId = data.ReadInt32();
     CallRestrictionInfo *pCRInfo = (CallRestrictionInfo *)data.ReadRawData(sizeof(CallRestrictionInfo));
-    if (pCRInfo == nullptr) {
+    if (pCRInfo == nullptr || strnlen(pCTInfo->password, kMaxNumberLen + 1) == static_cast<size_t>(kMaxNumberLen + 1)) {
         TELEPHONY_LOGE("data error");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -786,7 +786,7 @@ int32_t CallManagerServiceStub::OnSetTransferNumber(MessageParcel &data, Message
     }
     int32_t slotId = data.ReadInt32();
     CallTransferInfo *pCTInfo = (CallTransferInfo *)data.ReadRawData(sizeof(CallTransferInfo));
-    if (pCTInfo == nullptr) {
+    if (pCTInfo == nullptr || strnlen(pCTInfo->transferNum, kMaxNumberLen + 1) == static_cast<size_t>(kMaxNumberLen + 1)) {
         TELEPHONY_LOGE("data error");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }

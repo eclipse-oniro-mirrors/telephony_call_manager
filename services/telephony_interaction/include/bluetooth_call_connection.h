@@ -50,6 +50,7 @@ private:
     bool isBtCallScoConnected_ = false;
     std::string hfpPhoneNumber_;
     std::string hfpContactName_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

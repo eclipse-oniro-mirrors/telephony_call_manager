@@ -481,7 +481,11 @@ void DataShareReadyEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     if (action == CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
         DelayedSingleton<CallRecordsManager>::GetInstance()->SetDataShareReady(true);
         std::vector<int32_t> activeList = { 0 };
-        DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
+        ErrCode ret = DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
+        if (ret != ERR_OK || activeList.empty()) {
+            TELEPHONY_LOGE("QueryActiveOsAccountIds failed or empty");
+            return;
+        }
         bool isBasicStatementAgree = DelayedSingleton<CallRecordsManager>::GetInstance()->IsBasicStatementAgree();
         if (activeList[0] == ACTIVE_USER_ID && isBasicStatementAgree) {
             DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(activeList[0]);

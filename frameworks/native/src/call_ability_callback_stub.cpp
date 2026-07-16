@@ -139,6 +139,10 @@ int32_t CallAbilityCallbackStub::OnUpdateCallEvent(MessageParcel &data, MessageP
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
+    if (len != sizeof(CallEventInfo)) {
+        TELEPHONY_LOGE("Invalid parameter, len = %{public}d, expected = %{public}d", len, sizeof(CallEventInfo));
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
     if ((parcelPtr = reinterpret_cast<const CallEventInfo *>(data.ReadRawData(sizeof(CallEventInfo)))) == nullptr) {
         TELEPHONY_LOGE("reading raw data failed, length = %d", len);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

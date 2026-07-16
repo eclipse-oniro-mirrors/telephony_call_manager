@@ -300,6 +300,7 @@ int32_t CallObjectManager::HasNewCall()
 int32_t CallObjectManager::IsNewCallAllowedCreate(bool &enabled)
 {
     enabled = true;
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() != CallType::TYPE_VOIP &&

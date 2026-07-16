@@ -41,8 +41,11 @@ enum CallStateType {
  * describes the available audio scenes of a call.
  */
 class AudioSceneProcessor : public std::enable_shared_from_this<AudioSceneProcessor> {
-    DECLARE_DELAYED_SINGLETON(AudioSceneProcessor)
+
 public:
+    AudioSceneProcessor();
+    ~AudioSceneProcessor();
+    static std::shared_ptr<AudioSceneProcessor> GetInstance();
     int32_t Init();
     bool ProcessEvent(AudioEvent event);
 

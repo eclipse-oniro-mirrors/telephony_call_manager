@@ -264,7 +264,7 @@ bool NapiCallManagerUtils::GetUssdStringProperty(
         napi_status getStringStatus =
             napi_get_value_string_utf8(env, value, tmpStr, MESSAGE_CONTENT_MAXIMUM_LIMIT, &len);
         if (getStringStatus == napi_ok && len > 0) {
-            result = std::string(tmpStr, len);
+            result = std::string(tmpStr);
             return true;
         }
     }
