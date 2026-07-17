@@ -2048,10 +2048,11 @@ bool CallManagerService::CheckSetTelephonyStatePermission()
         TELEPHONY_LOGE("Permission denied!");
         return false;
     }
-    return true; 
+    return true;
 }
 
-bool CallManagerService::CheckCallerIsSystemApp() {
+bool CallManagerService::CheckCallerIsSystemApp() 
+{
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return false;
