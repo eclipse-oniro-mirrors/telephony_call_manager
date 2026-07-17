@@ -2229,6 +2229,14 @@ void CallControlManager::StartFlashRemind()
     incomingFlashReminder_->StartFlashRemind();
 }
 
+void CallControlManager::SetRegMmiCodeCallbackState(bool isReg)
+{
+    auto callAbilityReportProxy = DelayedSingleton<CallAbilityReportProxy>::GetInstance();
+    if (callAbilityReportProxy != nullptr) {
+        callAbilityReportProxy->SetRegMmiCodeCallbackState(isReg);
+    }
+}
+
 void CallControlManager::StopFlashRemind()
 {
     std::lock_guard<ffrt::mutex> lock(reminderMutex_);
