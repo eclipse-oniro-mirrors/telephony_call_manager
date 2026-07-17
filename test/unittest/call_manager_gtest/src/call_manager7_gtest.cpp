@@ -297,6 +297,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, TestSize.Level1)
     callManagerService->ObserverOnCallDetailsChange();
     callManagerService->RegisterVoipCallManagerCallback();
     callManagerService->UnRegisterVoipCallManagerCallback();
+    callManagerService->SetRegMmiCodeCallbackState(true);
     int32_t callId = 0;
     bool proceed = false;
     callManagerService->PostDialProceed(callId, proceed);
