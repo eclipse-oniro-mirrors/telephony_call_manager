@@ -335,6 +335,10 @@ public:
     {
         return TELEPHONY_SUCCESS;
     }
+    int32_t SetRegMmiCodeCallbackState(bool isReg) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
     int32_t CancelCallUpgrade(int32_t callId) override
     {
         return TELEPHONY_SUCCESS;
