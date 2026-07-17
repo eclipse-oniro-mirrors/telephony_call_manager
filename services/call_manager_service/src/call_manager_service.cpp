@@ -1610,6 +1610,21 @@ std::string CallManagerService::GetBundleInfo()
     return bundleInfo;
 }
 
+int32_t CallManagerService::SetRegMmiCodeCallbackState(bool isReg)
+{
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (callControlManagerPtr_ != nullptr) {
+        callControlManagerPtr_->SetRegMmiCodeCallbackState(isReg);
+        return TELEPHONY_SUCCESS;
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
 int32_t CallManagerService::ReportAudioDeviceInfo()
 {
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
