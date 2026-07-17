@@ -15,6 +15,14 @@
 
 #include "call_manager_service_test_base.h"
 
+#include "audio_control_manager.h"
+#include "audio_device_manager.h"
+#include "distributed_call_manager.h"
+
+#ifdef SUPPORT_DSOFTBUS
+#include "distributed_communication_manager.h"
+#endif
+
 namespace OHOS {
 namespace Telephony {
 
@@ -221,6 +229,252 @@ HWTEST_F(CallManagerServiceTest, CallManagerService_SwitchCall_0400, TestSize.Le
 {
     int32_t ret = service_->SwitchCall(1);
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
+ * @tc.number   CallManagerService_UpdateDeviceForForegroundCall_NotAnswered
+ * @tc.name     test UpdateDeviceForForegroundCall with AnsweredByPhone false
+ * @tc.desc     Branch coverage: !foregroundCall->GetAnsweredByPhone() early return path
+ */
+HWTEST_F(CallManagerServiceTest, CallManagerService_UpdateDeviceForForegroundCall_NotAnswered, TestSize.Level1)
+{
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    ASSERT_NE(audioControlManager, nullptr);
+    ASSERT_NE(audioDeviceManager, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_IMS;
+    dialParaInfo.callState = TelCallState::CALL_STATUS_ACTIVE;
+    dialParaInfo.videoState = VideoStateType::TYPE_VOICE;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    ASSERT_NE(call, nullptr);
+    call->SetIsAnsweredByPhone(false);
+    auto distributedCallManager = DelayedSingleton<DistributedCallManager>::GetInstance();
+    if (distributedCallManager != nullptr) {
+        distributedCallManager->onlineDCallDevices_.clear();
+    }
+    audioControlManager->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
+    audioDeviceManager->audioDeviceType_ = AudioDeviceType::DEVICE_UNKNOWN;
+    AudioDeviceManager::isEarpieceAvailable_ = true;
+    audioControlManager->UpdateDeviceForForegroundCall(call);
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_UNKNOWN);
+}
+
+/**
+ * @tc.number   CallManagerService_UpdateDeviceForForegroundCall_CarDeviceOnline
+ * @tc.name     test UpdateDeviceForForegroundCall with distributed car device online
+ * @tc.desc     Branch coverage: IsDistributedCarDeviceOnline() true early return path
+ */
+HWTEST_F(CallManagerServiceTest, CallManagerService_UpdateDeviceForForegroundCall_CarDeviceOnline, TestSize.Level1)
+{
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    ASSERT_NE(audioControlManager, nullptr);
+    ASSERT_NE(audioDeviceManager, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_IMS;
+    dialParaInfo.callState = TelCallState::CALL_STATUS_ACTIVE;
+    dialParaInfo.videoState = VideoStateType::TYPE_VOICE;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    ASSERT_NE(call, nullptr);
+    call->SetIsAnsweredByPhone(true);
+    auto distributedCallManager = DelayedSingleton<DistributedCallManager>::GetInstance();
+    ASSERT_NE(distributedCallManager, nullptr);
+    AudioDevice onlineDevice;
+    onlineDevice.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE;
+    distributedCallManager->onlineDCallDevices_["test_car_device"] = onlineDevice;
+    audioControlManager->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
+    audioDeviceManager->audioDeviceType_ = AudioDeviceType::DEVICE_UNKNOWN;
+    AudioDeviceManager::isEarpieceAvailable_ = true;
+    audioControlManager->UpdateDeviceForForegroundCall(call);
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_UNKNOWN);
+    distributedCallManager->onlineDCallDevices_.clear();
+}
+
+/**
+ * @tc.number   CallManagerService_UpdateDeviceForForegroundCall_SpeakerMode
+ * @tc.name     test UpdateDeviceForForegroundCall with speaker mode
+ * @tc.desc     Branch coverage: IsSpeakerMode() true -> SetAudioDeviceByAudioMode path
+ */
+HWTEST_F(CallManagerServiceTest, CallManagerService_UpdateDeviceForForegroundCall_SpeakerMode, TestSize.Level1)
+{
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    ASSERT_NE(audioControlManager, nullptr);
+    ASSERT_NE(audioDeviceManager, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_IMS;
+    dialParaInfo.callState = TelCallState::CALL_STATUS_ACTIVE;
+    dialParaInfo.videoState = VideoStateType::TYPE_VOICE;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    ASSERT_NE(call, nullptr);
+    call->SetIsAnsweredByPhone(true);
+    auto distributedCallManager = DelayedSingleton<DistributedCallManager>::GetInstance();
+    if (distributedCallManager != nullptr) {
+        distributedCallManager->onlineDCallDevices_.clear();
+    }
+    CallAudioMode speakerMode;
+    speakerMode.audioMode = 1;
+    speakerMode.audioScene = 0;
+    audioDeviceManager->SetCallAudioMode(speakerMode);
+    AudioDeviceManager::isSpeakerAvailable_ = true;
+    audioControlManager->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
+    AudioDeviceManager::isEarpieceAvailable_ = true;
+    audioControlManager->UpdateDeviceForForegroundCall(call);
+    EXPECT_TRUE(audioDeviceManager->IsSpeakerMode());
+    CallAudioMode normalMode;
+    normalMode.audioMode = 0;
+    normalMode.audioScene = 0;
+    audioDeviceManager->SetCallAudioMode(normalMode);
+}
+
+/**
+ * @tc.number   CallManagerService_UpdateDeviceForForegroundCall_DeviceTypeChanged
+ * @tc.name     test UpdateDeviceForForegroundCall with initDeviceType != currentDeviceType
+ * @tc.desc     Branch coverage: initDeviceType != currentDeviceType -> SetAudioDevice path
+ */
+HWTEST_F(CallManagerServiceTest, CallManagerService_UpdateDeviceForForegroundCall_DeviceTypeChanged, TestSize.Level1)
+{
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    ASSERT_NE(audioControlManager, nullptr);
+    ASSERT_NE(audioDeviceManager, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_IMS;
+    dialParaInfo.callState = TelCallState::CALL_STATUS_ACTIVE;
+    dialParaInfo.videoState = VideoStateType::TYPE_VOICE;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    ASSERT_NE(call, nullptr);
+    call->SetIsAnsweredByPhone(true);
+    CallObjectManager::callObjectPtrList_.emplace_back(call);
+    auto distributedCallManager = DelayedSingleton<DistributedCallManager>::GetInstance();
+    if (distributedCallManager != nullptr) {
+        distributedCallManager->onlineDCallDevices_.clear();
+    }
+    CallAudioMode normalMode;
+    normalMode.audioMode = 0;
+    normalMode.audioScene = 0;
+    audioDeviceManager->SetCallAudioMode(normalMode);
+    audioDeviceManager->audioDeviceType_ = AudioDeviceType::DEVICE_EARPIECE;
+    AudioDeviceManager::isSpeakerAvailable_ = true;
+    AudioDeviceManager::isEarpieceAvailable_ = false;
+    AudioDeviceManager::isWiredHeadsetConnected_ = false;
+    audioControlManager->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
+    audioControlManager->UpdateDeviceForForegroundCall(call);
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
+ * @tc.number   CallManagerService_UpdateDeviceForForegroundCall_DeviceTypeSame
+ * @tc.name     test UpdateDeviceForForegroundCall with initDeviceType == currentDeviceType
+ * @tc.desc     Branch coverage: initDeviceType == currentDeviceType -> no SetAudioDevice path
+ */
+HWTEST_F(CallManagerServiceTest, CallManagerService_UpdateDeviceForForegroundCall_DeviceTypeSame, TestSize.Level1)
+{
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    ASSERT_NE(audioControlManager, nullptr);
+    ASSERT_NE(audioDeviceManager, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_IMS;
+    dialParaInfo.callState = TelCallState::CALL_STATUS_ACTIVE;
+    dialParaInfo.videoState = VideoStateType::TYPE_VOICE;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    ASSERT_NE(call, nullptr);
+    call->SetIsAnsweredByPhone(true);
+    auto distributedCallManager = DelayedSingleton<DistributedCallManager>::GetInstance();
+    if (distributedCallManager != nullptr) {
+        distributedCallManager->onlineDCallDevices_.clear();
+    }
+    CallAudioMode normalMode;
+    normalMode.audioMode = 0;
+    normalMode.audioScene = 0;
+    audioDeviceManager->SetCallAudioMode(normalMode);
+    audioDeviceManager->audioDeviceType_ = AudioDeviceType::DEVICE_EARPIECE;
+    audioControlManager->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
+    AudioDeviceManager::isEarpieceAvailable_ = true;
+    audioControlManager->UpdateDeviceForForegroundCall(call);
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_EARPIECE);
+}
+
+#ifdef SUPPORT_DSOFTBUS
+/**
+ * @tc.number   CallManagerService_UpdateDeviceForForegroundCall_AudioOnSink
+ * @tc.name     test UpdateDeviceForForegroundCall with IsAudioOnSink true
+ * @tc.desc     Branch coverage: SUPPORT_DSOFTBUS && IsAudioOnSink() true early return path
+ */
+HWTEST_F(CallManagerServiceTest, CallManagerService_UpdateDeviceForForegroundCall_AudioOnSink, TestSize.Level1)
+{
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    auto dcMgrInstance = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    ASSERT_NE(audioControlManager, nullptr);
+    ASSERT_NE(audioDeviceManager, nullptr);
+    ASSERT_NE(dcMgrInstance, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_IMS;
+    dialParaInfo.callState = TelCallState::CALL_STATUS_ACTIVE;
+    dialParaInfo.videoState = VideoStateType::TYPE_VOICE;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    ASSERT_NE(call, nullptr);
+    call->SetIsAnsweredByPhone(true);
+    auto distributedCallManager = DelayedSingleton<DistributedCallManager>::GetInstance();
+    if (distributedCallManager != nullptr) {
+        distributedCallManager->onlineDCallDevices_.clear();
+    }
+    bool savedIsAudioOnSink = false;
+    if (dcMgrInstance->devSwitchController_ != nullptr) {
+        savedIsAudioOnSink = dcMgrInstance->devSwitchController_->isAudioOnSink_;
+        dcMgrInstance->devSwitchController_->isAudioOnSink_ = true;
+    }
+    CallAudioMode normalMode;
+    normalMode.audioMode = 0;
+    normalMode.audioScene = 0;
+    audioDeviceManager->SetCallAudioMode(normalMode);
+    audioDeviceManager->audioDeviceType_ = AudioDeviceType::DEVICE_UNKNOWN;
+    audioControlManager->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
+    AudioDeviceManager::isEarpieceAvailable_ = true;
+    audioControlManager->UpdateDeviceForForegroundCall(call);
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_UNKNOWN);
+    if (dcMgrInstance->devSwitchController_ != nullptr) {
+        dcMgrInstance->devSwitchController_->isAudioOnSink_ = savedIsAudioOnSink;
+    }
+}
+#endif
+
+/**
+ * @tc.number   CallManagerService_UpdateDeviceForForegroundCall_Integration
+ * @tc.name     test UpdateDeviceType with non-video IMS call (answer 2nd call scenario)
+ * @tc.desc     Integration: UpdateDeviceType -> UpdateDeviceForForegroundCall path
+ */
+HWTEST_F(CallManagerServiceTest, CallManagerService_UpdateDeviceForForegroundCall_Integration, TestSize.Level1)
+{
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    ASSERT_NE(audioControlManager, nullptr);
+    ASSERT_NE(audioDeviceManager, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_IMS;
+    dialParaInfo.callState = TelCallState::CALL_STATUS_ACTIVE;
+    dialParaInfo.videoState = VideoStateType::TYPE_VOICE;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    ASSERT_NE(call, nullptr);
+    call->SetIsAnsweredByPhone(true);
+    CallObjectManager::callObjectPtrList_.emplace_back(call);
+    auto distributedCallManager = DelayedSingleton<DistributedCallManager>::GetInstance();
+    if (distributedCallManager != nullptr) {
+        distributedCallManager->onlineDCallDevices_.clear();
+    }
+    CallAudioMode normalMode;
+    normalMode.audioMode = 0;
+    normalMode.audioScene = 0;
+    audioDeviceManager->SetCallAudioMode(normalMode);
+    AudioDeviceManager::isSpeakerAvailable_ = true;
+    AudioDeviceManager::isEarpieceAvailable_ = true;
+    AudioDeviceManager::isWiredHeadsetConnected_ = false;
+    audioControlManager->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
+    audioControlManager->UpdateDeviceType(call);
+    CallObjectManager::callObjectPtrList_.clear();
 }
 } // namespace Telephony
 } // namespace OHOS
