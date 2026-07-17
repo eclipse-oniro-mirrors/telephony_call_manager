@@ -239,7 +239,8 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     callObjectPtr->SetSlotId(-1);
     callStatusManager->SetVideoCallState(callObjectPtr, TelCallState::CALL_STATUS_ACTIVE);
     EXPECT_TRUE(callStatusManager->GetConferenceCallList(-1).empty());
-    callStatusManager->ShouldRejectIncomingCall();
+    sptr<CallBase> call = new CSCall(dialParaInfo);
+    callStatusManager->ShouldRejectIncomingCall(call);
     callStatusManager->IsRingOnceCall(callObjectPtr, callDetailInfo);
     sptr<CallBase> callObjectPtr1 = nullptr;
     int32_t res = callStatusManager->HandleRingOnceCall(callObjectPtr1);
@@ -351,7 +352,9 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     EXPECT_EQ(helper->UnRegisterToDataShare(uri, oobeStatusObserver_), true);
 
     callStatusManager->deviceProvisioned_ = 0;
-    EXPECT_TRUE(callStatusManager->ShouldRejectIncomingCall());
+    DialParaInfo dialParaInfo;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    EXPECT_TRUE(callStatusManager->ShouldRejectIncomingCall(call));
     reportCallInfo->UpdateCallReportInfo(info);
     callStatusManager->RegisterObserver();
     callStatusManager->oobeStatusObserver_ = nullptr;
