@@ -731,6 +731,14 @@ public:
     sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) override;
 
     /**
+     * SetRegMmiCodeCallbackState
+     *
+     * @brief set register mmi code callback state
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetRegMmiCodeCallbackState(bool isReg) override;
+
+    /**
      * ReportAudioDeviceInfo
      *
      * @brief report audio device info
