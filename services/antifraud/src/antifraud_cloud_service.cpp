@@ -50,7 +50,8 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
     std::unique_lock<ffrt::mutex> lock(mutex_);
     isSettled_ = false;
     auto auth = std::make_shared<std::string>();
-    helper.ConnectHsdr([weakPtr, metaData, wqAuth = std::weak_ptr<std::string>(auth)](sptr<IRemoteObject> remoteObject) {
+    helper.ConnectHsdr([weakPtr, metaData,
+        wqAuth = std::weak_ptr<std::string>(auth)](sptr<IRemoteObject> remoteObject) {
         auto ptr = weakPtr.lock();
         auto sqAuth = wqAuth.lock();
         if (ptr == nullptr || sqAuth == nullptr) {
@@ -71,7 +72,6 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
         ptr->isSettled_ = true;
         ptr->cv_.notify_all();
     });
-
     while (!isSettled_) {
         if (cv_.wait_for(lock, std::chrono::milliseconds(COMMON_TIME_OUT)) == ffrt::cv_status::timeout) {
             TELEPHONY_LOGE("get auth timeout.");
@@ -79,14 +79,13 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
             return false;
         }
     }
-
     if (auth.empty()) {
         TELEPHONY_LOGE("Failed to get auth.");
         helper.DisconnectHsdr();
         return false;
     }
-
-    helper.ConnectHsdr([metaData, wqAuth = std::weak_ptr<std::string>(auth), antiFraudResult, weakPtr](sptr<IRemoteObject> remoteObject) {
+    helper.ConnectHsdr([metaData, wqAuth = std::weak_ptr<std::string>(auth),
+        antiFraudResult, weakPtr](sptr<IRemoteObject> remoteObject) {
         auto ptr = weakPtr.lock();
         auto sqAuth = wqAuth.lock();
         if (ptr == nullptr || sqAuth == nullptr) {
@@ -94,7 +93,7 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
             helper.DisconnectHsdr();
             return;
         }
-        ptr->ConnectCloudAsync(metaData, auth, antiFraudResult, remoteObject);
+        ptr->ConnectCloudAsync(metaData, sqAuth, antiFraudResult, remoteObject);
     });
     return true;
 }

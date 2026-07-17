@@ -41,7 +41,6 @@ enum CallStateType {
  * describes the available audio scenes of a call.
  */
 class AudioSceneProcessor : public std::enable_shared_from_this<AudioSceneProcessor> {
-
 public:
     AudioSceneProcessor();
     ~AudioSceneProcessor();

@@ -431,7 +431,8 @@ int32_t CallStatusManager::HandleOttEventReportInfo(const OttCallEventInfo &info
             TELEPHONY_LOGE("Number out of limit!");
             return CALL_ERR_NUMBER_OUT_OF_RANGE;
         }
-        if (memcpy_s(eventInfo.bundleName, kMaxBundleNameLen + 1, info.bundleName, strlen(info.bundleName, kMaxBundleNameLen + 1)) != EOK) {
+        if (memcpy_s(eventInfo.bundleName, kMaxBundleNameLen + 1, info.bundleName,
+            strlen(info.bundleName, kMaxBundleNameLen + 1)) != EOK) {
             TELEPHONY_LOGE("memcpy_s failed!");
             return TELEPHONY_ERR_MEMCPY_FAIL;
         }

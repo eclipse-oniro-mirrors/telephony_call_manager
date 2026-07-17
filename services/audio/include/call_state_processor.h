@@ -29,7 +29,6 @@ constexpr uint16_t EMPTY_VALUE = 0;
 constexpr uint16_t EXIST_ONLY_ONE_CALL = 1;
 
 class CallStateProcessor : public std::enable_shared_from_this<CallStateProcessor> {
-    
 public:
     CallStateProcessor();
     ~CallStateProcessor();

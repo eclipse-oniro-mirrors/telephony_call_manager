@@ -43,7 +43,7 @@ AudioSceneProcessor::AudioSceneProcessor()
 
 AudioSceneProcessor::~AudioSceneProcessor() {}
 
-static shared_ptr<AudioSceneProcessor> AudioSceneProcessor::GetInstance() 
+static shared_ptr<AudioSceneProcessor> AudioSceneProcessor::GetInstance()
 {
     stad::shared_ptr<AudioSceneProcessor> instance = std::make_shared<AudioSceneProcessor>();
     return instance;

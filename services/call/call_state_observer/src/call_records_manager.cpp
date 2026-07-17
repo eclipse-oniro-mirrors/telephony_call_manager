@@ -481,7 +481,8 @@ void DataShareReadyEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     if (action == CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
         DelayedSingleton<CallRecordsManager>::GetInstance()->SetDataShareReady(true);
         std::vector<int32_t> activeList = { 0 };
-        ErrCode ret = DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
+        ErrCode ret =
+            DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
         if (ret != ERR_OK || activeList.empty()) {
             TELEPHONY_LOGE("QueryActiveOsAccountIds failed or empty");
             return;
