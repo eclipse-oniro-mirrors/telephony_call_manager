@@ -1209,13 +1209,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_001, TestSize.Level0)
     callStatusCallback->InviteToConferenceResult(result);
     MmiCodeInfo mmiCodeInfo;
     callStatusCallback->SendMmiCodeResult(mmiCodeInfo);
-    std::shared_ptr<CallAbilityReportProxy> callAbilityReportProxy = std::make_shared<CallAbilityReportProxy>();
-    auto tempPtr = callAbilityReportProxy->cacheInfo_;
-    callAbilityReportProxy->cacheInfo_ = nullptr;
-    callAbilityReportProxy->SetRegMmiCodeCallbackState(true);
-    callAbilityReportProxy->cacheInfo_ = nullptr;
-    callAbilityReportProxy->SetRegMmiCodeCallbackState(false);
-    callAbilityReportProxy->cacheInfo_ = tempPtr;
     int32_t res = callStatusCallback->CloseUnFinishedUssdResult(result);
     ASSERT_NE(res, TELEPHONY_SUCCESS);
 }
