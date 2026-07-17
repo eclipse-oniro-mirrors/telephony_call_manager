@@ -213,6 +213,8 @@ void CallManagerServiceStub::InitCallMultimediaRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetDeviceDirection(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UPDATE_CALL_MEDIA_MODE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallMediaMode(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_REG_MMI_CODE_CALLBACK_STATE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetRegMmiCodeCallbackState(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REPORT_AUDIO_DEVICE_INFO)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnReportAudioDeviceInfo(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CANCEL_CALL_UPGRADE)] =
@@ -1399,6 +1401,18 @@ int32_t CallManagerServiceStub::OnGetProxyObjectPtr(MessageParcel &data, Message
     sptr<IRemoteObject> objectPtr = GetProxyObjectPtr(proxyType);
     if (!reply.WriteRemoteObject(objectPtr)) {
         TELEPHONY_LOGE("OnGetProxyObjectPtr fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnSetRegMmiCodeCallbackState(MessageParcel &data, MessageParcel &reply)
+{
+    bool isReg = data.ReadBool();
+    int32_t result = SetRegMmiCodeCallbackState(isReg);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
