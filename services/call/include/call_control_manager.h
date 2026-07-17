@@ -179,6 +179,7 @@ public:
     void DisconnectAllCalls(bool isIncludeEmergencyCall = true,
         bool isFromThermalProtection = false, bool isWaitingForResponse = true);
     void StartFlashRemind();
+    void SetRegMmiCodeCallbackState(bool isReg);
     void StopFlashRemind();
     void ClearFlashReminder();
     bool SetVirtualCall(bool isVirtual);

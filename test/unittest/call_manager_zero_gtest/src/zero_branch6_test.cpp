@@ -60,6 +60,8 @@
 #include "video_control_manager.h"
 #include "voip_call_manager_proxy.h"
 #include "voip_call.h"
+#include "call_manager_proxy.h"
+#include "call_manager_service.h"
 #include "accesstoken_kit.h"
 #include "token_setproc.h"
 #include "nativetoken_kit.h"
@@ -1236,6 +1238,12 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_002, TestSize.Level0)
     callStatusCallback->HandleCameraCapabilitiesChanged(cameraCapabilities);
     ImsSuppExtReportInfo suppExtInfo;
     callStatusCallback->HandleImsSuppExtChanged(suppExtInfo);
+    auto callAbilityReportProxy = DelayedSingleton<CallAbilityReportProxy>::GetInstance();
+    MmiCodeInfo mmiCodeInfo;
+    callAbilityReportProxy->SetRegMmiCodeCallbackState(true);
+    callStatusCallback->SendMmiCodeResult(mmiCodeInfo);
+    callAbilityReportProxy->SetRegMmiCodeCallbackState(false);
+    callStatusCallback->SendMmiCodeResult(mmiCodeInfo);
     VoipCallEventInfo voipCallEventInfo;
     res = callStatusCallback->UpdateVoipEventInfo(voipCallEventInfo);
     ASSERT_EQ(res, TELEPHONY_SUCCESS);

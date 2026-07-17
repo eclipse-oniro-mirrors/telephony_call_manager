@@ -759,6 +759,16 @@ bool CallManagerClient::HasVoiceCapability()
     return false;
 }
 
+int32_t CallManagerClient::SetRegMmiCodeCallbackState(bool isReg)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->SetRegMmiCodeCallbackState(isReg);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t CallManagerClient::ReportAudioDeviceInfo()
 {
     if (g_callManagerProxy != nullptr) {

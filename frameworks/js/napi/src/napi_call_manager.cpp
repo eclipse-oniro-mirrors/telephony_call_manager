@@ -2646,6 +2646,11 @@ void NapiCallManager::RegisterNapiCallFuncCallback(std::string tmpStr, EventCall
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterDisconnectedCauseCallback(stateCallback);
     } else if (tmpStr == "mmiCodeResult") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterMmiCodeCallback(stateCallback);
+        auto callManagerClient = DelayedSingleton<CallManagerClient>::GetInstance();
+        if (callManagerClient != nullptr) {
+            int32_t result = callManagerClient->SetRegMmiCodeCallbackState(true);
+            TELEPHONY_LOGI("result == %{public}d", result);
+        }
     } else if (tmpStr == "audioDeviceChange") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterAudioDeviceCallback(stateCallback);
         int32_t result = DelayedSingleton<CallManagerClient>::GetInstance()->ReportAudioDeviceInfo();
@@ -2714,6 +2719,11 @@ void NapiCallManager::UnRegisterCallbackWithListenerType(std::string tmpStr)
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterDisconnectedCauseCallback();
     } else if (tmpStr == "mmiCodeResult") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterMmiCodeCallback();
+        auto callManagerClient = DelayedSingleton<CallManagerClient>::GetInstance();
+        if (callManagerClient != nullptr) {
+            int32_t result = callManagerClient->SetRegMmiCodeCallbackState(false);
+            TELEPHONY_LOGI("result == %{public}d", result);
+        }
     } else if (tmpStr == "audioDeviceChange") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterAudioDeviceCallback();
     } else if (tmpStr == "postDialDelay") {

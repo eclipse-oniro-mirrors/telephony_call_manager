@@ -118,6 +118,7 @@ public:
     int32_t GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber);
     sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType);
     void OnRemoteDied(const wptr<IRemoteObject> &remote);
+    int32_t SetRegMmiCodeCallbackState(bool isReg);
     int32_t ReportAudioDeviceInfo();
     int32_t CancelCallUpgrade(int32_t callId);
     int32_t RequestCameraCapabilities(int32_t callId);

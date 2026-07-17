@@ -731,6 +731,14 @@ public:
     sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) override;
 
     /**
+     * SetRegMmiCodeCallbackState
+     *
+     * @brief set register mmi code callback state
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetRegMmiCodeCallbackState(bool isReg) override;
+
+    /**
      * ReportAudioDeviceInfo
      *
      * @brief report audio device info
@@ -940,6 +948,8 @@ private:
     int32_t HandleCeliaAutoAnswerCall(int32_t callId, bool enable);
     int32_t HandleVoIPCallEvent(int32_t callId, std::string &eventName);
     void BtCallWaitSlotId(AppExecFwk::PacMap &dialInfo, const std::u16string &number);
+    bool CheckSetTelephonyStatePermission();
+    bool CheckCallerIsSystemApp();
 
 private:
     enum ServiceRunningState {
