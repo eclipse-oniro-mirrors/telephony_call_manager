@@ -2051,7 +2051,7 @@ bool CallManagerService::CheckSetTelephonyStatePermission()
     return true;
 }
 
-bool CallManagerService::CheckCallerIsSystemApp() 
+bool CallManagerService::CheckCallerIsSystemApp()
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
