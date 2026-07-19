@@ -168,7 +168,7 @@ int32_t CallNumberUtils::IsCarrierVtConfig(const int32_t slotId, bool &enabled)
 
 bool CallNumberUtils::IsValidSlotId(int32_t slotId) const
 {
-    if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT)) {
+    if ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT_MD)) {
         return true;
     }
     return false;
@@ -380,7 +380,7 @@ int32_t CallNumberUtils::QueryYellowPageAndMarkInfo(NumberMarkInfo &numberMarkIn
 
 bool CallNumberUtils::GetAccountIdByNumber(const std::u16string &inputNumber, int32_t& slotId)
 {
-    for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
+    for (int32_t i = 0; i < SIM_SLOT_COUNT_MD; i++) {
         std::u16string showNumber;
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetShowNumber(i, showNumber);
         if (IsSamePhoneNumber(showNumber, inputNumber)) {
