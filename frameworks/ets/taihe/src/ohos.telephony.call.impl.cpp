@@ -91,6 +91,25 @@ void MakeCallSync2(uintptr_t context, ::taihe::string_view phoneNumber)
     return;
 }
 
+::taihe::string_view MakeCallWithTokenSync(::taihe::string_view phoneNumber,
+    ::taihe::optional_view<::ohos::telephony::call::MakeCallOptions> options)
+{
+    CallManagerClientInitializer init;
+    static std::string token;
+    OHOS::AppExecFwk::PacMap pacMap;
+    bool isCustomAccessibility = false;
+    if (options.has_value()) {
+        isCustomAccessibility = options.value().isCustomAccessibility.value_or(false);
+    }
+    pacMap.PutBooleanValue("isCustomAccessibility", isCustomAccessibility);
+    auto errCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->MakeCallWithToken(
+        std::string(phoneNumber), pacMap, token);
+    if (errCode != TELEPHONY_ERR_SUCCESS) {
+        ConvertErrorForBusinessError(errCode);
+    }
+    return token;
+}
+
 bool HasVoiceCapability()
 {
     CallManagerClientInitializer init;
@@ -1462,6 +1481,7 @@ void OffCameraCapabilitiesChange(
 // NOLINTBEGIN
 TH_EXPORT_CPP_API_MakeCallSync(MakeCallSync);
 TH_EXPORT_CPP_API_MakeCallSync2(MakeCallSync2);
+TH_EXPORT_CPP_API_MakeCallWithTokenSync(MakeCallWithTokenSync);
 TH_EXPORT_CPP_API_HasVoiceCapability(HasVoiceCapability);
 TH_EXPORT_CPP_API_FormatPhoneNumberSync(FormatPhoneNumberSync);
 TH_EXPORT_CPP_API_FormatPhoneNumberSync2(FormatPhoneNumberSync2);

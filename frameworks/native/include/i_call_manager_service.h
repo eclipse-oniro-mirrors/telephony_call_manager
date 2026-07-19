@@ -44,6 +44,7 @@ public:
     virtual int32_t ObserverOnCallDetailsChange() = 0;
     virtual int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras) = 0;
     virtual int32_t MakeCall(std::string number) = 0;
+    virtual int32_t MakeCallWithToken(std::string number, AppExecFwk::PacMap &options, std::string &token) = 0;
     virtual int32_t AnswerCall(int32_t callId, int32_t videoState, bool isRTT = false) = 0;
     virtual int32_t RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage) = 0;
     virtual int32_t HangUpCall(int32_t callId) = 0;
@@ -109,6 +110,7 @@ public:
     virtual int32_t SetVoIPCallInfo(const int32_t callId, const int32_t state, const std::string phoneNumber) = 0;
     virtual int32_t GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber) = 0;
     virtual sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) = 0;
+    virtual int32_t SetRegMmiCodeCallbackState(bool isReg) = 0;
     virtual int32_t ReportAudioDeviceInfo() = 0;
     virtual int32_t CancelCallUpgrade(int32_t callId) = 0;
     virtual int32_t RequestCameraCapabilities(int32_t callId) = 0;
@@ -133,6 +135,8 @@ public:
     virtual int32_t RejectCall() = 0;
     virtual int32_t HangUpCall() = 0;
     virtual int32_t GetCallTransferInfo(const std::string number, CallTransferType type) = 0;
+    virtual bool CheckCallRecordingPermission(const std::string& cellularRecordPhoneNum,
+        const std::string& cellularRecordToken) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallManagerService");

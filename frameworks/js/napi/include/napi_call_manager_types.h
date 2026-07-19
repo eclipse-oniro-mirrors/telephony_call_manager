@@ -199,6 +199,11 @@ struct SendCallUiEventAsyncContext : AsyncContext {
     std::string eventName = "";
 };
 
+struct MakeCallWithTokenAsyncContext : AsyncContext {
+    AppExecFwk::PacMap options;
+    std::string token = "";
+};
+
 enum CallWaitingStatus {
     CALL_WAITING_DISABLE = 0,
     CALL_WAITING_ENABLE,

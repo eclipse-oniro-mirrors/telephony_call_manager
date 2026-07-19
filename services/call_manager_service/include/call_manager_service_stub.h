@@ -55,6 +55,7 @@ private:
     int32_t OnObserverOnCallDetailsChange(MessageParcel &data, MessageParcel &reply);
     int32_t OnDialCall(MessageParcel &data, MessageParcel &reply);
     int32_t OnMakeCall(MessageParcel &data, MessageParcel &reply);
+    int32_t OnMakeCallWithToken(MessageParcel &data, MessageParcel &reply);
     int32_t OnAcceptCall(MessageParcel &data, MessageParcel &reply);
     int32_t OnRejectCall(MessageParcel &data, MessageParcel &reply);
     int32_t OnHangUpCall(MessageParcel &data, MessageParcel &reply);
@@ -120,6 +121,7 @@ private:
     int32_t OnSetVoIPCallInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetVoIPCallInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetProxyObjectPtr(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetRegMmiCodeCallbackState(MessageParcel &data, MessageParcel &reply);
     int32_t OnReportAudioDeviceInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnCancelCallUpgrade(MessageParcel &data, MessageParcel &reply);
     int32_t OnRequestCameraCapabilities(MessageParcel &data, MessageParcel &reply);
@@ -143,6 +145,7 @@ private:
     int32_t OnRejectCallNoParam(MessageParcel &data, MessageParcel &reply);
     int32_t OnHangUpCallNoParam(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetTransferNumberByNumber(MessageParcel &data, MessageParcel &reply);
+    int32_t OnCheckCallRecordingPermission(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
     std::map<uint32_t, std::string> collieCodeStringMap_ = {

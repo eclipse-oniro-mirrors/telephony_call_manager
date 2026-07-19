@@ -942,6 +942,22 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0100, Function |
 }
 
 /**
+ * @tc.number   Telephony_CallManager_Telephony_CallManager_SetRegMmiCodeCallbackState_0100
+ * @tc.name     input slotId:0, content:1, Test SetRegMmiCodeCallbackState, return error code if failed
+ * @tc.desc     Function test
+ * @tc.require: issueI5JUAQ
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetRegMmiCodeCallbackState_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    sptr<IRemoteObject> remoteObject = new MockRemoteObject1();
+    EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
+ 
+    bool boolValue = true;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetRegMmiCodeCallbackState(boolValue), RETURN_VALUE_IS_ZERO);
+}
+
+/**
  * @tc.number   Telephony_CallManager_Telephony_CallManager_SendUssdResponse_0100SetAudioDevice_0100
  * @tc.name     input slotId:0, content:1, Test SendUssdResponse, return error code if failed
  * @tc.desc     Function test

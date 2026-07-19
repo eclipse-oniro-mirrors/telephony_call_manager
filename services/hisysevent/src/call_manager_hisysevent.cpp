@@ -28,6 +28,10 @@
 
 namespace OHOS {
 namespace Telephony {
+void *CallManagerHisysevent::telephonyExtHandle_ = nullptr;
+typedef bool (*ReportChrAsync)(const std::string &, MessageParcel &);
+
+constexpr int32_t NOTIFY_CALL_DROP_MSG_TYPE = 31;
 // EVENT
 static constexpr const char *CALL_DIAL_FAILED_EVENT = "CALL_DIAL_FAILED";
 static constexpr const char *CALL_INCOMING_FAILED_EVENT = "CALL_INCOMING_FAILED";
@@ -527,6 +531,67 @@ void CallManagerHisysevent::ClearVoipProcedureCallInfo(const std::string &callId
 {
     std::lock_guard<ffrt::shared_mutex> lock(voipProcedureCallInfoLock_);
     voipProcedureCallInfo_.erase(callId);
+}
+
+bool CallManagerHisysevent::InitTelephonyExtWrapper()
+{
+    if (telephonyExtHandle_ != nullptr) {
+        return true;
+    }
+    telephonyExtHandle_ = dlopen("libtelephony_ext_service.z.so", RTLD_LAZY);
+    if (telephonyExtHandle_ == nullptr) {
+        TELEPHONY_LOGE("open ext so failed[%{public}s]", dlerror());
+        return false;
+    }
+    return true;
+}
+
+void CallManagerHisysevent::DeInitTelephonyExtWrapper()
+{
+    if (telephonyExtHandle_ != nullptr) {
+        dlclose(telephonyExtHandle_);
+        telephonyExtHandle_ = nullptr;
+    }
+}
+
+bool CallManagerHisysevent::ReportEventToChrAsync(const std::string &moduleName, MessageParcel &parcelIn)
+{
+    if (telephonyExtHandle_ == nullptr) {
+        TELEPHONY_LOGE("handle is null");
+        return false;
+    }
+    ReportChrAsync func = reinterpret_cast<ReportChrAsync>(dlsym(telephonyExtHandle_, "ReportEventToChrAsync"));
+    if (func == nullptr) {
+        TELEPHONY_LOGE("dlsym failed, error: %{public}s", dlerror());
+        return false;
+    }
+    bool isSucc = func(moduleName, parcelIn);
+    TELEPHONY_LOGI("ReportEventToChrAsync, isSucc[%{public}d]", isSucc);
+    return isSucc;
+}
+
+void CallManagerHisysevent::ReportCallDropChrEvent(int32_t slotId, int32_t callIndex, int32_t dropReason)
+{
+    MessageParcel parcel;
+    if (!parcel.WriteInt32(NOTIFY_CALL_DROP_MSG_TYPE)) {
+        TELEPHONY_LOGE("write moduleId error.");
+        return;
+    }
+    parcel.WriteInt32(slotId);
+    parcel.WriteInt32(callIndex);
+    parcel.WriteInt32(dropReason);
+    ReportEventToChrAsync("CallModule", parcel);
+}
+
+void CallManagerHisysevent::ReportCallDropChrEvent(int32_t callId, int32_t dropReason)
+{
+    sptr<CallBase> call = CallObjectManager::GetOneCallObject(callId);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("GetOneCallObject failed");
+        return;
+    }
+    call->SetApCauseReported(true);
+    ReportCallDropChrEvent(call->GetSlotId(), call->GetCallIndex(), dropReason);
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -88,8 +88,10 @@ ohos_unittest("tel_call_manager_special0_test") {
     "openssl:libssl_shared",
     "os_account:os_account_innerkits",
     "player_framework:system_sound_client",
+    "protobuf:protobuf_lite",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
   ]
 
   if (call_manager_feature_support_dsoftbus) {
@@ -232,8 +234,10 @@ ohos_unittest("tel_call_manager_special1_test") {
     "openssl:libssl_shared",
     "os_account:os_account_innerkits",
     "player_framework:system_sound_client",
+    "protobuf:protobuf_lite",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
   ]
 
   if (call_manager_feature_support_dsoftbus) {
@@ -376,8 +380,10 @@ ohos_unittest("tel_call_manager_special2_test") {
     "openssl:libssl_shared",
     "os_account:os_account_innerkits",
     "player_framework:system_sound_client",
+    "protobuf:protobuf_lite",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
   ]
 
   if (call_manager_feature_support_dsoftbus) {
@@ -521,8 +527,10 @@ ohos_unittest("tel_call_manager_special3_test") {
     "openssl:libssl_shared",
     "os_account:os_account_innerkits",
     "player_framework:system_sound_client",
+    "protobuf:protobuf_lite",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
   ]
 
   if (call_manager_feature_support_dsoftbus) {

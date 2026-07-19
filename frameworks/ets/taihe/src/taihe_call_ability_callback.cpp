@@ -45,6 +45,7 @@ int32_t TaiheCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &i
         .conferenceState = ::ohos::telephony::call::ConferenceState::key_t::TEL_CONFERENCE_IDLE,
         .crsType = -1,
         .originalCallType = -1,
+        .isCustomAccessibility = false,
         .numberLocation = ::taihe::optional<::taihe::string>(std::in_place_t{}, "")
     };
     Utils::CallAttributeInfoToTaihe(taiheCallAttributeInfo, info);

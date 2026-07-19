@@ -50,6 +50,7 @@ public:
     int32_t ObserverOnCallDetailsChange();
     int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras);
     int32_t MakeCall(std::string number);
+    int32_t MakeCallWithToken(std::string number, AppExecFwk::PacMap &options, std::string &token);
     int32_t AnswerCall(int32_t callId, int32_t videoState, bool isRTT = false);
     int32_t RejectCall(int32_t callId, bool isSendSms, std::u16string content);
     int32_t HangUpCall(int32_t callId);
@@ -117,6 +118,7 @@ public:
     int32_t GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber);
     sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType);
     void OnRemoteDied(const wptr<IRemoteObject> &remote);
+    int32_t SetRegMmiCodeCallbackState(bool isReg);
     int32_t ReportAudioDeviceInfo();
     int32_t CancelCallUpgrade(int32_t callId);
     int32_t RequestCameraCapabilities(int32_t callId);
@@ -129,6 +131,8 @@ public:
     bool EndCall();
     bool HasDistributedCommunicationCapability();
     int32_t NotifyVoIPAudioStreamStart(int32_t uid);
+    bool CheckCallRecordingPermission(const std::string& cellularRecordPhoneNum,
+        const std::string& cellularRecordToken);
 #ifdef SUPPORT_RTT_CALL
     int32_t SendRttMessage(int32_t callId, const std::string &rttMessage);
     int32_t SetRttCapability(int32_t slotId, bool isEnable);

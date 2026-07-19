@@ -310,6 +310,7 @@ HWTEST_F(SpecialBranch1Test, CallManagerService_NormalFuncTest, TestSize.Level0)
     callManagerService->BtCallWaitSlotId(dialInfo, number);
     callManagerService->RegisterVoipCallManagerCallback();
     callManagerService->UnRegisterVoipCallManagerCallback();
+    callManagerService->SetRegMmiCodeCallbackState(true);
     callManagerService->GetVoIPCallState(state);
     callManagerService->SetVoIPCallInfo(1, 1, "1234567890");
     callManagerService->AnswerCall();

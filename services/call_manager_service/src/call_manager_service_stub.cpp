@@ -67,6 +67,8 @@ void CallManagerServiceStub::InitCallBasicRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnDialCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_MAKE_CALL)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnMakeCall(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_MAKE_CALL_WITH_TOKEN)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnMakeCallWithToken(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_ANSWER_CALL)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnAcceptCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REJECT_CALL)] =
@@ -175,6 +177,8 @@ void CallManagerServiceStub::InitCallSupplementRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSendUssdResponse(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_TRANSFER_BY_NUMBER)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetTransferNumberByNumber(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CHECK_CALL_RECORDING_PERMISSION)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnCheckCallRecordingPermission(data, reply); };
 }
 
 void CallManagerServiceStub::initCallConferenceExRequest()
@@ -209,6 +213,8 @@ void CallManagerServiceStub::InitCallMultimediaRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetDeviceDirection(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UPDATE_CALL_MEDIA_MODE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallMediaMode(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_REG_MMI_CODE_CALLBACK_STATE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetRegMmiCodeCallbackState(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REPORT_AUDIO_DEVICE_INFO)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnReportAudioDeviceInfo(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CANCEL_CALL_UPGRADE)] =
@@ -406,6 +412,33 @@ int32_t CallManagerServiceStub::OnMakeCall(MessageParcel &data, MessageParcel &r
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CallManagerServiceStub::OnMakeCallWithToken(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    std::string callNumber = data.ReadString();
+    if (callNumber.empty() || callNumber.length() > ACCOUNT_NUMBER_MAX_LENGTH) {
+        TELEPHONY_LOGE("the account number length exceeds the limit");
+        return CALL_ERR_NUMBER_OUT_OF_RANGE;
+    }
+    bool isCustomAccessibility = data.ReadBool();
+    AppExecFwk::PacMap options;
+    options.PutBooleanValue("isCustomAccessibility", isCustomAccessibility);
+    std::string token;
+    result = MakeCallWithToken(callNumber, options, token);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result == TELEPHONY_SUCCESS) {
+        if (!reply.WriteString(token)) {
+            TELEPHONY_LOGE("fail to write token");
+            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+        }
     }
     return result;
 }
@@ -1373,6 +1406,18 @@ int32_t CallManagerServiceStub::OnGetProxyObjectPtr(MessageParcel &data, Message
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallManagerServiceStub::OnSetRegMmiCodeCallbackState(MessageParcel &data, MessageParcel &reply)
+{
+    bool isReg = data.ReadBool();
+    int32_t result = SetRegMmiCodeCallbackState(isReg);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerServiceStub::OnReportAudioDeviceInfo(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = ReportAudioDeviceInfo();
@@ -1650,6 +1695,22 @@ int32_t CallManagerServiceStub::OnGetTransferNumberByNumber(MessageParcel &data,
     result = GetCallTransferInfo(number, type);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnCheckCallRecordingPermission(MessageParcel &data, MessageParcel &reply)
+{
+    std::string cellularRecordPhoneNum = data.ReadString();
+    std::string cellularRecordToken = data.ReadString();
+    if (cellularRecordPhoneNum.empty() || cellularRecordPhoneNum.length() > ACCOUNT_NUMBER_MAX_LENGTH) {
+        TELEPHONY_LOGE("the phone number is invalid");
+        return CALL_ERR_NUMBER_OUT_OF_RANGE;
+    }
+    bool result = CheckCallRecordingPermission(cellularRecordPhoneNum, cellularRecordToken);
+    if (!reply.WriteBool(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }

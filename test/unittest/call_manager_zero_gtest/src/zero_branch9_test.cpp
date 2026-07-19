@@ -206,8 +206,15 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_005, TestSize.Level0)
     audioControl->ExcludeBluetoothSco();
     audioControl->UnexcludeBluetoothSco();
     AudioDeviceType deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
+    AudioDevice device = {
+        .deviceType = AudioDeviceType::DEVICE_SPEAKER,
+        .address = { 0 },
+    };
     audioControl->UpdateDeviceTypeForCrs(deviceType);
+    audioControl->AdjustDeviceForCrs(device, deviceType);
     EXPECT_TRUE(audioControl->IsRingingVibrateModeOn());
+    deviceType = AudioDeviceType::DEVICE_EARPIECE;
+    audioControl->AdjustDeviceForCrs(device, deviceType);
     auto callControl = DelayedSingleton<CallControlManager>::GetInstance();
     callControl->SetVoIPCallState(1);
     EXPECT_TRUE(audioControl->IsVoIPCallActived());
@@ -756,5 +763,22 @@ HWTEST_F(ZeroBranch9Test, Telephony_SpeakerMode_SelectDevice, Function | MediumT
     audioControlManager->UpdateDeviceType(call);
     EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
     callControlManager->VoIPCallState_ = tmpVoIPCallState;
+}
+
+HWTEST_F(ZeroBranch9Test, Telephony_CallManager_DisconnectCallLocaly_ImsCall, TestSize.Level0)
+{
+    DialParaInfo dialInfo;
+    dialInfo.callType = CallType::TYPE_IMS;
+    dialInfo.callState = TelCallState::CALL_STATUS_INCOMING;
+    dialInfo.videoState = VideoStateType::TYPE_VIDEO;
+    sptr<CallBase> call = nullptr;
+    auto callObjectManager = DelayedSingleton<CallObjectManager>::GetInstance();
+    auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    int32_t ret = callObjectManager->ReportCallDisconnected(call);
+    EXPECT_TRUE(ret == TELEPHONY_ERR_LOCAL_PTR_NULL);
+    call = new IMSCall(dialInfo);
+    CallObjectManager::callObjectPtrList_.emplace_back(call);
+    callControlManager->DisconnectAllCalls(true, false, false);
+    callObjectManager->ReportCallDisconnected(call);
 }
 }

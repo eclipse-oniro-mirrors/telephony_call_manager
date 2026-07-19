@@ -77,6 +77,7 @@ __attribute__((noinline)) void CallManagerUtils::WriteCallAttributeInfo(
     WriteVoipCallInfo(info, messageParcel);
     messageParcel.WriteInt32(info.phoneOrWatch);
     messageParcel.WriteInt32(static_cast<int32_t>(info.rttState));
+    messageParcel.WriteBool(info.isCustomAccessibility);
 }
 
 __attribute__((noinline)) bool CallManagerUtils::IsBundleInstalled(const std::string &bundleName, int32_t userId)

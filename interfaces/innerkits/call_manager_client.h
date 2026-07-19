@@ -78,6 +78,16 @@ public:
     int32_t MakeCall(std::string number);
 
     /**
+     * @brief Make a phone call with options, generate a token for the call
+     *
+     * @param number[in], phone number to call
+     * @param options[in], call options including isCustomAccessibility flag
+     * @param token[out], generated token for the call
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t MakeCallWithToken(std::string number, AppExecFwk::PacMap &options, std::string &token);
+
+    /**
      * @brief Answer a phone call
      *
      * @param callId[in], call id
@@ -608,6 +618,13 @@ public:
     bool HasVoiceCapability();
 
     /**
+     * @brief set register mmi code callback state
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetRegMmiCodeCallbackState(bool isReg);
+
+    /**
      * @brief report audio device info
      *
      * @return Returns 0 on success, others on failure.
@@ -764,6 +781,16 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t GetCallTransferInfo(const std::string number, CallTransferType type);
+
+    /**
+     * @brief Check if recording permission is allowed for the call
+     *
+     * @param cellularRecordPhoneNum[in], phone number of the call to check
+     * @param cellularRecordToken[in], token of the call to verify
+     * @return Returns true if permission is allowed, false otherwise.
+     */
+    bool CheckCallRecordingPermission(const std::string& cellularRecordPhoneNum,
+        const std::string& cellularRecordToken);
 };
 } // namespace Telephony
 } // namespace OHOS

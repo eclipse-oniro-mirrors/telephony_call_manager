@@ -148,6 +148,9 @@ public:
     void SetAnsweredCall(bool isAnswered);
     AAFwk::WantParams GetExtraParams();
     void SetPhoneOrWatchDial(int32_t phoneOrWatch);
+    void SetIsCustomAccessibility(bool isCustomAccessibility);
+    bool GetIsCustomAccessibility();
+    std::string GetToken();
     bool IsAiAutoAnswer();
     void SetAiAutoAnswer(bool isAiAutoAnswer);
     bool IsForcedReportVoiceCall();
@@ -161,6 +164,8 @@ public:
     void SetBtCallSlotId(int32_t slotId);
     int32_t GetAntiFraudState();
     void SetAntiFraudState(int32_t antifraudState);
+    void SetApCauseReported(bool isReported);
+    bool IsApCauseReported();
     bool isNonVirtualCall();
     void SetNonVirtualCall(bool isNonVirtualCall);
 
@@ -214,6 +219,8 @@ private:
     bool isAnswered_;
     std::string detectDetails_;
     int32_t phoneOrWatch_ = 0;
+    bool isCustomAccessibility_ = false;
+    std::string token_;
     bool isAiAutoAnswer_;
     bool isForcedReportVoiceCall_{false};
     bool isAnsweredByPhone_{false};
@@ -223,6 +230,7 @@ private:
     bool isNonVirtualCall_{false};
     int32_t imsDomain_ = 0;
     bool isMicDisabled_;
+    bool isApCauseReported_{false};
 };
 } // namespace Telephony
 } // namespace OHOS

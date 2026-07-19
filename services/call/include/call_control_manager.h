@@ -54,6 +54,20 @@ namespace Telephony {
     constexpr int32_t WEAR_STATUS_INVALID = 0;
     constexpr int32_t WEAR_STATUS_OFF = 1;
     constexpr int32_t WEAR_STATUS_ON = 2;
+    constexpr int32_t DROP_CALL_BY_THERMAL_PROTECTION = 1;
+    constexpr int32_t DROP_CALL_BY_WATCH_CALL_BLOCKING = DROP_CALL_BY_THERMAL_PROTECTION + 1;
+    constexpr int32_t DROP_CALL_BY_POWER_OFF = DROP_CALL_BY_WATCH_CALL_BLOCKING + 1;
+    constexpr int32_t DROP_CALL_BY_MULTI_CALL_REJECT = DROP_CALL_BY_POWER_OFF + 1;
+    constexpr int32_t DROP_CALL_BY_EXTERNAL_INVOCATION = DROP_CALL_BY_MULTI_CALL_REJECT + 1;
+    constexpr int32_t DROP_CALL_BY_EMC_CALL_EXIST = DROP_CALL_BY_EXTERNAL_INVOCATION + 1;
+    constexpr int32_t DROP_CALL_BY_INVALID_DEVICE_PROPERTY = DROP_CALL_BY_EMC_CALL_EXIST + 1;
+    constexpr int32_t DROP_CALL_BY_OOBE = DROP_CALL_BY_INVALID_DEVICE_PROPERTY + 1;
+    constexpr int32_t DROP_CALL_BY_FOCUS_MODE = DROP_CALL_BY_OOBE + 1;
+    constexpr int32_t DROP_CALL_BY_CALL_BLOCKING = DROP_CALL_BY_FOCUS_MODE + 1;
+    constexpr int32_t DROP_CALL_BY_VOIP_CONFLICT = DROP_CALL_BY_CALL_BLOCKING + 1;
+    constexpr int32_t DROP_CALL_BY_MEETIME_CONFLICT = DROP_CALL_BY_VOIP_CONFLICT + 1;
+    constexpr int32_t DROP_CALL_BY_CALL_NUM_LIMITED = DROP_CALL_BY_MEETIME_CONFLICT + 1;
+    constexpr int32_t DROP_CALL_BY_MEETIME_CALL_ALERTING = DROP_CALL_BY_CALL_NUM_LIMITED + 1;
 class WearStatusObserver : public AAFwk::DataAbilityObserverStub {
 public:
     WearStatusObserver() = default;
@@ -162,8 +176,10 @@ public:
     void ReleaseIncomingLock();
     void AcquireDisconnectedLock();
     void ReleaseDisconnectedLock();
-    void DisconnectAllCalls(bool isIncludeEmergencyCall = true);
+    void DisconnectAllCalls(bool isIncludeEmergencyCall = true,
+        bool isFromThermalProtection = false, bool isWaitingForResponse = true);
     void StartFlashRemind();
+    void SetRegMmiCodeCallbackState(bool isReg);
     void StopFlashRemind();
     void ClearFlashReminder();
     bool SetVirtualCall(bool isVirtual);

@@ -1002,6 +1002,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_005, TestSize.Level0)
     callControlManager->SetVirtualCall(true);
     callControlManager->PreloadCallUi(true, callingPid);
     callControlManager->PreloadCallUi(false, callingPid);
+    callControlManager->SetRegMmiCodeCallbackState(true);
     ASSERT_EQ(callControlManager->SetVoIPCallState(0), TELEPHONY_SUCCESS);
 }
 
@@ -2055,6 +2056,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_019, TestSize.Level0)
     audioControl->HandleCallStateUpdated(
         call, TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_DISCONNECTED);
     ASSERT_FALSE(audioControl->IsScoTemporarilyDisabled());
+    audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_WAITING, TelCallState::CALL_STATUS_WAITING);
+    ASSERT_TRUE(audioControl->IsScoTemporarilyDisabled());
     CallObjectManager::callObjectPtrList_.clear();
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
@@ -2076,6 +2079,32 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_ActiveHandle_StopTorch, Te
     sleep(1);
     EXPECT_EQ(stopped, true);
     DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ = nullptr;
+}
+
+/**
+ * @tc.number   CallStatusManagerAlertHandleTest
+ * @tc.name     Test AlertHandle
+ * @tc.desc     When prior state is disconnecting, next state is alter
+ */
+HWTEST_F(ZeroBranch4Test, CallStatusManagerAlertHandleTest, Function | MediumTest | Level1)
+{
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    DialParaInfo callInfo;
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.callType = CallType::TYPE_IMS;
+    info.index = 1;
+    info.state = TelCallState::CALL_STATUS_DISCONNECTING;
+    info.accountId = 0;
+    sptr<IMSCall> call = new IMSCall(callInfo);
+    call->SetSlotId(info.accountId);
+    call->SetCallIndex(info.index);
+    call->SetCallType(info.callType);
+    call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTING);
+    CallObjectManager::callObjectPtrList_.push_back(call);
+    callStatusManager->AlertHandle(info);
+    EXPECT_EQ(callStatusManager->AlertHandle(info), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
+    CallObjectManager::callObjectPtrList_.pop_back();
 }
 } // namespace Telephony
 } // namespace OHOS

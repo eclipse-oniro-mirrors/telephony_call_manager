@@ -43,8 +43,9 @@ CallBase::CallBase(DialParaInfo &info)
       ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
       blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams), isAnswered_(false),
-      detectDetails_(""), phoneOrWatch_(info.phoneOrWatch), isAiAutoAnswer_(false),
-      isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox), imsDomain_(0), isMicDisabled_(false)
+      detectDetails_(""), phoneOrWatch_(info.phoneOrWatch), isCustomAccessibility_(info.isCustomAccessibility),
+      token_(info.token), isAiAutoAnswer_(false), isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox),
+      imsDomain_(0), isMicDisabled_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -62,8 +63,8 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
       numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1),
       extraParams_(info.extraParams), isAnswered_(false), detectDetails_(""), phoneOrWatch_(info.phoneOrWatch),
-      isAiAutoAnswer_(false), isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox), imsDomain_(0),
-      isMicDisabled_(false)
+      isCustomAccessibility_(info.isCustomAccessibility), token_(info.token), isAiAutoAnswer_(false),
+      isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox), imsDomain_(0), isMicDisabled_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -188,6 +189,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.antiFraudState = object.GetIntParam("antiFraudState", 0);
         info.phoneOrWatch = phoneOrWatch_;
         info.imsDomain = imsDomain_;
+        info.isCustomAccessibility = isCustomAccessibility_;
         info.simType = object.GetIntParam("simType", 0);
         info.simIndex = object.GetIntParam("simIndex", 0);
         if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
@@ -748,6 +750,24 @@ int32_t CallBase::GetPhoneOrWatchDial()
     return phoneOrWatch_;
 }
 
+void CallBase::SetIsCustomAccessibility(bool isCustomAccessibility)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    isCustomAccessibility_ = isCustomAccessibility;
+}
+ 
+bool CallBase::GetIsCustomAccessibility()
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    return isCustomAccessibility_;
+}
+ 
+std::string CallBase::GetToken()
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    return token_;
+}
+
 void CallBase::SetAiAutoAnswer(bool isAiAutoAnswer)
 {
     isAiAutoAnswer_ = isAiAutoAnswer;
@@ -822,6 +842,18 @@ void CallBase::SetNonVirtualCall(bool isNonVirtualCall)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
     isNonVirtualCall_ = isNonVirtualCall;
+}
+
+void CallBase::SetApCauseReported(bool isReported)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    isApCauseReported_ = isReported;
+}
+
+bool CallBase::IsApCauseReported()
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    return isApCauseReported_;
 }
 } // namespace Telephony
 } // namespace OHOS

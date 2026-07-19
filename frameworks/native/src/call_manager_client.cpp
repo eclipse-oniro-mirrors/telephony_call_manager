@@ -104,6 +104,16 @@ int32_t CallManagerClient::MakeCall(std::string number)
     }
 }
 
+int32_t CallManagerClient::MakeCallWithToken(std::string number, AppExecFwk::PacMap &options, std::string &token)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->MakeCallWithToken(number, options, token);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t CallManagerClient::AnswerCall(int32_t callId, int32_t videoState, bool isRTT)
 {
     if (g_callManagerProxy != nullptr) {
@@ -749,6 +759,16 @@ bool CallManagerClient::HasVoiceCapability()
     return false;
 }
 
+int32_t CallManagerClient::SetRegMmiCodeCallbackState(bool isReg)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->SetRegMmiCodeCallbackState(isReg);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t CallManagerClient::ReportAudioDeviceInfo()
 {
     if (g_callManagerProxy != nullptr) {
@@ -929,6 +949,17 @@ int32_t CallManagerClient::GetCallTransferInfo(const std::string number, CallTra
     } else {
         TELEPHONY_LOGE("GetCallTransferInfo by number, init first please!");
         return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+bool CallManagerClient::CheckCallRecordingPermission(const std::string& cellularRecordPhoneNum,
+    const std::string& cellularRecordToken)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->CheckCallRecordingPermission(cellularRecordPhoneNum, cellularRecordToken);
+    } else {
+        TELEPHONY_LOGE("CheckCallRecordingPermission, init first please!");
+        return false;
     }
 }
 } // namespace Telephony

@@ -21,6 +21,7 @@
 #include "telephony_hisysevent.h"
 #include "nlohmann/json.hpp"
 #include "voip_call_manager_info.h"
+#include "message_parcel.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -80,6 +81,11 @@ public:
         const int32_t ScenarioDetailCode);
     static void ReportCallProcedureEvents(const std::string &callId, const std::string &procedureJsonStr);
     static void ClearVoipProcedureCallInfo(const std::string &callId);
+    static bool InitTelephonyExtWrapper();
+    static void DeInitTelephonyExtWrapper();
+    static bool ReportEventToChrAsync(const std::string &moduleName, MessageParcel &parcelIn);
+    static void ReportCallDropChrEvent(int32_t slotId, int32_t callIndex, int32_t dropReason);
+    static void ReportCallDropChrEvent(int32_t callId, int32_t dropReason);
 
 public:
     template<typename... Types>
@@ -104,6 +110,7 @@ private:
     int64_t answerStartTime_ = 0;
     static std::map<std::string, nlohmann::json> voipProcedureCallInfo_;
     static ffrt::shared_mutex voipProcedureCallInfoLock_;
+    static void *telephonyExtHandle_;
 };
 } // namespace Telephony
 } // namespace OHOS

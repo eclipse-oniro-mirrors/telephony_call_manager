@@ -273,10 +273,6 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
 
 void AudioControlManager::UpdateDeviceType(const sptr<CallBase> &callObjectPtr)
 {
-    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
-    if (audioDeviceManager == nullptr) {
-        return;
-    }
     sptr<CallBase> foregroundCall = callObjectPtr;
     if (callObjectPtr == nullptr) {
         foregroundCall = CallObjectManager::GetForegroundCall();
@@ -291,6 +287,11 @@ void AudioControlManager::UpdateDeviceType(const sptr<CallBase> &callObjectPtr)
         TELEPHONY_LOGE("other call not need control audio");
         return;
     }
+    UpdateDeviceForForegroundCall(foregroundCall);
+}
+
+void AudioControlManager::UpdateDeviceForForegroundCall(const sptr<CallBase> &foregroundCall)
+{
     AudioDevice device = {
         .deviceType = AudioDeviceType::DEVICE_SPEAKER,
         .address = { 0 },
@@ -303,18 +304,32 @@ void AudioControlManager::UpdateDeviceType(const sptr<CallBase> &callObjectPtr)
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
         SetAudioDevice(device);
-    } else {
-        if (audioDeviceManager->IsSpeakerMode()) {
-            audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
-        } else {
-            AudioDeviceType currentDeviceType = audioDeviceManager->GetCurrentAudioDevice();
-            TELEPHONY_LOGI("GetCurrentAudioDevice: %{public}d,initDeviceType: %{public}d",
-                static_cast<int32_t>(currentDeviceType), static_cast<int32_t>(initDeviceType));
-            if (initDeviceType != currentDeviceType) {
-                device.deviceType = initDeviceType;
-                SetAudioDevice(device);
-            }
-        }
+        return;
+    }
+#ifdef SUPPORT_DSOFTBUS
+    auto dcMgrInstance = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    if (dcMgrInstance != nullptr && dcMgrInstance->IsAudioOnSink()) {
+        return;
+    }
+#endif
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    auto distributedCallManager = DelayedSingleton<DistributedCallManager>::GetInstance();
+    if (audioDeviceManager == nullptr || distributedCallManager == nullptr) {
+        return;
+    }
+    if (!foregroundCall->GetAnsweredByPhone() || distributedCallManager->IsDistributedCarDeviceOnline()) {
+        return;
+    }
+    if (audioDeviceManager->IsSpeakerMode()) {
+        audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
+        return;
+    }
+    AudioDeviceType currentDeviceType = audioDeviceManager->GetCurrentAudioDevice();
+    TELEPHONY_LOGI("GetCurrentAudioDevice: %{public}d,initDeviceType: %{public}d",
+        static_cast<int32_t>(currentDeviceType), static_cast<int32_t>(initDeviceType));
+    if (initDeviceType != currentDeviceType) {
+        device.deviceType = initDeviceType;
+        SetAudioDevice(device);
     }
 }
 
@@ -329,13 +344,7 @@ void AudioControlManager::UpdateDeviceTypeForCrs(AudioDeviceType deviceType)
             .deviceType = AudioDeviceType::DEVICE_SPEAKER,
             .address = { 0 },
         };
-        AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
-        if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
-            AudioDeviceType initDeviceType = GetInitAudioDeviceType();
-            if (IsInEarAudioDevice(initDeviceType)) {
-                device.deviceType = initDeviceType;
-            }
-        }
+        AdjustDeviceForCrs(device, deviceType);
         HILOG_COMM_INFO("update deviceType = %{public}d,initCrsDeviceType_ %{public}d",
             deviceType, initCrsDeviceType_);
         initCrsDeviceType_ = deviceType;
@@ -344,6 +353,28 @@ void AudioControlManager::UpdateDeviceTypeForCrs(AudioDeviceType deviceType)
         }
         TELEPHONY_LOGI("crs ring tone should be speaker");
         SetAudioDevice(device);
+    }
+}
+
+void AudioControlManager::AdjustDeviceForCrs(AudioDevice &device, AudioDeviceType deviceType)
+{
+    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
+    if (audioProxy == nullptr) {
+        return;
+    }
+    AudioStandard::AudioRingerMode ringMode = audioProxy->GetRingerMode();
+    if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
+        return;
+    }
+    AudioDeviceType initDeviceType = GetInitAudioDeviceType();
+    TELEPHONY_LOGI("InitAudioDeviceType is %{public}d", initDeviceType);
+    if (IsInEarAudioDevice(initDeviceType)) {
+        device.deviceType = initDeviceType;
+        return;
+    }
+    if (deviceType == AudioDeviceType::DEVICE_EARPIECE && soundState_ == SoundState::SOUNDING) {
+        TELEPHONY_LOGI("SetVoiceRingtoneMute when AdjustDeviceForNonNormalRingMode");
+        audioProxy->SetVoiceRingtoneMute(true);
     }
 }
 
@@ -433,7 +464,7 @@ void AudioControlManager::HandleCallStateUpdated(
     }
     if (callObjectPtr->GetCallType() == CallType::TYPE_BLUETOOTH) {
         if (!IsScoTemporarilyDisabled() && (priorState == TelCallState::CALL_STATUS_DIALING || priorState ==
-            TelCallState::CALL_STATUS_INCOMING)) {
+            TelCallState::CALL_STATUS_INCOMING || priorState == TelCallState::CALL_STATUS_WAITING)) {
             ExcludeBluetoothSco();
         }
         if (nextState == TelCallState::CALL_STATUS_DISCONNECTED) {

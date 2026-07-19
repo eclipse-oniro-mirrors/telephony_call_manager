@@ -75,6 +75,7 @@ public:
     static napi_value Dial(napi_env env, napi_callback_info info);
     static napi_value DialCall(napi_env env, napi_callback_info info);
     static napi_value MakeCall(napi_env env, napi_callback_info info);
+    static napi_value MakeCallWithToken(napi_env env, napi_callback_info info);
     static napi_value AnswerCall(napi_env env, napi_callback_info info);
     static napi_value AnswerVideoCall(napi_env env, napi_callback_info info);
     static napi_value RejectCall(napi_env env, napi_callback_info info);
@@ -174,12 +175,16 @@ private:
     static void NativeListCallBack(napi_env env, napi_status status, void *data);
     static void NativeOffCallBack(napi_env env, napi_status status, void *data);
     static void GetDialInfo(napi_env env, napi_value objValue, DialAsyncContext &asyncContext);
+    static void GetMakeCallWithTokenOptions(
+        napi_env env, napi_value optionsObj, MakeCallWithTokenAsyncContext &asyncContext);
     static void GetSmsInfo(napi_env env, napi_value objValue, RejectAsyncContext &asyncContext);
     static int32_t GetRestrictionInfo(napi_env env, napi_value objValue, CallRestrictionAsyncContext &asyncContext);
     static int32_t GetTransferInfo(napi_env env, napi_value objValue, CallTransferAsyncContext &asyncContext);
     static void NativeDial(napi_env env, void *data);
     static void NativeDialCall(napi_env env, void *data);
     static void NativeMakeCall(napi_env env, void *data);
+    static void NativeMakeCallWithToken(napi_env env, void *data);
+    static void NativeMakeCallWithTokenCallBack(napi_env env, napi_status status, void *data);
     static void NativeAnswerCall(napi_env env, void *data);
     static void NativeRejectCall(napi_env env, void *data);
     static void NativeHangUpCall(napi_env env, void *data);

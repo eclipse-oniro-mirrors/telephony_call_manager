@@ -36,6 +36,7 @@ void Utils::CallAttributeInfoToTaihe(::ohos::telephony::call::CallAttributeOptio
         ::ohos::telephony::call::ConferenceState::from_value(static_cast<int32_t>(info.conferenceState));
     taiheCallAttributeInfo.crsType = info.crsType;
     taiheCallAttributeInfo.originalCallType = info.originalCallType;
+    taiheCallAttributeInfo.isCustomAccessibility = info.isCustomAccessibility;
     taiheCallAttributeInfo.numberLocation = ::taihe::optional<::taihe::string>(std::in_place_t{}, info.numberLocation);
 }
 

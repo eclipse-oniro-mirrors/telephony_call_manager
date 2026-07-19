@@ -139,6 +139,7 @@ call_manager_sources = [
   "${call_manager_path}/utils/src/call_dialog.cpp",
   "${call_manager_path}/utils/src/call_manager_utils.cpp",
   "${call_manager_path}/utils/src/call_number_utils.cpp",
+  "${call_manager_path}/utils/src/challenge_token_manager.cpp",
   "${call_manager_path}/utils/src/call_setting_ability_connection.cpp",
   "${call_manager_path}/utils/src/incoming_flash_reminder.cpp",
   "${call_manager_path}/utils/src/motion_recognition.cpp",
@@ -219,7 +220,6 @@ call_manager_external_deps += [
   "ability_runtime:ability_connect_callback_stub",
   "ability_runtime:ability_deps_wrapper",
   "ability_runtime:ability_manager",
-  "ability_runtime:abilitykit_native",
   "ability_runtime:app_manager",
   "ability_runtime:dataobs_manager",
   "ability_runtime:extension_manager",
@@ -254,6 +254,7 @@ call_manager_external_deps += [
   "player_framework:system_sound_client",
   "safwk:system_ability_fwk",
   "samgr:samgr_proxy",
+  "window_manager:libdm_lite",
 ]
 
 if (defined(global_parts_info) &&

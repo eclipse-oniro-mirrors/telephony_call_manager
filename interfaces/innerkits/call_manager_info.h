@@ -425,6 +425,11 @@ struct CallAttributeInfo {
      * - 2：vonr
      */
     int32_t imsDomain = 0;
+
+    /**
+     * Whether the third-party app supports custom accessibility features for accessible calling.
+     */
+    bool isCustomAccessibility = false;
 };
 
 /**

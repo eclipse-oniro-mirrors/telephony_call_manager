@@ -102,6 +102,7 @@ bool CallControlManager::Init()
     CallStateObserve();
     DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RegisterSuperPrivacyMode();
     DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIPOrRestart();
+    CallManagerHisysevent::InitTelephonyExtWrapper();
     return true;
 }
 
@@ -117,6 +118,7 @@ void CallControlManager::UnInit()
     UnregisterAppStateObserver();
     UnRegisterObserver();
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
+    CallManagerHisysevent::DeInitTelephonyExtWrapper();
 }
 
 void CallControlManager::ReportPhoneUEInSuperPrivacy(const std::string &eventName)
@@ -223,6 +225,8 @@ void CallControlManager::PackageDialInformation(AppExecFwk::PacMap &extras, std:
     dialSrcInfo_.videoState = (VideoStateType)extras.GetIntValue("videoState");
     dialSrcInfo_.originalCallType = (int32_t)extras.GetIntValue("videoState");
     dialSrcInfo_.bundleName = extras.GetStringValue("bundleName");
+    dialSrcInfo_.isCustomAccessibility = extras.GetBooleanValue("isCustomAccessibility", false);
+    dialSrcInfo_.token = extras.GetStringValue("token");
     extras_.Clear();
     extras_ = extras;
 }
@@ -1369,10 +1373,8 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIPOrRestart();
     CallVoiceAssistantManager::GetInstance()->UpdateVoipCallState(state);
-    if (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE ||
-        VoIPCallState_ == CallStateToApp::CALL_STATE_UNKNOWN) {
-        UnregisterAppStateObserver();
-    } else {
+    if (VoIPCallState_ != CallStateToApp::CALL_STATE_IDLE &&
+        VoIPCallState_ != CallStateToApp::CALL_STATE_UNKNOWN) {
         RegisterAppStateObserver();
     }
     IPCSkeleton::SetCallingIdentity(identity);
@@ -1754,7 +1756,8 @@ void CallControlManager::ReleaseDisconnectedLock()
 #endif
 }
 
-void CallControlManager::DisconnectAllCalls(bool isIncludeEmergencyCall)
+void CallControlManager::DisconnectAllCalls(bool isIncludeEmergencyCall, bool isFromThermalProtection,
+    bool isWaitingForResponse)
 {
     std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
     int32_t ret = -1;
@@ -1765,6 +1768,7 @@ void CallControlManager::DisconnectAllCalls(bool isIncludeEmergencyCall)
         if (call->GetCallType() == CallType::TYPE_BLUETOOTH) {
             continue;
         }
+        int32_t callDropCause = DROP_CALL_BY_POWER_OFF;
         if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
             ret = RejectCall(call->GetCallID(), false, Str8ToStr16(""));
         } else {
@@ -1773,12 +1777,20 @@ void CallControlManager::DisconnectAllCalls(bool isIncludeEmergencyCall)
                 TELEPHONY_LOGI("Emergency call in progress, skipping thermal action");
                 continue;
             }
+            if (isFromThermalProtection) {
+                callDropCause = DROP_CALL_BY_THERMAL_PROTECTION;
+            }
 #endif
             ret = HangUpCall(call->GetCallID());
         }
+        CallManagerHisysevent::ReportCallDropChrEvent(call->GetSlotId(), call->GetCallIndex(), callDropCause);
+        call->SetApCauseReported(true);
         if (ret == TELEPHONY_SUCCESS) {
             TELEPHONY_LOGI("one call is disconnected. call state: %{public}d, callId: %{public}d",
                 call->GetCallRunningState(), call->GetCallID());
+        }
+        if (!isWaitingForResponse) {
+            ReportCallDisconnected(call);
         }
     }
 }
@@ -2075,6 +2087,7 @@ void CallControlManager::HangUpOtherCallByAnswerCallID(int32_t answerCallId, boo
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("HangUpCall fail callid=%{public}d", callId);
             }
+            CallManagerHisysevent::ReportCallDropChrEvent(callId, DROP_CALL_BY_MULTI_CALL_REJECT);
         } else if (telCallState == TelCallState::CALL_STATUS_INCOMING ||
             telCallState == TelCallState::CALL_STATUS_WAITING) {
             TELEPHONY_LOGI("RejectCall callid=%{public}d", callId);
@@ -2194,7 +2207,6 @@ void CallControlManager::PreloadCallUi(bool enable, int32_t callingPid)
         if (preloadedCallUiRequestPids_.empty()) {
             TELEPHONY_LOGI("UnloadCallUi pid: %{public}d", callingPid);
             ConnectCallUiService(enable);
-            UnregisterAppStateObserver();
         }
     }
     IPCSkeleton::SetCallingIdentity(identity);
@@ -2224,6 +2236,14 @@ void CallControlManager::StartFlashRemind()
         );
     }
     incomingFlashReminder_->StartFlashRemind();
+}
+
+void CallControlManager::SetRegMmiCodeCallbackState(bool isReg)
+{
+    auto callAbilityReportProxy = DelayedSingleton<CallAbilityReportProxy>::GetInstance();
+    if (callAbilityReportProxy != nullptr) {
+        callAbilityReportProxy->SetRegMmiCodeCallbackState(isReg);
+    }
 }
 
 void CallControlManager::StopFlashRemind()
@@ -2278,6 +2298,7 @@ bool CallControlManager::EndCall()
                 call->GetCallType() == CallType::TYPE_VOIP) {
                 continue;
             }
+            CallManagerHisysevent::ReportCallDropChrEvent(callId, DROP_CALL_BY_EXTERNAL_INVOCATION);
             if (state == CallRunningState::CALL_RUNNING_STATE_RINGING) {
                 ret = RejectCall(callId, false, Str8ToStr16(""));
             } else {
@@ -2392,7 +2413,7 @@ void CallControlManager::HandleThermalLevelChange(int32_t level)
         TELEPHONY_LOGI("No active call exists");
         return;
     }
-    DisconnectAllCalls(false);
+    DisconnectAllCalls(false, true);
     TELEPHONY_LOGI("Terminating all calls due to thermal level");
 }
 

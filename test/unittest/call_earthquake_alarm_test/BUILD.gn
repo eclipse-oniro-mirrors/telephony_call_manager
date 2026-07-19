@@ -41,6 +41,7 @@ ohos_unittest("tel_call_earthquake_alarm_test") {
     "libphonenumber:phonenumber_standard",
     "libphonenumber:geocoding",
     "protobuf:protobuf",
+    "protobuf:protobuf_lite",
   ]
   external_deps += call_manager_external_deps
   external_deps -= ["ffrt:libffrt"]

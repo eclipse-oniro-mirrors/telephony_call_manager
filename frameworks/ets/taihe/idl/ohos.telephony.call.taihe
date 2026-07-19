@@ -319,6 +319,7 @@ struct CallAttributeOptions {
     voipCallAttribute: Optional<VoipCallAttribute>;
     crsType: i32;
     originalCallType: i32;
+    isCustomAccessibility: bool;
     numberLocation: Optional<String>;
     numberMarkInfo: Optional<NumberMarkInfo>;
     extraParams: Optional<@record Map<String, @sts_type("Object") Opaque>>;
@@ -422,12 +423,20 @@ struct CallTransferResult {
     endMinute: i32;
 }
 
+struct MakeCallOptions {
+    isHideDialScreen: Optional<bool>;
+    isCustomAccessibility: Optional<bool>;
+}
+
 @gen_async("makeCall")
 @gen_promise("makeCall")
 function MakeCallSync(phoneNumber: String): void;
 
 @gen_promise("makeCall")
 function MakeCallSync2(context: @sts_type("Context") Opaque, phoneNumber: String): void;
+
+@gen_promise("makeCallWithToken")
+function MakeCallWithTokenSync(phoneNumber: String, options: Optional<MakeCallOptions>): String;
 
 function HasVoiceCapability(): bool;
 

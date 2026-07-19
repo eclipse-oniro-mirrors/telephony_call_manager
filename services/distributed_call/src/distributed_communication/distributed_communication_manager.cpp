@@ -286,10 +286,6 @@ void DistributedCommunicationManager::NewCallCreated(sptr<CallBase> &call)
         return;
     }
 
-    if (role_ == DistributedRole::SINK) {
-        DistributedSinkSwitchController::TrySwitchToBtHeadset();
-    }
-
     std::lock_guard<ffrt::mutex> lock(mutex_);
     if (dataController_ != nullptr) {
         if (peerDevices_.empty()) {
