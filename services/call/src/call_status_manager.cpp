@@ -75,7 +75,7 @@ sptr<OOBEStatusObserver> CallStatusManager::oobeStatusObserver_ = nullptr;
 CallStatusManager::CallStatusManager()
 {
     (void)memset_s(&callReportInfo_, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo));
-    for (int32_t i = 0; i < SLOT_NUM; i++) {
+    for (int32_t i = 0; i < SIM_SLOT_COUNT_MD; i++) {
         (void)memset_s(&callDetailsInfo_[i], sizeof(CallDetailsInfo), 0, sizeof(CallDetailsInfo));
     }
 }
@@ -84,11 +84,11 @@ CallStatusManager::~CallStatusManager() {}
 
 int32_t CallStatusManager::Init()
 {
-    for (int32_t i = 0; i < SLOT_NUM; i++) {
+    for (int32_t i = 0; i < SIM_SLOT_COUNT_MD; i++) {
         callDetailsInfo_[i].callVec.clear();
         tmpCallDetailsInfo_[i].callVec.clear();
     }
-    for (int32_t i = 0; i < SLOT_NUM; i++) {
+    for (int32_t i = 0; i < SIM_SLOT_COUNT_MD; i++) {
         priorVideoState_[i] = VideoStateType::TYPE_VOICE;
     }
     mEventIdTransferMap_.clear();
