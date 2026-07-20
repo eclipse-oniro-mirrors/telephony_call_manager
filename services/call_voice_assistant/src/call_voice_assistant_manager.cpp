@@ -534,21 +534,20 @@ void CallVoiceAssistantManager::CallStateUpdated(
         if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
             return;
         }
-        TelCallState callState = callObjectPtr->GetTelCallState();
-        if (callState != TelCallState::CALL_STATUS_ACTIVE && callState != TelCallState::CALL_STATUS_DIALING &&
-            callState != TelCallState::CALL_STATUS_INCOMING && callState != TelCallState::CALL_STATUS_DISCONNECTED) {
+        if (nextState != TelCallState::CALL_STATUS_ACTIVE && nextState != TelCallState::CALL_STATUS_DIALING &&
+            nextState != TelCallState::CALL_STATUS_INCOMING && nextState != TelCallState::CALL_STATUS_DISCONNECTED) {
             return;
         }
         int32_t callId = callObjectPtr->GetCallID();
         int32_t accountId = callObjectPtr->GetAccountId();
         auto info = GetContactInfo(callId);
         if (info != nullptr) {
-            info->call_status = (int32_t)callState;
+            info->call_status = static_cast<int32_t>(nextState);
             info->accountId = accountId;
             info->callId = callId;
             info->call = callObjectPtr;
         }
-        switch (callState) {
+        switch (nextState) {
             case TelCallState::CALL_STATUS_ACTIVE:
                 CallStatusActive(callId, accountId);
                 break;
