@@ -24,6 +24,7 @@
 #include "fold_status_manager.h"
 #include "call_object_manager.h"
 #include "call_superprivacy_control_manager.h"
+#include "super_privacy_policy_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -110,10 +111,10 @@ std::string CallDialog::BuildStartCommand(const std::string &dialogReason, int32
     return startCommand;
 }
 
-bool CallDialog::DialogConnectPrivpacyModeExtension(const std::string &dialogReason, std::u16string &number,
+bool CallDialog::DialogConnectPrivacyModeExtension(const std::string &dialogReason, std::u16string &number,
     int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo)
 {
-    std::string commandStr = BuildStartPrivpacyModeCommand(dialogReason, number,
+    std::string commandStr = BuildStartPrivacyModeCommand(dialogReason, number,
     accountId, videoState, dialType, dialScene, callType, isVideo);
     AAFwk::Want want;
     std::string bundleName = "com.ohos.sceneboard";
@@ -127,10 +128,10 @@ bool CallDialog::DialogConnectPrivpacyModeExtension(const std::string &dialogRea
     return true;
 }
 
-bool CallDialog::DialogConnectAnswerPrivpacyModeExtension(const std::string &dialogReason,
+bool CallDialog::DialogConnectAnswerPrivacyModeExtension(const std::string &dialogReason,
     int32_t &callId, int32_t &videoState, bool isVideo)
 {
-    std::string commandStr = BuildStartAnswerPrivpacyModeCommand(dialogReason, callId, videoState, isVideo);
+    std::string commandStr = BuildStartAnswerPrivacyModeCommand(dialogReason, callId, videoState, isVideo);
     AAFwk::Want want;
     std::string bundleName = "com.ohos.sceneboard";
     std::string abilityName = "com.ohos.sceneboard.systemdialog";
@@ -145,8 +146,12 @@ bool CallDialog::DialogConnectAnswerPrivpacyModeExtension(const std::string &dia
 
 void CallDialog::DialogCallingPrivacyModeExtension(Rosen::FoldStatus foldStatus)
 {
+    auto callSuperPrivacyControlManager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
+    if (callSuperPrivacyControlManager == nullptr) {
+        return;
+    }
     if (foldStatus != Rosen::FoldStatus::FOLDED
-        || !DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetCurrentIsSuperPrivacyMode()) {
+        || callSuperPrivacyControlManager->CanCallWithSuperPrivacyPolicy()) {
         return;
     }
     sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall(false);
@@ -165,9 +170,18 @@ void CallDialog::DialogCallingPrivacyModeExtension(Rosen::FoldStatus foldStatus)
     }
 }
 
-std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogReason, std::u16string &number,
+std::string CallDialog::BuildStartPrivacyModeCommand(const std::string &dialogReason, std::u16string &number,
     int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo)
 {
+    SuperPrivacyPolicyInfo policyInfo;
+    auto callSuperPrivacyControlManager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
+    if (callSuperPrivacyControlManager != nullptr) {
+        callSuperPrivacyControlManager->GetCurrentPrivacyPolicy(policyInfo);
+    }
+    bool isEnableCam = (policyInfo.superPrivacyPolicies[static_cast<int32_t>(PrivacySensorType::CAMERA)]
+        .sensorState != PrivacySensorState::DISABLED);
+    bool isEnableMic = (policyInfo.superPrivacyPolicies[static_cast<int32_t>(PrivacySensorType::MICROPHONE)]
+        .sensorState != PrivacySensorState::DISABLED);
     nlohmann::json root;
     std::string uiExtensionType = "sysDialog/common";
     root["ability.want.params.uiExtensionType"] = uiExtensionType;
@@ -181,16 +195,27 @@ std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogR
     root["callType"] = callType;
     root["isAnswer"] = false;
     root["isVideo"] = isVideo;
+    root["isEnableCam"] = isEnableCam;
+    root["isEnableMic"] = isEnableMic;
     root["isFold"] = FoldStatusManager::IsSmallFoldDevice()
         && Rosen::DisplayManagerLite::GetInstance().GetFoldStatus() == Rosen::FoldStatus::FOLDED;
     std::string startCommand = root.dump();
-    TELEPHONY_LOGI("BuildStartPrivpacyModeCommand success startCommand is: xxx");
+    TELEPHONY_LOGI("BuildStartPrivacyModeCommand success");
     return startCommand;
 }
 
-std::string CallDialog::BuildStartAnswerPrivpacyModeCommand(const std::string &dialogReason,
+std::string CallDialog::BuildStartAnswerPrivacyModeCommand(const std::string &dialogReason,
     int32_t &callId, int32_t &videoState, bool isVideo)
 {
+    SuperPrivacyPolicyInfo policyInfo;
+    auto callSuperPrivacyControlManager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
+    if (callSuperPrivacyControlManager != nullptr) {
+        callSuperPrivacyControlManager->GetCurrentPrivacyPolicy(policyInfo);
+    }
+    bool isEnableCam = (policyInfo.superPrivacyPolicies[static_cast<int32_t>(PrivacySensorType::CAMERA)]
+        .sensorState != PrivacySensorState::DISABLED);
+    bool isEnableMic = (policyInfo.superPrivacyPolicies[static_cast<int32_t>(PrivacySensorType::MICROPHONE)]
+        .sensorState != PrivacySensorState::DISABLED);
     nlohmann::json root;
     std::string uiExtensionType = "sysDialog/common";
     root["ability.want.params.uiExtensionType"] = uiExtensionType;
@@ -200,6 +225,8 @@ std::string CallDialog::BuildStartAnswerPrivpacyModeCommand(const std::string &d
     root["videoState"] = videoState;
     root["isAnswer"] = true;
     root["isVideo"] = isVideo;
+    root["isEnableCam"] = isEnableCam;
+    root["isEnableMic"] = isEnableMic;
     root["isFold"] = FoldStatusManager::IsSmallFoldDevice()
         && Rosen::DisplayManagerLite::GetInstance().GetFoldStatus() == Rosen::FoldStatus::FOLDED;
     std::string startCommand = root.dump();
