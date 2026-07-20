@@ -245,6 +245,7 @@ void AudioPlayer::ReleaseRenderer()
     audioRenderer_->Drain();
     audioRenderer_->Stop();
     audioRenderer_->Release();
+    audioRenderer_.reset();
     isRenderInitialized_ = false;
 }
 
