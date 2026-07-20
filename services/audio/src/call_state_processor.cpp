@@ -33,7 +33,7 @@ CallStateProcessor::~CallStateProcessor()
     dialingCalls_.clear();
 }
 
-static std::shared_ptr<CallStateProcessor> CallStateProcessor::GetInstance()
+std::shared_ptr<CallStateProcessor> CallStateProcessor::GetInstance()
 {
     static std::shared_ptr<CallStateProcessor> instance = std::make_shared<CallStateProcessor>();
     return instance;

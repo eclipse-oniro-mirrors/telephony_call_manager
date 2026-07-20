@@ -79,7 +79,7 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
             return false;
         }
     }
-    if (auth.empty()) {
+    if (auth->empty()) {
         TELEPHONY_LOGE("Failed to get auth.");
         helper.DisconnectHsdr();
         return false;

@@ -732,7 +732,7 @@ int32_t CallManagerServiceStub::OnSetCallRestriction(MessageParcel &data, Messag
     }
     int32_t slotId = data.ReadInt32();
     CallRestrictionInfo *pCRInfo = (CallRestrictionInfo *)data.ReadRawData(sizeof(CallRestrictionInfo));
-    if (pCRInfo == nullptr || strnlen(pCTInfo->password, kMaxNumberLen + 1) == static_cast<size_t>(kMaxNumberLen + 1)) {
+    if (pCRInfo == nullptr || strnlen(pCRInfo->password, kMaxNumberLen + 1) == static_cast<size_t>(kMaxNumberLen + 1)) {
         TELEPHONY_LOGE("data error");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }

@@ -751,7 +751,7 @@ int32_t CallManagerService::SetCallRestrictionPassword(
 {
     if (oldPassword == nullptr || newPassword == nullptr) {
         TELEPHONY_LOGE("oldPassword or newPassword is nullptr!");
-        retrun TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
