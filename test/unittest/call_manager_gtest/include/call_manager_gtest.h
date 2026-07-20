@@ -185,6 +185,7 @@ public:
         samgr = nullptr;
         SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = nullptr;
         std::cout << "---------- gtest end ------------" << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(SLEEP_ONE_SECONDS));
     }
 
     void HangUpCall();
