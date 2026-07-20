@@ -265,8 +265,8 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
         for (const auto &it1 : callDetailsInfo_[curSlotId].callVec) {
             if (it.index == it1.index) {
                 // call state changes
-                if (it.state != it1.state || it.mpty != it1.mpty || it.callType != it1.callType
-                    || it.callMode != it1.callMode || it.state == TelCallState::CALL_STATUS_ALERTING) {
+                if (it.state != it1.state || it.mpty != it1.mpty || it.state == TelCallState::CALL_STATUS_ALERTING ||
+                    it.callType == CallType::TYPE_VOIP || it.callMode != it1.callMode || it.callType != it1.callType) {
                     TELEPHONY_LOGI("handle updated call state:%{public}d", it.state);
                     HandleCallReportInfo(it);
                 }
@@ -678,6 +678,12 @@ int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
     }
     call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
     if (call == nullptr) {
+        sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
+        if (voipCall != nullptr) {
+            if (voipCall->UpdateCallAttributeInfo(info)) {
+                return UpdateCallState(call, info.state);
+            }
+        }
         TELEPHONY_LOGE("CreateVoipCall failed!");
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
@@ -699,12 +705,6 @@ int32_t CallStatusManager::OutgoingVoipCallHandle(const CallDetailInfo &info)
     sptr<CallBase> call = GetOneCallObjectByVoipCallId(
         info.voipCallInfo.voipCallId, info.voipCallInfo.voipBundleName, info.voipCallInfo.uid);
     if (call != nullptr) {
-        VideoStateType originalType = call->GetVideoStateType();
-        if (originalType != info.callMode) {
-            TELEPHONY_LOGI("change VideoStateType from %{public}d to %{public}d",
-                static_cast<int32_t>(originalType), static_cast<int32_t>(info.callMode));
-            call->SetVideoStateType(info.callMode);
-        }
         sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
         if (voipCall != nullptr) {
             voipCall->UpdateCallAttributeInfo(info);
@@ -1149,17 +1149,13 @@ int32_t CallStatusManager::ActiveVoipCallHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("voip Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    VideoStateType originalType = call->GetVideoStateType();
-    if (originalType != info.callMode) {
-        TELEPHONY_LOGI("change VideoStateType from %{public}d to %{public}d",
-            static_cast<int32_t>(originalType), static_cast<int32_t>(info.callMode));
-        call->SetVideoStateType(info.callMode);
-    }
     sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
-    if (voipCall != nullptr) {
-        voipCall->UpdateCallAttributeInfo(info);
+    if (voipCall == nullptr) {
+        TELEPHONY_LOGE("voip Call is NULL");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
+    voipCall->UpdateCallAttributeInfo(info);
+    bool ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
