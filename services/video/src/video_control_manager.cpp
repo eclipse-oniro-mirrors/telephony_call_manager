@@ -185,7 +185,6 @@ int32_t VideoControlManager::UpdateImsCallMode(int32_t callId, ImsCallMode callM
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (callPtr->GetCallType() == CallType::TYPE_IMS) {
-        // only netcall type support update call media mode
         sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
         TELEPHONY_LOGI("ims call update media request");
         ret = netCall->UpdateImsCallMode(callMode);
