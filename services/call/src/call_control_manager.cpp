@@ -320,6 +320,8 @@ bool CallControlManager::CurrentIsSuperPrivacyMode(int32_t callId, int32_t video
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectAnswerPrivacyModeExtension("SUPER_PRIVACY_MODE",
             callId, videoState, true);
         return true;
+    }
+    return false;
 }
 
 void CallControlManager::AnswerHandlerForSatelliteOrVideoCall(sptr<CallBase> &call, int32_t videoState)
