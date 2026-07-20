@@ -87,5 +87,27 @@ HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_PostDialProceed_02
     EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
+/**
+ * @tc.number   Telephony_CallManagerService_SetRegMmiCodeCallbackState_0100
+ * @tc.name     test SetRegMmiCodeCallbackState with null callControlManagerPtr_
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetRegMmiCodeCallbackState_0100, TestSize.Level1)
+{
+    SetCallControlManagerNull();
+    int32_t ret = service_->SetRegMmiCodeCallbackState(true);
+    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+ 
+/**
+ * @tc.number   Telephony_CallManagerService_SetRegMmiCodeCallbackState_0200
+ * @tc.name     test SetRegMmiCodeCallbackState with valid callControlManagerPtr_
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerServiceTest, Telephony_CallManagerService_SetRegMmiCodeCallbackState_0200, TestSize.Level1)
+{
+    int32_t ret = service_->SetRegMmiCodeCallbackState(true);
+    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
 } // namespace Telephony
 } // namespace OHOS

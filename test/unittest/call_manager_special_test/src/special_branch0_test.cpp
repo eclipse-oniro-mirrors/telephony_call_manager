@@ -799,6 +799,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_005, TestSize.Level0)
     ASSERT_TRUE(callManagerService != nullptr);
     callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
     int32_t ret = callManagerService->PostDialProceed(1, false);
+    callManagerService->SetRegMmiCodeCallbackState(true);
     EXPECT_NE(ret, 0);
 }
 
@@ -1118,6 +1119,21 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_026, TestSize.Level0)
     AudioDevice audioDevice;
     int32_t ret = callManagerService->SetAudioDevice(audioDevice);
     EXPECT_NE(ret, 0);
+}
+
+/**
+ * @tc.number   SpecialBranch0Test_CallManagerServiceStub_OnSetRegMmiCodeCallbackState_Success
+ * @tc.name     CallManagerServiceStub_OnSetRegMmiCodeCallbackState_Success
+ * @tc.desc     Normal path for OnSetRegMmiCodeCallbackState
+ */
+HWTEST_F(SpecialBranch0Test, CallManagerServiceStub_OnSetRegMmiCodeCallbackState_Success, TestSize.Level1)
+{
+    auto service = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(service != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t result = service->OnSetRegMmiCodeCallbackState(data, reply);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
 /**

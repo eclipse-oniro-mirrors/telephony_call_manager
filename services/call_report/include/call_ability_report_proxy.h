@@ -24,6 +24,7 @@
 
 #include "call_state_listener_base.h"
 #include "app_state_observer.h"
+#include "call_manager_inner_type.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -52,6 +53,9 @@ public:
     int32_t ReportCallDataUsageChange(const int64_t dataUsage);
     int32_t ReportCameraCapabilities(const CameraCapabilities &cameraCapabilities);
     int32_t ReportPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
+    void CacheMmiCodeInfo(const MmiCodeInfo &info);
+    void SetRegMmiCodeCallbackState(bool isReg);
+    bool IsMmiCodeCallbackRegistered();
 #ifdef SUPPORT_RTT_CALL
     int32_t ReportRttCallEvtChanged(const RttEvent &info);
     int32_t ReportRttCallError(const RttError &info);
@@ -68,6 +72,8 @@ private:
     sptr<ApplicationStateObserver> appStateObserver;
     sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
     ffrt::mutex mutex_;
+    bool isMmiCodeCallbackRegistered_ = false;
+    std::shared_ptr<MmiCodeInfo> cacheInfo_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

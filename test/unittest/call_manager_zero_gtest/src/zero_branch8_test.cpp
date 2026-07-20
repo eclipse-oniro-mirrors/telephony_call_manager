@@ -538,7 +538,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_ThermalProtection_001, Function | MediumTest
     callControl->thermalLevel_ = 4;
     callState->IncomingHandle(detailInfo);
     EXPECT_TRUE(callControl->IsThermalProtectionRequired());
-    EXPECT_TRUE(callState->ShouldRejectIncomingCall());
+    EXPECT_TRUE(callState->ShouldRejectIncomingCall(call2));
     CallObjectManager::DeleteOneCallObject(call2);
 }
 #endif

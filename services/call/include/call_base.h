@@ -162,6 +162,8 @@ public:
     int32_t GetNewCallUseBox();
     int32_t GetBtCallSlotId();
     void SetBtCallSlotId(int32_t slotId);
+    void SetApCauseReported(bool isReported);
+    bool IsApCauseReported();
     bool isNonVirtualCall();
     void SetNonVirtualCall(bool isNonVirtualCall);
 
@@ -225,6 +227,7 @@ private:
     bool isNonVirtualCall_{false};
     int32_t imsDomain_ = 0;
     bool isMicDisabled_;
+    bool isApCauseReported_{false};
 };
 } // namespace Telephony
 } // namespace OHOS

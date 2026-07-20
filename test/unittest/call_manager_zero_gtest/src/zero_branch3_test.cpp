@@ -1002,6 +1002,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_005, TestSize.Level0)
     callControlManager->SetVirtualCall(true);
     callControlManager->PreloadCallUi(true, callingPid);
     callControlManager->PreloadCallUi(false, callingPid);
+    callControlManager->SetRegMmiCodeCallbackState(true);
     ASSERT_EQ(callControlManager->SetVoIPCallState(0), TELEPHONY_SUCCESS);
 }
 

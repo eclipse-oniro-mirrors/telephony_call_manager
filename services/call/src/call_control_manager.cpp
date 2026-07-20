@@ -102,6 +102,7 @@ bool CallControlManager::Init()
     CallStateObserve();
     DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RegisterSuperPrivacyMode();
     DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIPOrRestart();
+    CallManagerHisysevent::InitTelephonyExtWrapper();
     return true;
 }
 
@@ -117,6 +118,7 @@ void CallControlManager::UnInit()
     UnregisterAppStateObserver();
     UnRegisterObserver();
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
+    CallManagerHisysevent::DeInitTelephonyExtWrapper();
 }
 
 void CallControlManager::ReportPhoneUEInSuperPrivacy(const std::string &eventName)
@@ -1766,6 +1768,7 @@ void CallControlManager::DisconnectAllCalls(bool isIncludeEmergencyCall, bool is
         if (call->GetCallType() == CallType::TYPE_BLUETOOTH) {
             continue;
         }
+        int32_t callDropCause = DROP_CALL_BY_POWER_OFF;
         if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
             ret = RejectCall(call->GetCallID(), false, Str8ToStr16(""));
         } else {
@@ -1774,9 +1777,14 @@ void CallControlManager::DisconnectAllCalls(bool isIncludeEmergencyCall, bool is
                 TELEPHONY_LOGI("Emergency call in progress, skipping thermal action");
                 continue;
             }
+            if (isFromThermalProtection) {
+                callDropCause = DROP_CALL_BY_THERMAL_PROTECTION;
+            }
 #endif
             ret = HangUpCall(call->GetCallID());
         }
+        CallManagerHisysevent::ReportCallDropChrEvent(call->GetSlotId(), call->GetCallIndex(), callDropCause);
+        call->SetApCauseReported(true);
         if (ret == TELEPHONY_SUCCESS) {
             TELEPHONY_LOGI("one call is disconnected. call state: %{public}d, callId: %{public}d",
                 call->GetCallRunningState(), call->GetCallID());
@@ -2079,6 +2087,7 @@ void CallControlManager::HangUpOtherCallByAnswerCallID(int32_t answerCallId, boo
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("HangUpCall fail callid=%{public}d", callId);
             }
+            CallManagerHisysevent::ReportCallDropChrEvent(callId, DROP_CALL_BY_MULTI_CALL_REJECT);
         } else if (telCallState == TelCallState::CALL_STATUS_INCOMING ||
             telCallState == TelCallState::CALL_STATUS_WAITING) {
             TELEPHONY_LOGI("RejectCall callid=%{public}d", callId);
@@ -2231,6 +2240,14 @@ void CallControlManager::StartFlashRemind()
     incomingFlashReminder_->StartFlashRemind();
 }
 
+void CallControlManager::SetRegMmiCodeCallbackState(bool isReg)
+{
+    auto callAbilityReportProxy = DelayedSingleton<CallAbilityReportProxy>::GetInstance();
+    if (callAbilityReportProxy != nullptr) {
+        callAbilityReportProxy->SetRegMmiCodeCallbackState(isReg);
+    }
+}
+
 void CallControlManager::StopFlashRemind()
 {
     std::lock_guard<ffrt::mutex> lock(reminderMutex_);
@@ -2283,6 +2300,7 @@ bool CallControlManager::EndCall()
                 call->GetCallType() == CallType::TYPE_VOIP) {
                 continue;
             }
+            CallManagerHisysevent::ReportCallDropChrEvent(callId, DROP_CALL_BY_EXTERNAL_INVOCATION);
             if (state == CallRunningState::CALL_RUNNING_STATE_RINGING) {
                 ret = RejectCall(callId, false, Str8ToStr16(""));
             } else {
@@ -2397,7 +2415,7 @@ void CallControlManager::HandleThermalLevelChange(int32_t level)
         TELEPHONY_LOGI("No active call exists");
         return;
     }
-    DisconnectAllCalls(false);
+    DisconnectAllCalls(false, true);
     TELEPHONY_LOGI("Terminating all calls due to thermal level");
 }
 

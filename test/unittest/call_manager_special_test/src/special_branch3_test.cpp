@@ -118,6 +118,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_002, TestSize.Lev
     EXPECT_EQ(proxy.SetCallPreferenceMode(0, 0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     std::u16string msg = u"";
     EXPECT_EQ(proxy.CombineConference(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.SetRegMmiCodeCallbackState(true), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.SeparateConference(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.KickOutFromConference(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.ControlCamera(0, msg), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -225,6 +226,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerProxy_001, TestSize.Level1)
     OttCallEventInfo ottInfo;
     EXPECT_EQ(callManagerProxyPtr->ReportOttCallEventInfo(ottInfo), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(callManagerProxyPtr->CloseUnFinishedUssd(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(callManagerProxyPtr->SetRegMmiCodeCallbackState(true), TELEPHONY_ERR_PERMISSION_ERR);
     EXPECT_EQ(callManagerProxyPtr->InputDialerSpecialCode(id), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(callManagerProxyPtr->RemoveMissedIncomingCallNotification(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(callManagerProxyPtr->ReportAudioDeviceInfo(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -240,6 +242,20 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerProxy_001, TestSize.Level1)
     EXPECT_NE(callManagerProxyPtr->SendRttMessage(callId, message), TELEPHONY_SUCCESS);
     EXPECT_NE(callManagerProxyPtr->SetRttCapability(slotId, isEnable), TELEPHONY_SUCCESS);
 #endif
+}
+
+/**
+ * @tc.number   SpecialBranch3Test_CallManagerServiceProxy_SetRegMmiCodeCallbackState_Success
+ * @tc.name     CallManagerServiceProxy_SetRegMmiCodeCallbackState_Success
+ * @tc.desc     With MockRemoteObject, test SetRegMmiCodeCallbackState success path
+ */
+HWTEST_F(SpecialBranch3Test, CallManagerServiceProxy_SetRegMmiCodeCallbackState_Success, TestSize.Level1)
+{
+    sptr<MockRemoteObject> remote = new MockRemoteObject(0);
+    CallManagerServiceProxy proxy(remote);
+    bool boolValue = false;
+    int32_t result = proxy.SetRegMmiCodeCallbackState(boolValue);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 
 /**

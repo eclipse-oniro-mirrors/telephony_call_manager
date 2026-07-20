@@ -16,6 +16,8 @@
 #include "call_setting_ability_connection.h"
 
 #include "telephony_log_wrapper.h"
+#include "call_ability_report_proxy.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -47,6 +49,10 @@ void CallSettingAbilityConnection::OnAbilityConnectDone(const AppExecFwk::Elemen
 void CallSettingAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element,
     int32_t resultCode)
 {
+    auto callAbilityReportProxy = DelayedSingleton<CallAbilityReportProxy>::GetInstance();
+    if (callAbilityReportProxy != nullptr) {
+        callAbilityReportProxy->SetRegMmiCodeCallbackState(false);
+    }
     TELEPHONY_LOGI("OnAbilityDisconnectDone, resultCode = %{public}d", resultCode);
 }
 } // namespace Telephony
