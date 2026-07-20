@@ -86,6 +86,9 @@ void AudioControlManager::UnInit()
         TELEPHONY_LOGE("ring_ is nullptr ignore UnRegisterObserver");
     }
 #endif
+    if (sound_ != nullptr) {
+        sound_->ReleaseRenderer();
+    }
 }
 
 void AudioControlManager::UpdateForegroundLiveCall()
