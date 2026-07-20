@@ -1333,7 +1333,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (CallObjectManager::GetCurrentCallNum() <= 0) {
-        callSuperPrivacyControlManager->RestoreSuperPrivacyMode();
+        callSuperPrivacyControlManager->RestorePrivacyPolicy();
         callControlManager->SetReduceRingToneVolume(false);
     }
     StopCallMotionRecognition(TelCallState::CALL_STATUS_DISCONNECTED);
