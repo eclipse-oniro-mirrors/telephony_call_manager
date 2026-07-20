@@ -94,7 +94,6 @@ HWTEST_F(SuperPrivacyTest, Telephony_GetCurrentPrivacyPolicy, TestSize.Level0)
     system::SetParameter("persist.super_privacy_policy.sensors", "18");
     manager->GetCurrentPrivacyPolicy(policyInfo);
     EXPECT_EQ(policyInfo.superPrivacyMode, SuperPrivacyMode::ALWAYS_ON);
-
 }
 
 /**
