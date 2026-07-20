@@ -49,8 +49,11 @@ public:
         INTERFACE_REPORT_OUTGOING_CALL,
         INTERFACE_SEND_CALL_UI_EVENT_FOR_WINDOW,
         INTERFACE_NOTIFY_VOIP_START,
+        INTERFACE_REPORT_CALL_ATTRIBUTE_CHANGE,
     };
     virtual ~IVoipCallManagerService() = default;
+    virtual int32_t ReportCallAttributeChange(
+        AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason) = 0;
     virtual int32_t ReportIncomingCall(
         AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason) = 0;
     virtual int32_t ReportIncomingCallError(AppExecFwk::PacMap &extras) = 0;
