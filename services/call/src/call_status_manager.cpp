@@ -18,6 +18,7 @@
 #include <securec.h>
 
 #include "antifraud_service.h"
+#include "call_manager_config.h"
 #include "audio_control_manager.h"
 #include "bluetooth_call.h"
 #include "bluetooth_call_connection.h"
@@ -735,11 +736,27 @@ int32_t CallStatusManager::AnsweredVoipCallHandle(const CallDetailInfo &info)
     if (call == nullptr) {
         return ret;
     }
+    if (CallManagerConfig::ShouldHangUpCellularCallBeforeAnswer(info.voipCallInfo.uid)) {
+        HangUpCellularCall();
+    }
     if (DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallStateUpdated(
         call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED)) {
         return TELEPHONY_SUCCESS;
     } else {
         return ret;
+    }
+}
+
+void CallStatusManager::HangUpCellularCall()
+{
+    std::list<int32_t> carrierCallList;
+    GetCarrierCallList(carrierCallList);
+    for (int32_t callId : carrierCallList) {
+        sptr<CallBase> carrierCall = CallObjectManager::GetOneCallObject(callId);
+        if (carrierCall != nullptr) {
+            TELEPHONY_LOGI("hang up carrier call id: %{public}d", callId);
+            carrierCall->HangUpCall();
+        }
     }
 }
 
