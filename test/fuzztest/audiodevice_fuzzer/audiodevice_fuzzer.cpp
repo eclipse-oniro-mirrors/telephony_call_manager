@@ -35,6 +35,7 @@ constexpr int32_t AUDIO_DEVICE_NUM = 6;
 constexpr int32_t AUDIO_EVENT = 30;
 constexpr int32_t AUDIO_SCENE_NUM = 4;
 constexpr int32_t AUDIO_VOLUME_TYPE_NUM = 13;
+constexpr int32_t WAIT_TIME = 2;
 
 void AudioControlManagerFunc(FuzzedDataProvider& provider)
 {
@@ -179,13 +180,15 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
+    FuzzedDataProvider provider(data, size);
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMicStateChangeCallback();
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
-    AudioControlManagerFunc(data, size);
-    AudioDeviceManagerFunc(data, size);
-    AudioProxyFunc(data, size);
-    AudioSceneProcessorFunc(data, size);
+    AudioControlManagerFunc(provider);
+    AudioDeviceManagerFunc(provider);
+    AudioProxyFunc(provider);
+    AudioSceneProcessorFunc(provider);
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 } // namespace OHOS
 
