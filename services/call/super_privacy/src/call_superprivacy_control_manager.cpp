@@ -68,7 +68,7 @@ void CallSuperPrivacyControlManager::ParsePolicyFromParam(SuperPrivacyPolicyInfo
 {
     // 解析格式：低到高为 总开关(4bit)，摄像头(4bit)，麦克风(4bit)，位置(4bit)
     int32_t privacyMode = (valueNum & 0xF);
-    if (privacyMode > 2) {
+    if (privacyMode > static_cast<int32_t>(PrivacySensorState::DISABLED)) {
         TELEPHONY_LOGE("illegal superprivacy mode");
         return;
     }
@@ -76,7 +76,7 @@ void CallSuperPrivacyControlManager::ParsePolicyFromParam(SuperPrivacyPolicyInfo
     const size_t POLICY_SIZE = 3;
     for (size_t i = 0; i < POLICY_SIZE; ++i) {
         int32_t sensorState = ((valueNum >> (4 * (i +1))) & 0xF);
-        if (sensorState > 2) {
+        if (sensorState > static_cast<int32_t>(PrivacySensorState::DISABLED)) {
             TELEPHONY_LOGE("illegal sensor state");
             return;
         }
