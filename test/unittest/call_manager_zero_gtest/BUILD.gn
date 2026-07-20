@@ -574,6 +574,8 @@ ohos_unittest("tel_call_manager_zero_super_privacy_gtest") {
   defines = [
     "TELEPHONY_LOG_TAG = \"CallManagerGtest\"",
     "LOG_DOMAIN = 0xD000F00",
+    "private=public",
+    "protected=public",
   ]
   defines += call_manager_defines
 }
