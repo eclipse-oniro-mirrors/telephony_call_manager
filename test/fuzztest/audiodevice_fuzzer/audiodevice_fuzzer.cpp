@@ -186,8 +186,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     AudioDeviceManagerFunc(data, size);
     AudioProxyFunc(data, size);
     AudioSceneProcessorFunc(data, size);
-    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
-    sleep(WAIT_TIME);
 }
 } // namespace OHOS
 
@@ -197,5 +195,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::AddCallTokenFuzzer token;
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
+    OHOS::DelayedSingleton<AudioControlManager>::DestroyInstance();
     return 0;
 }
