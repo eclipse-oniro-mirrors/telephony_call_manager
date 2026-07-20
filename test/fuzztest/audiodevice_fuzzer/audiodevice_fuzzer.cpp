@@ -83,6 +83,7 @@ void AudioControlManagerFunc(FuzzedDataProvider& provider)
     audioControlManager->IsCurrentRinging();
     audioControlManager->StopRingback();
     audioControlManager->StopWaitingTone();
+    audioControlManager->sound_->ReleaseRenderer();
 }
 
 void AudioDeviceManagerFunc(FuzzedDataProvider& provider)
@@ -165,6 +166,7 @@ void AudioSceneProcessorFunc(FuzzedDataProvider& provider)
     std::string phoneNum = provider.ConsumeRandomLengthString();
 
     audioControlManager->IsNumberAllowed(phoneNum);
+    audioControlManager->sound_->ReleaseRenderer();
     audioSceneProcessor->Init();
     audioSceneProcessor->SwitchDialing();
     audioSceneProcessor->SwitchCS();
@@ -179,15 +181,16 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
-    FuzzedDataProvider provider(data, size);
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMicStateChangeCallback();
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
-    AudioControlManagerFunc(provider);
-    AudioDeviceManagerFunc(provider);
-    AudioProxyFunc(provider);
-    AudioSceneProcessorFunc(provider);
+    AudioControlManagerFunc(data, size);
+    AudioDeviceManagerFunc(data, size);
+    AudioProxyFunc(data, size);
+    AudioSceneProcessorFunc(data, size);
+    DelayedSingleton<AudioControlManager>::GetInstance()->sound_->ReleaseRenderer();
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
+    sleep(WAIT_TIME);
 }
 } // namespace OHOS
 
