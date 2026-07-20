@@ -64,7 +64,7 @@ int32_t BluetoothCallService::AnswerCall()
         videoState = static_cast<VideoStateType>(call->GetOriginalCallType());
     }
     if (callControlManagerPtr_ != nullptr) {
-       auto callSuperPrivacyControlManager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
+        auto callSuperPrivacyControlManager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
         if (callSuperPrivacyControlManager == nullptr) {
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
