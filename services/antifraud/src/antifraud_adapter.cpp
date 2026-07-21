@@ -12,34 +12,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "antifraud_adapter.h"
- 
-#include "anti_fraud_service_client.h"
 #include "telephony_log_wrapper.h"
- 
+
 namespace OHOS {
 namespace Telephony {
 AntiFraudAdapter::AntiFraudAdapter()
 {}
- 
+
 AntiFraudAdapter::~AntiFraudAdapter()
 {}
- 
+
 void* AntiFraudAdapter::GetLibAntiFraud()
 {
     if (libAntiFraud_ != nullptr) {
         return libAntiFraud_;
     }
- 
+
     libAntiFraud_ = dlopen("libanti_fraud_service_client.so", RTLD_LAZY);
     if (libAntiFraud_ == nullptr) {
         TELEPHONY_LOGE("gLibAntiFraud_ is null");
     }
- 
+
     return libAntiFraud_;
 }
- 
+
 void AntiFraudAdapter::ReleaseAntiFraud()
 {
     TELEPHONY_LOGI("ReleaseAntiFraud");
@@ -49,39 +47,40 @@ void AntiFraudAdapter::ReleaseAntiFraud()
     }
 }
 
-int32_t AntiFraudAdapter::CheckAntiFraud(std::string phoneNum)
+int32_t AntiFraudAdapter::AntiFraudDetectCheck(const OHOS::AntiFraudService::AfsDetectType &detectType)
 {
     libAntiFraud_ = GetLibAntiFraud();
     if (libAntiFraud_ == nullptr) {
         return -1;
     }
  
-    PfnAntiFraudVoiceCheck func =
-        reinterpret_cast<PfnAntiFraudVoiceCheck>(dlsym(libAntiFraud_, "AntiFraudVoiceCheck"));
+    PfnAntiFraudDetectCheck func =
+        reinterpret_cast<PfnAntiFraudDetectCheck>(dlsym(libAntiFraud_, "AntiFraudDetectCheck"));
     if (func == nullptr) {
         TELEPHONY_LOGE("func is NULL");
         return -1;
     }
  
-    return func(phoneNum);
+    return func(detectType);
 }
 
-int32_t AntiFraudAdapter::DetectAntiFraud(
-    const std::shared_ptr<OHOS::AntiFraudService::AntiFraudDetectResListener> &listener)
+int32_t AntiFraudAdapter::AntiFraudStartDetect(
+    const std::shared_ptr<OHOS::AntiFraudService::AntiFraudStartDetectResListener> &listener,
+    const OHOS::AntiFraudService::AfsDetectType &detectType)
 {
     libAntiFraud_ = GetLibAntiFraud();
     if (libAntiFraud_ == nullptr) {
         return -1;
     }
- 
-    PfnAntiFraudVoiceDetect func =
-        reinterpret_cast<PfnAntiFraudVoiceDetect>(dlsym(libAntiFraud_, "AntiFraudVoiceDetect"));
+
+    PfnAntiFraudStartDetect func =
+        reinterpret_cast<PfnAntiFraudStartDetect>(dlsym(libAntiFraud_, "AntiFraudStartDetect"));
     if (func == nullptr) {
         TELEPHONY_LOGE("func is NULL");
         return -1;
     }
- 
-    return func(listener);
+
+    return func(listener, detectType);
 }
 
 int32_t AntiFraudAdapter::StopAntiFraud()
@@ -91,14 +90,31 @@ int32_t AntiFraudAdapter::StopAntiFraud()
         return -1;
     }
 
-    PfnStopAntiFraudVoiceDetect func =
-        reinterpret_cast<PfnStopAntiFraudVoiceDetect>(dlsym(libAntiFraud_, "StopAntiFraudVoiceDetect"));
+    PfnAntiFraudStopDetect func =
+        reinterpret_cast<PfnAntiFraudStopDetect>(dlsym(libAntiFraud_, "AntiFraudStopDetect"));
     if (func == nullptr) {
         TELEPHONY_LOGE("func is NULL");
         return -1;
     }
 
     return func();
+}
+
+int32_t AntiFraudAdapter::StopAntiFraudByType(const OHOS::AntiFraudService::AfsDetectType &detectType)
+{
+    libAntiFraud_ = GetLibAntiFraud();
+    if (libAntiFraud_ == nullptr) {
+        return -1;
+    }
+ 
+    PfnAntiFraudStopDetectByType func =
+        reinterpret_cast<PfnAntiFraudStopDetectByType>(dlsym(libAntiFraud_, "AntiFraudStopDetectByType"));
+    if (func == nullptr) {
+        TELEPHONY_LOGE("func is NULL");
+        return -1;
+    }
+ 
+    return func(detectType);
 }
 }
 }

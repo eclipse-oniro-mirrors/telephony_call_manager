@@ -25,6 +25,7 @@
 #include "call_incoming_filter_manager.h"
 #include "time_wait_helper.h"
 #include "voip_call_manager_info.h"
+#include "anti_fraud_service_client_type.h"
 #ifdef SUPPORT_RTT_CALL
 #include "ims_rtt_manager.h"
 #endif
@@ -70,7 +71,7 @@ public:
     void CallFilterCompleteResult(const CallDetailInfo &info);
     int32_t HandleVoipEventReportInfo(const VoipCallEventInfo &info);
     void HandleCeliaCall(sptr<CallBase> &call);
-    void TriggerAntiFraud(int32_t antiFraudState);
+    void TriggerAntiFraud(int32_t antiFraudState, const OHOS::AntiFraudService::AntiFraudResultExt &antiFraudResultExt);
     int32_t GetAntiFraudSlotId();
     int32_t GetAntiFraudIndex();
     static int32_t GetDevProvisioned();
@@ -127,14 +128,21 @@ private:
     void SetAntiFraudSlotId(int32_t slotId);
     void SetAntiFraudIndex(int32_t index);
     void SetupAntiFraudService(const sptr<CallBase> &call, const CallDetailInfo &info);
+    uint32_t GetAntiFraudDetectType(
+        int32_t slotId, const CallDirection callDirection, const VideoStateType videoStateType);
+    uint32_t GetAntiFraudDetectType(int32_t slotId, const CallDirection callDirection);
     void StopAntiFraudDetect(sptr<CallBase> &call, const CallDetailInfo &info);
-    void UpdateAntiFraudState(sptr<CallBase> &call, int32_t antiFraudState);
+    void PauseAntiFraudDetect(sptr<CallBase> &call, const CallDetailInfo &info);
+    void UpdateAntiFraudState(sptr<CallBase> &call, int32_t antiFraudState,
+        const OHOS::AntiFraudService::AntiFraudResultExt &antiFraudResultExt);
     bool IsContactPhoneNum(const std::string &phoneNum);
     void HandleVideoCallInAdvsecMode(const sptr<CallBase> &call, const CallDetailInfo &info);
     bool IsTrustedNumber(MarkType markType, std::string phoneNumber);
     int32_t UpdateDialingCallInfo(const CallDetailInfo &info);
     void SetContactInfo(sptr<CallBase> &call, std::string phoneNum);
     bool SetBluetoothCallContactInfo(sptr<CallBase> &call, ContactInfo &contactInfo, std::string phoneNum);
+    void StartAntiFraudDetectTask(const sptr<CallBase> &call, const CallDetailInfo &info,
+        const std::string &phoneNum, const VideoStateType videoStateType);
     int32_t HandleRejectCall(sptr<CallBase> &call, bool isBlock);
     bool ShouldRejectIncomingCall(sptr<CallBase> &call);
     bool ShouldBlockIncomingCall(const sptr<CallBase> &call, const CallDetailInfo &info);

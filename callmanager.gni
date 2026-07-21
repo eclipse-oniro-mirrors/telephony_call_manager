@@ -27,6 +27,7 @@ call_manager_defines = []
 call_manager_external_deps = []
 
 call_manager_sources = [
+  "${call_manager_path}/services/antifraud/src/afs_detect_type.cpp",
   "${call_manager_path}/services/antifraud/src/anonymize_adapter.cpp",
   "${call_manager_path}/services/antifraud/src/antifraud_adapter.cpp",
   "${call_manager_path}/services/antifraud/src/antifraud_cloud_service.cpp",

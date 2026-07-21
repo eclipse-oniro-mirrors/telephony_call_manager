@@ -253,7 +253,7 @@ bool AntiFraudCloudService::ConnectCloudAsync(const std::string &metaData, const
     }
     HsdrProxy service(remoteObject);
     std::string boundary = GenerateRandomString(BOUNDARY_LENGTH);
-    std::map<std::string, std::string> headers = GenerateHeadersMap(auth, antiFraudResult.text, boundary);
+    std::map<std::string, std::string> headers = GenerateHeadersMap(auth, antiFraudResult.voiceText, boundary);
     std::ostringstream bodyStream;
     bodyStream << "--" << boundary << "\r\n" <<
         "Content-Disposition: form-data; name=\"meta-data\"\r\n" <<
@@ -264,7 +264,7 @@ bool AntiFraudCloudService::ConnectCloudAsync(const std::string &metaData, const
         "Content-Disposition: form-data; name=\"file-data\"; filename=\"file.txt\"\r\n" <<
         "Content-Type: text/plain\r\n" <<
         "\r\n" <<
-        antiFraudResult.text << "\r\n" <<
+        antiFraudResult.voiceText << "\r\n" <<
         "--" << boundary << "--";
     std::string body = bodyStream.str();
     std::string requestJson = GenerateRequestJson(headers, body);

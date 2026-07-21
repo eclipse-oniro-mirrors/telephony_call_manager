@@ -1301,9 +1301,9 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, TestSize.Level0)
 
     std::string switchName = "noswitch";
     EXPECT_FALSE(antiFraudService->IsSwitchOn(switchName));
-    EXPECT_FALSE(antiFraudService->IsSwitchOn(ANTIFRAUD_SWITCH));
+    EXPECT_FALSE(antiFraudService->IsSwitchOn(ANTIFRAUD_SWITCH_VOICE));
 
-    OHOS::AntiFraudService::AntiFraudResult fraudResult;
+    OHOS::AntiFraudService::StartDetectionResult fraudResult;
     std::string phoneNum = "123456";
     antiFraudService->stoppedSlotId_ = 0;
     antiFraudService->stoppedIndex_ = 0;
@@ -1311,18 +1311,21 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, TestSize.Level0)
     EXPECT_EQ(antiFraudService->antiFraudState_, 3);
     antiFraudService->RecordDetectResult(fraudResult, phoneNum, 0, 1);
     EXPECT_EQ(antiFraudService->antiFraudState_, 3);
-    fraudResult.result = true;
+    fraudResult.voiceDetectionResult.result = true;
     antiFraudService->RecordDetectResult(fraudResult, phoneNum, 1, 0);
     EXPECT_EQ(antiFraudService->antiFraudState_, 2);
     antiFraudService->RecordDetectResult(fraudResult, phoneNum, 0, 0);
     EXPECT_EQ(antiFraudService->stoppedIndex_, -1);
 
-    EXPECT_NE(antiFraudService->CheckAntiFraudService(phoneNum, 0, 0), 0);
-    EXPECT_NE(antiFraudService->StartAntiFraudService(phoneNum, 0, 0), 0);
+    OHOS::AntiFraudService::AfsDetectType detectType;
+    detectType.type_ = 0;
+    detectType.isFirstTime_ = true;
+    detectType.callNum_ = phoneNum;
+    detectType.voiceType_ = 0;
+    EXPECT_NE(antiFraudService->StartAntiFraudService(phoneNum, 0, 0, detectType), 0);
     EXPECT_NE(antiFraudService->StopAntiFraudService(0, 0), 0);
 
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
-    antiFraudAdapter->DetectAntiFraud(nullptr);
     antiFraudAdapter->ReleaseAntiFraud();
     EXPECT_EQ(antiFraudAdapter->libAntiFraud_, nullptr);
 }
@@ -1396,6 +1399,462 @@ HWTEST_F(CallManagerGtest, AudioPlayerTest, TestSize.Level1)
     AudioStandard::AudioStreamType streamType = AudioStandard::AudioStreamType::STREAM_VOICE_RING;
     PlayerType playerType = PlayerType::TYPE_RING;
     EXPECT_NE(audioPlayer->Play(path, streamType, playerType), 0);
+}
+
+/**
+ * @tc.number   Telephony_AntiFraudService_SetCallStatusManager_0100
+ * @tc.name     Test AntiFraudService SetCallStatusManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudService_SetCallStatusManager_0100, TestSize.Level0)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    antiFraudService->SetCallStatusManager(callStatusManager);
+    EXPECT_NE(antiFraudService->callStatusManagerPtr_, nullptr);
+    antiFraudService->SetCallStatusManager(nullptr);
+    EXPECT_EQ(antiFraudService->callStatusManagerPtr_, nullptr);
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudService_CheckAntiFraudService_0100
+ * @tc.name     Test AntiFraudService CheckAntiFraudService with null lib
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudService_CheckAntiFraudService_0100, TestSize.Level0)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
+    antiFraudAdapter->ReleaseAntiFraud();
+    OHOS::AntiFraudService::AfsDetectType detectType;
+    detectType.type_ = 0;
+    detectType.isFirstTime_ = true;
+    detectType.callNum_ = "123456";
+    detectType.voiceType_ = 0;
+    int32_t ret = antiFraudService->CheckAntiFraudService(detectType);
+    EXPECT_NE(ret, 0);
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudService_StoppedSlotIdIndex_0100
+ * @tc.name     Test AntiFraudService GetStoppedSlotId/GetStoppedIndex/SetStoppedSlotId/SetStoppedIndex
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudService_StoppedSlotIdIndex_0100, TestSize.Level0)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    antiFraudService->SetStoppedSlotId(0);
+    EXPECT_EQ(antiFraudService->GetStoppedSlotId(), 0);
+    antiFraudService->SetStoppedSlotId(1);
+    EXPECT_EQ(antiFraudService->GetStoppedSlotId(), 1);
+    antiFraudService->SetStoppedSlotId(-1);
+    EXPECT_EQ(antiFraudService->GetStoppedSlotId(), -1);
+ 
+    antiFraudService->SetStoppedIndex(0);
+    EXPECT_EQ(antiFraudService->GetStoppedIndex(), 0);
+    antiFraudService->SetStoppedIndex(1);
+    EXPECT_EQ(antiFraudService->GetStoppedIndex(), 1);
+    antiFraudService->SetStoppedIndex(-1);
+    EXPECT_EQ(antiFraudService->GetStoppedIndex(), -1);
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudService_AddRuleToConfig_0100
+ * @tc.name     Test AntiFraudService AddRuleToConfig
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudService_AddRuleToConfig_0100, TestSize.Level0)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    auto anonymizeAdapter = DelayedSingleton<AnonymizeAdapter>::GetInstance();
+    anonymizeAdapter->ReleaseLibAnonymize();
+    void *config = nullptr;
+    antiFraudService->AddRuleToConfig("PRC", config);
+    antiFraudService->AddRuleToConfig("CHINA_RESIDENT_PASSPORT", config);
+    antiFraudService->AddRuleToConfig("MILITARY_IDENTITY_CARD_NUMBER", config);
+    antiFraudService->AddRuleToConfig("BANK_CARD_NUMBER", config);
+    antiFraudService->AddRuleToConfig("PERMIT_LAND_TO_HM", config);
+    antiFraudService->AddRuleToConfig("PERMIT_LAND_TO_TW", config);
+    antiFraudService->AddRuleToConfig("PERMIT_HM_TO_LAND", config);
+    antiFraudService->AddRuleToConfig("PERMIT_TW_TO_LAND", config);
+    antiFraudService->AddRuleToConfig("BIRTH_CERTIFICATE", config);
+    antiFraudService->AddRuleToConfig("SEAFARER_PASSPORT", config);
+    antiFraudService->AddRuleToConfig("POLICE_OFFICER_CARD", config);
+    antiFraudService->SetStoppedIndex(-1);
+    EXPECT_EQ(antiFraudService->GetStoppedIndex(), -1);
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudAdapter_AntiFraudDetectCheck_0100
+ * @tc.name     Test AntiFraudAdapter AntiFraudDetectCheck with null lib
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudAdapter_AntiFraudDetectCheck_0100, TestSize.Level0)
+{
+    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
+    antiFraudAdapter->ReleaseAntiFraud();
+    OHOS::AntiFraudService::AfsDetectType detectType;
+    detectType.type_ = 0;
+    detectType.isFirstTime_ = true;
+    detectType.callNum_ = "123456";
+    detectType.voiceType_ = 0;
+    int32_t ret = antiFraudAdapter->AntiFraudDetectCheck(detectType);
+    EXPECT_NE(ret, 0);
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudAdapter_AntiFraudStartDetect_0100
+ * @tc.name     Test AntiFraudAdapter AntiFraudStartDetect with null lib
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudAdapter_AntiFraudStartDetect_0100, TestSize.Level0)
+{
+    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
+    antiFraudAdapter->ReleaseAntiFraud();
+    OHOS::AntiFraudService::AfsDetectType detectType;
+    detectType.type_ = 0;
+    detectType.isFirstTime_ = true;
+    detectType.callNum_ = "123456";
+    detectType.voiceType_ = 0;
+    auto listener = std::make_shared<AntiFraudService::AntiFraudStartDetectResListenerImpl>("123456", 0, 0);
+    int32_t ret = antiFraudAdapter->AntiFraudStartDetect(listener, detectType);
+    EXPECT_NE(ret, 0);
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudAdapter_StopAntiFraud_0100
+ * @tc.name     Test AntiFraudAdapter StopAntiFraud with null lib
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudAdapter_StopAntiFraud_0100, TestSize.Level0)
+{
+    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
+    antiFraudAdapter->ReleaseAntiFraud();
+    int32_t ret = antiFraudAdapter->StopAntiFraud();
+    EXPECT_NE(ret, 0);
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudStartDetectResListener_HandleResListener_0100
+ * @tc.name     Test AntiFraudStartDetectResListener HandleResListener with StartDetectionResult
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudStartDetectResListener_HandleResListener_0100, TestSize.Level0)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    antiFraudService->SetCallStatusManager(callStatusManager);
+    antiFraudService->antiFraudState_ = 0;
+    antiFraudService->stoppedSlotId_ = -1;
+    antiFraudService->stoppedIndex_ = -1;
+ 
+    auto listener = std::make_shared<AntiFraudService::AntiFraudStartDetectResListenerImpl>("123456", 0, 1);
+    OHOS::AntiFraudService::StartDetectionResult detectionResult;
+    detectionResult.voiceDetectionResult.result = false;
+    detectionResult.speechSynthesisResult.result = false;
+    detectionResult.voipCallTransferResult.result = false;
+    OHOS::AntiFraudService::ListenerResult listenerResult = detectionResult;
+    listener->HandleResListener(listenerResult);
+    EXPECT_EQ(antiFraudService->antiFraudState_,
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED));
+ 
+    antiFraudService->SetCallStatusManager(nullptr);
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudStartDetectResListener_HandleAntiFraudStartDetectRes_0100
+ * @tc.name     Test HandleAntiFraudStartDetectRes with fraud result
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudStartDetectResListener_HandleAntiFraudStartDetectRes_0100,
+    TestSize.Level0)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    antiFraudService->SetCallStatusManager(callStatusManager);
+    antiFraudService->antiFraudState_ = 0;
+    antiFraudService->stoppedSlotId_ = -1;
+    antiFraudService->stoppedIndex_ = -1;
+ 
+    auto listener = std::make_shared<AntiFraudService::AntiFraudStartDetectResListenerImpl>("123456", 0, 1);
+    OHOS::AntiFraudService::StartDetectionResult detectionResult;
+    detectionResult.voiceDetectionResult.result = true;
+    detectionResult.speechSynthesisResult.result = false;
+    detectionResult.voipCallTransferResult.result = false;
+    listener->HandleAntiFraudStartDetectRes(detectionResult);
+    EXPECT_EQ(antiFraudService->antiFraudState_,
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK));
+ 
+    antiFraudService->SetCallStatusManager(nullptr);
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudStartDetectResListener_HandleAntiFraudStartDetectRes_0200
+ * @tc.name     Test HandleAntiFraudStartDetectRes with not fraud result
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudStartDetectResListener_HandleAntiFraudStartDetectRes_0200,
+    TestSize.Level0)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    antiFraudService->SetCallStatusManager(callStatusManager);
+    antiFraudService->antiFraudState_ = 0;
+    antiFraudService->stoppedSlotId_ = -1;
+    antiFraudService->stoppedIndex_ = -1;
+ 
+    auto listener = std::make_shared<AntiFraudService::AntiFraudStartDetectResListenerImpl>("123456", 0, 1);
+    OHOS::AntiFraudService::StartDetectionResult detectionResult;
+    detectionResult.voiceDetectionResult.result = false;
+    detectionResult.speechSynthesisResult.result = false;
+    detectionResult.voipCallTransferResult.result = false;
+    listener->HandleAntiFraudStartDetectRes(detectionResult);
+    EXPECT_EQ(antiFraudService->antiFraudState_,
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED));
+ 
+    antiFraudService->SetCallStatusManager(nullptr);
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudStartDetectResListener_HandleAntiFraudStartDetectRes_0300
+ * @tc.name     Test HandleAntiFraudStartDetectRes with speech synthesis fraud
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudStartDetectResListener_HandleAntiFraudStartDetectRes_0300,
+    TestSize.Level0)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    antiFraudService->SetCallStatusManager(callStatusManager);
+    antiFraudService->antiFraudState_ = 0;
+    antiFraudService->stoppedSlotId_ = -1;
+    antiFraudService->stoppedIndex_ = -1;
+ 
+    auto listener = std::make_shared<AntiFraudService::AntiFraudStartDetectResListenerImpl>("123456", 0, 1);
+    OHOS::AntiFraudService::StartDetectionResult detectionResult;
+    detectionResult.voiceDetectionResult.result = false;
+    detectionResult.speechSynthesisResult.result = true;
+    detectionResult.speechSynthesisResult.pvalue = 0.95f;
+    detectionResult.voipCallTransferResult.result = false;
+    listener->HandleAntiFraudStartDetectRes(detectionResult);
+    EXPECT_EQ(antiFraudService->antiFraudState_,
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK));
+    EXPECT_TRUE(antiFraudService->antiFraudResultExt_.isSpeechSynthesisFraud);
+ 
+    antiFraudService->SetCallStatusManager(nullptr);
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudStartDetectResListener_HandleAntiFraudStartDetectRes_0400
+ * @tc.name     Test HandleAntiFraudStartDetectRes with xoip fraud
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudStartDetectResListener_HandleAntiFraudStartDetectRes_0400,
+    TestSize.Level0)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    antiFraudService->SetCallStatusManager(callStatusManager);
+    antiFraudService->antiFraudState_ = 0;
+    antiFraudService->stoppedSlotId_ = -1;
+    antiFraudService->stoppedIndex_ = -1;
+ 
+    auto listener = std::make_shared<AntiFraudService::AntiFraudStartDetectResListenerImpl>("123456", 0, 1);
+    OHOS::AntiFraudService::StartDetectionResult detectionResult;
+    detectionResult.voiceDetectionResult.result = false;
+    detectionResult.speechSynthesisResult.result = false;
+    detectionResult.voipCallTransferResult.result = true;
+    listener->HandleAntiFraudStartDetectRes(detectionResult);
+    EXPECT_EQ(antiFraudService->antiFraudState_,
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK));
+    EXPECT_TRUE(antiFraudService->antiFraudResultExt_.isXoipFraud);
+ 
+    antiFraudService->SetCallStatusManager(nullptr);
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudStartDetectResListener_HandleAntiFraudStartDetectRes_0500
+ * @tc.name     Test HandleAntiFraudStartDetectRes with stopped slot
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudStartDetectResListener_HandleAntiFraudStartDetectRes_0500,
+    TestSize.Level0)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    antiFraudService->stoppedSlotId_ = 0;
+    antiFraudService->stoppedIndex_ = 1;
+    antiFraudService->antiFraudState_ = 0;
+ 
+    auto listener = std::make_shared<AntiFraudService::AntiFraudStartDetectResListenerImpl>("123456", 0, 1);
+    OHOS::AntiFraudService::StartDetectionResult detectionResult;
+    detectionResult.voiceDetectionResult.result = true;
+    detectionResult.speechSynthesisResult.result = false;
+    detectionResult.voipCallTransferResult.result = false;
+    listener->HandleAntiFraudStartDetectRes(detectionResult);
+    EXPECT_EQ(antiFraudService->stoppedSlotId_, -1);
+    EXPECT_EQ(antiFraudService->stoppedIndex_, -1);
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudService_RecordDetectResult_0200
+ * @tc.name     Test RecordDetectResult with voice text
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudService_RecordDetectResult_0200, TestSize.Level0)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    antiFraudService->SetCallStatusManager(callStatusManager);
+    antiFraudService->antiFraudState_ = 0;
+    antiFraudService->stoppedSlotId_ = -1;
+    antiFraudService->stoppedIndex_ = -1;
+ 
+    OHOS::AntiFraudService::StartDetectionResult fraudResult;
+    fraudResult.voiceDetectionResult.result = true;
+    fraudResult.voiceDetectionResult.voiceText = "hello this is a test voice text";
+    fraudResult.speechSynthesisResult.result = false;
+    fraudResult.voipCallTransferResult.result = false;
+    std::string phoneNum = "123456";
+    antiFraudService->RecordDetectResult(fraudResult, phoneNum, 0, 1);
+    EXPECT_EQ(antiFraudService->antiFraudState_,
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK));
+    EXPECT_EQ(antiFraudService->fraudDetectText_, "hello this is a test voice text");
+ 
+    antiFraudService->SetCallStatusManager(nullptr);
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudService_StartAntiFraudService_0200
+ * @tc.name     Test StartAntiFraudService when state is RISK
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudService_StartAntiFraudService_0200, TestSize.Level0)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    antiFraudService->antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK);
+    OHOS::AntiFraudService::AfsDetectType detectType;
+    detectType.type_ = 0;
+    detectType.isFirstTime_ = true;
+    detectType.callNum_ = "123456";
+    detectType.voiceType_ = 0;
+    int32_t ret = antiFraudService->StartAntiFraudService("123456", 0, 1, detectType);
+    EXPECT_NE(ret, 0);
+    antiFraudService->antiFraudState_ = 0;
+}
+ 
+/**
+ * @tc.number   Telephony_AntiFraudService_StartAntiFraudService_0300
+ * @tc.name     Test StartAntiFraudService when state is NOT_RISK_OR_STOPPED
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudService_StartAntiFraudService_0300, TestSize.Level0)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    antiFraudService->antiFraudState_ =
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED);
+    OHOS::AntiFraudService::AfsDetectType detectType;
+    detectType.type_ = 0;
+    detectType.isFirstTime_ = true;
+    detectType.callNum_ = "123456";
+    detectType.voiceType_ = 0;
+    int32_t ret = antiFraudService->StartAntiFraudService("123456", 0, 1, detectType);
+    EXPECT_NE(ret, 0);
+    antiFraudService->antiFraudState_ = 0;
+}
+ 
+/**
+ * @tc.number   Telephony_CallStatusManager_AntiFraudSlotIdIndex_0100
+ * @tc.name     Test CallStatusManager GetAntiFraudSlotId/GetAntiFraudIndex/SetAntiFraudSlotId/SetAntiFraudIndex
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallStatusManager_AntiFraudSlotIdIndex_0100, TestSize.Level0)
+{
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    EXPECT_EQ(callStatusManager->GetAntiFraudSlotId(), -1);
+    EXPECT_EQ(callStatusManager->GetAntiFraudIndex(), -1);
+ 
+    callStatusManager->SetAntiFraudSlotId(0);
+    EXPECT_EQ(callStatusManager->GetAntiFraudSlotId(), 0);
+    callStatusManager->SetAntiFraudIndex(1);
+    EXPECT_EQ(callStatusManager->GetAntiFraudIndex(), 1);
+ 
+    callStatusManager->SetAntiFraudSlotId(-1);
+    callStatusManager->SetAntiFraudIndex(-1);
+    EXPECT_EQ(callStatusManager->GetAntiFraudSlotId(), -1);
+    EXPECT_EQ(callStatusManager->GetAntiFraudIndex(), -1);
+}
+ 
+/**
+ * @tc.number   Telephony_CallStatusManager_TriggerAntiFraud_0100
+ * @tc.name     Test CallStatusManager TriggerAntiFraud with invalid slotId
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallStatusManager_TriggerAntiFraud_0100, TestSize.Level0)
+{
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    callStatusManager->SetAntiFraudSlotId(-1);
+    OHOS::AntiFraudService::AntiFraudResultExt antiFraudResultExt;
+    callStatusManager->TriggerAntiFraud(
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_STARTED), antiFraudResultExt);
+    EXPECT_EQ(callStatusManager->GetAntiFraudSlotId(), -1);
+    callStatusManager->SetAntiFraudSlotId(2);
+    callStatusManager->TriggerAntiFraud(
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_STARTED), antiFraudResultExt);
+    EXPECT_EQ(callStatusManager->GetAntiFraudSlotId(), 2);
+    callStatusManager->SetAntiFraudSlotId(0);
+    callStatusManager->SetAntiFraudIndex(1);
+    callStatusManager->TriggerAntiFraud(
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK), antiFraudResultExt);
+    EXPECT_EQ(callStatusManager->GetAntiFraudSlotId(), -1);
+    EXPECT_EQ(callStatusManager->GetAntiFraudIndex(), -1);
+    callStatusManager->SetAntiFraudSlotId(0);
+    callStatusManager->SetAntiFraudIndex(1);
+    callStatusManager->TriggerAntiFraud(
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED), antiFraudResultExt);
+    EXPECT_EQ(callStatusManager->GetAntiFraudSlotId(), -1);
+    EXPECT_EQ(callStatusManager->GetAntiFraudIndex(), -1);
+    callStatusManager->SetAntiFraudSlotId(0);
+    callStatusManager->SetAntiFraudIndex(1);
+    callStatusManager->TriggerAntiFraud(
+        static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_DEFAULT), antiFraudResultExt);
+    EXPECT_EQ(callStatusManager->GetAntiFraudSlotId(), 0);
+    EXPECT_EQ(callStatusManager->GetAntiFraudIndex(), 1);
+    callStatusManager->SetAntiFraudSlotId(-1);
+    callStatusManager->SetAntiFraudIndex(-1);
+}
+ 
+/**
+ * @tc.number   Telephony_CallStatusManager_IsContactPhoneNum_0100
+ * @tc.name     Test CallStatusManager IsContactPhoneNum with unknown number
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallStatusManager_IsContactPhoneNum_0100, TestSize.Level0)
+{
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    bool result = callStatusManager->IsContactPhoneNum("0000000000");
+    EXPECT_FALSE(result);
+    result = callStatusManager->IsContactPhoneNum("");
+    EXPECT_FALSE(result);
+}
+ 
+/**
+ * @tc.number   Telephony_CallStatusManager_GetAntiFraudDetectType_0100
+ * @tc.name     Test CallStatusManager GetAntiFraudDetectType
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallStatusManager_GetAntiFraudDetectType_0100, TestSize.Level0)
+{
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    CallDirection callDirection = CallDirection::CALL_DIRECTION_OUT;
+    VideoStateType videoStateType = VideoStateType::TYPE_VOICE;
+    uint32_t type = callStatusManager->GetAntiFraudDetectType(0, callDirection, videoStateType);
+    EXPECT_EQ(type, OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_VOICE_SEMANTIC |
+        OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_SPEECH_SYNTHESIS);
+    callDirection = CallDirection::CALL_DIRECTION_IN;
+    type = callStatusManager->GetAntiFraudDetectType(0, callDirection, videoStateType);
+    EXPECT_EQ(type, OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_VOICE_SEMANTIC |
+        OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_SPEECH_SYNTHESIS |
+        OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_XOIP_TRANSFER);
 }
 } // namespace Telephony
 } // namespace OHOS

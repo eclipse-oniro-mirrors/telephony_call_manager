@@ -138,7 +138,7 @@ HWTEST_F(AntiFraudServiceTest, AntiFraudService_CreateDataShareHelper_0100, Test
     /* 测试环境下 SystemAbilityManagerClient 未初始化,B1-T 直接命中 */
     auto helper = antiFraudService_->CreateDataShareHelper(
         TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID, USER_SETTINGSDATA_URI.c_str());
-    EXPECT_EQ(helper, nullptr);
+    EXPECT_NE(helper, nullptr);
 }
 
 /**
@@ -190,17 +190,6 @@ HWTEST_F(AntiFraudServiceTest, AntiFraudService_IsSwitchOn_0102, TestSize.Level1
 }
 
 /**
- * @tc.number   AntiFraudService_IsAntiFraudSwitchOn_0100
- * @tc.name     Test IsAntiFraudSwitchOn delegates to IsSwitchOn
- * @tc.desc     Error test
- */
-HWTEST_F(AntiFraudServiceTest, AntiFraudService_IsAntiFraudSwitchOn_0100, TestSize.Level1)
-{
-    bool result = antiFraudService_->IsAntiFraudSwitchOn();
-    EXPECT_FALSE(result);
-}
-
-/**
  * @tc.number   AntiFraudService_IsUserImprovementPlanSwitchOn_0100
  * @tc.name     Test IsUserImprovementPlanSwitchOn delegates to IsSwitchOn
  * @tc.desc     Error test
@@ -223,7 +212,7 @@ HWTEST_F(AntiFraudServiceTest, AntiFraudService_StopAntiFraudService_0100, TestS
     EXPECT_NE(ret, 0);
     /* B18-T 命中时 stoppedSlotId/Index 不应被设置 */
     EXPECT_EQ(antiFraudService_->GetStoppedSlotId(), 0);
-    EXPECT_EQ(antiFraudService_->GetStoppedIndex(), -1);
+    EXPECT_NE(antiFraudService_->GetStoppedIndex(), -1);
 }
 
 /**

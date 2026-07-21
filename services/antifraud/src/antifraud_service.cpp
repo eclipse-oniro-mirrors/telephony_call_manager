@@ -12,32 +12,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "antifraud_service.h"
 
 #include <string>
 #include "antifraud_adapter.h"
 #include "anonymize_adapter.h"
 #include "antifraud_cloud_service.h"
-#include "anti_fraud_service_client.h"
 #include "common_type.h"
 #include "hitrace/tracechain.h"
 #include "telephony_log_wrapper.h"
 #include "iservice_registry.h"
- 
+
 namespace OHOS {
 namespace Telephony {
+constexpr const int32_t MAX_VOICE_TEXT_LENGTH = 1000;
 AntiFraudService::AntiFraudService()
 {}
- 
+
 AntiFraudService::~AntiFraudService()
 {}
- 
+
 void AntiFraudService::SetCallStatusManager(std::shared_ptr<CallStatusManager> callStatusManager)
 {
     callStatusManagerPtr_ = callStatusManager;
 }
- 
+
 std::shared_ptr<DataShare::DataShareHelper> AntiFraudService::CreateDataShareHelper(
     int32_t systemAbilityId, const char *uri)
 {
@@ -53,7 +53,7 @@ std::shared_ptr<DataShare::DataShareHelper> AntiFraudService::CreateDataShareHel
     }
     return DataShare::DataShareHelper::Creator(remoteObj, uri);
 }
- 
+
 bool AntiFraudService::IsSwitchOn(const std::string switchName)
 {
     auto settingHelper = CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID,
@@ -62,7 +62,7 @@ bool AntiFraudService::IsSwitchOn(const std::string switchName)
         TELEPHONY_LOGE("settingHelper is null");
         return false;
     }
- 
+
     DataShare::DataSharePredicates predicates;
     std::vector<std::string> columns;
     std::string keyword = "KEYWORD";
@@ -74,7 +74,7 @@ bool AntiFraudService::IsSwitchOn(const std::string switchName)
         settingHelper->Release();
         return false;
     }
- 
+
     result->GoToFirstRow();
     int32_t columnIndex;
     std::string resultValue;
@@ -84,37 +84,45 @@ bool AntiFraudService::IsSwitchOn(const std::string switchName)
     result->Close();
     settingHelper->Release();
     if (resultValue.empty()) {
-        TELEPHONY_LOGE("resultValue is empty");
+        if (switchName == ANTIFRAUD_CONTACTS_ENABLED_VOICE || switchName == ANTIFRAUD_CONTACTS_ENABLED_VIDEO) {
+            return true;
+        }
         return false;
     }
- 
-    TELEPHONY_LOGI("Query end resultValue is %{public}s", resultValue.c_str());
-    int32_t value = atoi(resultValue.c_str());
-    if (value == 1) {
+
+    TELEPHONY_LOGI("Antifraud switch: %{public}s query end, the result value is %{public}s",
+        switchName.c_str(), resultValue.c_str());
+    if (resultValue == "1" || resultValue == "true") {
         return true;
     } else {
         return false;
     }
 }
- 
-bool AntiFraudService::IsAntiFraudSwitchOn()
+
+bool AntiFraudService::IsAntiFraudSwitchOn(const VideoStateType videoStateType)
 {
-    return IsSwitchOn(ANTIFRAUD_SWITCH);
+    if (videoStateType == VideoStateType::TYPE_VIDEO) {
+        return IsSwitchOn(ANTIFRAUD_SWITCH_VIDEO);
+    }
+    return IsSwitchOn(ANTIFRAUD_SWITCH_VOICE);
 }
- 
+
+bool AntiFraudService::IsAntiFraudContactsEnabled(const VideoStateType videoStateType)
+{
+    if (videoStateType == VideoStateType::TYPE_VIDEO) {
+        return IsSwitchOn(ANTIFRAUD_CONTACTS_ENABLED_VIDEO);
+    }
+    return IsSwitchOn(ANTIFRAUD_CONTACTS_ENABLED_VOICE);
+}
+
 bool AntiFraudService::IsUserImprovementPlanSwitchOn()
 {
     return IsSwitchOn(USER_IMPROPLAN_SWITCH);
 }
- 
+
 void AntiFraudService::InitParams()
 {
-    fraudDetectErr_ = 0;
-    isResultFraud_ = false;
-    fraudDetectVersion_ = 0;
-    fraudDetectType_ = 0;
     fraudDetectText_ = "";
-    fraudDetectProb_ = 0.0;
     antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_DEFAULT);
 }
 
@@ -142,8 +150,8 @@ void AntiFraudService::SetStoppedIndex(int32_t index)
     stoppedIndex_ = index;
 }
 
-void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult,
-                                          std::string resultPhoneNum, int32_t resultSlotId, int32_t resultIndex)
+void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::StartDetectionResult &antiFraudResult,
+    std::string resultPhoneNum, int32_t resultSlotId, int32_t resultIndex)
 {
     if (GetStoppedSlotId() == resultSlotId && GetStoppedIndex() == resultIndex) {
         TELEPHONY_LOGI("detect stopped, no need to record result");
@@ -153,41 +161,43 @@ void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFrau
     }
 
     std::lock_guard<ffrt::mutex> lock(fraudMutex_);
-    fraudDetectErr_ = antiFraudResult.errCode;
-    isResultFraud_ = antiFraudResult.result;
-    fraudDetectVersion_ = antiFraudResult.modelVersion;
-    fraudDetectType_ = antiFraudResult.fraudType;
-    fraudDetectText_ = antiFraudResult.text;
-    fraudDetectProb_ = antiFraudResult.pvalue;
+    antiFraudResultExt_.isVoiceSemanticFraud = antiFraudResult.voiceDetectionResult.result;
+    antiFraudResultExt_.isSpeechSynthesisFraud = antiFraudResult.speechSynthesisResult.result;
+    antiFraudResultExt_.speechSynthesisProb = antiFraudResult.speechSynthesisResult.pvalue;
+    antiFraudResultExt_.isXoipFraud = antiFraudResult.voipCallTransferResult.result;
+    if (!antiFraudResult.voiceDetectionResult.voiceText.empty() &&
+        antiFraudResult.voiceDetectionResult.voiceText.length() <= MAX_VOICE_TEXT_LENGTH) {
+        fraudDetectText_ = antiFraudResult.voiceDetectionResult.voiceText;
+    }
 
-    if (isResultFraud_) {
+    if (antiFraudResultExt_.isVoiceSemanticFraud || antiFraudResultExt_.isSpeechSynthesisFraud ||
+        antiFraudResultExt_.isXoipFraud) {
         TELEPHONY_LOGI("AntiFraud detect finish, is fraud call");
         antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK);
     } else {
         TELEPHONY_LOGI("AntiFraud detect finish, is not fraud call");
-        antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED);
+        antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_NOT_RISK_OR_STOPPED);
     }
     if (callStatusManagerPtr_ != nullptr) {
-        callStatusManagerPtr_->TriggerAntiFraud(antiFraudState_);
+        callStatusManagerPtr_->TriggerAntiFraud(antiFraudState_, antiFraudResultExt_);
     }
 
-    if (isResultFraud_ && IsUserImprovementPlanSwitchOn()) {
+    if (antiFraudResultExt_.isVoiceSemanticFraud && IsUserImprovementPlanSwitchOn()) {
         TELEPHONY_LOGI("text reported to the cloud after anonymize");
         int ret = AnonymizeText();
         if (ret != 0) {
             TELEPHONY_LOGE("Anonymize text fail");
             return;
         }
-        OHOS::AntiFraudService::AntiFraudResult fraudResult = antiFraudResult;
-        fraudResult.text = fraudDetectText_;
+        OHOS::AntiFraudService::AntiFraudResult fraudResult = antiFraudResult.voiceDetectionResult;
         std::make_shared<AntiFraudCloudService>(resultPhoneNum)->UploadPostRequest(fraudResult);
     }
 }
 
-int32_t AntiFraudService::CheckAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index)
+int32_t AntiFraudService::CheckAntiFraudService(const OHOS::AntiFraudService::AfsDetectType &detectType)
 {
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
-    int32_t antiFraudErrCode = antiFraudAdapter->CheckAntiFraud(phoneNum);
+    int32_t antiFraudErrCode = antiFraudAdapter->AntiFraudDetectCheck(detectType);
     if (antiFraudErrCode != 0) {
         TELEPHONY_LOGE("Check AntiFraud, no need to detect, ErrCode:%{public}d", antiFraudErrCode);
         return antiFraudErrCode;
@@ -195,16 +205,17 @@ int32_t AntiFraudService::CheckAntiFraudService(const std::string &phoneNum, int
     return 0;
 }
 
-int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index)
+int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index,
+    const OHOS::AntiFraudService::AfsDetectType &detectType)
 {
-    int32_t antiFraudErrCode = CheckAntiFraudService(phoneNum, slotId, index);
+    int32_t antiFraudErrCode = CheckAntiFraudService(detectType);
     if (antiFraudErrCode != 0) {
         return antiFraudErrCode;
     }
     if (callStatusManagerPtr_ != nullptr) {
         if (callStatusManagerPtr_->GetAntiFraudSlotId() != slotId ||
             callStatusManagerPtr_->GetAntiFraudIndex() != index) {
-            TELEPHONY_LOGI("call ending, no need to detect");
+            TELEPHONY_LOGI("call ending, no need to antifraud detect");
             return -1;
         }
     }
@@ -214,20 +225,29 @@ int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int
             OHOS::HiviewDFX::HiTraceChain::Begin("StartAntiFraudService", HiTraceFlag::HITRACE_FLAG_INCLUDE_ASYNC);
     }
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
-    auto listener = std::make_shared<AntiFraudDetectResListenerImpl>(phoneNum, slotId, index);
-    antiFraudErrCode = antiFraudAdapter->DetectAntiFraud(listener);
+    auto listener = std::make_shared<AntiFraudStartDetectResListenerImpl>(phoneNum, slotId, index);
+    antiFraudErrCode = antiFraudAdapter->AntiFraudStartDetect(listener, detectType);
     if (antiFraudErrCode != 0) {
-        TELEPHONY_LOGE("Detect AntiFraud failed, ErrCode=%{public}d", antiFraudErrCode);
+        TELEPHONY_LOGE("AntiFraudStartDetect failed, ErrCode=%{public}d", antiFraudErrCode);
         return antiFraudErrCode;
     }
     TELEPHONY_LOGI("AntiFraud begin detect, slotId=%{public}d, index=%{public}d", slotId, index);
     std::lock_guard<ffrt::mutex> lock(fraudMutex_);
     antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_STARTED);
     if (callStatusManagerPtr_ != nullptr) {
-        callStatusManagerPtr_->TriggerAntiFraud(antiFraudState_);
+        callStatusManagerPtr_->TriggerAntiFraud(antiFraudState_, antiFraudResultExt_);
     }
     InitParams();
     return 0;
+}
+
+void AntiFraudService::UpdateVideoState(VideoStateType priorVideoState, VideoStateType nextVideoState)
+{
+    if (priorVideoState == VideoStateType::TYPE_VOICE && nextVideoState == VideoStateType::TYPE_VIDEO) {
+        OHOS::AntiFraudService::AfsDetectType detectType(
+            OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_XOIP_TRANSFER, false, "", 0);
+        StopAntiFraudDetectByType(detectType);
+    }
 }
 
 int32_t AntiFraudService::StopAntiFraudService(int32_t slotId, int32_t index)
@@ -244,16 +264,33 @@ int32_t AntiFraudService::StopAntiFraudService(int32_t slotId, int32_t index)
     return 0;
 }
 
-void AntiFraudService::AntiFraudDetectResListenerImpl::HandleAntiFraudDetectRes(
-    const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult)
+int32_t AntiFraudService::StopAntiFraudDetectByType(const OHOS::AntiFraudService::AfsDetectType &detectType)
 {
-    std::string resultPhoneNum = phoneNum_;
-    int32_t resultSlotId = slotId_;
-    int32_t resultIndex = index_;
-    TELEPHONY_LOGI("HandleAntiFraudDetectRes, result=%{public}d, slotId=%{public}d, index=%{public}d",
-        antiFraudResult.result, slotId_, index_);
-    DelayedSingleton<AntiFraudService>::GetInstance()->
-        RecordDetectResult(antiFraudResult, resultPhoneNum, resultSlotId, resultIndex);
+    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
+    if (antiFraudAdapter == nullptr) {
+        return -1;
+    }
+    int32_t antiFraudErrCode = antiFraudAdapter->StopAntiFraudByType(detectType);
+    if (antiFraudErrCode != 0) {
+        TELEPHONY_LOGE("Stop AntiFraud by type failed, ErrCode=%{public}d", antiFraudErrCode);
+        return antiFraudErrCode;
+    }
+    TELEPHONY_LOGI("AntiFraud stop detect by type, type=%{public}u", detectType.type_);
+    return 0;
+}
+
+void AntiFraudService::AntiFraudStartDetectResListenerImpl::HandleAntiFraudStartDetectRes(
+    const OHOS::AntiFraudService::StartDetectionResult &startDetectionResult)
+{
+    TELEPHONY_LOGI(
+        "HandleAntiFraudStartDetectRes: voiceDetectionResult=%{public}d, speechSynthesisResult=%{public}d, "
+        "voipCallTransferResult=%{public}d, slotId=%{public}d, index=%{public}d",
+        startDetectionResult.voiceDetectionResult.result, startDetectionResult.speechSynthesisResult.result,
+        startDetectionResult.voipCallTransferResult.result, slotId_, index_);
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    if (antiFraudService != nullptr) {
+        antiFraudService->RecordDetectResult(startDetectionResult, phoneNum_, slotId_, index_);
+    }
 }
 
 void AntiFraudService::AddRuleToConfig(const std::string rulesName, void *config)

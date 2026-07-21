@@ -162,6 +162,8 @@ public:
     int32_t GetNewCallUseBox();
     int32_t GetBtCallSlotId();
     void SetBtCallSlotId(int32_t slotId);
+    int32_t GetAntiFraudState();
+    void SetAntiFraudState(int32_t antifraudState);
     void SetApCauseReported(bool isReported);
     bool IsApCauseReported();
     bool isNonVirtualCall();
@@ -224,6 +226,7 @@ private:
     bool isAnsweredByPhone_{false};
     int32_t newCallUseBox_ = 0;
     int32_t btCallSlotId_{BT_CALL_INVALID_SLOT};
+    int32_t antiFraudState_ = 0;
     bool isNonVirtualCall_{false};
     int32_t imsDomain_ = 0;
     bool isMicDisabled_;
