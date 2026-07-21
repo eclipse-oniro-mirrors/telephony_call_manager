@@ -74,7 +74,8 @@ bool AntiFraudCloudService::GetAuthAsync(const std::string &metaData, std::share
     isSettled_ = false;
 
     auto &helper = DelayedRefSingleton<HsdrHelper>().GetInstance();
-    helper.ConnectHsdr([weakPtr, metaData, wqAuth = std::weak_ptr<std::string>(auth)](sptr<IRemoteObject> remoteObject) {
+    helper.ConnectHsdr([weakPtr, metaData, wqAuth =
+        std::weak_ptr<std::string>(auth)](sptr<IRemoteObject> remoteObject) {
         auto ptr = weakPtr.lock();
         auto sqAuth = wqAuth.lock();
         if (ptr == nullptr || sqAuth == nullptr) {
