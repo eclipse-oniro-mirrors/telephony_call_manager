@@ -87,7 +87,6 @@ const int32_t SIM1_SLOTID = 0;
 const int32_t VALID_CALLID = 1;
 const int32_t ERROR_CALLID = -1;
 const int32_t IS_CELIA_CALL = 1;
-const int32_t SOURCE_CALL = 2;
 const int32_t TELEPHONY_EXT_SA_ID = 4011;
 const int32_t DISTRIBUTED_CALL_SOURCE_SA_ID = 9855;
 constexpr const char *TEST_STR = "123";
@@ -1142,22 +1141,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_OTTCallConnection_001, TestSize.Level0)
     AppExecFwk::PacMap info;
     ott.PackCellularCallInfo(requestInfo, info);
     ASSERT_NE(result, TELEPHONY_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_SuperPrivacyManagerClient_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_SuperPrivacyManagerClient_001, TestSize.Level0)
-{
-    int32_t privacy = SuperPrivacyManagerClient::GetInstance().
-        SetSuperPrivacyMode(static_cast<int32_t>(CallSuperPrivacyModeType::OFF), SOURCE_CALL);
-#ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
-    ASSERT_EQ(privacy, 22);
-#else
-    ASSERT_EQ(privacy, 0);
-#endif
 }
 
 /**

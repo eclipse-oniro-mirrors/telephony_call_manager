@@ -52,7 +52,7 @@ public:
     std::string GetVoipCallId();
     std::string GetVoipBundleName();
     int32_t GetVoipUid();
-    void UpdateCallAttributeInfo(const CallDetailInfo &info);
+    bool UpdateCallAttributeInfo(const CallDetailInfo &info);
     bool GetUserMuteRingToneAllowed();
 
 protected:

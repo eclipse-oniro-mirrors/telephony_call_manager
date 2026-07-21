@@ -64,8 +64,11 @@ int32_t BluetoothCallService::AnswerCall()
         videoState = static_cast<VideoStateType>(call->GetOriginalCallType());
     }
     if (callControlManagerPtr_ != nullptr) {
-        if (DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
-            GetCurrentIsSuperPrivacyMode()) {
+        auto callSuperPrivacyControlManager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
+        if (callSuperPrivacyControlManager == nullptr) {
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        if (!callSuperPrivacyControlManager->CanCallWithSuperPrivacyPolicy()) {
             DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
             ffrt::submit_h([]() {
                 DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();

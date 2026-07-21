@@ -39,7 +39,7 @@ public:
     virtual ~VoipCallManagerProxy() = default;
 
     /**
-     * @brief thrid-party applications report a incoming call.
+     * @brief third-party applications report a incoming call.
      *
      * @param extras[in], extras date.
      * @return Returns 0 on success, others on failure.
@@ -47,14 +47,14 @@ public:
     int32_t ReportIncomingCall(
         AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason) override;
     /**
-     * @brief thrid-party applications report incoming call failed causes.
+     * @brief third-party applications report incoming call failed causes.
      *
      * @param extras[in], extras date.
      * @return Returns 0 on success, others on failure.
      */
     int32_t ReportIncomingCallError(AppExecFwk::PacMap &extras) override;
     /**
-     * @brief thrid-party applications report call state change.
+     * @brief third-party applications report call state change.
      *
      * @param callId[in], The call id
      * @param VoipCallState[in], The voip call state
@@ -64,7 +64,16 @@ public:
     int32_t ReportCallStateChange(std::string callId, const VoipCallState &state, const VoipCallType &type,
         int32_t &errorCode) override;
     /**
-     * @brief thrid-party applications report a outgoing call.
+     * @brief third-party applications report call attribute change.
+     *
+     * @param extras[in], The voip call attribute.
+     * @param userProfile[in], The user profile.
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t ReportCallAttributeChange(
+        AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason) override;
+    /**
+     * @brief third-party applications report a outgoing call.
      *
      * @param extras[in], extras date.
      * @return Returns 0 on success, others on failure.
@@ -175,7 +184,7 @@ public:
     int32_t SendCallUiEventForWindow(AppExecFwk::PacMap &extras) override;
 
     /**
-     * @brief thrid-party applications report call audio event change
+     * @brief third-party applications report call audio event change
      *
      * @param voipCallId[in], The VoipCallId
      * @param callAudioEvent[in], The call audio event

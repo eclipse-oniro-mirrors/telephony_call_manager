@@ -46,17 +46,33 @@ async function makeCallFunc(...args) {
                 resolve();
             });
         } catch (error) {
-            console.log("[call] makeCall error: " + error);
+            console.log('[call] makeCall error: ' + error);
             return new Promise((resolve, reject) => {
                 reject(error);
             });
         }
     } else {
         console.log('[call] makeCall callback invalid');
-        throw Error('invalid callback');
+        const error = new Error('invalid callback');
+        error.code = 401;
+        throw error;
     }
+    
 }
 
+function parsePhoneNumber(phoneNumber) {
+    const telPrefix = 'tel:';
+    if (phoneNumber.toLowerCase().startsWith(telPrefix)) {
+        let decoded = phoneNumber.substring(telPrefix.length);
+        try {
+            decoded = decodeURI(decoded);
+        } catch (e) {
+        }
+        return decoded.replace(/[\u4e00-\u9fa5]/g, '');
+    }
+    return phoneNumber;
+}
+ 
 async function startAbility(args, context) {
     let config = {
         parameters: {
@@ -84,7 +100,7 @@ async function startAbility(args, context) {
             let phoneNumber = phoneNumberUri.pathname;
             config.parameters.phoneNumber = phoneNumber;
         } else {
-            config.parameters.phoneNumber = args[0];
+            config.parameters.phoneNumber = parsePhoneNumber(args[0]);
         }
         if (args.length > 1 && typeof args[1] === 'object') {
             config.parameters.isHideDialScreen = args[1]?.isHideDialScreen;
@@ -95,7 +111,7 @@ async function startAbility(args, context) {
             let phoneNumber = phoneNumberUri.pathname;
             config.parameters.phoneNumber = phoneNumber;
         } else {
-            config.parameters.phoneNumber = args[1];
+            config.parameters.phoneNumber = parsePhoneNumber(args[1]);
         }
     }
     if (context) {

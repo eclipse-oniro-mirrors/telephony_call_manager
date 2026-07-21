@@ -100,7 +100,10 @@ bool CallControlManager::Init()
     }
     DelayedSingleton<AudioControlManager>::GetInstance()->Init();
     CallStateObserve();
-    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RegisterSuperPrivacyMode();
+    auto callSuperPrivacyControlManager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
+    if (callSuperPrivacyControlManager != nullptr) {
+        callSuperPrivacyControlManager->RegisterSuperPrivacyPolicy();
+    }
     DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIPOrRestart();
     CallManagerHisysevent::InitTelephonyExtWrapper();
     return true;
@@ -123,7 +126,11 @@ void CallControlManager::UnInit()
 
 void CallControlManager::ReportPhoneUEInSuperPrivacy(const std::string &eventName)
 {
-    if (DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetCurrentIsSuperPrivacyMode()) {
+    auto callSuperPrivacyControlManager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
+    if (callSuperPrivacyControlManager == nullptr) {
+        return;
+    }
+    if (!callSuperPrivacyControlManager->CanCallWithSuperPrivacyPolicy()) {
         CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
             eventName, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "");
     }
@@ -299,14 +306,18 @@ int32_t CallControlManager::HandlerAnswerCall(int32_t callId, int32_t videoState
     }
     return TELEPHONY_SUCCESS;
 }
+
 bool CallControlManager::CurrentIsSuperPrivacyMode(int32_t callId, int32_t videoState)
 {
-    bool currentIsSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
-        GetCurrentIsSuperPrivacyMode();
-    TELEPHONY_LOGI("call policy answer currentIsSuperPrivacyMode:%{public}d", currentIsSuperPrivacyMode);
-    if (currentIsSuperPrivacyMode) {
+    auto callSuperPrivacyControlManager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
+    if (callSuperPrivacyControlManager == nullptr) {
+        return false;
+    }
+    bool canCallWithPrivacyPolicy = callSuperPrivacyControlManager->CanCallWithSuperPrivacyPolicy();
+    if (!canCallWithPrivacyPolicy) {
+        TELEPHONY_LOGI("can't answer directly, need dialog");
         DelayedSingleton<AudioControlManager>::GetInstance()->MuteRinger();
-        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectAnswerPrivpacyModeExtension("SUPER_PRIVACY_MODE",
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectAnswerPrivacyModeExtension("SUPER_PRIVACY_MODE",
             callId, videoState, true);
         return true;
     }

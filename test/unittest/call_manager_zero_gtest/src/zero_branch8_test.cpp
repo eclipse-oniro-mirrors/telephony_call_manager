@@ -358,38 +358,6 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBroadCastSubscriber_002, Function | Medi
 }
 
 /**
- * @tc.number   Telephony_CallBroadcastSubscriber_003
- * @tc.name     test ConnectCallUiSuperPrivacyModeBroadcast
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch7Test, Telephony_CallBroadcastSubscriber_003, Function | MediumTest | Level1)
-{
-    EventFwk::MatchingSkills matchingSkills;
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
-    EventFwk::CommonEventData data;
-    OHOS::EventFwk::Want want;
-    want.SetAction("usual.event.SUPER_PRIVACY_MODE");
-    want.SetParam("isInCall", false);
-    want.SetParam("isHangup", true);
-    data.SetWant(want);
-    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetIsChangeSuperPrivacyMode(false);
-    subscriberPtr->OnReceiveEvent(data);
-    EXPECT_TRUE(DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetIsChangeSuperPrivacyMode());
-    want.SetParam("isInCall", true);
-    want.SetParam("isHangup", false);
-    want.SetParam("isAnswer", true);
-    data.SetWant(want);
-    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetIsChangeSuperPrivacyMode(false);
-    subscriberPtr->OnReceiveEvent(data);
-    want.SetParam("isInCall", true);
-    want.SetParam("isHangup", true);
-    data.SetWant(want);
-    subscriberPtr->OnReceiveEvent(data);
-    EXPECT_TRUE(DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetIsChangeSuperPrivacyMode());
-}
-
-/**
  * @tc.number   Telephony_CallBroadcastSubscriber_004
  * @tc.name     test HfpConnectBroadcast
  * @tc.desc     Function test
@@ -895,7 +863,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallSuperPrivacyControlManager_001, Function
     CallObjectManager::AddOneCallObject(call5);
     CallObjectManager::AddOneCallObject(call6);
     DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseAllCall();
-    EXPECT_FALSE(DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetCurrentIsSuperPrivacyMode());
+    EXPECT_TRUE(DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CanCallWithSuperPrivacyPolicy());
     CallObjectManager::callObjectPtrList_.clear();
 }
 

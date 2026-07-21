@@ -200,12 +200,34 @@ void VoIPCall::GetCallAttributeInfo(CallAttributeInfo &info)
     return;
 }
 
-void VoIPCall::UpdateCallAttributeInfo(const CallDetailInfo &info)
+bool VoIPCall::UpdateCallAttributeInfo(const CallDetailInfo &info)
 {
+    bool isChanged = false;
     if (hasMicPermission_ != info.voipCallInfo.hasMicPermission) {
         hasMicPermission_ = info.voipCallInfo.hasMicPermission;
-        TELEPHONY_LOGI("UpdateCallAttributeInfo hasMicPermission change to %{public}d", hasMicPermission_);
+        isChanged = true;
     }
+    if (userName_ != info.voipCallInfo.userName) {
+        userName_ = info.voipCallInfo.userName;
+        isChanged = true;
+    }
+    if (userProfile_ != info.voipCallInfo.userProfile) {
+        userProfile_ = info.voipCallInfo.userProfile;
+        isChanged = true;
+    }
+    if (isConferenceCall_ != info.voipCallInfo.isConferenceCall) {
+        isConferenceCall_ = info.voipCallInfo.isConferenceCall;
+        isChanged = true;
+    }
+    VideoStateType originalType = GetVideoStateType();
+    if (originalType != info.callMode) {
+        TELEPHONY_LOGI("change VideoStateType from %{public}d to %{public}d",
+            static_cast<int32_t>(originalType), static_cast<int32_t>(info.callMode));
+        SetVideoStateType(info.callMode);
+        isChanged = true;
+    }
+    TELEPHONY_LOGI("UpdateCallAttributeInfo isChanged: %{public}d", isChanged);
+    return isChanged;
 }
 
 int32_t VoIPCall::CombineConference()

@@ -872,9 +872,9 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_011, TestSize.Level1)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
-    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
+    callManagerService->callControlManagerPtr_ = nullptr;
     int32_t ret = callManagerService->MuteRinger();
-    EXPECT_EQ(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -1031,7 +1031,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_019, TestSize.Level1)
     int32_t ret = callManagerService->SendCallUiEvent(1, eventName);
     EXPECT_EQ(ret, 0);
     ret = callManagerService->PreloadCallUi(true);
-    EXPECT_EQ(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 
 /**

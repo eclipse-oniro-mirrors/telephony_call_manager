@@ -74,6 +74,7 @@ public:
 #endif
 
 private:
+    void FillVoipCallInfo(const CallReportInfo &info, CallDetailInfo &detailInfo);
     void ShouldStopWaitingTone();
 
 private:

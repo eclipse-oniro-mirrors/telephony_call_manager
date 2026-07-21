@@ -25,7 +25,6 @@
       *NearlinkCallClient*;
       *VoipCallConnection*;
       *VoipCallManagerProxy*;
-      *SuperPrivacyManagerClient*;
     };
   local:
     *;

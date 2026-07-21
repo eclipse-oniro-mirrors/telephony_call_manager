@@ -1254,9 +1254,9 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallDialog_001, Function | MediumTest | Leve
     int32_t dialScene = 0;
     int32_t callType = 1;
     bool isVideo = false;
-    ASSERT_TRUE(callDialog->DialogConnectPrivpacyModeExtension(
+    ASSERT_TRUE(callDialog->DialogConnectPrivacyModeExtension(
         diallogReason, number, slotId, videoState, dialType, dialScene, callType, isVideo));
-    ASSERT_TRUE(callDialog->DialogConnectAnswerPrivpacyModeExtension(diallogReason, slotId, videoState, isVideo));
+    ASSERT_TRUE(callDialog->DialogConnectAnswerPrivacyModeExtension(diallogReason, slotId, videoState, isVideo));
     callDialog->DialogCallingPrivacyModeExtension(Rosen::FoldStatus::FOLDED);
     callDialog->DialogCallingPrivacyModeExtension(Rosen::FoldStatus::EXPAND);
 }

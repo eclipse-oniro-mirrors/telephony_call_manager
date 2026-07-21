@@ -147,29 +147,34 @@ void CallBroadcastSubscriber::ConnectCallUiSuperPrivacyModeBroadcast(const Event
 {
     bool isInCall = data.GetWant().GetBoolParam("isInCall", false);
     bool isHangup = data.GetWant().GetBoolParam("isHangup", false);
+
+    auto callSuperPrivacyControlManager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
+    if (callSuperPrivacyControlManager == nullptr) {
+        return;
+    }
     if (isInCall && isHangup) {
-        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseAllCall();
+        callSuperPrivacyControlManager->CloseAllCall();
         return;
     }
     int32_t videoState = data.GetWant().GetIntParam("videoState", -1);
     bool isAnswer = data.GetWant().GetBoolParam("isAnswer", false);
-    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetOldSuperPrivacyMode();
-    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetIsChangeSuperPrivacyMode(true);
+    
+    callSuperPrivacyControlManager->RecordChangedPrivacyPolicy();
     if (isInCall) {
-        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseSuperPrivacyMode();
+        callSuperPrivacyControlManager->CloseSuperPrivacyMode();
         return;
     }
+
     TELEPHONY_LOGI("CallUiSuperPrivacyModeBroadcast isAnswer:%{public}d", isAnswer);
     if (isAnswer) {
         int32_t callId = data.GetWant().GetIntParam("callId", -1);
         TELEPHONY_LOGI("CallUiSuperPrivacyModeBroadcast_Answer callId:%{public}d", callId);
-        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
-            CloseAnswerSuperPrivacyMode(callId, videoState);
+        callSuperPrivacyControlManager->CloseAnswerSuperPrivacyMode(callId, videoState);
     } else {
         std::string phoneNumber = data.GetWant().GetStringParam("phoneNumber");
         std::u16string phNumber = Str8ToStr16(phoneNumber);
         int32_t accountId = data.GetWant().GetIntParam("accountId", -1);
-        TELEPHONY_LOGI("CallUiSuperPrivacyModeBroadcast_Answer accountId:%{public}d", accountId);
+        TELEPHONY_LOGI("CallUiSuperPrivacyModeBroadcast_Dial accountId:%{public}d", accountId);
         int32_t dialScene = data.GetWant().GetIntParam("dialScene", -1);
         int32_t dialType = data.GetWant().GetIntParam("dialType", -1);
         int32_t callType = data.GetWant().GetIntParam("callType", -1);
