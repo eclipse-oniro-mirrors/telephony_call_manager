@@ -52,9 +52,7 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
     auto auth = std::make_shared<std::string>();
     helper.ConnectHsdr([weakPtr, metaData,
         wqAuth = std::weak_ptr<std::string>(auth)](sptr<IRemoteObject> remoteObject) {
-        auto ptr = weakPtr.lock();
-        auto sqAuth = wqAuth.lock();
-        if (ptr == nullptr || sqAuth == nullptr) {
+        if (!(auto ptr = weakPtr.lock()) || !(auto sqAuth = wqAuth.lock())) {
             auto &helper = DelayedRefSingleton<HsdrHelper>().GetInstance();
             helper.DisconnectHsdr();
             return;
@@ -86,9 +84,7 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
     }
     helper.ConnectHsdr([metaData, wqAuth = std::weak_ptr<std::string>(auth),
         antiFraudResult, weakPtr](sptr<IRemoteObject> remoteObject) {
-        auto ptr = weakPtr.lock();
-        auto sqAuth = wqAuth.lock();
-        if (ptr == nullptr || sqAuth == nullptr) {
+        if (!(auto ptr = weakPtr.lock()) || !(auto sqAuth = wqAuth.lock())) {
             auto &helper = DelayedRefSingleton<HsdrHelper>().GetInstance();
             helper.DisconnectHsdr();
             return;
