@@ -817,24 +817,6 @@ enum class SatCommTempLevel {
 };
 
 /**
- * @brief Indicates the super privacy mode for  call.
- */
-enum class CallSuperPrivacyModeType {
-    /*
-     *  Indicates the super privacy mode for  OFF.
-     */
-    OFF = 0,
-    /*
-     *  Indicates the super privacy mode for  ON_WHEN_FOLDED.
-     */
-    ON_WHEN_FOLDED = 1,
-    /*
-     *  Indicates the super privacy mode for  ALWAYS_ON.
-     */
-    ALWAYS_ON = 2,
-};
-
-/**
  * @brief Indicates dial from phone or watch.
  */
 enum class PhoneOrWatchDial {

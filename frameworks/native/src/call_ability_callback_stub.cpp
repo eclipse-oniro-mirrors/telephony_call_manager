@@ -17,20 +17,12 @@
 
 #include <securec.h>
 
-#include "accesstoken_kit.h"
-#include "bundle_mgr_proxy.h"
-#include "bundle_mgr_interface.h"
 #include "call_manager_errors.h"
-#include "iservice_registry.h"
 #include "native_call_manager_utils.h"
-#include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
-#include "tokenid_kit.h"
 
 namespace OHOS {
 namespace Telephony {
-static constexpr const char *OHOS_PERMISSION_GET_CALL_TRANSFER_INFO = "ohos.permission.GET_CALL_TRANSFER_INFO";
-constexpr int PERMISSION_GRANTED = 1;
 const int32_t MAX_LEN = 100000;
 CallAbilityCallbackStub::CallAbilityCallbackStub()
 {
@@ -181,12 +173,7 @@ int32_t CallAbilityCallbackStub::OnUpdateAysncResults(MessageParcel &data, Messa
         case CallResultReportId::GET_CALL_TRANSFER_REPORT_ID:{
             resultInfo.PutIntValue("status", data.ReadInt32());
             resultInfo.PutIntValue("classx", data.ReadInt32());
-            std::string number = data.ReadString();
-            if (HasGetCallTransferPermission()) {
-                resultInfo.PutStringValue("number", "");
-            } else {
-                resultInfo.PutStringValue("number", number);
-            }
+            resultInfo.PutStringValue("number", data.ReadString());
             resultInfo.PutIntValue("type", data.ReadInt32());
             resultInfo.PutIntValue("reason", data.ReadInt32());
             resultInfo.PutIntValue("time", data.ReadInt32());
@@ -519,25 +506,5 @@ int32_t CallAbilityCallbackStub::OnUpdateRttCallMessage(MessageParcel &data, Mes
     return TELEPHONY_SUCCESS;
 }
 #endif
-
-bool CallAbilityCallbackStub::HasGetCallTransferPermission()
-{
-    sptr<ISystemAbilityManager> systemAbilityManager =
-        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (!systemAbilityManager) {
-        return false;
-    }
-    sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    sptr<AppExecFwk::IBundleMgr> proxy = iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
-    if (proxy == nullptr) {
-        return false;
-    }
-    AppExecFwk::BundleInfo bundleInfo;
-    if (proxy->GetBundleInfoForSelf(static_cast<int32_t>(AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT), bundleInfo)) {
-        return Security::AccessToken::AccessTokenKit::VerifyAccessToken(
-            bundleInfo.applicationInfo.accessTokenId, OHOS_PERMISSION_GET_CALL_TRANSFER_INFO) == PERMISSION_GRANTED;
-    }
-    return false;
-}
 } // namespace Telephony
 } // namespace OHOS

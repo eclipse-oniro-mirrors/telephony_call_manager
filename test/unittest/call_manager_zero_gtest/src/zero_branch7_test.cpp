@@ -638,24 +638,5 @@ HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTes
     int32_t uid = 20020211;
     voipCallConnection->NotifyVoIPAudioStreamStart(uid);
 }
-
-HWTEST_F(ZeroBranch8Test, Telephony_CallSuperPrivacyControlManager_001, Function | MediumTest | Level1)
-{
-    int32_t callId = 0;
-    int32_t videoState = 0;
-    std::u16string phoneNumber = u"";
-    int32_t accountId = 1;
-    int32_t dialType = 0;
-    int32_t dialScene = 0;
-    int32_t callType = 0;
-    auto controlManager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
-    controlManager->RestoreSuperPrivacyMode();
-    EXPECT_FALSE(controlManager->GetIsChangeSuperPrivacyMode());
-    controlManager->SetIsChangeSuperPrivacyMode(true);
-    controlManager->RestoreSuperPrivacyMode();
-    EXPECT_FALSE(controlManager->GetIsChangeSuperPrivacyMode());
-    controlManager->CloseAnswerSuperPrivacyMode(callId, videoState);
-    controlManager->CloseCallSuperPrivacyMode(phoneNumber, accountId, videoState, dialType, dialScene, callType);
-}
 } // namespace Telephony
 } // namespace OHOS

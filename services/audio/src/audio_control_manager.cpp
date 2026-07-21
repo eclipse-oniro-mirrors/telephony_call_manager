@@ -86,6 +86,9 @@ void AudioControlManager::UnInit()
         TELEPHONY_LOGE("ring_ is nullptr ignore UnRegisterObserver");
     }
 #endif
+    if (sound_ != nullptr) {
+        sound_->ReleaseRenderer();
+    }
 }
 
 void AudioControlManager::UpdateForegroundLiveCall()
@@ -413,7 +416,8 @@ bool AudioControlManager::PreHandleAnswerdState(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
     auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
-    if (callStateProcessor == nullptr) {
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    if (audioDeviceManager == nullptr || callStateProcessor == nullptr) {
         return false;
     }
     auto callId = callObjectPtr->GetCallID();
@@ -423,6 +427,7 @@ bool AudioControlManager::PreHandleAnswerdState(
             callStateProcessor->DeleteCall(callId, priorState);
             callObjectPtr->SetIsAnsweredByPhone(true);
             MuteRinger();
+            audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
             return true;
         }
     }

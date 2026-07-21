@@ -268,6 +268,19 @@ HWTEST_F(SpecialBranch3Test, Telephony_VoipCallManagerProxy_001, TestSize.Level1
     sptr<IRemoteObject> impl;
     VoipCallManagerProxy proxy(impl);
     VoipCallEventInfo events;
+    AppExecFwk::PacMap callAttribute;
+    callAttribute.PutStringValue("callId", "test_call_id");
+    callAttribute.PutIntValue("voipCallType", static_cast<int32_t>(VoipCallType::VOIP_CALL_VOICE));
+    callAttribute.PutStringValue("userName", "testUser");
+    callAttribute.PutStringValue("abilityName", "testAbility");
+    callAttribute.PutIntValue("voipCallState", static_cast<int32_t>(VoipCallState::VOIP_CALL_STATE_INCOMING));
+    callAttribute.PutBooleanValue("showBannerForIncomingCall", true);
+    callAttribute.PutBooleanValue("isConferenceCall", false);
+    callAttribute.PutBooleanValue("isVoiceAnswerSupported", true);
+    callAttribute.PutBooleanValue("isUserMuteRingToneAllowed", true);
+    callAttribute.PutBooleanValue("isDialingAllowedDuringCarrierCall", true);
+    std::vector<uint8_t> userProfile = { 0 };
+    ErrorReason reason = ErrorReason::ERROR_NONE;
     EXPECT_EQ(proxy.Answer(events, 0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.HangUp(events), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.Reject(events), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -279,6 +292,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_VoipCallManagerProxy_001, TestSize.Level1
     EXPECT_EQ(proxy.ReportCallAudioEventChange("", CallAudioEvent::AUDIO_EVENT_MUTED),
         TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.NotifyVoIPAudioStreamStart(20020211), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.ReportCallAttributeChange(callAttribute, userProfile, reason), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 /**
  * @tc.number   Telephony_CallStatusCallbackProxy_001
@@ -410,6 +424,57 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_002, TestSize.Level1)
     EXPECT_NE(Proxy->CancelCallUpgrade(slotId, index), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->RequestCameraCapabilities(slotId, index), TELEPHONY_SUCCESS);
     EXPECT_FALSE(Proxy->IsMmiCode(slotId, number));
+}
+
+/**
+ * @tc.number   Telephony_VoipCallManagerProxy_ReportCallAttributeChange_001
+ * @tc.name     test ReportCallAttributeChange with empty callId
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch3Test, Telephony_VoipCallManagerProxy_ReportCallAttributeChange_001, TestSize.Level1)
+{
+    sptr<IRemoteObject> impl;
+    auto Proxy = std::make_shared<VoipCallManagerProxy>(impl);
+    AppExecFwk::PacMap callAttribute;
+    callAttribute.PutStringValue("callId", "");
+    callAttribute.PutIntValue("voipCallType", static_cast<int32_t>(VoipCallType::VOIP_CALL_VOICE));
+    callAttribute.PutStringValue("userName", "testUser");
+    callAttribute.PutStringValue("abilityName", "testAbility");
+    callAttribute.PutIntValue("voipCallState", static_cast<int32_t>(VoipCallState::VOIP_CALL_STATE_INCOMING));
+    callAttribute.PutBooleanValue("showBannerForIncomingCall", true);
+    callAttribute.PutBooleanValue("isConferenceCall", false);
+    callAttribute.PutBooleanValue("isVoiceAnswerSupported", true);
+    callAttribute.PutBooleanValue("isUserMuteRingToneAllowed", true);
+    callAttribute.PutBooleanValue("isDialingAllowedDuringCarrierCall", true);
+    std::vector<uint8_t> userProfile = { 0 };
+    ErrorReason reason = ErrorReason::ERROR_NONE;
+    EXPECT_EQ(Proxy->ReportCallAttributeChange(callAttribute, userProfile, reason), TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+ 
+/**
+ * @tc.number   Telephony_VoipCallManagerProxy_ReportCallAttributeChange_002
+ * @tc.name     test ReportCallAttributeChange with null proxy
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch3Test, Telephony_VoipCallManagerProxy_ReportCallAttributeChange_002, TestSize.Level1)
+{
+    sptr<IRemoteObject> impl;
+    auto Proxy = std::make_shared<VoipCallManagerProxy>(impl);
+    AppExecFwk::PacMap callAttribute;
+    callAttribute.PutStringValue("callId", "test_call_id");
+    callAttribute.PutIntValue("voipCallType", static_cast<int32_t>(VoipCallType::VOIP_CALL_VOICE));
+    callAttribute.PutStringValue("userName", "testUser");
+    callAttribute.PutStringValue("abilityName", "testAbility");
+    callAttribute.PutIntValue("voipCallState", static_cast<int32_t>(VoipCallState::VOIP_CALL_STATE_INCOMING));
+    callAttribute.PutBooleanValue("showBannerForIncomingCall", true);
+    callAttribute.PutBooleanValue("isConferenceCall", false);
+    callAttribute.PutBooleanValue("isVoiceAnswerSupported", true);
+    callAttribute.PutBooleanValue("isUserMuteRingToneAllowed", true);
+    callAttribute.PutBooleanValue("isDialingAllowedDuringCarrierCall", true);
+    std::vector<uint8_t> userProfile = { 0 };
+    ErrorReason reason = ErrorReason::ERROR_NONE;
+    EXPECT_EQ(Proxy->ReportCallAttributeChange(callAttribute, userProfile, reason),
+        TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
 HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_MakeCallWithToken_001, TestSize.Level0)

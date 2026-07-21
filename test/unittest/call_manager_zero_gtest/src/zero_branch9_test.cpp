@@ -206,15 +206,8 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_005, TestSize.Level0)
     audioControl->ExcludeBluetoothSco();
     audioControl->UnexcludeBluetoothSco();
     AudioDeviceType deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-    AudioDevice device = {
-        .deviceType = AudioDeviceType::DEVICE_SPEAKER,
-        .address = { 0 },
-    };
     audioControl->UpdateDeviceTypeForCrs(deviceType);
-    audioControl->AdjustDeviceForCrs(device, deviceType);
-    EXPECT_TRUE(audioControl->IsRingingVibrateModeOn());
-    deviceType = AudioDeviceType::DEVICE_EARPIECE;
-    audioControl->AdjustDeviceForCrs(device, deviceType);
+    audioControl->IsRingingVibrateModeOn();
     auto callControl = DelayedSingleton<CallControlManager>::GetInstance();
     callControl->SetVoIPCallState(1);
     EXPECT_TRUE(audioControl->IsVoIPCallActived());
@@ -708,6 +701,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_SwitchIncoming_SelectDevice, Function | Medi
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
     auto audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     DialParaInfo dialParaInfo;
     dialParaInfo.callType = CallType::TYPE_IMS;
     dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
@@ -728,6 +722,12 @@ HWTEST_F(ZeroBranch9Test, Telephony_SwitchIncoming_SelectDevice, Function | Medi
     CallStateToApp tmpVoIPCallState = callControlManager->VoIPCallState_;
     callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_ANSWERED;
     audioSceneProcessor->SwitchIncoming();
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
+    audioControl->PreHandleAnswerdState(call, TelCallState::CALL_STATUS_INCOMING,
+        TelCallState::CALL_STATUS_ANSWERED);
+    call->SetIsAnsweredByPhone(false);
+    EXPECT_TRUE(audioControl->PreHandleAnswerdState(call, TelCallState::CALL_STATUS_INCOMING,
+        TelCallState::CALL_STATUS_ANSWERED));
     EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
     voicePtr->isQueryedBroadcastSwitch = tmpIsQueryedBroadcastSwitch;
     voicePtr->isBroadcastSwitchOn = tmpIsBroadcastSwitchOn;

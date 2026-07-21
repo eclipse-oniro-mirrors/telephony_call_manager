@@ -332,6 +332,14 @@ enum CallManagerErrorCode {
      * Indicates ims call supplyment doesn't connect.
      */
     CALL_ERR_UT_NO_CONNECTION,
+    /**
+     * Indicates parmas input phone number not in phone.
+     */
+    CALL_ERR_INVALID_CALL_NUMBER,
+    /**
+     * Indicates operation too frequent.
+     */
+    CALL_ERR_OPERATION_TOO_FREQUENT,
 };
 
 /**
@@ -364,14 +372,6 @@ enum PROTOCOL_ERROR_TYPE {
      * Indicates service or option not implemented.
      */
     CALL_ERR_OPTION_NOT_IMPLEMENTED,
-    /**
-     * Indicates parmas input phone number not in phone.
-     */
-    CALL_ERR_INVALID_CALL_NUMBER,
-    /**
-     * Indicates operation too frequent.
-     */
-    CALL_ERR_OPERATION_TOO_FREQUENT,
 };
 } // namespace Telephony
 } // namespace OHOS

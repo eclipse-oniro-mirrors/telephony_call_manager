@@ -35,6 +35,7 @@ constexpr int32_t AUDIO_DEVICE_NUM = 6;
 constexpr int32_t AUDIO_EVENT = 30;
 constexpr int32_t AUDIO_SCENE_NUM = 4;
 constexpr int32_t AUDIO_VOLUME_TYPE_NUM = 13;
+constexpr int32_t WAIT_TIME = 2;
 
 void AudioControlManagerFunc(FuzzedDataProvider& provider)
 {
@@ -197,5 +198,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::AddCallTokenFuzzer token;
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
+    OHOS::DelayedSingleton<AudioControlManager>::DestroyInstance();
     return 0;
 }
