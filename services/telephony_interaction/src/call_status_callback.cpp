@@ -19,6 +19,7 @@
 #include "call_ability_report_proxy.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
+#include "call_dialog.h"
 #include "cpp/task_ext.h"
 #include "hitrace_meter.h"
 #include "report_call_info_handler.h"
@@ -230,6 +231,17 @@ int32_t CallStatusCallback::SendUssdResult(const int32_t result)
 
 int32_t CallStatusCallback::SendMmiCodeResult(const MmiCodeInfo &info)
 {
+    auto callAbilityReportProxy = DelayedSingleton<CallAbilityReportProxy>::GetInstance();
+    if (callAbilityReportProxy != nullptr) {
+        if (!callAbilityReportProxy->IsMmiCodeCallbackRegistered()) {
+            auto callDialog = DelayedSingleton<CallDialog>::GetInstance();
+            if (callDialog != nullptr) {
+                callDialog->DialogProcessMMICodeExtension();
+            }
+            callAbilityReportProxy->CacheMmiCodeInfo(info);
+            return TELEPHONY_SUCCESS;
+        }
+    }
     ffrt::submit_h([info] {
         TELEPHONY_LOGI("SendMmiCodeResult result = %{public}d, message = %{public}s", info.result, info.message);
         int32_t ret = DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportMmiCodeResult(info);

@@ -240,6 +240,7 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_001, TestSize.Level0
     ASSERT_FALSE(client->HasCall(false));
     ASSERT_FALSE(client->HasCall(true));
     ASSERT_EQ(client->CancelCallUpgrade(g_newCallId), TELEPHONY_ERR_UNINIT);
+    ASSERT_EQ(client->SetRegMmiCodeCallbackState(boolValue), TELEPHONY_ERR_UNINIT);
 }
 
 /**
@@ -309,6 +310,8 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, TestSize.Level0
     std::vector<std::string> dialingList;
     std::vector<std::string> incomingList;
     ASSERT_EQ(client->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_ERR_UNINIT);
+    bool boolValue = true;
+    ASSERT_EQ(client->SetRegMmiCodeCallbackState(boolValue), TELEPHONY_ERR_UNINIT);
 }
 
 #ifdef SUPPORT_RTT_CALL

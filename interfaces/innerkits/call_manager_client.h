@@ -618,6 +618,13 @@ public:
     bool HasVoiceCapability();
 
     /**
+     * @brief set register mmi code callback state
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetRegMmiCodeCallbackState(bool isReg);
+
+    /**
      * @brief report audio device info
      *
      * @return Returns 0 on success, others on failure.

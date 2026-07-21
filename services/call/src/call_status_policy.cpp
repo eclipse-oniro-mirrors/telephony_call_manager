@@ -18,6 +18,7 @@
 #include <securec.h>
 
 #include "call_manager_errors.h"
+#include "call_manager_hisysevent.h"
 #include "telephony_log_wrapper.h"
 
 #include "call_control_manager.h"
@@ -47,6 +48,9 @@ int32_t CallStatusPolicy::FilterResultsDispose(sptr<CallBase> call)
     }
     if (HasRingingMaximum() || HasDialingMaximum()) {
         TELEPHONY_LOGI("the number of Ringing or Dialing call is bigger than Maximum, start to hung up");
+        CallManagerHisysevent::ReportCallDropChrEvent(call->GetSlotId(), call->GetCallIndex(),
+            DROP_CALL_BY_CALL_NUM_LIMITED);
+        call->SetApCauseReported(true);
         ret = call->HangUpCall();
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("HangUpCall failed!");
@@ -58,6 +62,9 @@ int32_t CallStatusPolicy::FilterResultsDispose(sptr<CallBase> call)
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
     if (state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
+        CallManagerHisysevent::ReportCallDropChrEvent(call->GetSlotId(), call->GetCallIndex(),
+            DROP_CALL_BY_MEETIME_CALL_ALERTING);
+        call->SetApCauseReported(true);
         ret = call->RejectCall();
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGI("Reject call failed!");

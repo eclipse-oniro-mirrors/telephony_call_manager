@@ -1333,6 +1333,23 @@ sptr<IRemoteObject> CallManagerServiceProxy::GetProxyObjectPtr(CallManagerProxyT
     return replyParcel.ReadRemoteObject();
 }
 
+int32_t CallManagerServiceProxy::SetRegMmiCodeCallbackState(bool isReg)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteBool(isReg);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_SET_REG_MMI_CODE_CALLBACK_STATE, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function SetRegMmiCodeCallbackState failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
 int32_t CallManagerServiceProxy::ReportAudioDeviceInfo()
 {
     return SendRequest(INTERFACE_REPORT_AUDIO_DEVICE_INFO);

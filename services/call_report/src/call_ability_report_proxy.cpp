@@ -22,6 +22,7 @@
 #include "bluetooth_call_manager.h"
 #include "call_ability_callback_death_recipient.h"
 #include "call_manager_errors.h"
+#include "call_dialog.h"
 #include "iservice_registry.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
@@ -279,6 +280,35 @@ int32_t CallAbilityReportProxy::ReportAsyncResults(
     }
     TELEPHONY_LOGI("ReportAsyncResults success, reportId:%{public}d", reportId);
     return ret;
+}
+
+void CallAbilityReportProxy::CacheMmiCodeInfo(const MmiCodeInfo &info)
+{
+    std::unique_lock<ffrt::mutex> lock(mutex_);
+    cacheInfo_ = std::make_shared<MmiCodeInfo>(info);
+}
+ 
+void CallAbilityReportProxy::SetRegMmiCodeCallbackState(bool isReg)
+{
+    std::unique_lock<ffrt::mutex> lock(mutex_);
+    if (isReg) {
+        isMmiCodeCallbackRegistered_ = true;
+        if (cacheInfo_ != nullptr) {
+            auto info = std::move(*cacheInfo_);
+            cacheInfo_ = nullptr;
+            lock.unlock();
+            ReportMmiCodeResult(info);
+        }
+    } else {
+        isMmiCodeCallbackRegistered_ = false;
+        cacheInfo_ = nullptr;
+    }
+}
+ 
+bool CallAbilityReportProxy::IsMmiCodeCallbackRegistered()
+{
+    std::unique_lock<ffrt::mutex> lock(mutex_);
+    return isMmiCodeCallbackRegistered_;
 }
 
 int32_t CallAbilityReportProxy::ReportMmiCodeResult(const MmiCodeInfo &info)

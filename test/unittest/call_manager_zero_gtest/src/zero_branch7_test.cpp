@@ -571,6 +571,8 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerClient_001, Function | MediumTest
         TELEPHONY_ERR_UNINIT);
 #endif
     EXPECT_NE(callManagerClient->CancelCallUpgrade(callId), TELEPHONY_ERR_UNINIT);
+    bool boolValue = false;
+    EXPECT_NE(callManagerClient->SetRegMmiCodeCallbackState(boolValue), TELEPHONY_ERR_UNINIT);
     EXPECT_NE(callManagerClient->RequestCameraCapabilities(callId), TELEPHONY_ERR_UNINIT);
     std::string eventName = "abc";
     EXPECT_NE(callManagerClient->SendCallUiEvent(callId, eventName), TELEPHONY_ERR_UNINIT);

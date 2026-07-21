@@ -831,5 +831,17 @@ void CallBase::SetNonVirtualCall(bool isNonVirtualCall)
     std::lock_guard<ffrt::mutex> lock(mutex_);
     isNonVirtualCall_ = isNonVirtualCall;
 }
+
+void CallBase::SetApCauseReported(bool isReported)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    isApCauseReported_ = isReported;
+}
+
+bool CallBase::IsApCauseReported()
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    return isApCauseReported_;
+}
 } // namespace Telephony
 } // namespace OHOS

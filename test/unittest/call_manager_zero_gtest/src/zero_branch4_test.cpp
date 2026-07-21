@@ -764,6 +764,8 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_002, TestSize.Level0)
     ASSERT_GT(callManagerClient->SetDeviceDirection(callId, 0), TELEPHONY_ERROR);
     ASSERT_GT(callManagerClient->CancelCallUpgrade(callId), TELEPHONY_ERROR);
     ASSERT_GT(callManagerClient->RequestCameraCapabilities(callId), TELEPHONY_ERROR);
+    bool boolValue = true;
+    ASSERT_GT(callManagerClient->SetRegMmiCodeCallbackState(boolValue), TELEPHONY_ERROR);
     int32_t slotId = 0;
     std::string content = "1";
     ASSERT_GT(callManagerClient->SendUssdResponse(slotId, content), TELEPHONY_ERROR);
@@ -949,6 +951,40 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_003, TestSize.Level0)
         "isConferenceCall" : false, "direction" : 0, "appIndex" : 0}})";
     callManagerHisysevent->ReportCallProcedureEvents(callId, procedureJsonStr);
     callManagerHisysevent->ClearVoipProcedureCallInfo(callId);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerHisysevent_004
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_004, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerHisysevent> callManagerHisysevent = std::make_shared<CallManagerHisysevent>();
+
+    std::string callId = "1";
+    std::string procedureJsonStr = "str";
+    nlohmann::json procedures = {{"1", {"str", {{"Procedures", {"P", "[1,2,3,4,5]"}}, {"P", "[1,2,3,4,5]"}}}}};
+    callManagerHisysevent->voipProcedureCallInfo_["1"] = procedures;
+    callManagerHisysevent->ReportCallProcedureEvents(callId, procedureJsonStr);
+
+    procedureJsonStr = R"({"Procedures": {"P": 2}})";
+    callManagerHisysevent->ReportCallProcedureEvents(callId, procedureJsonStr);
+
+    procedureJsonStr = R"({"Procedures": {"P": [1,2,3]}})";
+    callManagerHisysevent->ReportCallProcedureEvents(callId, procedureJsonStr);
+
+    callManagerHisysevent->ReportCallDropChrEvent(-100, 123);
+    DialParaInfo dialParaInfo;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    call->callId_ = 100;
+    CallObjectManager::callObjectPtrList_.push_back(call);
+    callManagerHisysevent->ReportCallDropChrEvent(100, 123);
+    EXPECT_TRUE(call->IsApCauseReported());
+
+    CallObjectManager::callObjectPtrList_.pop_back();
+    MessageParcel parcel;
+    EXPECT_FALSE(callManagerHisysevent->ReportEventToChrAsync("TestDtModule", parcel));
 }
 /**
  * @tc.number   Telephony_OTTCall_001

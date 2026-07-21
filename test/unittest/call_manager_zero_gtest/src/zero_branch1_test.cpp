@@ -1312,6 +1312,27 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallNumberUtils_003, Function | MediumTest |
 }
 
 /**
+ * @tc.number   Telephony_CallNumberUtils_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallNumberUtils_005, Function | MediumTest | Level1)
+{
+    std::string phoneNumber = "12345678901";
+    std::string countryCode = "86";
+    std::string formatNumber = "";
+    DelayedSingleton<CallNumberUtils>::GetInstance()->
+        FormatPhoneNumberAsYouType(phoneNumber, countryCode, formatNumber);
+    phoneNumber = "";
+    countryCode = "";
+    EXPECT_EQ(DelayedSingleton<CallNumberUtils>::GetInstance()->
+        FormatPhoneNumberAsYouType(phoneNumber, countryCode, formatNumber), TELEPHONY_ERR_ARGUMENT_INVALID);
+    phoneNumber = "**";
+    EXPECT_EQ(DelayedSingleton<CallNumberUtils>::GetInstance()->
+        FormatPhoneNumberAsYouType(phoneNumber, countryCode, formatNumber), TELEPHONY_SUCCESS);
+}
+
+/**
  * @tc.number   Telephony_EdmCallPolicy_001
  * @tc.name     test error branch
  * @tc.desc     Function test
