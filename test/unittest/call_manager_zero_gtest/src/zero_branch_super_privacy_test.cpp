@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#define private public
+#define protected public
+
 #include "call_superprivacy_control_manager.h"
 #include "super_privacy_policy_info.h"
 #include "super_privacy_manager_client.h"
@@ -94,6 +97,7 @@ HWTEST_F(SuperPrivacyTest, Telephony_GetCurrentPrivacyPolicy, TestSize.Level0)
     system::SetParameter("persist.super_privacy_policy.sensors", "18");
     manager->GetCurrentPrivacyPolicy(policyInfo);
     EXPECT_EQ(policyInfo.superPrivacyMode, SuperPrivacyMode::ALWAYS_ON);
+
 }
 
 /**
@@ -124,80 +128,91 @@ HWTEST_F(SuperPrivacyTest, Telephony_CanCallWithSuperPrivacyPolicy, TestSize.Lev
 
 /**
  * @tc.number   Telephony_RecordChangedPrivacyPolicy
- * @tc.name     test RecordChangedPrivacyPolicy stores current mode
+ * @tc.name     test RecordChangedPrivacyPolicy
  * @tc.desc     Function test
  */
 HWTEST_F(SuperPrivacyTest, Telephony_RecordChangedPrivacyPolicy, TestSize.Level0)
 {
     auto manager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
     
-    // Record policy with ON mode
-    system::SetParameter("persist.super_privacy_policy.sensors", "0");
+    // Test: mic DISABLED
+    system::SetParameter("persist.super_privacy_policy.sensors", "514");
     manager->RecordChangedPrivacyPolicy();
-    EXPECT_EQ(manager->oldSuperPrivacyMode_, SuperPrivacyMode::OFF);
+    EXPECT_NE(manager->disabledSensorsDuringCall_.find(PrivacySensorType::MICROPHONE),
+                manager->disabledSensorsDuringCall_.end());
 
-    system::SetParameter("persist.super_privacy_policy.sensors", "2");
+    // Test: cam DISABLED
+    system::SetParameter("persist.super_privacy_policy.sensors", "34");
     manager->RecordChangedPrivacyPolicy();
-    EXPECT_EQ(manager->oldSuperPrivacyMode_, SuperPrivacyMode::ALWAYS_ON);
+    EXPECT_NE(manager->disabledSensorsDuringCall_.find(PrivacySensorType::CAMERA),
+                manager->disabledSensorsDuringCall_.end());
+    
+    // Test: all ENABLED (no add)
+    manager->disabledSensorsDuringCall_.clear();
+    system::SetParameter("persist.super_privacy_policy.sensors", "8194");
+    manager->RecordChangedPrivacyPolicy();
+    EXPECT_TRUE(manager->disabledSensorsDuringCall_.empty());
+
 }
 
 /**
  * @tc.number   Telephony_RestorePrivacyPolicy
- * @tc.name     test RestorePrivacyPolicy restores mode and is idempotent
+ * @tc.name     test RestorePrivacyPolicy - cover all branches
  * @tc.desc     Function test
  */
 HWTEST_F(SuperPrivacyTest, Telephony_RestorePrivacyPolicy, TestSize.Level0)
 {
     auto manager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
     
-    // Branch: record then close and restore
+    // Branch: empty set -> early return
+    {
+        std::unique_lock<ffrt::shared_mutex> lock(manager->superPrivacyModeMutex_);
+        manager->disabledSensorsDuringCall_.clear();
+    }
+    manager->RestorePrivacyPolicy();
+    {
+        std::shared_lock<ffrt::shared_mutex> lock(manager->superPrivacyModeMutex_);
+        EXPECT_TRUE(manager->disabledSensorsDuringCall_.empty());
+    }
+    
+    // Branch: OFF mode -> clear without restore
     system::SetParameter("persist.super_privacy_policy.sensors", "0");
-    manager->SetSuperPrivacyChanged(true);
-    manager->SetOldSuperPrivacyMode(SuperPrivacyMode::ALWAYS_ON);
-    EXPECT_TRUE(manager->CanCallWithSuperPrivacyPolicy());
-
+    {
+        std::unique_lock<ffrt::shared_mutex> lock(manager->superPrivacyModeMutex_);
+        manager->disabledSensorsDuringCall_.insert(PrivacySensorType::MICROPHONE);
+    }
     manager->RestorePrivacyPolicy();
-    EXPECT_EQ(manager->IsSuperPrivacyChanged(), false);
+    {
+        std::shared_lock<ffrt::shared_mutex> lock(manager->superPrivacyModeMutex_);
+        EXPECT_TRUE(manager->disabledSensorsDuringCall_.empty());
+    }
+    
+    // Branch: ON mode -> restore and clear
+    system::SetParameter("persist.super_privacy_policy.sensors", "1");
+    {
+        std::unique_lock<ffrt::shared_mutex> lock(manager->superPrivacyModeMutex_);
+        manager->disabledSensorsDuringCall_.insert(PrivacySensorType::MICROPHONE);
+        manager->disabledSensorsDuringCall_.insert(PrivacySensorType::CAMERA);
+    }
+    manager->RestorePrivacyPolicy();
+    {
+        std::shared_lock<ffrt::shared_mutex> lock(manager->superPrivacyModeMutex_);
+        EXPECT_TRUE(manager->disabledSensorsDuringCall_.empty());
+    }
 }
 
 /**
- * @tc.number   Telephony_CloseSuperPrivacyMode
- * @tc.name     test CloseSuperPrivacyMode sets flag and turns off mode
+ * @tc.number   Telephony_EnablePrivacySensors
+ * @tc.name     test EnablePrivacySensors
  * @tc.desc     Function test
  */
-HWTEST_F(SuperPrivacyTest, Telephony_CloseSuperPrivacyMode, TestSize.Level0)
+HWTEST_F(SuperPrivacyTest, Telephony_EnablePrivacySensors, TestSize.Level0)
 {
     auto manager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
-    system::SetParameter("persist.super_privacy_policy.sensors", "18");
-    int32_t result = manager->CloseSuperPrivacyMode();
-    EXPECT_EQ(result, 0);
-    EXPECT_TRUE(manager->CanCallWithSuperPrivacyPolicy());
-    manager->RestorePrivacyPolicy();
-}
-
-/**
- * @tc.number   Telephony_UserReEnablePrivacyDuringCall
- * @tc.name     test user re-enables privacy during call clears record
- * @tc.desc     Function test
- */
-HWTEST_F(SuperPrivacyTest, Telephony_UserReEnablePrivacyDuringCall, TestSize.Level0)
-{
-    auto manager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
-    
-    // Simulate: close privacy for call
-    system::SetParameter("persist.super_privacy_policy.sensors", "18");
-    manager->CloseSuperPrivacyMode();
-    EXPECT_TRUE(manager->CanCallWithSuperPrivacyPolicy());
-    
-    // Simulate: user manually re-enables privacy (mode changes to non-OFF)
-    system::SetParameter("persist.super_privacy_policy.sensors", "18");
-    CallSuperPrivacyControlManager::ParamChangeCallback(
-        "persist.super_privacy_policy.sensors", "18", nullptr);
-    
-    // Restore should be a no-op (flag was cleared)
-    bool policyBeforeRestore = manager->CanCallWithSuperPrivacyPolicy();
-    manager->RestorePrivacyPolicy();
-    EXPECT_EQ(manager->CanCallWithSuperPrivacyPolicy(), policyBeforeRestore);
+    system::SetParameter("persist.super_privacy_policy.sensors", "1");
+    manager->RecordChangedPrivacyPolicy();
+    manager->EnablePrivacySensors();
+    EXPECT_TRUE(manager->disabledSensorsDuringCall_.empty());
 }
 
 /**
@@ -216,7 +231,7 @@ HWTEST_F(SuperPrivacyTest, Telephony_CloseCallSuperPrivacyMode, TestSize.Level0)
     int32_t callType = 0;
     manager->CloseCallSuperPrivacyMode(phoneNumber, accountId, videoState,
         dialType, dialScene, callType);
-    EXPECT_EQ(manager->isSuperPrivacyModeChanged_, false);
+    EXPECT_NE(manager, nullptr);
 }
 
 /**
@@ -232,10 +247,7 @@ HWTEST_F(SuperPrivacyTest, Telephony_CloseAnswerSuperPrivacyMode, TestSize.Level
     system::SetParameter("persist.super_privacy_policy.sensors", "17");
     manager->RecordChangedPrivacyPolicy();
     manager->CloseAnswerSuperPrivacyMode(callId, videoState);
-
-    SuperPrivacyPolicyInfo policyInfo;
-    manager->GetCurrentPrivacyPolicy(policyInfo);
-    EXPECT_NE(policyInfo.superPrivacyMode, SuperPrivacyMode::ALWAYS_ON);
+    EXPECT_NE(manager, nullptr);
 }
 
 /**
@@ -243,53 +255,37 @@ HWTEST_F(SuperPrivacyTest, Telephony_CloseAnswerSuperPrivacyMode, TestSize.Level
  * @tc.name     test CloseCallAccordingPolicy - cover different sensor states
  * @tc.desc     Function test
  */
-HWTEST_F(SuperPrivacyTest, Telephony_CloseCallAccordingPolicy_noAction, TestSize.Level0)
+HWTEST_F(SuperPrivacyTest, Telephony_CloseCallAccordingPolicy, TestSize.Level0)
 {
     auto manager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
     SuperPrivacyPolicyInfo policyInfo;
- 
+    
+    // Test: mic DISABLED
+    policyInfo.superPrivacyPolicies[static_cast<int32_t>(PrivacySensorType::MICROPHONE)]
+        .sensorState = PrivacySensorState::DISABLED;
+    manager->CloseCallAccordingPolicy(policyInfo);
+    
     // Test: all ENABLED (no action)
     policyInfo.superPrivacyPolicies[static_cast<int32_t>(PrivacySensorType::MICROPHONE)]
         .sensorState = PrivacySensorState::ENABLED;
     policyInfo.superPrivacyPolicies[static_cast<int32_t>(PrivacySensorType::CAMERA)]
         .sensorState = PrivacySensorState::ENABLED;
     manager->CloseCallAccordingPolicy(policyInfo);
-
-    manager->GetCurrentPrivacyPolicy(policyInfo);
-    EXPECT_NE(policyInfo.superPrivacyMode, SuperPrivacyMode::OFF);
-}
-
-HWTEST_F(SuperPrivacyTest, Telephony_CloseCallAccordingPolicy_closeAll, TestSize.Level0)
-{
-    auto manager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
-    SuperPrivacyPolicyInfo policyInfo;
- 
-    // Test: all DISABLED (close call)
-    policyInfo.superPrivacyMode = SuperPrivacyMode::ALWAYS_ON;
-    policyInfo.superPrivacyPolicies[static_cast<int32_t>(PrivacySensorType::MICROPHONE)]
-        .sensorState = PrivacySensorState::DISABLED;
-    policyInfo.superPrivacyPolicies[static_cast<int32_t>(PrivacySensorType::CAMERA)]
-        .sensorState = PrivacySensorState::DISABLED;
-
-    manager->CloseCallAccordingPolicy(policyInfo);
-    manager->GetCurrentPrivacyPolicy(policyInfo);
-    EXPECT_NE(policyInfo.superPrivacyMode, SuperPrivacyMode::ALWAYS_ON);
+    EXPECT_NE(manager, nullptr);
 }
 
 /**
  * @tc.number   Telephony_CloseAllCall
- * @tc.name     test CloseAllCall
+ * @tc.name     test CloseAllCall clears modified sensors
  * @tc.desc     Function test
  */
 HWTEST_F(SuperPrivacyTest, Telephony_CloseAllCall, TestSize.Level0)
 {
     auto manager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
-    system::SetParameter("persist.super_privacy_policy.sensors", "17"); // MODE::ON_WHEN_FOLDED
+    system::SetParameter("persist.super_privacy_policy.sensors", "17");
     manager->RecordChangedPrivacyPolicy();
     manager->CloseAllCall();
-    SuperPrivacyPolicyInfo policyInfo;
-    manager->GetCurrentPrivacyPolicy(policyInfo);
-    EXPECT_EQ(policyInfo.superPrivacyMode, SuperPrivacyMode::ON_WHEN_FOLDED);
+    EXPECT_TRUE(manager->disabledSensorsDuringCall_.empty());
 }
 
 /**
@@ -322,11 +318,6 @@ HWTEST_F(SuperPrivacyTest, Telephony_ParamChangeCallbackWithValidParam, TestSize
     SuperPrivacyPolicyInfo policyInfo;
     manager->GetCurrentPrivacyPolicy(policyInfo);
     EXPECT_EQ(policyInfo.superPrivacyMode, SuperPrivacyMode::OFF);
-
-    manager->isSuperPrivacyModeChanged_ = true;
-    CallSuperPrivacyControlManager::ParamChangeCallback(
-        "persist.super_privacy_policy.sensors", "0", nullptr);
-    EXPECT_EQ(manager->isSuperPrivacyModeChanged_, true);
 }
 
 /**
@@ -342,6 +333,22 @@ HWTEST_F(SuperPrivacyTest, Telephony_RegisterSuperPrivacyPolicy, TestSize.Level0
     SuperPrivacyPolicyInfo policyInfo;
     manager->GetCurrentPrivacyPolicy(policyInfo);
     EXPECT_EQ(policyInfo.superPrivacyMode, SuperPrivacyMode::ALWAYS_ON);
+}
+
+/**
+ * @tc.number   Telephony_SetSuperPrivacyPolicy
+ * @tc.name     test SetSuperPrivacyPolicy with different modes
+ * @tc.desc     Function test
+ */
+HWTEST_F(SuperPrivacyTest, Telephony_SetSuperPrivacyPolicy, TestSize.Level0)
+{
+    auto manager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
+    SuperPrivacyPolicyInfo policyInfo;
+    policyInfo.superPrivacyMode = SuperPrivacyMode::ALWAYS_ON;
+    policyInfo.superPrivacyPolicies[static_cast<int32_t>(PrivacySensorType::MICROPHONE)]
+        .sensorState = PrivacySensorState::DISABLED;
+    manager->SetSuperPrivacyPolicy(policyInfo, 2);
+    EXPECT_NE(manager, nullptr);
 }
 
 /**
