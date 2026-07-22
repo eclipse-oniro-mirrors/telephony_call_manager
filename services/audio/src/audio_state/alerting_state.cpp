@@ -45,7 +45,7 @@ bool AlertingState::ProcessEvent(int32_t event)
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->
                 ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 TELEPHONY_LOGI("alerting state switch ims call to active state");
-                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent( 
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_IMS_CALL_STATE);
             }
             break;
