@@ -26,48 +26,41 @@ bool HoldingState::ProcessEvent(int32_t event)
 {
     bool result = false;
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
-    auto audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
     switch (event) {
         case AudioEvent::NEW_ACTIVE_CS_CALL:
-            if (callStateProcessor != nullptr &&
-                callStateProcessor->ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+                ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 TELEPHONY_LOGI("holding state switch cs call to active state");
-                if (audioSceneProcessor != nullptr) {
-                    result = audioSceneProcessor->ProcessEvent(AudioEvent::SWITCH_CS_CALL_STATE);
-                }
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                    AudioEvent::SWITCH_CS_CALL_STATE);
             }
             break;
         case AudioEvent::NEW_ACTIVE_IMS_CALL:
-            if (callStateProcessor != nullptr &&
-                callStateProcessor->ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+                ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 TELEPHONY_LOGI("holding state switch ims call to active state");
-                if (audioSceneProcessor != nullptr) {
-                    result = audioSceneProcessor->ProcessEvent(AudioEvent::SWITCH_IMS_CALL_STATE);
-                }
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                    AudioEvent::SWITCH_IMS_CALL_STATE);
             }
             break;
         case AudioEvent::NEW_INCOMING_CALL:
-            if (callStateProcessor != nullptr &&
-                callStateProcessor->ShouldSwitchState(TelCallState::CALL_STATUS_INCOMING)) {
+            // should switch incoming state while only one incoming call exists
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+                ShouldSwitchState(TelCallState::CALL_STATUS_INCOMING)) {
                 TELEPHONY_LOGI("holding state switch call to incoming state");
-                if (audioSceneProcessor != nullptr) {
-                    result = audioSceneProcessor->ProcessEvent(AudioEvent::SWITCH_INCOMING_STATE);
-                }
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                    AudioEvent::SWITCH_INCOMING_STATE); // switch to incoming state
             }
             break;
         case AudioEvent::NO_MORE_HOLDING_CALL:
-            if (callStateProcessor != nullptr) {
-                result = callStateProcessor->UpdateCurrentCallState();
-            }
+            result = DelayedSingleton<CallStateProcessor>::GetInstance()->UpdateCurrentCallState();
             break;
         case AudioEvent::NEW_ALERTING_CALL:
-            if (callStateProcessor != nullptr &&
-                callStateProcessor->ShouldSwitchState(TelCallState::CALL_STATUS_ALERTING)) {
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+                ShouldSwitchState(TelCallState::CALL_STATUS_ALERTING)) {
                 TELEPHONY_LOGI("holding state switch call to alerting state and ignore dialing state");
-                if (audioSceneProcessor != nullptr) {
-                    result = audioSceneProcessor->ProcessEvent(AudioEvent::SWITCH_ALERTING_STATE);
-                }
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                    AudioEvent::SWITCH_ALERTING_STATE);
             }
             break;
         default:
