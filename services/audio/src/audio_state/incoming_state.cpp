@@ -28,29 +28,29 @@ bool IncomingState::ProcessEvent(int32_t event)
     std::lock_guard<ffrt::mutex> lock(mutex_);
     switch (event) {
         case AudioEvent::NO_MORE_INCOMING_CALL:
-            result = CallStateProcessor::GetInstance()->UpdateCurrentCallState();
+            result = DelayedSingleton<CallStateProcessor>::GetInstance()->UpdateCurrentCallState();
             break;
         case AudioEvent::NEW_ACTIVE_CS_CALL:
             // switch to cs call state anyway.
-            if (CallStateProcessor::GetInstance()->
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
                 ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 TELEPHONY_LOGI("incoming state switch cs call to active state");
-                result = AudioSceneProcessor::GetInstance()->ProcessEvent(
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_CS_CALL_STATE);
             }
             break;
         case AudioEvent::NEW_ACTIVE_IMS_CALL:
-            if (CallStateProcessor::GetInstance()->
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
                 ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 // switch to ims call state anyway.
                 TELEPHONY_LOGI("incoming state switch ims call to active state");
-                result = AudioSceneProcessor::GetInstance()->ProcessEvent(
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_IMS_CALL_STATE);
             }
             break;
         case AudioEvent::NEW_INCOMING_CALL:
             TELEPHONY_LOGI("incoming state switch incoming state");
-            result = AudioSceneProcessor::GetInstance()->ProcessEvent(
+            result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                 AudioEvent::SWITCH_INCOMING_STATE);
             break;
         default:

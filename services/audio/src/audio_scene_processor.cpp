@@ -43,12 +43,6 @@ AudioSceneProcessor::AudioSceneProcessor()
 
 AudioSceneProcessor::~AudioSceneProcessor() {}
 
-std::shared_ptr<AudioSceneProcessor> AudioSceneProcessor::GetInstance()
-{
-    std::shared_ptr<AudioSceneProcessor> instance = std::make_shared<AudioSceneProcessor>();
-    return instance;
-}
-
 int32_t AudioSceneProcessor::Init()
 {
     memberFuncMap_[AudioEvent::SWITCH_DIALING_STATE] = [this]() { return SwitchDialing(); };
@@ -81,7 +75,7 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
         case AudioEvent::SWITCH_IMS_CALL_STATE:
         case AudioEvent::SWITCH_HOLDING_STATE:
         case AudioEvent::SWITCH_AUDIO_INACTIVE_STATE:
-            if (CallStateProcessor::GetInstance()->ShouldStopSoundtone()) {
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
                 DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundtone();
                 // Acquire disconnected lock in DisconnectedHandle when the remote hangup
                 DelayedSingleton<CallControlManager>::GetInstance()->ReleaseDisconnectedLock();
@@ -96,7 +90,7 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
         case AudioEvent::NO_MORE_ACTIVE_CALL:
         case AudioEvent::NO_MORE_ALERTING_CALL:
             DelayedSingleton<AudioControlManager>::GetInstance()->StopRingback();
-            if (CallStateProcessor::GetInstance()->ShouldStopSoundtone()) {
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
                 DelayedSingleton<AudioControlManager>::GetInstance()->
                     PlayCallEndedTone();
             } else {
@@ -108,7 +102,7 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
             break;
         case AudioEvent::NO_MORE_DIALING_CALL:
         case AudioEvent::NO_MORE_HOLDING_CALL:
-            if (CallStateProcessor::GetInstance()->ShouldStopSoundtone()) {
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
                 DelayedSingleton<AudioControlManager>::GetInstance()->
                     PlayCallEndedTone();
             } else {
@@ -222,7 +216,7 @@ bool AudioSceneProcessor::SwitchIncoming()
     auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
-    auto callStateProcessor = CallStateProcessor::GetInstance();
+    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
     if (audioDeviceManager == nullptr || audioControlManager == nullptr || callControlManager == nullptr ||
         callStateProcessor == nullptr) {
         return false;
@@ -319,7 +313,7 @@ bool AudioSceneProcessor::SwitchOTT()
 void AudioSceneProcessor::PlaySosSoundTone(AudioEvent event)
 {
     if (event == AudioEvent::NO_MORE_ALERTING_CALL || event == AudioEvent::NO_MORE_DIALING_CALL) {
-        auto callStateProcessor = CallStateProcessor::GetInstance();
+        auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
         if (callStateProcessor == nullptr) {
             TELEPHONY_LOGE("callStateProcessor is nullptr");
             return;

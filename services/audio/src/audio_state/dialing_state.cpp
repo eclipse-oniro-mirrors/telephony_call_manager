@@ -28,31 +28,31 @@ bool DialingState::ProcessEvent(int32_t event)
     std::lock_guard<ffrt::mutex> lock(mutex_);
     switch (event) {
         case AudioEvent::NO_MORE_DIALING_CALL:
-            result = CallStateProcessor::GetInstance()->UpdateCurrentCallState();
+            result = DelayedSingleton<CallStateProcessor>::GetInstance()->UpdateCurrentCallState();
             break;
         case AudioEvent::NEW_ACTIVE_CS_CALL:
             // switch to cs call state anyway.
-            if (CallStateProcessor::GetInstance()->
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
                 ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 TELEPHONY_LOGI("dialing state switch cs call to active state");
-                result = AudioSceneProcessor::GetInstance()->ProcessEvent(
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_CS_CALL_STATE);
             }
             break;
         case AudioEvent::NEW_ACTIVE_IMS_CALL:
             // switch to ims call state anyway.
-            if (CallStateProcessor::GetInstance()->
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
                 ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 TELEPHONY_LOGI("dialing state switch ims call to active state");
-                result = AudioSceneProcessor::GetInstance()->ProcessEvent(
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_IMS_CALL_STATE);
             }
             break;
         case AudioEvent::NEW_ALERTING_CALL:
             // switch to ims call state anyway.
-            if (CallStateProcessor::GetInstance()->
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
                 ShouldSwitchState(TelCallState::CALL_STATUS_ALERTING)) {
-                result = AudioSceneProcessor::GetInstance()->ProcessEvent(
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_ALERTING_STATE);
             }
             break;

@@ -27,38 +27,46 @@ bool AlertingState::ProcessEvent(int32_t event)
 {
     bool result = false;
     std::lock_guard<ffrt::mutex> lock(mutex_);
+    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+    auto audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
     switch (event) {
         case AudioEvent::NO_MORE_ALERTING_CALL:
-            result = CallStateProcessor::GetInstance()->UpdateCurrentCallState();
+            if (callStateProcessor != nullptr) {
+                result = callStateProcessor->UpdateCurrentCallState();
+            }
             break;
         case AudioEvent::NEW_ACTIVE_CS_CALL:
-            // switch to cs call state anyway.
-            if (CallStateProcessor::GetInstance()->
-                ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
+            if (callStateProcessor != nullptr &&
+                callStateProcessor->ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 TELEPHONY_LOGI("alerting state switch cs call to active state");
-                result = AudioSceneProcessor::GetInstance()->ProcessEvent(
-                    AudioEvent::SWITCH_CS_CALL_STATE);
+                if (audioSceneProcessor != nullptr) {
+                    result = audioSceneProcessor->ProcessEvent(AudioEvent::SWITCH_CS_CALL_STATE);
+                }
             }
             break;
         case AudioEvent::NEW_ACTIVE_IMS_CALL:
-            // switch to ims call state anyway.
-            if (CallStateProcessor::GetInstance()->
-                ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
+            if (callStateProcessor != nullptr &&
+                callStateProcessor->ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 TELEPHONY_LOGI("alerting state switch ims call to active state");
-                result = AudioSceneProcessor::GetInstance()->ProcessEvent(
-                    AudioEvent::SWITCH_IMS_CALL_STATE);
+                if (audioSceneProcessor != nullptr) {
+                    result = audioSceneProcessor->ProcessEvent(AudioEvent::SWITCH_IMS_CALL_STATE);
+                }
             }
             break;
         case AudioEvent::NEW_ALERTING_CALL:
-            if (CallStateProcessor::GetInstance()->
-                ShouldSwitchState(TelCallState::CALL_STATUS_ALERTING)) {
+            if (callStateProcessor != nullptr &&
+                callStateProcessor->ShouldSwitchState(TelCallState::CALL_STATUS_ALERTING)) {
                 TELEPHONY_LOGI("alerting state: check is should play ringback tone.");
-                result = AudioSceneProcessor::GetInstance()->ProcessEvent(
-                    AudioEvent::SWITCH_ALERTING_STATE);
+                if (audioSceneProcessor != nullptr) {
+                    result = audioSceneProcessor->ProcessEvent(AudioEvent::SWITCH_ALERTING_STATE);
+                }
             }
             break;
         case AudioEvent::NEW_INCOMING_CALL:
-            result = DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
+            if (audioControlManager != nullptr) {
+                result = audioControlManager->PlayWaitingTone();
+            }
             break;
         default:
             break;

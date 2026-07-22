@@ -29,10 +29,8 @@ constexpr uint16_t EMPTY_VALUE = 0;
 constexpr uint16_t EXIST_ONLY_ONE_CALL = 1;
 
 class CallStateProcessor : public std::enable_shared_from_this<CallStateProcessor> {
+    DECLARE_DELAYED_SINGLETON(CallStateProcessor)
 public:
-    CallStateProcessor();
-    ~CallStateProcessor();
-    static std::shared_ptr<CallStateProcessor> GetInstance();
     void AddCall(int32_t callId, TelCallState state);
     void DeleteCall(int32_t callId, TelCallState state);
     bool UpdateCurrentCallState();

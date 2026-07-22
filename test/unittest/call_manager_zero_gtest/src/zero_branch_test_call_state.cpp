@@ -453,7 +453,7 @@ HWTEST_F(CallStateTest, Telephony_AudioPlayer_001, TestSize.Level0)
  */
 HWTEST_F(CallStateTest, Telephony_AudioSceneProcessor_001, TestSize.Level0)
 {
-    auto audioSceneProcessor = AudioSceneProcessor::GetInstance();
+    auto audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
     audioSceneProcessor->SwitchState(CallStateType::ALERTING_STATE);
     audioSceneProcessor->SwitchState(CallStateType::INCOMING_STATE);
     audioSceneProcessor->SwitchState(CallStateType::CS_CALL_STATE);
@@ -1006,7 +1006,7 @@ HWTEST_F(CallStateTest, Telephony_VoipCallConnection_001, TestSize.Level0)
  */
 HWTEST_F(CallStateTest, Telephony_CallStateProcessor_001, TestSize.Level0)
 {
-    auto callStateProcessor = CallStateProcessor::GetInstance();
+    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
     TelCallState state = TelCallState::CALL_STATUS_ACTIVE;
     callStateProcessor->AddCall(1, state);
     bool result = callStateProcessor->UpdateCurrentCallState();

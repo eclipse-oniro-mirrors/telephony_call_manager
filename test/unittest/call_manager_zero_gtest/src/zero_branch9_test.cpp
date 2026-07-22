@@ -74,7 +74,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_001, TestSize.Level0)
     DialParaInfo mDialParaInfo;
     mDialParaInfo.accountId = 0;
     sptr<OHOS::Telephony::CallBase> callObjectPtr = nullptr;
-    CallStateProcessor::GetInstance()->holdingCalls_.insert(1);
+    DelayedSingleton<CallStateProcessor>::GetInstance()->holdingCalls_.insert(1);
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
     callObjectPtr = new IMSCall(mDialParaInfo);
@@ -261,7 +261,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_006, TestSize.Level0)
     ringingCall->SetCrsType(2);
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     audioDeviceManager->isWiredHeadsetConnected_ = true;
-    auto callStateProcessor = CallStateProcessor::GetInstance();
+    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
     callStateProcessor->incomingCalls_.insert(1);
     callStateProcessor->alertingCalls_.clear();
     ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
@@ -322,7 +322,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_008, Function | MediumTe
     ASSERT_NO_THROW(audioControl->MuteNetWorkRingTone(false));
     audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING,
         TelCallState::CALL_STATUS_DISCONNECTING);
-    ASSERT_NO_THROW(CallStateProcessor::GetInstance()->DeleteCall(call->GetCallID(),
+    ASSERT_NO_THROW(DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(call->GetCallID(),
         TelCallState::CALL_STATUS_ACTIVE));
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
@@ -509,9 +509,9 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_012, Function | MediumTe
 HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_sos_noringback_tone, TestSize.Level3)
 {
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
-    auto audioScene = AudioSceneProcessor::GetInstance();
+    auto audioScene = DelayedSingleton<AudioSceneProcessor>::GetInstance();
     auto callControl = DelayedSingleton<CallControlManager>::GetInstance();
-    auto callState = CallStateProcessor::GetInstance();
+    auto callState = DelayedSingleton<CallStateProcessor>::GetInstance();
     AppExecFwk::PacMap extras;
     DialParaInfo dialInfo;
     sptr<CallBase> call = new IMSCall(dialInfo);
@@ -608,7 +608,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_PlayRingtone_001, Function | MediumTest | Le
  */
 HWTEST_F(ZeroBranch9Test, Telephony_SwitchIncoming_001, Function | MediumTest | Level3)
 {
-    auto audioSceneProcessor = AudioSceneProcessor::GetInstance();
+    auto audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     DialParaInfo mDialParaInfo;
     mDialParaInfo.callType = CallType::TYPE_IMS;
@@ -677,11 +677,11 @@ HWTEST_F(ZeroBranch9Test, Telephony_PlayRingtone_CallNumberExceed1, Function | M
 {
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     audioControl->Init();
-    auto callStateProcessor = CallStateProcessor::GetInstance();
+    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
     callStateProcessor->alertingCalls_.clear();
     callStateProcessor->incomingCalls_.clear();
     callStateProcessor->incomingCalls_.insert(CRS_TYPE);
-    AudioSceneProcessor::GetInstance()->SwitchIncoming();
+    DelayedSingleton<AudioSceneProcessor>::GetInstance()->SwitchIncoming();
     CallObjectManager::callObjectPtrList_.clear();
     DialParaInfo info;
     sptr<CallBase> call = new IMSCall(info);
@@ -700,7 +700,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_SwitchIncoming_SelectDevice, Function | Medi
 {
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
-    auto audioSceneProcessor = AudioSceneProcessor::GetInstance();
+    auto audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     DialParaInfo dialParaInfo;
     dialParaInfo.callType = CallType::TYPE_IMS;

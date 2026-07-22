@@ -33,12 +33,6 @@ CallStateProcessor::~CallStateProcessor()
     dialingCalls_.clear();
 }
 
-std::shared_ptr<CallStateProcessor> CallStateProcessor::GetInstance()
-{
-    static std::shared_ptr<CallStateProcessor> instance = std::make_shared<CallStateProcessor>();
-    return instance;
-}
-
 void CallStateProcessor::AddCall(int32_t callId, TelCallState state)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
@@ -192,7 +186,7 @@ bool CallStateProcessor::UpdateCurrentCallState()
         event = AudioEvent::SWITCH_AUDIO_INACTIVE_STATE;
     }
     TELEPHONY_LOGI("UpdateCurrentCallState ProcessEvent event=%{public}d", event);
-    return AudioSceneProcessor::GetInstance()->ProcessEvent(event);
+    return DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
 }
 
 bool CallStateProcessor::ShouldStopSoundtone()

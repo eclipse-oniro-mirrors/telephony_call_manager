@@ -30,13 +30,13 @@ bool IMSCallState::ProcessEvent(int32_t event)
     switch (event) {
         case AudioEvent::NO_MORE_ACTIVE_CALL:
         case AudioEvent::NO_MORE_INCOMING_CALL:
-            result = CallStateProcessor::GetInstance()->UpdateCurrentCallState();
+            result = DelayedSingleton<CallStateProcessor>::GetInstance()->UpdateCurrentCallState();
             break;
         case AudioEvent::NEW_INCOMING_CALL:
             result = DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
             break;
         case AudioEvent::CALL_TYPE_IMS_CHANGE_CS:
-            result = AudioSceneProcessor::GetInstance()->ProcessEvent(
+            result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                 AudioEvent::SWITCH_CS_CALL_STATE);
             break;
         default:

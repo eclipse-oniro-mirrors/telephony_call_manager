@@ -161,7 +161,7 @@ void AudioSceneProcessorFunc(FuzzedDataProvider& provider)
         return;
     }
 
-    std::shared_ptr<AudioSceneProcessor> audioSceneProcessor = AudioSceneProcessor::GetInstance();
+    std::shared_ptr<AudioSceneProcessor> audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
     std::shared_ptr<AudioControlManager> audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
     std::string phoneNum = provider.ConsumeRandomLengthString();
 
