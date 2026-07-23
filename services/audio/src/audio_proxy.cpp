@@ -545,11 +545,6 @@ bool AudioPreferDeviceChangeCallback::IsDistributedDeviceSelected(
             }
             return true;
         }
-        if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDistributedCarDeviceOnline() &&
-            LOCAL_DEVICE == networkId && (*iter)->deviceType_ == AudioStandard::DEVICE_TYPE_EARPIECE) {
-            TELEPHONY_LOGI("filter local earpiece.");
-            return true;
-        }
     }
     return false;
 }

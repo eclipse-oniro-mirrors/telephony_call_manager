@@ -77,15 +77,20 @@ void DistributedDeviceObserver::UnRegisterDevStatusCallback(
 
 void DistributedDeviceObserver::RegisterDevCallback()
 {
-    if (deviceListener_ == nullptr) {
-        deviceListener_ = std::make_shared<DistributedDeviceCallback>();
+    std::shared_ptr<IDistributedDeviceCallback> deviceListener;
+    {
+        std::lock_guard<ffrt::mutex> lock(mutex_);
+        if (deviceListener_ == nullptr) {
+            deviceListener_ = std::make_shared<DistributedDeviceCallback>();
+        }
+        deviceListener = deviceListener_;
     }
-    if (deviceListener_ == nullptr) {
+    if (deviceListener == nullptr) {
         return;
     }
     auto distributedMgr = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
     if (distributedMgr != nullptr) {
-        auto ret = distributedMgr->RegDevCallbackWrapper(deviceListener_);
+        auto ret = distributedMgr->RegDevCallbackWrapper(deviceListener);
         TELEPHONY_LOGI("reg distributed device callback result[%{public}d]", ret);
     }
 }
@@ -93,6 +98,7 @@ void DistributedDeviceObserver::RegisterDevCallback()
 int32_t DistributedDeviceObserver::UnRegisterDevCallback()
 {
     int32_t res = TELEPHONY_SUCCESS;
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (deviceListener_ != nullptr) {
         auto distributedMgr = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
         if (distributedMgr != nullptr) {

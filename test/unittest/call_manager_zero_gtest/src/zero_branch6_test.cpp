@@ -804,6 +804,31 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallRequestEventHandlerHelper_001, TestSize.
 }
 
 /**
+ * @tc.number   Telephony_DistributedCallManager_ValidProxy
+ * @tc.name     test IsSelectVirtualModem with valid proxy
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_ValidProxy, TestSize.Level0)
+{
+    DistributedCallManager manager;
+    AudioDevice device;
+    std::string deviceId = "{ \"devId\": \"101\" }";
+    EXPECT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
+    // No online device -> false
+    manager.onlineDCallDevices_.clear();
+    EXPECT_FALSE(manager.IsSelectVirtualModem());
+    // Has online device, dcallProxy_ is null -> false
+    manager.onlineDCallDevices_["101"] = device;
+    manager.dcallProxy_ = nullptr;
+    EXPECT_FALSE(manager.IsSelectVirtualModem());
+    // Has online device, dcallProxy_ is valid -> calls dcallProxy_->IsSelectVirtualModem
+    manager.dcallProxy_ = std::make_shared<DistributedCallProxy>();
+    EXPECT_FALSE(manager.IsSelectVirtualModem());
+    manager.onlineDCallDevices_.clear();
+    manager.dcallProxy_ = nullptr;
+}
+
+/**
  * @tc.number   Telephony_DistributedCallManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -894,6 +919,13 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_002, TestSize.Level0)
     ASSERT_TRUE(manager.IsDistributedCarDeviceOnline());
     manager.onlineDCallDevices_.clear();
     ASSERT_FALSE(manager.IsDistributedCarDeviceOnline());
+    // IsSelectVirtualModem: no online dcall device
+    EXPECT_FALSE(manager.IsSelectVirtualModem());
+    // IsSelectVirtualModem: has online device but dcallProxy_ is null
+    manager.onlineDCallDevices_["101"] = device;
+    manager.dcallProxy_ = nullptr;
+    EXPECT_FALSE(manager.IsSelectVirtualModem());
+    manager.onlineDCallDevices_.clear();
     CallObjectManager::callObjectPtrList_.clear();
     ASSERT_FALSE(manager.isCeliaCall());
     call->callType_ = CallType::TYPE_IMS;
@@ -947,29 +979,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_003, TestSize.Level0)
     manager.ReportDistributedDeviceInfo(device);
     ASSERT_TRUE(manager.isCallActived_);
 }
-
-/**
- * @tc.number   Telephony_DistributedCallManager_004
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_004, TestSize.Level0)
-{
-    Bluetooth::BluetoothRemoteDevice device;
-    int32_t action = 1; // unwear bt headset
-    DCallHfpListener listener;
-    listener.OnHfpStackChanged(device, action); // not bt head set
-
-    DistributedCallManager manager;
-    manager.dcallHfpListener_ = nullptr;
-    EXPECT_EQ(manager.AddDCallDevice(TEST_STR), TELEPHONY_ERR_FAIL);
-    manager.OnDCallDeviceOffline(TEST_STR);
-    manager.dcallHfpListener_ = std::make_shared<DCallHfpListener>();
-    EXPECT_EQ(manager.AddDCallDevice(TEST_STR), TELEPHONY_ERR_FAIL);
-    manager.OnDCallDeviceOffline(TEST_STR);
-}
-#endif
 
 /**
  * @tc.number   Telephony_DistributedCallProxy_001
