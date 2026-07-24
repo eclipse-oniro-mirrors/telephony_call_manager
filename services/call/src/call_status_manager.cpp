@@ -691,6 +691,7 @@ int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
     }
     
     call->SetNonVirtualCall(!DelayedSingleton<AudioDeviceManager>::GetInstance()->GetVirtualCall());
+    call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
     AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
