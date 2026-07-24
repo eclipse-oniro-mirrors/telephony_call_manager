@@ -535,7 +535,7 @@ void CallManagerHisysevent::ClearVoipProcedureCallInfo(const std::string &callId
 
 bool CallManagerHisysevent::InitTelephonyExtWrapper()
 {
-    return ture;
+    return true;
 }
 
 void CallManagerHisysevent::DeInitTelephonyExtWrapper()
