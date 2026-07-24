@@ -535,6 +535,7 @@ void CallManagerHisysevent::ClearVoipProcedureCallInfo(const std::string &callId
 
 bool CallManagerHisysevent::InitTelephonyExtWrapper()
 {
+    return ture;
 }
 
 void CallManagerHisysevent::DeInitTelephonyExtWrapper()
@@ -543,6 +544,7 @@ void CallManagerHisysevent::DeInitTelephonyExtWrapper()
 
 bool CallManagerHisysevent::ReportEventToChrAsync(const std::string &moduleName, MessageParcel &parcelIn)
 {
+    return true;
 }
 
 void CallManagerHisysevent::ReportCallDropChrEvent(int32_t slotId, int32_t callIndex, int32_t dropReason)
