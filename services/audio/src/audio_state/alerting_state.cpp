@@ -59,7 +59,6 @@ bool AlertingState::ProcessEvent(int32_t event)
             break;
         case AudioEvent::NEW_INCOMING_CALL:
             result = DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
-            break;
         default:
             break;
     }

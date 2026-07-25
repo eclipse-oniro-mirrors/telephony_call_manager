@@ -142,12 +142,14 @@ bool BluetoothCallConnection::GetSupportBtCall()
 
 void BluetoothCallConnection::SetBtCallScoConnected(bool isBtCallScoConnected)
 {
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     isBtCallScoConnected_ = isBtCallScoConnected;
     TELEPHONY_LOGI("Set BtCallScoConnected=%{public}d", isBtCallScoConnected_);
 }
 
 bool BluetoothCallConnection::GetBtCallScoConnected()
 {
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     TELEPHONY_LOGI("Get BtCallScoConnected=%{public}d", isBtCallScoConnected_);
     return isBtCallScoConnected_;
 }

@@ -1062,6 +1062,10 @@ bool AudioControlManager::DealCrsScene(const AudioStandard::AudioRingerMode &rin
         HILOG_COMM_ERROR("play soundtone fail.");
         return false;
     } else {
+        if (ring_ == nullptr) {
+            TELEPHONY_LOGE("ring_ is nullptr");
+            return false;
+        }
         ring_->Play(accountId, "", Media::HapticStartupMode::DEFAULT);
         TELEPHONY_LOGI("type_crs palyRingTone in silent and vibrat mode");
         return true;

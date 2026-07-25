@@ -205,6 +205,10 @@ int32_t VideoControlManager::OpenCamera(
 {
     // cameraId check
     std::string id(Str16ToStr8(cameraId));
+    if (!ContainCameraID(id)) {
+        TELEPHONY_LOGE("Invalid cameraId: %{public}s", id.c_str());
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     int32_t ret = TELEPHONY_ERR_FAIL;
     ret = CallPolicy::VideoCallPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
@@ -239,6 +243,10 @@ int32_t VideoControlManager::CloseCamera(
     int32_t callId, std::u16string &cameraId, int32_t callingUid, int32_t callingPid)
 {
     std::string id(Str16ToStr8(cameraId));
+    if (!ContainCameraID(id)) {
+        TELEPHONY_LOGE("Invalid cameraId: %{public}s", id.c_str());
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     int32_t ret = TELEPHONY_ERR_FAIL;
     ret = CallPolicy::VideoCallPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {

@@ -720,7 +720,12 @@ int32_t CallManagerService::SetCallRestriction(int32_t slotId, CallRestrictionIn
 int32_t CallManagerService::SetCallRestrictionPassword(
     int32_t slotId, CallRestrictionType fac, const char *oldPassword, const char *newPassword)
 {
-    if (!CheckCallerIsSystemApp()) {
+    if (oldPassword == nullptr || newPassword == nullptr) {
+        TELEPHONY_LOGE("oldPassword or newPassword is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (!CheckSetTelephonyStatePermission()) {
@@ -971,7 +976,12 @@ int32_t CallManagerService::SetPreviewWindow(int32_t callId, std::string &surfac
 
 int32_t CallManagerService::SetDisplayWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface)
 {
-    if (!CheckCallerIsSystemApp()) {
+    if (surface == nullptr) {
+        TELEPHONY_LOGE("surface is null!");
+        return TELEPHONY_ERR_FAIL;
+    }
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (!CheckSetTelephonyStatePermission()) {
@@ -1119,7 +1129,12 @@ int32_t CallManagerService::GetCallIdListForConference(int32_t callId, std::vect
 
 int32_t CallManagerService::GetImsConfig(int32_t slotId, ImsConfigItem item)
 {
-    if (!CheckCallerIsSystemApp()) {
+    if (item != ITEM_VIDEO_QUALITY && item != ITEM_IMS_SWITCH_STATUS) {
+        TELEPHONY_LOGE("Invalid item is %{public}d", item);
+        return TELEPHONY_ERR_FAIL;
+    }
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
@@ -1136,7 +1151,12 @@ int32_t CallManagerService::GetImsConfig(int32_t slotId, ImsConfigItem item)
 
 int32_t CallManagerService::SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value)
 {
-    if (!CheckCallerIsSystemApp()) {
+    if (item != ITEM_VIDEO_QUALITY && item != ITEM_IMS_SWITCH_STATUS) {
+        TELEPHONY_LOGE("Invalid item is %{public}d", item);
+        return TELEPHONY_ERR_FAIL;
+    }
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (!CheckSetTelephonyStatePermission()) {
@@ -1169,7 +1189,12 @@ int32_t CallManagerService::GetImsFeatureValue(int32_t slotId, FeatureType type)
 
 int32_t CallManagerService::SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value)
 {
-    if (!CheckCallerIsSystemApp()) {
+    if (type < TYPE_VOICE_OVER_LTE || type > TYPE_SS_OVER_UT) {
+        TELEPHONY_LOGE("Invalid type is %{public}d", type);
+        return TELEPHONY_ERR_FAIL;
+    }
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (!CheckSetTelephonyStatePermission()) {
@@ -1185,7 +1210,12 @@ int32_t CallManagerService::SetImsFeatureValue(int32_t slotId, FeatureType type,
 
 int32_t CallManagerService::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
 {
-    if (!CheckCallerIsSystemApp()) {
+    if (mode < CALL_MODE_AUDIO_ONLY || mode > CALL_MODE_VIDEO_PAUSED) {
+        TELEPHONY_LOGE("Invalid mode is %{public}d", mode);
+        return TELEPHONY_ERR_FAIL;
+    }
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (!CheckSetTelephonyStatePermission()) {

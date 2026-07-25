@@ -429,11 +429,12 @@ int32_t CallStatusManager::HandleOttEventReportInfo(const OttCallEventInfo &info
     (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
     if (mOttEventIdTransferMap_.find(info.ottCallEventId) != mOttEventIdTransferMap_.end()) {
         eventInfo.eventId = mOttEventIdTransferMap_[info.ottCallEventId];
-        if (strnlen(info.bundleName, kMaxNumberLen + 1) > static_cast<size_t>(kMaxNumberLen)) {
+        if (strnlen(info.bundleName, kMaxBundleNameLen + 1) > static_cast<size_t>(kMaxBundleNameLen)) {
             TELEPHONY_LOGE("Number out of limit!");
             return CALL_ERR_NUMBER_OUT_OF_RANGE;
         }
-        if (memcpy_s(eventInfo.bundleName, kMaxNumberLen, info.bundleName, strlen(info.bundleName)) != EOK) {
+        if (memcpy_s(eventInfo.bundleName, kMaxBundleNameLen + 1, info.bundleName,
+            strnlen(info.bundleName, kMaxBundleNameLen + 1)) != EOK) {
             TELEPHONY_LOGE("memcpy_s failed!");
             return TELEPHONY_ERR_MEMCPY_FAIL;
         }

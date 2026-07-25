@@ -197,23 +197,25 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
     resultSet->GetString(columnIndex, contactInfo.name);
     resultSet->GetColumnIndex(PERSONAL_RINGTONE, columnIndex);
     resultSet->GetString(columnIndex, ringtonePath);
-    uint32_t length = ringtonePath.length() > FILE_PATH_MAX_LEN ? FILE_PATH_MAX_LEN : ringtonePath.length();
+    uint32_t length = ringtonePath.length() > FILE_PATH_MAX_LEN ? FILE_PATH_MAX_LEN - 1 : ringtonePath.length();
     if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, ringtonePath.c_str(), length) != EOK) {
         TELEPHONY_LOGE("memcpy_s ringtonePath fail!");
         resultSet->Close();
         return false;
     }
+    contactInfo.ringtonePath[length] = '\0';
     TELEPHONY_LOGI("ringtonePath: %{public}s", contactInfo.ringtonePath);
     resultSet->GetColumnIndex(PERSONAL_NOTIFICATION_RINGTONE, columnIndex);
     resultSet->GetString(columnIndex, personalNotificationRingtone);
     resultSet->Close();
     length = personalNotificationRingtone.length() > FILE_PATH_MAX_LEN ?
-        FILE_PATH_MAX_LEN : personalNotificationRingtone.length();
+        FILE_PATH_MAX_LEN - 1 : personalNotificationRingtone.length();
     if (memcpy_s(contactInfo.personalNotificationRingtone, FILE_PATH_MAX_LEN, personalNotificationRingtone.c_str(),
         length) != EOK) {
         TELEPHONY_LOGE("memcpy_s personalNotificationRingtone fail!");
         return false;
     }
+    contactInfo.personalNotificationRingtone[length] = '\0';
     TELEPHONY_LOGI("Query end, contactName length: %{public}zu", contactInfo.name.length());
     return true;
 }

@@ -32,7 +32,7 @@ struct CellularCallInfo {
     /**
      * Indicates the call phone number.
      */
-    char phoneNum[kMaxNumberLen] = { 0 };
+    char phoneNum[kMaxNumberLen + 1] = { 0 };
     /**
      * Indicates the slot id.
      */
