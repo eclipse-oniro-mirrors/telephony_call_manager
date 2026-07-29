@@ -64,6 +64,7 @@
                 "audio_framework",
                 "camera_framework",
                 "napi",
+                "node",
                 "os_account",
                 "player_framework",
                 "power_manager",
