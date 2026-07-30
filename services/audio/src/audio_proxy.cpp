@@ -146,6 +146,7 @@ void AudioProxy::PreventInterruption(VibrationType type)
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(LOOP_DURATION_2S));
             if (audioProxyPtr->needVibrate_) {
+                Sensors::SetUsage(VIBRATOR_USAGE_MAP.at(type));
                 Sensors::StartVibrator(EFFECT_ID_MAP.at(type).c_str());
             }
         }
