@@ -84,6 +84,7 @@ public:
 private:
     void InitCallBaseEvent();
     int32_t IncomingHandle(const CallDetailInfo &info);
+    int32_t FinalizeIncomingState(sptr<CallBase> &call, const TelCallState nextState);
     int32_t PrepareIncomingCall(const CallDetailInfo &info, bool &isExisted);
     int32_t IncomingVoipCallHandle(const CallDetailInfo &info);
     int32_t OutgoingVoipCallHandle(const CallDetailInfo &info);
