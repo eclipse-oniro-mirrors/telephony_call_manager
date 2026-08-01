@@ -533,7 +533,6 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 int32_t CallStatusManager::FinalizeIncomingState(sptr<CallBase> &call, const TelCallState nextState)
 {
     int32_t ret = UpdateCallState(call, nextState);
-    ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed!");
         return ret;
