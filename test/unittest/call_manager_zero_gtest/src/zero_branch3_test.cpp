@@ -2106,5 +2106,120 @@ HWTEST_F(ZeroBranch4Test, CallStatusManagerAlertHandleTest, Function | MediumTes
     EXPECT_EQ(callStatusManager->AlertHandle(info), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
     CallObjectManager::callObjectPtrList_.pop_back();
 }
+
+/**
+ * @tc.number   CallStatusManager_FinalizeIncomingState_UpdateCallStateFail
+ * @tc.name     FinalizeIncomingState_UpdateCallStateFail
+ * @tc.desc     When UpdateCallState returns failure, FinalizeIncomingState should return the failure
+ */
+HWTEST_F(ZeroBranch4Test, CallStatusManager_FinalizeIncomingState, Function | MediumTest | Level1)
+{
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    ASSERT_NE(callStatusManager, nullptr);
+    DialParaInfo paraInfo;
+    paraInfo.callType = CallType::TYPE_IMS;
+    sptr<CallBase> call = new IMSCall(paraInfo);
+    ASSERT_NE(call, nullptr);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    TelCallState nextState = TelCallState::CALL_STATUS_INCOMING;
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::AddOneCallObject(call);
+    int32_t ret = callStatusManager->FinalizeIncomingState(call, nextState);
+    EXPECT_NE(ret, TELEPHONY_SUCCESS);
+    CallObjectManager::DeleteOneCallObject(call);
+}
+ 
+/**
+ * @tc.number   CallStatusManager_FinalizeIncomingState
+ * @tc.name     FinalizeIncomingState_FilterResultsDisposeFail
+ * @tc.desc     When FilterResultsDispose returns failure, FinalizeIncomingState should return the failure
+ */
+HWTEST_F(ZeroBranch4Test, CallStatusManager_FinalizeIncomingState_Fail, Function | MediumTest | Level1)
+{
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    ASSERT_NE(callStatusManager, nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_INCOMING;
+    info.callType = CallType::TYPE_IMS;
+    info.callMode = VideoStateType::TYPE_VOICE;
+    std::string number = "123456";
+    memcpy_s(&info.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    info.index = 1;
+    info.accountId = 0;
+    sptr<CallBase> call = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    ASSERT_NE(call, nullptr);
+    CallObjectManager::AddOneCallObject(call);
+    TelCallState nextState = TelCallState::CALL_STATUS_INCOMING;
+    callStatusManager->CallFilterCompleteResult(info);
+    int32_t ret = callStatusManager->FinalizeIncomingState(call, nextState);
+    EXPECT_NE(ret, TELEPHONY_SUCCESS);
+    CallObjectManager::DeleteOneCallObject(call);
+}
+ 
+/**
+ * @tc.number   CallStatusManager_FinalizeIncomingState_Success
+ * @tc.name     FinalizeIncomingState_Success
+ * @tc.desc     When both UpdateCallState and FilterResultsDispose succ, FinalizeIncomingState should succeed
+ */
+HWTEST_F(ZeroBranch4Test, CallStatusManager_FinalizeIncomingState_Success, Function | MediumTest | Level1)
+{
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    ASSERT_NE(callStatusManager, nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_INCOMING;
+    info.callType = CallType::TYPE_IMS;
+    info.callMode = VideoStateType::TYPE_VOICE;
+    std::string number = "123456";
+    memcpy_s(&info.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    info.index = 1;
+    info.accountId = 0;
+    sptr<CallBase> call = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    ASSERT_NE(call, nullptr);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    CallObjectManager::AddOneCallObject(call);
+    TelCallState nextState = TelCallState::CALL_STATUS_INCOMING;
+    int32_t ret = callStatusManager->FinalizeIncomingState(call, nextState);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    CallObjectManager::DeleteOneCallObject(call);
+}
+ 
+/**
+ * @tc.number   CallStatusManager_FinalizeIncomingState_NullCall
+ * @tc.name     FinalizeIncomingState_NullCall
+ * @tc.desc     When call is nullptr, FinalizeIncomingState should return error
+ */
+HWTEST_F(ZeroBranch4Test, CallStatusManager_FinalizeIncomingState_NullCall, Function | MediumTest | Level1)
+{
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    ASSERT_NE(callStatusManager, nullptr);
+    sptr<CallBase> nullCall = nullptr;
+    TelCallState nextState = TelCallState::CALL_STATUS_INCOMING;
+    int32_t ret = callStatusManager->FinalizeIncomingState(nullCall, nextState);
+    EXPECT_NE(ret, TELEPHONY_SUCCESS);
+}
+ 
+/**
+ * @tc.number   CallStatusManager_IncomingHandle_BluetoothCall
+ * @tc.name     IncomingHandle_BluetoothCall_YellowPageUpdate
+ * @tc.desc     When GetCallType() is TYPE_BLUETOOTH, YellowPageAndMarkUpdate should be called
+ */
+HWTEST_F(ZeroBranch4Test, CallStatusManager_IncomingHandle_BluetoothCall, Function | MediumTest | Level1)
+{
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    ASSERT_NE(callStatusManager, nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_INCOMING;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    info.callMode = VideoStateType::TYPE_VOICE;
+    info.index = 1;
+    info.accountId = 0;
+    std::string number = "12345678901";
+    memcpy_s(&info.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    ASSERT_GT(callStatusManager->IncomingHandle(info), TELEPHONY_ERROR);
+    CallObjectManager::callObjectPtrList_.clear();
+}
 } // namespace Telephony
 } // namespace OHOS

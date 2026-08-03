@@ -502,6 +502,11 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         ModifyEsimType();
     }
     SetContactInfo(call, std::string(info.phoneNum));
+    // Bluetooth call does not support spam detection, check the yellow page now
+    auto callNumberUtils = DelayedSingleton<CallNumberUtils>::GetInstance();
+    if (callNumberUtils != nullptr && call->GetCallType() == CallType::TYPE_BLUETOOTH) {
+        callNumberUtils->YellowPageAndMarkUpdate(call);
+    }
 #ifdef SUPPORT_DSOFTBUS
     auto dcMgrInstance = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
     if (!(dcMgrInstance != nullptr && dcMgrInstance->IsSinkRole() && dcMgrInstance->IsConnected())) {
@@ -522,7 +527,12 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     AddOneCallObject(call);
     StartInComingCallMotionRecognition();
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
-    ret = UpdateCallState(call, info.state);
+    return FinalizeIncomingState(call, info.state);
+}
+
+int32_t CallStatusManager::FinalizeIncomingState(sptr<CallBase> &call, const TelCallState nextState)
+{
+    int32_t ret = UpdateCallState(call, nextState);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed!");
         return ret;
