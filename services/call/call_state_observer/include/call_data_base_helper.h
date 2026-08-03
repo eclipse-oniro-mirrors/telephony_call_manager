@@ -36,6 +36,7 @@ constexpr const char *CALL_DISPLAY_NAME = "display_name";
 constexpr const char *CALL_DIRECTION = "call_direction";
 constexpr const char *CALL_VOICEMAIL_URI = "voicemail_uri";
 constexpr const char *CALL_SIM_TYPE = "sim_type";
+constexpr const char *CALL_SIM_INDEX = "sim_index";
 constexpr const char *CALL_IS_HD = "is_hd";
 constexpr const char *CALL_IS_READ = "is_read";
 constexpr const char *CALL_RING_DURATION = "ring_duration";

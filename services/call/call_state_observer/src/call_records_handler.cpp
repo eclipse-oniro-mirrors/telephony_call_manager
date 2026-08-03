@@ -110,6 +110,7 @@ void CallRecordsHandler::MakeCallLogInsertBucket(DataShare::DataShareValuesBucke
     bucket.Put(CALL_DIRECTION, static_cast<int32_t>(info.directionType));
     bucket.Put(CALL_VOICEMAIL_URI, std::string(""));
     bucket.Put(CALL_SIM_TYPE, info.simType);
+    bucket.Put(CALL_SIM_INDEX, info.simIndex);
     bucket.Put(CALL_IS_HD, static_cast<int32_t>(info.callType));
     bucket.Put(CALL_IS_READ, 0);
     bucket.Put(CALL_RING_DURATION, static_cast<int32_t>(info.ringDuration));
