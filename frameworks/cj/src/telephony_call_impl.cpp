@@ -19,7 +19,6 @@
 #include "telephony_types.h"
 #include "string_wrapper.h"
 #include "bool_wrapper.h"
-#include "ability_manager_client.h"
 #include "telephony_errors.h"
 #include "call_manager_errors.h"
 
@@ -120,15 +119,7 @@ namespace Telephony {
         if (phoneNumber == nullptr) {
             return ConvertCJErrCode(TELEPHONY_ERR_ARGUMENT_NULL);
         }
-        AAFwk::Want want;
-        AppExecFwk::ElementName element("", "com.ohos.contacts", "com.ohos.contacts.MainAbility");
-        want.SetElement(element);
-        AAFwk::WantParams wantParams;
-        wantParams.SetParam("phoneNumber", AAFwk::String::Box(std::string(phoneNumber)));
-        wantParams.SetParam("pageFlag", AAFwk::String::Box("page_flag_edit_before_calling"));
-        wantParams.SetParam(AAFwk::Want::PARAM_BACK_TO_OTHER_MISSION_STACK, AAFwk::Boolean::Box(true));
-        want.SetParams(wantParams);
-        int32_t err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+        int32_t err = DelayedSingleton<CallManagerClient>::GetInstance()->MakeCall(std::string(phoneNumber));
         return ConvertCJErrCode(err);
     }
 
