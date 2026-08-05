@@ -21,6 +21,9 @@
 #include "bool_wrapper.h"
 #include "telephony_errors.h"
 #include "call_manager_errors.h"
+#include "want.h"
+#include "element_name.h"
+#include "ability_manager_client.h"
 
 #include "telephony_call_log.h"
 #include "telephony_call_impl.h"
@@ -83,6 +86,9 @@ namespace Telephony {
             case TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API:
                 // 202
                 return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
+            case 2097177:
+                // START_ABILIES_FROM_BACKGROUND permission denied, map to 201
+                return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
             default:
                 return errCode;
         }
@@ -119,7 +125,14 @@ namespace Telephony {
         if (phoneNumber == nullptr) {
             return ConvertCJErrCode(TELEPHONY_ERR_ARGUMENT_NULL);
         }
-        int32_t err = DelayedSingleton<CallManagerClient>::GetInstance()->MakeCall(std::string(phoneNumber));
+        AAFwk::Want want;
+        AppExecFwk::ElementName element("", "com.ohos.contacts", "com.ohos.contacts.MainAbility");
+        want.SetElement(element);
+        AAFwk::WantParams wantParams;
+        wantParams.SetParam("phoneNumber", AAFwk::String::Box(std::string(phoneNumber)));
+        wantParams.SetParam("pageFlag", AAFwk::String::Box("page_flag_edit_before_calling"));
+        want.SetParams(wantParams);
+        int32_t err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
         return ConvertCJErrCode(err);
     }
 
