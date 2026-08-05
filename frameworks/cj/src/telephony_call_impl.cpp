@@ -21,8 +21,6 @@
 #include "bool_wrapper.h"
 #include "telephony_errors.h"
 #include "call_manager_errors.h"
-#include "want.h"
-#include "element_name.h"
 #include "ability_manager_client.h"
 
 #include "telephony_call_log.h"
