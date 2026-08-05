@@ -72,8 +72,8 @@ void InteroperableCommunicationManager::OnDeviceOffline(const DistributedHardwar
     if (devObserver_ == nullptr) {
         return;
     }
-    std::string networkId = deviceInfo.networkId;
-    std::string devName = deviceInfo.deviceName;
+    std::string networkId(deviceInfo.networkId, strnlen(deviceInfo.networkId, std::size(deviceInfo.networkId)));
+    std::string devName(deviceInfo.deviceName, strnlen(deviceInfo.deviceName, std::size(deviceInfo.deviceName)));
     uint16_t devType = deviceInfo.deviceTypeId;
     std::string ownType = CallManagerUtils::GetSystemParameter("const.product.devicetype", "");
     if (devType != DEV_WATCH && ownType != "wearable") {
