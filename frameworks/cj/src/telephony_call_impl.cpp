@@ -129,6 +129,7 @@ namespace Telephony {
         AAFwk::WantParams wantParams;
         wantParams.SetParam("phoneNumber", AAFwk::String::Box(std::string(phoneNumber)));
         wantParams.SetParam("pageFlag", AAFwk::String::Box("page_flag_edit_before_calling"));
+        wantParams.SetParam(AAFwk::Want::PARAM_BACK_TO_OTHER_MISSION_STACK, AAFwk::Boolean::Box(true));
         want.SetParams(wantParams);
         int32_t err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
         return ConvertCJErrCode(err);
