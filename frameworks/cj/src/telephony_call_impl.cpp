@@ -33,16 +33,9 @@ namespace Telephony {
     // AbilityManager check permission failed, from ability_errorcode.cj CHECK_PERMISSION_FAILED
     static constexpr int32_t ABILITY_CHECK_PERMISSION_FAILED = 2097177;
 
-    static int32_t ConvertCJErrCode(int32_t errCode)
+    static bool ConvertToServiceError(int32_t errCode, int32_t &result)
     {
-        LOGI("The original error code is displayed: %{public}d", errCode);
         switch (errCode) {
-            case TELEPHONY_ERR_ARGUMENT_MISMATCH:
-            case TELEPHONY_ERR_ARGUMENT_INVALID:
-            case TELEPHONY_ERR_ARGUMENT_NULL:
-            case TELEPHONY_ERR_SLOTID_INVALID:
-                // 83000001
-                return CJ_ERROR_TELEPHONY_ARGUMENT_ERROR;
             case TELEPHONY_ERR_DESCRIPTOR_MISMATCH:
             case TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL:
             case TELEPHONY_ERR_WRITE_DATA_FAIL:
@@ -54,7 +47,16 @@ namespace Telephony {
             case TELEPHONY_ERR_UNINIT:
             case TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL:
                 // 83000002
-                return CJ_ERROR_TELEPHONY_SERVICE_ERROR;
+                result = CJ_ERROR_TELEPHONY_SERVICE_ERROR;
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    static bool ConvertToSystemError(int32_t errCode, int32_t &result)
+    {
+        switch (errCode) {
             case TELEPHONY_ERR_VCARD_FILE_INVALID:
             case TELEPHONY_ERR_FAIL:
             case TELEPHONY_ERR_MEMCPY_FAIL:
@@ -71,7 +73,23 @@ namespace Telephony {
             case TELEPHONY_ERR_UNKNOWN_NETWORK_TYPE:
             case CALL_ERR_INVALID_VIDEO_STATE:
                 // 83000003
-                return CJ_ERROR_TELEPHONY_SYSTEM_ERROR;
+                result = CJ_ERROR_TELEPHONY_SYSTEM_ERROR;
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    static int32_t ConvertCJErrCode(int32_t errCode)
+    {
+        LOGI("The original error code is displayed: %{public}d", errCode);
+        switch (errCode) {
+            case TELEPHONY_ERR_ARGUMENT_MISMATCH:
+            case TELEPHONY_ERR_ARGUMENT_INVALID:
+            case TELEPHONY_ERR_ARGUMENT_NULL:
+            case TELEPHONY_ERR_SLOTID_INVALID:
+                // 83000001
+                return CJ_ERROR_TELEPHONY_ARGUMENT_ERROR;
             case TELEPHONY_ERR_NO_SIM_CARD:
                 // 83000004
                 return CJ_ERROR_TELEPHONY_NO_SIM_CARD;
@@ -82,16 +100,17 @@ namespace Telephony {
                 // 83000006
                 return CJ_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE;
             case TELEPHONY_ERR_PERMISSION_ERR:
-                // 201
-                return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
             case TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API:
-                // 202
-                return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
             case ABILITY_CHECK_PERMISSION_FAILED:
-                // 201
+                // 201 / 202
                 return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
-            default:
+            default: {
+                int32_t result;
+                if (ConvertToServiceError(errCode, result) || ConvertToSystemError(errCode, result)) {
+                    return result;
+                }
                 return errCode;
+            }
         }
     }
 
