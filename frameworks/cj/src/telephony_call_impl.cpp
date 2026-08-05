@@ -30,6 +30,9 @@ using namespace OHOS::Telephony;
 
 namespace OHOS {
 namespace Telephony {
+    // AbilityManager check permission failed, from ability_errorcode.cj CHECK_PERMISSION_FAILED
+    static constexpr int32_t ABILITY_CHECK_PERMISSION_FAILED = 2097177;
+
     static int32_t ConvertCJErrCode(int32_t errCode)
     {
         LOGI("The original error code is displayed: %{public}d", errCode);
@@ -84,8 +87,8 @@ namespace Telephony {
             case TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API:
                 // 202
                 return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
-            case 2097177:
-                // START_ABILIES_FROM_BACKGROUND permission denied, map to 201
+            case ABILITY_CHECK_PERMISSION_FAILED:
+                // 201
                 return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
             default:
                 return errCode;
