@@ -19,11 +19,10 @@
 #include "telephony_types.h"
 #include "string_wrapper.h"
 #include "bool_wrapper.h"
+#include "ability_manager_client.h"
 #include "telephony_errors.h"
 #include "call_manager_errors.h"
-#include "ability_manager_client.h"
 #include "ability_manager_errors.h"
-
 #include "telephony_call_log.h"
 #include "telephony_call_impl.h"
 
