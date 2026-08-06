@@ -41,15 +41,6 @@ namespace Telephony {
             case TELEPHONY_ERR_SLOTID_INVALID:
                 // 83000001
                 return CJ_ERROR_TELEPHONY_ARGUMENT_ERROR;
-            case TELEPHONY_ERR_NO_SIM_CARD:
-                // 83000004
-                return CJ_ERROR_TELEPHONY_NO_SIM_CARD;
-            case TELEPHONY_ERR_AIRPLANE_MODE_ON:
-                // 83000005
-                return CJ_ERROR_TELEPHONY_AIRPLANE_MODE_ON;
-            case TELEPHONY_ERR_NETWORK_NOT_IN_SERVICE:
-                // 83000006
-                return CJ_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE;
             case TELEPHONY_ERR_DESCRIPTOR_MISMATCH:
             case TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL:
             case TELEPHONY_ERR_WRITE_DATA_FAIL:
@@ -79,6 +70,15 @@ namespace Telephony {
             case CALL_ERR_INVALID_VIDEO_STATE:
                 // 83000003
                 return CJ_ERROR_TELEPHONY_SYSTEM_ERROR;
+            case TELEPHONY_ERR_NO_SIM_CARD:
+                // 83000004
+                return CJ_ERROR_TELEPHONY_NO_SIM_CARD;
+            case TELEPHONY_ERR_AIRPLANE_MODE_ON:
+                // 83000005
+                return CJ_ERROR_TELEPHONY_AIRPLANE_MODE_ON;
+            case TELEPHONY_ERR_NETWORK_NOT_IN_SERVICE:
+                // 83000006
+                return CJ_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE;
             case TELEPHONY_ERR_PERMISSION_ERR:
             case TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API:
             case AAFwk::CHECK_PERMISSION_FAILED:
