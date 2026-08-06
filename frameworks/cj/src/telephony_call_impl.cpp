@@ -79,11 +79,7 @@ namespace Telephony {
                 // 83000006
                 return CJ_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE;
             case TELEPHONY_ERR_PERMISSION_ERR:
-                // 201
-                return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
             case TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API:
-                // 202
-                return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
             case AAFwk::CHECK_PERMISSION_FAILED:
                 // 201
                 return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
