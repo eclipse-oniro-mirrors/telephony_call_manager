@@ -31,7 +31,7 @@ using namespace OHOS::Telephony;
 namespace OHOS {
 namespace Telephony {
     // AbilityManager check permission failed, from ability_errorcode.cj CHECK_PERMISSION_FAILED
-    static constexpr int32_t ABILITY_CHECK_PERMISSION_FAILED = 2097177;
+    //static constexpr int32_t ABILITY_CHECK_PERMISSION_FAILED = 2097177;
 
     static bool ConvertToServiceError(int32_t errCode, int32_t &result)
     {
@@ -101,9 +101,9 @@ namespace Telephony {
                 return CJ_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE;
             case TELEPHONY_ERR_PERMISSION_ERR:
             case TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API:
-            case ABILITY_CHECK_PERMISSION_FAILED:
-                // 201 / 202
-                return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
+            // case ABILITY_CHECK_PERMISSION_FAILED:
+            //     // 201 / 202
+            //     return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
             default: {
                 int32_t result;
                 if (ConvertToServiceError(errCode, result) || ConvertToSystemError(errCode, result)) {
@@ -151,7 +151,7 @@ namespace Telephony {
         AAFwk::WantParams wantParams;
         wantParams.SetParam("phoneNumber", AAFwk::String::Box(std::string(phoneNumber)));
         wantParams.SetParam("pageFlag", AAFwk::String::Box("page_flag_edit_before_calling"));
-        wantParams.SetParam(AAFwk::Want::PARAM_BACK_TO_OTHER_MISSION_STACK, AAFwk::Boolean::Box(true));
+        wantParams.SetParam("isHideDialScreen", AAFwk::Boolean::Box(false));
         want.SetParams(wantParams);
         int32_t err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
         return ConvertCJErrCode(err);
