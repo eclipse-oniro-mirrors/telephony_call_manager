@@ -68,18 +68,18 @@ void IncomingCallWakeup::WakeupDevice(sptr<CallBase> &callObjectPtr)
         phoneRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
             CreateRunningLock("phonerunninglock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
     }
-    if (phoneRunningLock_ != nullptr && !isPhoneLocked) {
+    if (phoneRunningLock_ != nullptr && !isPhoneLocked_) {
         phoneRunningLock_->Lock(WAKEUP_DEVICE_LOCK_TIMEOUT);
-        isPhoneLocked = true;
+        isPhoneLocked_ = true;
         TELEPHONY_LOGI("phoneRunningLock_ locked");
     }
     if (screenRunningLock_ == nullptr) {
         screenRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
             CreateRunningLock("screenonrunninglock", PowerMgr::RunningLockType::RUNNINGLOCK_SCREEN);
     }
-    if (screenRunningLock_ != nullptr && !isScreenOnLocked) {
+    if (screenRunningLock_ != nullptr && !isScreenOnLocked_) {
         screenRunningLock_->Lock(WAKEUP_DEVICE_LOCK_TIMEOUT);
-        isScreenOnLocked = true;
+        isScreenOnLocked_ = true;
         TELEPHONY_LOGI("screenRunningLock_ locked");
     }
     // if call type is voip, set the screen on
@@ -115,22 +115,25 @@ void IncomingCallWakeup::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool 
 void IncomingCallWakeup::CallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
-    if (!isPhoneLocked && !isScreenOnLocked) {
-        return;
+    {
+        std::lock_guard<ffrt::mutex> lock(mutex_);
+        if (!isPhoneLocked_ && !isScreenOnLocked_) {
+            return;
+        }
     }
     bool hasRingCall = false;
     CallObjectManager::HasRingingCall(hasRingCall);
     if (!hasRingCall) {
     #ifdef ABILITY_POWER_SUPPORT
         std::lock_guard<ffrt::mutex> lock(mutex_);
-        if (screenRunningLock_ != nullptr && isScreenOnLocked) {
+        if (screenRunningLock_ != nullptr && isScreenOnLocked_) {
             screenRunningLock_->UnLock();
-            isScreenOnLocked = false;
+            isScreenOnLocked_ = false;
             TELEPHONY_LOGI("screenRunningLock_ unlocked");
         }
-        if (phoneRunningLock_ != nullptr && isPhoneLocked) {
+        if (phoneRunningLock_ != nullptr && isPhoneLocked_) {
             phoneRunningLock_->UnLock();
-            isPhoneLocked = false;
+            isPhoneLocked_ = false;
             TELEPHONY_LOGI("phoneRunningLock_ unlocked");
         }
     #endif
