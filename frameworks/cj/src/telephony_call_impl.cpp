@@ -31,7 +31,6 @@ using namespace OHOS::Telephony;
 namespace OHOS {
 namespace Telephony {
     // AbilityManager check permission failed, from ability_errorcode.cj CHECK_PERMISSION_FAILED
-    //static constexpr int32_t ABILITY_CHECK_PERMISSION_FAILED = 2097177;
 
     static bool ConvertToServiceError(int32_t errCode, int32_t &result)
     {
@@ -101,9 +100,6 @@ namespace Telephony {
                 return CJ_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE;
             case TELEPHONY_ERR_PERMISSION_ERR:
             case TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API:
-            // case ABILITY_CHECK_PERMISSION_FAILED:
-            //     // 201 / 202
-            //     return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
             default: {
                 int32_t result;
                 if (ConvertToServiceError(errCode, result) || ConvertToSystemError(errCode, result)) {
