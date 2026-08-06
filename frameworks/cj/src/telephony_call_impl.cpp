@@ -22,6 +22,7 @@
 #include "telephony_errors.h"
 #include "call_manager_errors.h"
 #include "ability_manager_client.h"
+#include "ability_manager_errors.h"
 
 #include "telephony_call_log.h"
 #include "telephony_call_impl.h"
@@ -30,55 +31,6 @@ using namespace OHOS::Telephony;
 
 namespace OHOS {
 namespace Telephony {
-    // AbilityManager check permission failed, from ability_errorcode.cj CHECK_PERMISSION_FAILED
-
-    static bool ConvertToServiceError(int32_t errCode, int32_t &result)
-    {
-        switch (errCode) {
-            case TELEPHONY_ERR_DESCRIPTOR_MISMATCH:
-            case TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL:
-            case TELEPHONY_ERR_WRITE_DATA_FAIL:
-            case TELEPHONY_ERR_WRITE_REPLY_FAIL:
-            case TELEPHONY_ERR_READ_DATA_FAIL:
-            case TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL:
-            case TELEPHONY_ERR_REGISTER_CALLBACK_FAIL:
-            case TELEPHONY_ERR_CALLBACK_ALREADY_REGISTERED:
-            case TELEPHONY_ERR_UNINIT:
-            case TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL:
-                // 83000002
-                result = CJ_ERROR_TELEPHONY_SERVICE_ERROR;
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    static bool ConvertToSystemError(int32_t errCode, int32_t &result)
-    {
-        switch (errCode) {
-            case TELEPHONY_ERR_VCARD_FILE_INVALID:
-            case TELEPHONY_ERR_FAIL:
-            case TELEPHONY_ERR_MEMCPY_FAIL:
-            case TELEPHONY_ERR_MEMSET_FAIL:
-            case TELEPHONY_ERR_STRCPY_FAIL:
-            case TELEPHONY_ERR_LOCAL_PTR_NULL:
-            case TELEPHONY_ERR_SUBSCRIBE_BROADCAST_FAIL:
-            case TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL:
-            case TELEPHONY_ERR_ADD_DEATH_RECIPIENT_FAIL:
-            case TELEPHONY_ERR_STRTOINT_FAIL:
-            case TELEPHONY_ERR_RIL_CMD_FAIL:
-            case TELEPHONY_ERR_DATABASE_WRITE_FAIL:
-            case TELEPHONY_ERR_DATABASE_READ_FAIL:
-            case TELEPHONY_ERR_UNKNOWN_NETWORK_TYPE:
-            case CALL_ERR_INVALID_VIDEO_STATE:
-                // 83000003
-                result = CJ_ERROR_TELEPHONY_SYSTEM_ERROR;
-                return true;
-            default:
-                return false;
-        }
-    }
-
     static int32_t ConvertCJErrCode(int32_t errCode)
     {
         LOGI("The original error code is displayed: %{public}d", errCode);
@@ -98,15 +50,42 @@ namespace Telephony {
             case TELEPHONY_ERR_NETWORK_NOT_IN_SERVICE:
                 // 83000006
                 return CJ_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE;
+            case TELEPHONY_ERR_DESCRIPTOR_MISMATCH:
+            case TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL:
+            case TELEPHONY_ERR_WRITE_DATA_FAIL:
+            case TELEPHONY_ERR_WRITE_REPLY_FAIL:
+            case TELEPHONY_ERR_READ_DATA_FAIL:
+            case TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL:
+            case TELEPHONY_ERR_REGISTER_CALLBACK_FAIL:
+            case TELEPHONY_ERR_CALLBACK_ALREADY_REGISTERED:
+            case TELEPHONY_ERR_UNINIT:
+            case TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL:
+                // 83000002
+                return CJ_ERROR_TELEPHONY_SERVICE_ERROR;
+            case TELEPHONY_ERR_VCARD_FILE_INVALID:
+            case TELEPHONY_ERR_FAIL:
+            case TELEPHONY_ERR_MEMCPY_FAIL:
+            case TELEPHONY_ERR_MEMSET_FAIL:
+            case TELEPHONY_ERR_STRCPY_FAIL:
+            case TELEPHONY_ERR_LOCAL_PTR_NULL:
+            case TELEPHONY_ERR_SUBSCRIBE_BROADCAST_FAIL:
+            case TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL:
+            case TELEPHONY_ERR_ADD_DEATH_RECIPIENT_FAIL:
+            case TELEPHONY_ERR_STRTOINT_FAIL:
+            case TELEPHONY_ERR_RIL_CMD_FAIL:
+            case TELEPHONY_ERR_DATABASE_WRITE_FAIL:
+            case TELEPHONY_ERR_DATABASE_READ_FAIL:
+            case TELEPHONY_ERR_UNKNOWN_NETWORK_TYPE:
+            case CALL_ERR_INVALID_VIDEO_STATE:
+                // 83000003
+                return CJ_ERROR_TELEPHONY_SYSTEM_ERROR;
             case TELEPHONY_ERR_PERMISSION_ERR:
             case TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API:
-            default: {
-                int32_t result;
-                if (ConvertToServiceError(errCode, result) || ConvertToSystemError(errCode, result)) {
-                    return result;
-                }
+            case AAFwk::CHECK_PERMISSION_FAILED:
+                // 201
+                return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
+            default:
                 return errCode;
-            }
         }
     }
 
@@ -147,7 +126,7 @@ namespace Telephony {
         AAFwk::WantParams wantParams;
         wantParams.SetParam("phoneNumber", AAFwk::String::Box(std::string(phoneNumber)));
         wantParams.SetParam("pageFlag", AAFwk::String::Box("page_flag_edit_before_calling"));
-        wantParams.SetParam("isHideDialScreen", AAFwk::Boolean::Box(false));
+        wantParams.SetParam(AAFwk::Want::PARAM_BACK_TO_OTHER_MISSION_STACK, AAFwk::Boolean::Box(true));
         want.SetParams(wantParams);
         int32_t err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
         return ConvertCJErrCode(err);
