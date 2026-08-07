@@ -22,7 +22,7 @@
 #include "ability_manager_client.h"
 #include "telephony_errors.h"
 #include "call_manager_errors.h"
-
+#include "ability_manager_errors.h"
 #include "telephony_call_log.h"
 #include "telephony_call_impl.h"
 
@@ -79,10 +79,9 @@ namespace Telephony {
                 // 83000006
                 return CJ_ERROR_TELEPHONY_NETWORK_NOT_IN_SERVICE;
             case TELEPHONY_ERR_PERMISSION_ERR:
-                // 201
-                return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
             case TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API:
-                // 202
+            case AAFwk::CHECK_PERMISSION_FAILED:
+                // 201
                 return CJ_ERROR_TELEPHONY_PERMISSION_DENIED;
             default:
                 return errCode;
