@@ -124,7 +124,7 @@ public:
     int32_t RequestCameraCapabilities(int32_t callId);
     int32_t SendCallUiEvent(int32_t callId, std::string &eventName);
     int32_t PreloadCallUi(bool enable);
-    sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress);
+    sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(int32_t phoneIndex, std::string &macAddress);
     int32_t SendUssdResponse(int32_t slotId, std::string &content);
     int32_t SetCallPolicyInfo(bool isDialingTrustlist, const std::vector<std::string> &dialingList,
         bool isIncomingTrustlist, const std::vector<std::string> &incomingList);
