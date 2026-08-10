@@ -382,6 +382,7 @@ int32_t CallManagerServiceStub::OnDialCall(MessageParcel &data, MessageParcel &r
     dialInfo.PutIntValue("dialType", data.ReadInt32());
     dialInfo.PutIntValue("callType", data.ReadInt32());
     dialInfo.PutBooleanValue("isRTT", data.ReadBool());
+    dialInfo.PutIntValue("phoneIndex", data.ReadInt32());
     dialInfo.PutStringValue("extraParams", data.ReadString());
     dialInfo.PutStringValue("bundleName", data.ReadString());
     dialInfo.PutBooleanValue("btSlotIdUnknown", data.ReadBool());
@@ -1520,8 +1521,9 @@ void CallManagerServiceStub::CancelTimer(int32_t id)
 
 int32_t CallManagerServiceStub::OnRegisterBluetoothCallManagerCallbackPtr(MessageParcel &data, MessageParcel &reply)
 {
+    int32_t phoneIndex = data.ReadInt32();
     std::string macAddress = data.ReadString();
-    sptr<ICallStatusCallback> callback = RegisterBluetoothCallManagerCallbackPtr(macAddress);
+    sptr<ICallStatusCallback> callback = RegisterBluetoothCallManagerCallbackPtr(phoneIndex, macAddress);
     if (callback == nullptr) {
         TELEPHONY_LOGE("OnRegisterBluetoothCallManagerCallbackPtr fail.");
         return TELEPHONY_ERR_FAIL;
