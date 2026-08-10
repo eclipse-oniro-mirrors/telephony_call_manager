@@ -822,7 +822,18 @@ int32_t CallManagerClient::SendCallUiEvent(int32_t callId, std::string &eventNam
 sptr<ICallStatusCallback> CallManagerClient::RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->RegisterBluetoothCallManagerCallbackPtr(macAddress);
+        return g_callManagerProxy->RegisterBluetoothCallManagerCallbackPtr(0, macAddress);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return nullptr;
+    }
+}
+ 
+sptr<ICallStatusCallback> CallManagerClient::RegisterTwoPhoneCallManagerCallbackPtr(int32_t phoneIndex,
+    std::string &macAddress)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->RegisterBluetoothCallManagerCallbackPtr(phoneIndex, macAddress);
     } else {
         TELEPHONY_LOGE("init first please!");
         return nullptr;
