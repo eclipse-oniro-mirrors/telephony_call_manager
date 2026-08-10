@@ -54,6 +54,7 @@ public:
     int32_t GetPhoneIndex();
 
 private:
+    int32_t phoneIndex_ = 0;
     std::string  macAddress_ = "";
 };
 } // namespace Telephony
