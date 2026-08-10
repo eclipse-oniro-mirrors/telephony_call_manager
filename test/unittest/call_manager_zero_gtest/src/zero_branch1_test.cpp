@@ -592,7 +592,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_005, Function | MediumTest
 {
 #ifdef NOT_SUPPORT_MULTICALL
     DialParaInfo mDialParaInfo;
-    sptr<CallBase> btCall = new BluetoothCall(mDialParaInfo, "");
+    sptr<CallBase> btCall = new BluetoothCall(mDialParaInfo, "", 0);
     btCall->callId_ = 0;
     btCall->SetCallIndex(0);
     btCall->SetSlotId(0);
