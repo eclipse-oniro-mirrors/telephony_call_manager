@@ -22,17 +22,20 @@
 namespace OHOS {
 namespace Telephony {
 
-BluetoothCall::BluetoothCall(DialParaInfo &info, const std::string &macAddress) : CarrierCall(info)
+BluetoothCall::BluetoothCall(DialParaInfo &info, const std::string &macAddress, const int32_t &phoneIndex)
+    : CarrierCall(info)
 {
     callId_ = info.callId;
     macAddress_ = macAddress;
+    phoneIndex_ = phoneIndex;
 }
 
-BluetoothCall::BluetoothCall(DialParaInfo &info, AppExecFwk::PacMap &extras, const std::string &macAddress)
-    : CarrierCall(info, extras)
+BluetoothCall::BluetoothCall(DialParaInfo &info, AppExecFwk::PacMap &extras, const std::string &macAddress,
+    const int32_t &phoneIndex) : CarrierCall(info, extras)
 {
     callId_ = info.callId;
     macAddress_ = macAddress;
+    phoneIndex_ = phoneIndex;
     if (macAddress_.empty()) {
         TELEPHONY_LOGI("macAddress is empty");
     }
@@ -120,6 +123,7 @@ void BluetoothCall::GetCallAttributeInfo(CallAttributeInfo &info)
 {
     GetCallAttributeCarrierInfo(info);
     info.callId = callId_;
+    info.phoneIndex = phoneIndex_;
     return;
 }
 
@@ -207,6 +211,11 @@ int32_t BluetoothCall::StartDtmf(char str)
     uint8_t code = (uint8_t)str;
     profile->SendDTMFTone(device, code);
     return TELEPHONY_SUCCESS;
+}
+
+int32_t BluetoothCall::GetPhoneIndex()
+{
+    return phoneIndex_;
 }
 } // namespace Telephony
 } // namespace OHOS
