@@ -29,8 +29,9 @@ class BluetoothCallConnection : public std::enable_shared_from_this<BluetoothCal
 
 public:
     int32_t Dial(DialParaInfo &info);
-    void SetMacAddress(const std::string &macAddress);
-    std::string GetMacAddress();
+    void SetMacAddress(int32_t phoneIndex, const std::string &macAddress);
+    std::string GetMacAddress(int32_t phoneIndex);
+    std::string GetDeviceName(int32_t phoneIndex);
 
     int32_t ConnectBtSco();
     int32_t DisConnectBtSco();
@@ -46,6 +47,7 @@ public:
 
 private:
     std::string macAddress_;
+    std::string secondaryPhoneMacAddress_;
     bool isHfpConnected_ = false;
     bool isBtCallScoConnected_ = false;
     std::string hfpPhoneNumber_;
