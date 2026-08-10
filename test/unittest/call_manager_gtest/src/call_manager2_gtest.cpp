@@ -241,6 +241,11 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_001, TestSize.Level0
     ASSERT_FALSE(client->HasCall(true));
     ASSERT_EQ(client->CancelCallUpgrade(g_newCallId), TELEPHONY_ERR_UNINIT);
     ASSERT_EQ(client->SetRegMmiCodeCallbackState(boolValue), TELEPHONY_ERR_UNINIT);
+    std::string eventName = "abc";
+    ASSERT_EQ(client->RegisterBluetoothCallManagerCallbackPtr(eventName), nullptr);
+    ASSERT_EQ(client->RegisterBluetoothCallManagerCallbackPtr(eventName), nullptr);
+    ASSERT_EQ(client->RegisterTwoPhoneCallManagerCallbackPtr(0, eventName), nullptr);
+    ASSERT_EQ(client->RegisterTwoPhoneCallManagerCallbackPtr(1, eventName), nullptr);
 }
 
 /**
@@ -326,6 +331,23 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_004, TestSize.Level0
     ASSERT_EQ(client->UpdateImsRttCallMode(g_newCallId, ImsRTTCallMode::LOCAL_REQUEST_UPGRADE), TELEPHONY_ERR_UNINIT);
 }
 #endif
+
+/**
+ * @tc.number   Telephony_CallManagerClient_004
+ * @tc.name     test error nullptr branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_004, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    std::u16string str = u"";
+    client->UnInit();
+    std::string eventName = "abc";
+    ASSERT_EQ(client->RegisterBluetoothCallManagerCallbackPtr(eventName), nullptr);
+    ASSERT_EQ(client->RegisterTwoPhoneCallManagerCallbackPtr(0, eventName), nullptr);
+    ASSERT_EQ(client->RegisterBluetoothCallManagerCallbackPtr(eventName), nullptr);
+    ASSERT_EQ(client->RegisterTwoPhoneCallManagerCallbackPtr(1, eventName), nullptr);
+}
 
 /**
  * @tc.number   Telephony_BluetoothCallClient_001
