@@ -37,8 +37,12 @@ int32_t BluetoothCallConnection::Dial(DialParaInfo &info)
         TELEPHONY_LOGE("bluetooth call number is null!");
         return CALL_ERR_DIAL_FAILED;
     }
-    if (macAddress_.empty()) {
+    if (info.phoneIndex == 0 && macAddress_.empty()) {
         TELEPHONY_LOGE("bluetooth call macaddress is empty");
+        return CALL_ERR_DIAL_FAILED;
+    }
+    if (info.phoneIndex == 1 && secondaryPhoneMacAddress_.empty()) {
+        TELEPHONY_LOGE("bluetooth call secondaryPhoneMacAddress_ is empty");
         return CALL_ERR_DIAL_FAILED;
     }
     Bluetooth::HandsFreeUnit *profile = Bluetooth::HandsFreeUnit::GetProfile();
@@ -47,22 +51,40 @@ int32_t BluetoothCallConnection::Dial(DialParaInfo &info)
         return CALL_ERR_DIAL_FAILED;
     }
 
-    Bluetooth::BluetoothRemoteDevice device(macAddress_);
+    Bluetooth::BluetoothRemoteDevice device(info.phoneIndex == 1 ? secondaryPhoneMacAddress_ : macAddress_);
     profile->StartDial(device, number);
     return TELEPHONY_SUCCESS;
 }
 
-void BluetoothCallConnection::SetMacAddress(const std::string &macAddress)
+void BluetoothCallConnection::SetMacAddress(int32_t phoneIndex, const std::string &macAddress)
 {
-    macAddress_ = macAddress;
-    if (macAddress_.empty()) {
-        TELEPHONY_LOGE("BluetoothCallConnection macAddress is empty");
+    if (phoneIndex == 1) {
+        secondaryPhoneMacAddress_ = macAddress;
+        if (secondaryPhoneMacAddress_.empty()) {
+            TELEPHONY_LOGE("secondary phone BluetoothCallConnection macAddress is empty");
+        }
+    } else {
+        macAddress_ = macAddress;
+        if (macAddress_.empty()) {
+            TELEPHONY_LOGE("BluetoothCallConnection macAddress is empty");
+        }
     }
 }
 
-std::string BluetoothCallConnection::GetMacAddress()
+std::string BluetoothCallConnection::GetMacAddress(int32_t phoneIndex)
 {
-    return macAddress_;
+    if (phoneIndex == 1) {
+        return secondaryPhoneMacAddress_;
+    } else {
+        return macAddress_;
+    }
+}
+ 
+std::string BluetoothCallConnection::GetDeviceName(int32_t phoneIndex)
+{
+    Bluetooth::BluetoothRemoteDevice device(phoneIndex == 1 ? secondaryPhoneMacAddress_ : macAddress_);
+    std::string deviceName = device.GetDeviceName();
+    return deviceName;
 }
 
 int32_t BluetoothCallConnection::ConnectBtSco()
@@ -131,13 +153,15 @@ void BluetoothCallConnection::SetHfpConnected(bool isHfpConnected)
 bool BluetoothCallConnection::GetSupportBtCall()
 {
     Bluetooth::BluetoothRemoteDevice device(macAddress_);
+    Bluetooth::BluetoothRemoteDevice secondDevice(secondaryPhoneMacAddress_);
     bool isAclConnected = device.IsAclConnected();
-    if (isAclConnected) {
+    bool isSecondAclConnected = secondDevice.IsAclConnected();
+    if (isAclConnected || isSecondAclConnected) {
         TELEPHONY_LOGI("Watch Support Bluetooth Call.");
     } else {
         TELEPHONY_LOGE("Watch not Support Bluetooth Call.");
     }
-    return isAclConnected;
+    return isAclConnected || isSecondAclConnected;
 }
 
 void BluetoothCallConnection::SetBtCallScoConnected(bool isBtCallScoConnected)
