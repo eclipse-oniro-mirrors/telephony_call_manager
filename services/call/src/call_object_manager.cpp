@@ -722,15 +722,18 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexAndSlotId(int32_t index
 }
 
 sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(int32_t index, int32_t slotId,
-    CallType callType)
+    CallType callType, int32_t phoneIndex)
 {
     std::lock_guard<ffrt::mutex> lock(listMutex_);
     if (callType == CallType::TYPE_BLUETOOTH) {
         std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
         for (; it != callObjectPtrList_.end(); ++it) {
-            if ((*it)->GetCallType() == CallType::TYPE_BLUETOOTH && (*it)->GetCallIndex() == index &&
-                ((*it)->GetSlotId() == slotId || (*it)->GetPhoneOrWatchDial() ==
-                    static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL))) {
+            if ((*it)->GetCallType() != CallType::TYPE_BLUETOOTH) {
+                continue;
+            }
+            sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(it->GetRefPtr());
+            if ((*it)->GetCallIndex() == index &&((*it)->GetSlotId() == slotId || (*it)->GetPhoneOrWatchDial() ==
+                static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL)) && btCall->GetPhoneIndex() == phoneIndex) {
                 return (*it);
             }
         }
