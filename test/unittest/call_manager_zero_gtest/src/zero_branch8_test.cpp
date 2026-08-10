@@ -192,9 +192,11 @@ HWTEST_F(ZeroBranch7Test, Telephony_BluetoothCallConnection_001, TestSize.Level0
     auto blueToothConnectionPtr = DelayedSingleton<BluetoothCallConnection>::GetInstance();
     ASSERT_FALSE(blueToothConnectionPtr == nullptr);
     DialParaInfo info;
+    DialParaInfo info1;
+    info1.phoneIndex = 1;
     blueToothConnectionPtr->Dial(info);
-    blueToothConnectionPtr->SetMacAddress("");
-    blueToothConnectionPtr->SetMacAddress("abc");
+    blueToothConnectionPtr->SetMacAddress(0, "");
+    blueToothConnectionPtr->SetMacAddress(0, "abc");
     blueToothConnectionPtr->ConnectBtSco();
     blueToothConnectionPtr->DisConnectBtSco();
     blueToothConnectionPtr->GetBtScoIsConnected();
@@ -205,6 +207,22 @@ HWTEST_F(ZeroBranch7Test, Telephony_BluetoothCallConnection_001, TestSize.Level0
     blueToothConnectionPtr->SetHfpContactName("a", "b");
     blueToothConnectionPtr->GetHfpContactName("a");
     EXPECT_TRUE(blueToothConnectionPtr != nullptr);
+    blueToothConnectionPtr->SetMacAddress(0, "");
+    blueToothConnectionPtr->SetMacAddress(1, "");
+    blueToothConnectionPtr->Dial(info);
+    blueToothConnectionPtr->Dial(info1);
+    blueToothConnectionPtr->SetMacAddress(0, "abc");
+    blueToothConnectionPtr->Dial(info);
+    blueToothConnectionPtr->Dial(info1);
+    blueToothConnectionPtr->SetMacAddress(0, "");
+    blueToothConnectionPtr->SetMacAddress(1, "abc");
+    blueToothConnectionPtr->Dial(info);
+    blueToothConnectionPtr->Dial(info1);
+    blueToothConnectionPtr->SetMacAddress(0, "abc");
+    blueToothConnectionPtr->Dial(info);
+    blueToothConnectionPtr->Dial(info1);
+    blueToothConnectionPtr->GetMacAddress(0);
+    blueToothConnectionPtr->GetMacAddress(1);
 }
 
 /**
@@ -546,19 +564,19 @@ HWTEST_F(ZeroBranch7Test, Telephony_BluetoothCallState_001, Function | MediumTes
 HWTEST_F(ZeroBranch7Test, Telephony_BluetoothCall_001, Function | MediumTest | Level1)
 {
     DialParaInfo info;
-    EXPECT_TRUE(std::make_shared<BluetoothCall>(info, "")->macAddress_.empty());
+    EXPECT_TRUE(std::make_shared<BluetoothCall>(info, "", 0)->macAddress_.empty());
     AppExecFwk::PacMap extras;
-    EXPECT_TRUE(std::make_shared<BluetoothCall>(info, extras, "")->macAddress_.empty());
-    EXPECT_FALSE(std::make_shared<BluetoothCall>(info, "macAddress")->macAddress_.empty());
-    EXPECT_FALSE(std::make_shared<BluetoothCall>(info, extras, "macAddress")->macAddress_.empty());
-    EXPECT_GT(std::make_shared<BluetoothCall>(info, "")->AnswerCall(0), TELEPHONY_ERROR);
-    EXPECT_GT(std::make_shared<BluetoothCall>(info, "")->RejectCall(), TELEPHONY_ERROR);
-    EXPECT_GT(std::make_shared<BluetoothCall>(info, "")->HangUpCall(), TELEPHONY_ERROR);
-    EXPECT_GT(std::make_shared<BluetoothCall>(info, "")->StartDtmf('0'), TELEPHONY_ERROR);
-    EXPECT_GT(std::make_shared<BluetoothCall>(info, "macAddress")->AnswerCall(0), TELEPHONY_ERROR);
-    EXPECT_GT(std::make_shared<BluetoothCall>(info, "macAddress")->RejectCall(), TELEPHONY_ERROR);
-    EXPECT_GT(std::make_shared<BluetoothCall>(info, "macAddress")->HangUpCall(), TELEPHONY_ERROR);
-    EXPECT_GT(std::make_shared<BluetoothCall>(info, "macAddress")->StartDtmf('0'), TELEPHONY_ERROR);
+    EXPECT_TRUE(std::make_shared<BluetoothCall>(info, extras, "", 0)->macAddress_.empty());
+    EXPECT_FALSE(std::make_shared<BluetoothCall>(info, "macAddress", 0)->macAddress_.empty());
+    EXPECT_FALSE(std::make_shared<BluetoothCall>(info, extras, "macAddress", 0)->macAddress_.empty());
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "", 0)->AnswerCall(0), TELEPHONY_ERROR);
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "", 0)->RejectCall(), TELEPHONY_ERROR);
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "", 0)->HangUpCall(), TELEPHONY_ERROR);
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "", 0)->StartDtmf('0'), TELEPHONY_ERROR);
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "macAddress", 0)->AnswerCall(0), TELEPHONY_ERROR);
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "macAddress", 0)->RejectCall(), TELEPHONY_ERROR);
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "macAddress", 0)->HangUpCall(), TELEPHONY_ERROR);
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "macAddress", 0)->StartDtmf('0'), TELEPHONY_ERROR);
 }
 
 class MockRemoteObject : public IRemoteObject {
