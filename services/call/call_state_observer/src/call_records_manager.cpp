@@ -196,7 +196,6 @@ void CallRecordsManager::AddOneCallRecord(const sptr<CallBase> &callObjectPtr, c
     size_t commaPos = strcspn(info.accountNumber, ",");
     size_t copyLength = (commaPos < strlen(info.accountNumber)) ? commaPos : strlen(info.accountNumber);
     if (strncpy_s(data.phoneNumber, kMaxNumberLen, info.accountNumber, copyLength) != EOK) {
-        TELEPHONY_LOGE("memcpy_s failed!");
         return;
     }
     if (strlen(info.numberLocation) > static_cast<size_t>(kMaxNumberLen)) {
@@ -204,11 +203,9 @@ void CallRecordsManager::AddOneCallRecord(const sptr<CallBase> &callObjectPtr, c
         return;
     }
     if (strcpy_s(data.numberLocation, kMaxNumberLen, info.numberLocation) != EOK) {
-        TELEPHONY_LOGE("memcpy_s failed!");
         return;
     }
     if (strcpy_s(data.detectDetails, sizeof(data.detectDetails), info.detectDetails) != EOK) {
-        TELEPHONY_LOGE("memcpy_s detectDetails failed!");
         return;
     }
     CopyCallInfoToRecord(info, data);
