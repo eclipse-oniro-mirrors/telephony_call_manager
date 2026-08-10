@@ -363,7 +363,8 @@ public:
     {
         return TELEPHONY_SUCCESS;
     }
-    sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress) override
+    sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(int32_t phoneIndex,
+        std::string &macAddress) override
     {
         return nullptr;
     }
