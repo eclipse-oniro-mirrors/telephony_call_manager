@@ -764,7 +764,8 @@ public:
      * @brief notify bluetooth register callstatus call back
      * @return Returns ICallStatusCallback.
      */
-    sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress) override;
+    sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(int32_t phoneIndex,
+        std::string &macAddress) override;
 
     /**
      * SendUssdResponse
