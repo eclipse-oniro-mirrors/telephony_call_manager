@@ -4170,6 +4170,7 @@ void NapiCallManager::NativeDialCall(napi_env env, void *data)
     dialInfo.PutStringValue("extraParams", extraString);
     AAFwk::WantParams object = AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(extraString);
     dialInfo.PutBooleanValue("isRTT", (object.GetIntParam("isRTT", 0) == 1));
+    dialInfo.PutIntValue("phoneIndex", object.GetIntParam("phoneIndex", 0));
 
     asyncContext->errorCode =
         DelayedSingleton<CallManagerClient>::GetInstance()->DialCall(Str8ToStr16(phoneNumber), dialInfo);
