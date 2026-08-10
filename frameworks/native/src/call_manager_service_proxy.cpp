@@ -88,6 +88,7 @@ int32_t CallManagerServiceProxy::DialCall(std::u16string number, AppExecFwk::Pac
     dataParcel.WriteInt32(extras.GetIntValue("dialType"));
     dataParcel.WriteInt32(extras.GetIntValue("callType"));
     dataParcel.WriteBool(extras.GetBooleanValue("isRTT", false));
+    dataParcel.WriteInt32(extras.GetIntValue("phoneIndex"));
     dataParcel.WriteString(extras.GetStringValue("extraParams"));
     dataParcel.WriteBool(extras.GetBooleanValue("btSlotIdUnknown", false));
     TELEPHONY_LOGI("DialCall isRTT: %{public}d", extras.GetBooleanValue("isRTT"));
@@ -1453,13 +1454,15 @@ int32_t CallManagerServiceProxy::PreloadCallUi(bool enable)
     return replyParcel.ReadInt32();
 }
 
-sptr<ICallStatusCallback> CallManagerServiceProxy::RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress)
+sptr<ICallStatusCallback> CallManagerServiceProxy::RegisterBluetoothCallManagerCallbackPtr(int32_t phoneIndex,
+    std::string &macAddress)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return nullptr;
     }
+    dataParcel.WriteInt32(phoneIndex);
     dataParcel.WriteString(macAddress);
     MessageParcel replyParcel;
     int32_t error = SendRequest(INTERFACE_BLUETOOTH_REGISTER_CALLBACKPTR, dataParcel, replyParcel);
