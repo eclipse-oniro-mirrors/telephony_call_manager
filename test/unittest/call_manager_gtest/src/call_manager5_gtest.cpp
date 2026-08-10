@@ -955,6 +955,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetRegMmiCodeCallbackState_0100
  
     bool boolValue = true;
     EXPECT_EQ(CallManagerGtest::clientPtr_->SetRegMmiCodeCallbackState(boolValue), RETURN_VALUE_IS_ZERO);
+    std::string eventName = "abc";
+    clientPtr_->RegisterTwoPhoneCallManagerCallbackPtr(0, eventName);
+    clientPtr_->RegisterTwoPhoneCallManagerCallbackPtr(1, eventName);
 }
 
 /**
