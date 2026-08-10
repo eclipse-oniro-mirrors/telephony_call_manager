@@ -130,6 +130,8 @@ void CallRecordsHandler::MakeCallLogInsertBucket(DataShare::DataShareValuesBucke
     bucket.Put(CALL_FEATURES, info.features);
     bucket.Put(CALL_IS_CNAP, info.namePresentation);
     bucket.Put(CALL_USE_NEWCALLBOX, info.newCallUseBox);
+    bucket.Put(PHONE_INDEX, info.phoneIndex);
+    bucket.Put(DEVICE_NAME, info.deviceName);
 }
 
 std::string CallRecordsHandler::CheckNumberLocationInfo(const CallRecordInfo &info)
