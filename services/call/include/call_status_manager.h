@@ -63,6 +63,7 @@ public:
     int32_t ReportCallProcedureEvents(const std::string &callId, const std::string &procedureJsonStr);
     void HandleDsdaInfo(int32_t slotId);
     void SetImsDomainInfo(const sptr<CallBase> call, int32_t imsDomain);
+    void SetPhoneIndexInfo(const sptr<CallBase> call, int32_t phoneIndex);
     int32_t HandleCallsReportInfo(const CallDetailsInfo &info);
     int32_t HandleDisconnectedCause(const DisconnectedDetails &details);
     int32_t HandleEventResultReportInfo(const CellularCallEventInfo &info);
@@ -90,6 +91,7 @@ private:
     int32_t OutgoingVoipCallHandle(const CallDetailInfo &info);
     int32_t AnsweredVoipCallHandle(const CallDetailInfo &info);
     void HangUpCellularCall();
+    void HandleAntiFraudState(const sptr<CallBase> &call, const CallDetailInfo &info);
     int32_t DisconnectingVoipCallHandle(const CallDetailInfo &info);
     int32_t DialingHandle(const CallDetailInfo &info);
     int32_t ActiveHandle(const CallDetailInfo &info);
