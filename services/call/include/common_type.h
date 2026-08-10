@@ -57,6 +57,7 @@ struct DialParaInfo {
     bool isCustomAccessibility = false;
     int32_t newCallUseBox = 0;
     std::string token = "";
+    int32_t phoneIndex = 0;
 };
 
 enum PolicyFlag : uint64_t {
