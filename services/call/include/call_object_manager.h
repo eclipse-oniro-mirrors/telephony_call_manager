@@ -106,6 +106,9 @@ public:
 #ifdef NOT_SUPPORT_MULTICALL
     static bool HasBtCallWithDifferentNumber(const std::string &accountNumber);
 #endif
+#ifdef SUPPORT_RTT_CALL
+    static bool HasRttCall();
+#endif
 protected:
     static ffrt::condition_variable cv_;
     static bool isFirstDialCallAdded_;

@@ -106,6 +106,9 @@ int32_t IMSCall::DialingProcess()
 
 int32_t IMSCall::AnswerCall(int32_t videoState, bool isRTT)
 {
+#ifdef SUPPORT_RTT_CALL
+    rttState_ = isRTT ? RttCallState::RTT_STATE_YES : RttCallState::RTT_STATE_NO;
+#endif
     return CarrierAnswerCall(videoState, isRTT);
 }
 
@@ -503,6 +506,9 @@ int32_t IMSCall::UpdateImsRttCallMode(ImsRTTCallMode mode)
     if (cellularCallConnection == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+
+    bool needUpgrade = (mode == LOCAL_REQUEST_UPGRADE) || (mode == REMOTE_REQUEST_UPGRADE_LOCAL_ACCEPT);
+    rttState_ = needUpgrade ? RttCallState::RTT_STATE_YES : RttCallState::RTT_STATE_NO;
     ret = cellularCallConnection->UpdateImsRttCallMode(callInfo, mode);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateImsRttCallMode failed!");

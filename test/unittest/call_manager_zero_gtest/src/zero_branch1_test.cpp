@@ -614,6 +614,38 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_005, Function | MediumTest
 }
 
 /**
+ * @tc.number   Telephony_CallControlManager_016
+ * @tc.name     test CallControlManager HangUpOtherCall with HasRttCall
+ * @tc.desc     Function test - cover HasRttCall() == true branch
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallControlManager_016, Function | MediumTest | Level1)
+{
+#ifdef NOT_SUPPORT_MULTICALL
+    CallObjectManager::callObjectPtrList_.clear();
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    DialParaInfo activePara;
+    sptr<CallBase> activeCall = new IMSCall(activePara);
+    activeCall->callId_ = 0;
+    activeCall->SetCallIndex(0);
+    activeCall->SetSlotId(0);
+    activeCall->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    activeCall->SetCallType(CallType::TYPE_IMS);
+    reinterpret_cast<IMSCall *>(activeCall.GetRefPtr())->SetRttState(RttCallState::RTT_STATE_YES);
+    CallObjectManager::callObjectPtrList_.push_back(activeCall);
+    DialParaInfo incomingPara;
+    sptr<CallBase> incomingCall = new IMSCall(incomingPara);
+    incomingCall->callId_ = 1;
+    incomingCall->SetCallIndex(1);
+    incomingCall->SetSlotId(0);
+    incomingCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    incomingCall->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::callObjectPtrList_.push_back(incomingCall);
+    EXPECT_TRUE(callControlManager->HangUpOtherCall(1));
+    CallObjectManager::callObjectPtrList_.clear();
+#endif
+}
+
+/**
  * @tc.number   Telephony_CallNumberUtils_001
  * @tc.name     test error branch
  * @tc.desc     Function test

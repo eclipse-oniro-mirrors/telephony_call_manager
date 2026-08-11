@@ -1139,6 +1139,7 @@ bool CallObjectManager::IsNeedSilentInDoNotDisturbMode()
     }
     return false;
 }
+
 #ifdef NOT_SUPPORT_MULTICALL
 bool CallObjectManager::HasBtCallWithDifferentNumber(const std::string &accountNumber)
 {
@@ -1153,6 +1154,25 @@ bool CallObjectManager::HasBtCallWithDifferentNumber(const std::string &accountN
     }
     return false;
 }
+
+#ifdef SUPPORT_RTT_CALL
+bool CallObjectManager::HasRttCall()
+{
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
+    for (const auto& call : callObjectPtrList_) {
+        if (call == nullptr || call->GetCallType() == CallType::TYPE_IMS) {
+            continue;
+        }
+ 
+        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+        if (imsCall->GetRttState() == RttCallState::RTT_STATE_YES) {
+            return true;
+        }
+    }
+    return false;
+}
+#endif
+
 #endif
 } // namespace Telephony
 } // namespace OHOS
