@@ -753,7 +753,12 @@ void AnswerCallSyncOptional(::taihe::optional_view<int32_t> callId)
 void AnswerCallSyncVoid()
 {
     CallManagerClientInitializer init;
-    int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->AnswerCall(0, 0);
+    auto callManagerClient = OHOS::DelayedSingleton<CallManagerClient>::GetInstance();
+    if (callManagerClient == nullptr) {
+        TELEPHONY_LOGE("AnswerCallSyncVoid callManagerClient is null");
+        return;
+    }
+    int32_t errorCode = callManagerClient->AnswerCall();
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
         ConvertErrorForBusinessError(errorCode);
     }
@@ -811,10 +816,12 @@ void RejectCallWithCallIdSync(int32_t callId)
 void RejectCallWithVoidSync()
 {
     CallManagerClientInitializer init;
-    int32_t callId = DEFAULT_CALL_ID;
-    std::string message = "";
-    int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->RejectCall(
-        callId, false, OHOS::Str8ToStr16(std::string(message)));
+    auto callManagerClient = OHOS::DelayedSingleton<CallManagerClient>::GetInstance();
+    if (callManagerClient == nullptr) {
+        TELEPHONY_LOGE("RejectCallWithVoidSync callManagerClient is null");
+        return;
+    }
+    int32_t errorCode = callManagerClient->RejectCall();
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
         ConvertErrorForBusinessError(errorCode);
     }
@@ -853,8 +860,12 @@ void HangUpCallOptionalSync(::taihe::optional_view<int32_t> callId)
 void HangUpCallWithVoidSync()
 {
     CallManagerClientInitializer init;
-    int32_t callId = DEFAULT_CALL_ID;
-    int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->HangUpCall(callId);
+    auto callManagerClient = OHOS::DelayedSingleton<CallManagerClient>::GetInstance();
+    if (callManagerClient == nullptr) {
+        TELEPHONY_LOGE("HangUpCallWithVoidSync callManagerClient is null");
+        return;
+    }
+    int32_t errorCode = callManagerClient->HangUpCall();
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
         ConvertErrorForBusinessError(errorCode);
     }
