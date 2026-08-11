@@ -23,8 +23,9 @@ namespace OHOS {
 namespace Telephony {
 class BluetoothCall : public CarrierCall {
 public:
-    BluetoothCall(DialParaInfo &info, const std::string &macAddress);
-    BluetoothCall(DialParaInfo &info, AppExecFwk::PacMap &extras, const std::string &macAddress);
+    BluetoothCall(DialParaInfo &info, const std::string &macAddress, const int32_t &phoneIndex);
+    BluetoothCall(DialParaInfo &info, AppExecFwk::PacMap &extras, const std::string &macAddress,
+        const int32_t &phoneIndex);
     ~BluetoothCall();
     int32_t DialingProcess() override;
     int32_t AnswerCall(int32_t videoState, bool isRTT = false) override;
@@ -50,8 +51,10 @@ public:
     int32_t IsSupportConferenceable() override;
     int32_t SetMute(int32_t mute, int32_t slotId) override;
     int32_t StartDtmf(char str) override;
+    int32_t GetPhoneIndex();
 
 private:
+    int32_t phoneIndex_ = 0;
     std::string  macAddress_ = "";
 };
 } // namespace Telephony

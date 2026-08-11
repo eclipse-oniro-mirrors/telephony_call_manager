@@ -85,13 +85,14 @@ void ReportCallInfoHandler::DisconnectBtCallWhenPhoneAnswered(const CallDetailIn
 {
         TELEPHONY_LOGI("do not report callui when already exist active call index:%{public}d", info.index);
         sptr<CallBase> btCall = CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(
-            info.index, DEFAULT_SIM_SLOT_ID, CallType::TYPE_BLUETOOTH);
+            info.index, DEFAULT_SIM_SLOT_ID, CallType::TYPE_BLUETOOTH, info.phoneIndex);
         if (btCall != nullptr) {
             CallDetailInfo detailInfo;
             detailInfo.callType = info.callType;
             detailInfo.accountId = info.accountId;
             detailInfo.index = info.index;
             detailInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
+            detailInfo.phoneIndex = info.phoneIndex;
             (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, info.phoneNum, kMaxNumberLen);
             (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen  + 1, 0, kMaxBundleNameLen + 1);
             int32_t ret = UpdateCallReportInfo(detailInfo);

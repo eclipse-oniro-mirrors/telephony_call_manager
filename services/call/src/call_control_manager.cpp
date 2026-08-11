@@ -234,6 +234,7 @@ void CallControlManager::PackageDialInformation(AppExecFwk::PacMap &extras, std:
     dialSrcInfo_.bundleName = extras.GetStringValue("bundleName");
     dialSrcInfo_.isCustomAccessibility = extras.GetBooleanValue("isCustomAccessibility", false);
     dialSrcInfo_.token = extras.GetStringValue("token");
+    dialSrcInfo_.phoneIndex = extras.GetIntValue("phoneIndex");
     extras_.Clear();
     extras_ = extras;
 }
@@ -2378,7 +2379,7 @@ void CallControlManager::RefreshRttManager(const CallDetailInfo &callInfo)
         return;
     }
     sptr<CallBase> currCall = CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(
-        callInfo.index, callInfo.accountId, callInfo.callType);
+        callInfo.index, callInfo.accountId, callInfo.callType, callInfo.phoneIndex);
     if (currCall == nullptr) {
         TELEPHONY_LOGE("cannot RefreshRttManager currCall is nullptr.");
         return;

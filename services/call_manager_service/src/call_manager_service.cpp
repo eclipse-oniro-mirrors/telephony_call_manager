@@ -1743,7 +1743,8 @@ int32_t CallManagerService::HandleCeliaAutoAnswerCall(int32_t callId, bool enabl
     return TELEPHONY_SUCCESS;
 }
 
-sptr<ICallStatusCallback> CallManagerService::RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress)
+sptr<ICallStatusCallback> CallManagerService::RegisterBluetoothCallManagerCallbackPtr(int32_t phoneIndex,
+    std::string &macAddress)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("CallManagerService RegisterBluetoothCallManagerCallbackPtr, Permission denied!");
@@ -1769,7 +1770,7 @@ sptr<ICallStatusCallback> CallManagerService::RegisterBluetoothCallManagerCallba
     } else {
         TELEPHONY_LOGE("profile is nullptr");
     }
-    DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetMacAddress(macAddress);
+    DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetMacAddress(phoneIndex, macAddress);
     return bluetoothCallCallbackPtr_;
 }
 

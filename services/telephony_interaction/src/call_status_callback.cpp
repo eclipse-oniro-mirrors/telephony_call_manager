@@ -73,6 +73,7 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
     detailInfo.callMode = info.callMode;
     detailInfo.voiceDomain = info.voiceDomain;
     detailInfo.mpty = info.mpty;
+    detailInfo.phoneIndex = info.phoneIndex;
     if (info.callType == CallType::TYPE_VOIP &&
         CallManagerConfig::ShouldConvertUsernameToPhoneNum(info.voipCallInfo.uid) &&
         !info.voipCallInfo.userName.empty()) {

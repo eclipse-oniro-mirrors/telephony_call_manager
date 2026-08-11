@@ -614,7 +614,7 @@ void BluetoothCallConnectionFunc(FuzzedDataProvider& provider)
     info.accountId = provider.ConsumeIntegral<int32_t>();
     info.callId = provider.ConsumeIntegral<int32_t>();
     bluetoothConnection->Dial(info);
-    bluetoothConnection->GetMacAddress();
+    bluetoothConnection->GetMacAddress(0);
     bluetoothConnection->ConnectBtSco();
     bluetoothConnection->DisConnectBtSco();
     bluetoothConnection->GetBtScoIsConnected();

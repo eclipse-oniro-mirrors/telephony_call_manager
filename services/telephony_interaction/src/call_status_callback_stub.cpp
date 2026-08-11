@@ -236,6 +236,7 @@ void CallStatusCallbackStub::BuildCallReportInfo(MessageParcel &data, CallReport
     parcelPtr.mpty = data.ReadInt32();
     parcelPtr.crsType = data.ReadInt32();
     parcelPtr.originalCallType = data.ReadInt32();
+    parcelPtr.phoneIndex = data.ReadInt32();
     if (parcelPtr.callType == CallType::TYPE_VOIP) {
         parcelPtr.voipCallInfo.voipCallId = data.ReadString();
         parcelPtr.voipCallInfo.userName = data.ReadString();

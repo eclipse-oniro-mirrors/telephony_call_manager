@@ -218,7 +218,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_005, TestSize.Level0)
     CallObjectManager::callObjectPtrList_.clear();
     EXPECT_FALSE(audioControl->IsBtCallDisconnected());
     DialParaInfo info;
-    sptr<CallBase> call = new BluetoothCall(info, "");
+    sptr<CallBase> call = new BluetoothCall(info, "", 0);
     CallObjectManager::AddOneCallObject(call);
     call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
     EXPECT_FALSE(audioControl->IsBtCallDisconnected());
@@ -421,7 +421,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
 {
     DialParaInfo mDialParaInfo;
     mDialParaInfo.accountId = 0;
-    sptr<CallBase> call = new BluetoothCall(mDialParaInfo, "");
+    sptr<CallBase> call = new BluetoothCall(mDialParaInfo, "", 0);
     call->SetCallType(CallType::TYPE_BLUETOOTH);
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_ALERTING, TelCallState::CALL_STATUS_ALERTING);
@@ -484,7 +484,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_012, Function | MediumTe
         TelCallState::CALL_STATUS_DISCONNECTED);
     CallObjectManager::DeleteOneCallObject(call);
     DialParaInfo mDialParaInfo;
-    sptr<CallBase> call1 = new BluetoothCall(mDialParaInfo, "");
+    sptr<CallBase> call1 = new BluetoothCall(mDialParaInfo, "", 0);
     call1->SetCallType(CallType::TYPE_BLUETOOTH);
     CallObjectManager::AddOneCallObject(call1);
     call1->SetTelCallState(TelCallState::CALL_STATUS_DIALING);

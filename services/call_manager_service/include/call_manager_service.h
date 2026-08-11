@@ -810,7 +810,8 @@ public:
      * @brief notify bluetooth register callstatus callback
      * @return Returns sptr<ICallStatusCallback>.
      */
-    sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress) override;
+    sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(int32_t phoneIndex,
+        std::string &macAddress) override;
 
     /**
      * @brief send ussd response to modem

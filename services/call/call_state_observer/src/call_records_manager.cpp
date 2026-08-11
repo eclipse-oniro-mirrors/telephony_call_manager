@@ -27,6 +27,8 @@
 #include "telephony_cust_wrapper.h"
 #include "settings_datashare_helper.h"
 #include "call_manager_utils.h"
+#include "bluetooth_call_connection.h"
+#include "bluetooth_call.h"
 #ifdef SUPPORT_MUTE_BY_DATABASE
 #include "interoperable_settings_handler.h"
 #endif
@@ -194,7 +196,6 @@ void CallRecordsManager::AddOneCallRecord(const sptr<CallBase> &callObjectPtr, c
     size_t commaPos = strcspn(info.accountNumber, ",");
     size_t copyLength = (commaPos < strlen(info.accountNumber)) ? commaPos : strlen(info.accountNumber);
     if (strncpy_s(data.phoneNumber, kMaxNumberLen, info.accountNumber, copyLength) != EOK) {
-        TELEPHONY_LOGE("memcpy_s failed!");
         return;
     }
     if (strlen(info.numberLocation) > static_cast<size_t>(kMaxNumberLen)) {
@@ -202,14 +203,17 @@ void CallRecordsManager::AddOneCallRecord(const sptr<CallBase> &callObjectPtr, c
         return;
     }
     if (strcpy_s(data.numberLocation, kMaxNumberLen, info.numberLocation) != EOK) {
-        TELEPHONY_LOGE("memcpy_s failed!");
         return;
     }
     if (strcpy_s(data.detectDetails, sizeof(data.detectDetails), info.detectDetails) != EOK) {
-        TELEPHONY_LOGE("memcpy_s detectDetails failed!");
         return;
     }
     CopyCallInfoToRecord(info, data);
+    if (info.callType == CallType::TYPE_BLUETOOTH) {
+        sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(callObjectPtr.GetRefPtr());
+        data.phoneIndex = btCall->GetPhoneIndex();
+        data.deviceName = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetDeviceName(data.phoneIndex);
+    }
     std::string countryIso = GetCountryIso();
     int32_t formatRet = CopyFormatNumberToRecord(countryIso, data);
     if (formatRet != TELEPHONY_SUCCESS) {
@@ -297,6 +301,7 @@ void CallRecordsManager::CopyCallInfoToRecord(const CallAttributeInfo &info, Cal
     data.countryCode = DEFAULT_COUNTRY_CODE;
     data.slotId = info.accountId;
     data.callType = info.callType;
+    data.phoneIndex = info.phoneIndex;
     // use original call type for video call record
     int32_t callFeatures = GetCallFeatures(info);
     data.features = callFeatures;

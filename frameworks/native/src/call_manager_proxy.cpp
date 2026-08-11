@@ -1721,14 +1721,16 @@ int32_t CallManagerProxy::PreloadCallUi(bool enable)
     return TELEPHONY_SUCCESS;
 }
 
-sptr<ICallStatusCallback> CallManagerProxy::RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress)
+sptr<ICallStatusCallback> CallManagerProxy::RegisterBluetoothCallManagerCallbackPtr(int32_t phoneIndex,
+    std::string &macAddress)
 {
     std::shared_lock<ffrt::shared_mutex> lock(clientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return nullptr;
     }
-    sptr<ICallStatusCallback> ptr = callManagerServicePtr_->RegisterBluetoothCallManagerCallbackPtr(macAddress);
+    sptr<ICallStatusCallback> ptr = callManagerServicePtr_->RegisterBluetoothCallManagerCallbackPtr(phoneIndex,
+        macAddress);
     if (ptr == nullptr) {
         TELEPHONY_LOGE("GetProxyObjectPtr failed");
     }

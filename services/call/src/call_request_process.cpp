@@ -770,6 +770,7 @@ int32_t CallRequestProcess::UpdateCallReportInfo(const DialParaInfo &info, TelCa
     callDetatilInfo.originalCallType = info.originalCallType;
     callDetatilInfo.voiceDomain = static_cast<int32_t>(info.callType);
     callDetatilInfo.phoneOrWatch = info.phoneOrWatch;
+    callDetatilInfo.phoneIndex = info.phoneIndex;
     if (info.number.length() > kMaxNumberLen) {
         TELEPHONY_LOGE("numbser length out of range");
         return CALL_ERR_NUMBER_OUT_OF_RANGE;

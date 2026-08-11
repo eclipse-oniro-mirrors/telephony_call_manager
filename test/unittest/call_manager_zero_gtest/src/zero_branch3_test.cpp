@@ -1524,7 +1524,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_003, TestSize.Level0)
 
     //old call
     DialParaInfo dialParaInfoOld;
-    sptr<OHOS::Telephony::CallBase> oldCall = new BluetoothCall(dialParaInfoOld, "");
+    sptr<OHOS::Telephony::CallBase> oldCall = new BluetoothCall(dialParaInfoOld, "", 0);
     oldCall->SetAccountNumber(phoneNumber);
     oldCall->SetCallId(1);
     oldCall->SetCallCreateTime(oldCallCreateTime);
@@ -1564,7 +1564,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_004, TestSize.Level0)
 
     //old call
     DialParaInfo dialParaInfoOld;
-    sptr<OHOS::Telephony::CallBase> oldCall = new BluetoothCall(dialParaInfoOld, "");
+    sptr<OHOS::Telephony::CallBase> oldCall = new BluetoothCall(dialParaInfoOld, "", 0);
     oldCall->SetAccountNumber(phoneNumber);
     oldCall->SetCallId(1);
     oldCall->SetCallCreateTime(oldCallCreateTime);
@@ -1608,7 +1608,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_005, TestSize.Level0)
 
     // old call
     DialParaInfo dialParaInfoOld;
-    sptr<OHOS::Telephony::CallBase> oldCall = new BluetoothCall(dialParaInfoOld, "");
+    sptr<OHOS::Telephony::CallBase> oldCall = new BluetoothCall(dialParaInfoOld, "", 0);
     oldCall->SetAccountNumber(phoneNumber);
     oldCall->SetCallId(1);
     oldCall->SetCallCreateTime(oldCallCreateTime);
@@ -1663,6 +1663,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_007, TestSize.Level0)
     info.callType = CallType::TYPE_VOIP;
     info.state = TelCallState::CALL_STATUS_INCOMING;
     ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
+    callStatusManager->UpdateDialingCallInfo(info);
     info.callType = CallType::TYPE_BLUETOOTH;
     info.index = 1;
     info.state = TelCallState::CALL_STATUS_INCOMING;
@@ -2048,7 +2049,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_019, TestSize.Level0)
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     CallObjectManager::callObjectPtrList_.clear();
     DialParaInfo info1;
-    sptr<CallBase> call = new BluetoothCall(info1, "");
+    sptr<CallBase> call = new BluetoothCall(info1, "", 0);
     CallObjectManager::AddOneCallObject(call);
     call->SetCallType(CallType::TYPE_BLUETOOTH);
     audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_DIALING);

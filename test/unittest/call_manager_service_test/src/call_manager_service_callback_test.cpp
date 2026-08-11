@@ -71,7 +71,7 @@ HWTEST_F(CallManagerServiceTest, CallManagerService_UnRegisterVoipCallManagerCal
 HWTEST_F(CallManagerServiceTest, CallManagerService_RegisterBluetoothCallManagerCallbackPtr_0100, TestSize.Level1)
 {
     std::string macAddress = "00:11:22:33:44:55";
-    sptr<ICallStatusCallback> ret = service_->RegisterBluetoothCallManagerCallbackPtr(macAddress);
+    sptr<ICallStatusCallback> ret = service_->RegisterBluetoothCallManagerCallbackPtr(0, macAddress);
     EXPECT_NE(ret, nullptr);
 }
 
@@ -83,7 +83,7 @@ HWTEST_F(CallManagerServiceTest, CallManagerService_RegisterBluetoothCallManager
 HWTEST_F(CallManagerServiceTest, CallManagerService_RegisterBluetoothCallManagerCallbackPtr_0200, TestSize.Level1)
 {
     std::string macAddress = "";
-    sptr<ICallStatusCallback> ret = service_->RegisterBluetoothCallManagerCallbackPtr(macAddress);
+    sptr<ICallStatusCallback> ret = service_->RegisterBluetoothCallManagerCallbackPtr(0, macAddress);
     EXPECT_NE(ret, nullptr);
 }
 

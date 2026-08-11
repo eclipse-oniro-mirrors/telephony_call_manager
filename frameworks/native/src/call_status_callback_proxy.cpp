@@ -57,6 +57,7 @@ int32_t CallStatusCallbackProxy::UpdateCallReportInfo(const CallReportInfo &info
     dataParcel.WriteInt32(info.mpty);
     dataParcel.WriteInt32(info.crsType);
     dataParcel.WriteInt32(info.originalCallType);
+    dataParcel.WriteInt32(info.phoneIndex);
     if (info.callType == CallType::TYPE_VOIP) {
         dataParcel.WriteString(info.voipCallInfo.voipCallId);
         dataParcel.WriteString(info.voipCallInfo.userName);
@@ -768,6 +769,7 @@ int32_t CallStatusCallbackProxy::PackUpdateCallsReportInfo(const CallsReportInfo
         dataParcel.WriteInt32(it.mpty);
         dataParcel.WriteInt32(it.crsType);
         dataParcel.WriteInt32(it.originalCallType);
+        dataParcel.WriteInt32(it.phoneIndex);
         if (it.callType == CallType::TYPE_VOIP) {
             dataParcel.WriteString(it.voipCallInfo.voipCallId);
             dataParcel.WriteString(it.voipCallInfo.userName);

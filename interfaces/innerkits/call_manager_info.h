@@ -243,6 +243,12 @@ struct CallReportInfo {
      * - 2：vonr
      */
     int32_t imsDomain = 0;
+    /**
+     * Indicates the phone index.
+     * - 0：Primary phone
+     * - 1：Secondary phone
+     */
+    int32_t phoneIndex = 0;
 };
 
 /**
@@ -430,6 +436,12 @@ struct CallAttributeInfo {
      * Whether the third-party app supports custom accessibility features for accessible calling.
      */
     bool isCustomAccessibility = false;
+    /**
+     * Indicates the phone index.
+     * - 0: Primary phone
+     * - 1: Secondary phone
+     */
+    int32_t phoneIndex = 0;
 };
 
 /**
@@ -550,6 +562,16 @@ struct CallRecordInfo {
      * Identifies the sim card index;
      */
     int32_t simIndex = 0;
+    /**
+     * Indicates the phone index.
+     * - 0：Primary phone
+     * - 1：Secondary phone
+     */
+    int32_t phoneIndex = 0;
+    /**
+     * Remote Bluetooth device name
+     */
+    std::string deviceName = "";
 
     CallRecordInfo() {}
 
@@ -598,6 +620,8 @@ struct CallRecordInfo {
         newCallUseBox = temp.newCallUseBox;
         simType = temp.simType;
         simIndex = temp.simIndex;
+        phoneIndex = temp.phoneIndex;
+        deviceName = temp.deviceName;
         return *this;
     }
 };
@@ -707,6 +731,12 @@ struct CallDetailInfo {
      * - 2：vonr
      */
     int32_t imsDomain = 0;
+    /**
+     * Indicates the phone index.
+     * - 0：Primary phone
+     * - 1：Secondary phone
+     */
+    int32_t phoneIndex = 0;
 
     CallDetailInfo() {}
 
@@ -753,6 +783,7 @@ struct CallDetailInfo {
         rttState = temp.rttState;
         rttChannelId = temp.rttChannelId;
         imsDomain = temp.imsDomain;
+        phoneIndex = temp.phoneIndex;
         return *this;
     }
 };
