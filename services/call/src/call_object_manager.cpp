@@ -1154,10 +1154,11 @@ bool CallObjectManager::HasBtCallWithDifferentNumber(const std::string &accountN
     }
     return false;
 }
+#endif
 
-#ifdef SUPPORT_RTT_CALL
 bool CallObjectManager::HasRttCall()
 {
+#ifdef SUPPORT_RTT_CALL
     std::lock_guard<ffrt::mutex> lock(listMutex_);
     for (const auto& call : callObjectPtrList_) {
         if (call == nullptr || call->GetCallType() == CallType::TYPE_IMS) {
@@ -1169,10 +1170,8 @@ bool CallObjectManager::HasRttCall()
             return true;
         }
     }
+#endif
     return false;
 }
-#endif
-
-#endif
 } // namespace Telephony
 } // namespace OHOS

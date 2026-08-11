@@ -2066,10 +2066,7 @@ bool CallControlManager::HangUpOtherCall(int32_t answerCallId)
             isSupportCallHold = config.boolValue["support_multi_calls_bool"];
         }
         if (!isSupportCallHold || CallObjectManager::HasBtCallWithDifferentNumber(answerCall->GetAccountNumber())
-#ifdef SUPPORT_RTT_CALL
-            || CallObjectManager::HasRttCall()
-#endif
-        ) {
+            || CallObjectManager::HasRttCall()) {
             HangUpOtherCallByAnswerCallID(answerCallId, true);
             return true;
         }
