@@ -104,9 +104,11 @@ public:
     static sptr<CallBase> GetForegroundLiveCallByCallId(int32_t callId);
     static bool IsNeedSilentInDoNotDisturbMode();
     static bool IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath);
+    static bool HasRttCall();
 #ifdef NOT_SUPPORT_MULTICALL
     static bool HasBtCallWithDifferentNumber(const std::string &accountNumber);
 #endif
+
 protected:
     static ffrt::condition_variable cv_;
     static bool isFirstDialCallAdded_;

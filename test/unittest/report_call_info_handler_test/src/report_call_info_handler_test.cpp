@@ -413,7 +413,7 @@ HWTEST_F(ReportCallInfoHandlerTest, ReportCallInfoHandler_UpdateRttEventInfo_010
     ASSERT_TRUE(handler != nullptr);
     handler->callStatusManagerPtr_ = nullptr;
     
-    ImsRTTEventType eventType;
+    ImsRTTEventType eventType = ImsRTTEventType::EVENT_RTT_ENABLED;
     handler->UpdateRttEventInfo(eventType);
 }
 
@@ -429,7 +429,7 @@ HWTEST_F(ReportCallInfoHandlerTest, ReportCallInfoHandler_UpdateRttEventInfo_020
     handler->Init();
     ASSERT_TRUE(handler->callStatusManagerPtr_ != nullptr);
     
-    ImsRTTEventType eventType;
+    ImsRTTEventType eventType = ImsRTTEventType::EVENT_RTT_CLOSED;
     handler->UpdateRttEventInfo(eventType);
 }
 #endif

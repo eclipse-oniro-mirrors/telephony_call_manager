@@ -418,6 +418,21 @@ public:
     {
         return false;
     }
+
+#ifdef SUPPORT_RTT_CALL
+    int32_t SendRttMessage(int32_t callId, const std::string &rttMessage) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+    int32_t SetRttCapability(int32_t slotId, bool enabled) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+    int32_t UpdateImsRttCallMode(int32_t callId, ImsRTTCallMode mode) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+#endif
 };
 
 HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRemoteRequest_0100, TestSize.Level0)

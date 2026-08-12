@@ -90,7 +90,7 @@ private:
     bool isInitialized_;
     std::map<ImsCallMode, sptr<VideoCallState>> videoStateMap_;
 #ifdef SUPPORT_RTT_CALL
-    RttCallState rttState_ = RttCallState::RTT_STATE_NO;
+    std::atomic<RttCallState> rttState_ = RttCallState::RTT_STATE_NO;
     int32_t rttChannelId_ = -1;
     bool isPrevRtt_ = false;
 #endif
