@@ -753,12 +753,13 @@ void AnswerCallSyncOptional(::taihe::optional_view<int32_t> callId)
 void AnswerCallSyncVoid()
 {
     CallManagerClientInitializer init;
+    int32_t errorCode;
     auto callManagerClient = OHOS::DelayedSingleton<CallManagerClient>::GetInstance();
     if (callManagerClient == nullptr) {
-        TELEPHONY_LOGE("AnswerCallSyncVoid callManagerClient is null");
-        return;
+        errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
+    } else {
+        errorCode = callManagerClient->AnswerCall();
     }
-    int32_t errorCode = callManagerClient->AnswerCall();
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
         ConvertErrorForBusinessError(errorCode);
     }
@@ -816,12 +817,13 @@ void RejectCallWithCallIdSync(int32_t callId)
 void RejectCallWithVoidSync()
 {
     CallManagerClientInitializer init;
+    int32_t errorCode;
     auto callManagerClient = OHOS::DelayedSingleton<CallManagerClient>::GetInstance();
     if (callManagerClient == nullptr) {
-        TELEPHONY_LOGE("RejectCallWithVoidSync callManagerClient is null");
-        return;
+        errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
+    } else {
+        errorCode = callManagerClient->RejectCall();
     }
-    int32_t errorCode = callManagerClient->RejectCall();
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
         ConvertErrorForBusinessError(errorCode);
     }
@@ -860,12 +862,13 @@ void HangUpCallOptionalSync(::taihe::optional_view<int32_t> callId)
 void HangUpCallWithVoidSync()
 {
     CallManagerClientInitializer init;
+    int32_t errorCode;
     auto callManagerClient = OHOS::DelayedSingleton<CallManagerClient>::GetInstance();
     if (callManagerClient == nullptr) {
-        TELEPHONY_LOGE("HangUpCallWithVoidSync callManagerClient is null");
-        return;
+        errorCode = TELEPHONY_ERR_LOCAL_PTR_NULL;
+    } else {
+        errorCode = callManagerClient->HangUpCall();
     }
-    int32_t errorCode = callManagerClient->HangUpCall();
     if (errorCode != TELEPHONY_ERR_SUCCESS) {
         ConvertErrorForBusinessError(errorCode);
     }
