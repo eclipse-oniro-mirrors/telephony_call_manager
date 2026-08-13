@@ -67,6 +67,7 @@ static constexpr const char *OHOS_PERMISSION_READ_CALL_LOG = "ohos.permission.RE
 static constexpr const char *OHOS_PERMISSION_WRITE_CALL_LOG = "ohos.permission.WRITE_CALL_LOG";
 static constexpr const char *OHOS_PERMISSION_MANAGE_CALL_FOR_DEVICES = "ohos.permission.MANAGE_CALL_FOR_DEVICES";
 static constexpr const char *OHOS_PERMISSION_GET_CALL_TRANSFER_INFO = "ohos.permission.GET_CALL_TRANSFER_INFO";
+static constexpr const char *OHOS_PERMISSION_SEND_MESSAGES = "ohos.permission.SEND_MESSAGES";
 static constexpr const char *SLOT_ID = "accountId";
 static constexpr const char *CALL_TYPE = "callType";
 static constexpr const char *VIDEO_STATE = "videoState";
@@ -416,6 +417,10 @@ int32_t CallManagerService::RejectCall(int32_t callId, bool rejectWithMessage, s
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL) &&
         !TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (rejectWithMessage && !TelephonyPermission::CheckPermission(OHOS_PERMISSION_SEND_MESSAGES)) {
+        TELEPHONY_LOGE("SEBD_MESSAGES Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     CallManagerHisysevent::RecordVoipProcedure(callId,
