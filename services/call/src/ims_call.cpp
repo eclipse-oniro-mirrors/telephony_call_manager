@@ -467,10 +467,6 @@ bool IMSCall::IsSupportVideoCall()
         TELEPHONY_LOGW("incoming call not support video upgrade");
         isSupportVideoCall = false;
     }
-    if (GetEmergencyState()) {
-        TELEPHONY_LOGW("emergency call not support video upgrade");
-        isSupportVideoCall = false;
-    }
     return isSupportVideoCall;
 }
 
