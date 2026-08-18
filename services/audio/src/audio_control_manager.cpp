@@ -50,8 +50,8 @@ constexpr uint64_t UNMUTE_SOUNDTONE_DELAY_TIME = 500000;
 const int16_t MIN_MULITY_ACTIVE_CALL_COUNT = 1;
 const int16_t MIN_DC_MULITY_ACTIVE_CALL_COUNT = 2;
 const int32_t AUDIO_EVENT_MUTED_RINGTONE = 4;
-const int32_t MAX_RINGTONE_RETRY_COUNT = 3;
-const int32_t RINGTONE_RETRY_TIME = 100;
+const int32_t MAX_RINGTONE_RETRY_COUNT = 5;
+const int32_t RINGTONE_RETRY_TIME = 200;
 bool AudioControlManager::isIncomingConflict_ = false;
 ffrt::mutex AudioControlManager::incomingMutex_ = {};
 
