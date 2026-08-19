@@ -1522,12 +1522,22 @@ int32_t CallControlManager::HandleVoipDisconnected(int32_t &numActive, int32_t n
         TELEPHONY_LOGI("SetVoIPCallInfo handle cs call sucessed");
         sptr<CallBase> call = GetOneCallObject(carrierCallId);
         if (call != nullptr) {
+            ResumeWaitingToRinging(numActive, numHeld);
             return DelayedSingleton<BluetoothCallManager>::GetInstance()->
                 SendBtCallState(0, 0, (int32_t)TelCallState::CALL_STATUS_INCOMING, call->GetAccountNumber());
         }
     }
     return DelayedSingleton<BluetoothCallManager>::GetInstance()->
         SendBtCallState(numActive, numHeld, (int32_t)TelCallState::CALL_STATUS_IDLE, "");
+}
+
+void CallControlManager::ResumeWaitingToRinging(int32_t numActive, int32_t numHeld)
+{
+    int32_t numWaiting = GetCallNum(TelCallState::CALL_STATUS_WAITING, false);
+    if (numWaiting == 1 && numActive == 0 && numHeld == 0) {
+        DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
+        DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+    }
 }
 
 void CallControlManager::HandleVoipDialing(int32_t callId, const std::string &phoneNumber)
