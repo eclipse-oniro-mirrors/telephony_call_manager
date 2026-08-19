@@ -123,6 +123,14 @@ void AudioControlManager::UpdateForegroundLiveCall()
         if (frontCallMute != currentMute) {
             SetMute(frontCallMute);
         }
+    } else if (liveCall->GetTelCallState() == TelCallState::CALL_STATUS_WAITING) {
+        if (CallObjectManager::IsVoipCallExist()) {
+            TELEPHONY_LOGI("MeeTime call confict");
+            return;
+        }
+        TELEPHONY_LOGI("Resume waiting to ringing");
+        StopWaitingTone();
+        PlayRingtone();
     }
 }
 
