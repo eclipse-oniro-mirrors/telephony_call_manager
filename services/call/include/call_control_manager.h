@@ -227,6 +227,7 @@ private:
     void sendEventToVoip(CallAbilityEventId eventId);
     bool IsCallActivated(const TelCallState& priorState, const TelCallState& nextState);
     void EnqueueAnsweredCall(int32_t callId, int32_t videoState);
+    void ResumeWaitingToRinging(int32_t numActive, int32_t numHeld);
     sptr<CallBase> GetRingCall(int32_t callId, int32_t videoState);
     void PostPendingHangupProtectTask(int32_t callId);
 private:
