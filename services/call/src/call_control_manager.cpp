@@ -1534,10 +1534,10 @@ int32_t CallControlManager::HandleVoipDisconnected(int32_t &numActive, int32_t n
 void CallControlManager::ResumeWaitingToRinging(int32_t numActive, int32_t numHeld)
 {
     int32_t numWaiting = GetCallNum(TelCallState::CALL_STATUS_WAITING, false);
-    if (numWaiting == 1 && numActive == 0 && numHeld == 0) (
+    if (numWaiting == 1 && numActive == 0 && numHeld == 0) {
         DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
         DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
-    )
+    }
 }
 
 void CallControlManager::HandleVoipDialing(int32_t callId, const std::string &phoneNumber)
