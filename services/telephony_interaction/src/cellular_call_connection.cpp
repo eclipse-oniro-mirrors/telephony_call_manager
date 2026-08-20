@@ -119,9 +119,8 @@ int32_t CellularCallConnection::ConnectService()
 
 int32_t CellularCallConnection::RegisterCallBackFun()
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
-        TELEPHONY_LOGE("cellularCallInterfacePtr is nullptr!");
+    if (cellularCallInterfacePtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallInterfacePtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     cellularCallCallbackPtr_ = (std::make_unique<CallStatusCallback>()).release();
@@ -130,7 +129,7 @@ int32_t CellularCallConnection::RegisterCallBackFun()
         TELEPHONY_LOGE("cellularCallCallbackPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t ret = cellularCallInterfacePtr->RegisterCallManagerCallBack(cellularCallCallbackPtr_);
+    int32_t ret = cellularCallInterfacePtr_->RegisterCallManagerCallBack(cellularCallCallbackPtr_);
     if (ret != TELEPHONY_SUCCESS) {
         Clean();
         return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
@@ -177,15 +176,14 @@ void CellularCallConnection::Clean()
 
 int CellularCallConnection::Dial(const CellularCallInfo &callInfo)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         CallManagerHisysevent::WriteDialCallFaultEvent(callInfo.accountId, static_cast<int32_t>(callInfo.callType),
             callInfo.videoState, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, "ReConnectService failed");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     TELEPHONY_LOGI("callType:%{public}d", callInfo.callType);
-    int errCode = cellularCallInterfacePtr->Dial(callInfo);
+    int errCode = cellularCallInterfacePtr_->Dial(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("dial failed, errcode:%{public}d", errCode);
         return errCode;
@@ -195,14 +193,13 @@ int CellularCallConnection::Dial(const CellularCallInfo &callInfo)
 
 int CellularCallConnection::HangUp(const CellularCallInfo &callInfo, CallSupplementType type)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         CallManagerHisysevent::WriteHangUpFaultEvent(
             callInfo.accountId, callInfo.callId, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, "HangUp ipc reconnect failed");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->HangUp(callInfo, type);
+    int errCode = cellularCallInterfacePtr_->HangUp(callInfo, type);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("hangup call failed, errcode:%{public}d", errCode);
         return errCode;
@@ -212,14 +209,13 @@ int CellularCallConnection::HangUp(const CellularCallInfo &callInfo, CallSupplem
 
 int CellularCallConnection::Reject(const CellularCallInfo &callInfo)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         CallManagerHisysevent::WriteHangUpFaultEvent(
             callInfo.accountId, callInfo.callId, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, "Reject ipc reconnect failed");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->Reject(callInfo);
+    int errCode = cellularCallInterfacePtr_->Reject(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("rejecting call failed, errcode:%{public}d", errCode);
         return errCode;
@@ -229,14 +225,13 @@ int CellularCallConnection::Reject(const CellularCallInfo &callInfo)
 
 int CellularCallConnection::Answer(const CellularCallInfo &callInfo)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         CallManagerHisysevent::WriteAnswerCallFaultEvent(callInfo.accountId, callInfo.callId, callInfo.videoState,
             TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, "ipc reconnect failed");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->Answer(callInfo);
+    int errCode = cellularCallInterfacePtr_->Answer(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("answering call failed, errcode:%{public}d", errCode);
         return errCode;
@@ -246,12 +241,11 @@ int CellularCallConnection::Answer(const CellularCallInfo &callInfo)
 
 int CellularCallConnection::HoldCall(const CellularCallInfo &callInfo)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->HoldCall(callInfo);
+    int errCode = cellularCallInterfacePtr_->HoldCall(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("holding call failed, errcode:%{public}d", errCode);
         return errCode;
@@ -261,12 +255,11 @@ int CellularCallConnection::HoldCall(const CellularCallInfo &callInfo)
 
 int CellularCallConnection::UnHoldCall(const CellularCallInfo &callInfo)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->UnHoldCall(callInfo);
+    int errCode = cellularCallInterfacePtr_->UnHoldCall(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("unhold call failed, errcode:%{public}d", errCode);
         return errCode;
@@ -276,12 +269,11 @@ int CellularCallConnection::UnHoldCall(const CellularCallInfo &callInfo)
 
 int CellularCallConnection::SwitchCall(const CellularCallInfo &callInfo)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SwitchCall(callInfo);
+    int errCode = cellularCallInterfacePtr_->SwitchCall(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("switch call failed, errcode:%{public}d", errCode);
         return errCode;
@@ -291,22 +283,20 @@ int CellularCallConnection::SwitchCall(const CellularCallInfo &callInfo)
 
 int CellularCallConnection::IsEmergencyPhoneNumber(const std::string &phoneNum, int32_t slotId, bool &enabled)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return cellularCallInterfacePtr->IsEmergencyPhoneNumber(slotId, phoneNum, enabled);
+    return cellularCallInterfacePtr_->IsEmergencyPhoneNumber(slotId, phoneNum, enabled);
 }
 
 int CellularCallConnection::CombineConference(const CellularCallInfo &callInfo)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->CombineConference(callInfo);
+    int errCode = cellularCallInterfacePtr_->CombineConference(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("combine conference failed, errcode:%{public}d", errCode);
         return errCode;
@@ -316,12 +306,11 @@ int CellularCallConnection::CombineConference(const CellularCallInfo &callInfo)
 
 int CellularCallConnection::SeparateConference(const CellularCallInfo &callInfo)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SeparateConference(callInfo);
+    int errCode = cellularCallInterfacePtr_->SeparateConference(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("separate conference failed, errcode:%{public}d", errCode);
         return errCode;
@@ -331,12 +320,11 @@ int CellularCallConnection::SeparateConference(const CellularCallInfo &callInfo)
 
 int CellularCallConnection::KickOutFromConference(const CellularCallInfo &callInfo)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->KickOutFromConference(callInfo);
+    int errCode = cellularCallInterfacePtr_->KickOutFromConference(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Kick out from conference failed, errcode:%{public}d", errCode);
         return errCode;
@@ -346,12 +334,11 @@ int CellularCallConnection::KickOutFromConference(const CellularCallInfo &callIn
 
 int CellularCallConnection::StartDtmf(char cDTMFCode, const CellularCallInfo &callInfo)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->StartDtmf(cDTMFCode, callInfo);
+    int errCode = cellularCallInterfacePtr_->StartDtmf(cDTMFCode, callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("start dtmf failed, errcode:%{public}d", errCode);
         return errCode;
@@ -361,12 +348,11 @@ int CellularCallConnection::StartDtmf(char cDTMFCode, const CellularCallInfo &ca
 
 int CellularCallConnection::StopDtmf(const CellularCallInfo &callInfo)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->StopDtmf(callInfo);
+    int errCode = cellularCallInterfacePtr_->StopDtmf(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("stop dtmf failed, errcode:%{public}d", errCode);
         return errCode;
@@ -376,12 +362,11 @@ int CellularCallConnection::StopDtmf(const CellularCallInfo &callInfo)
 
 int CellularCallConnection::PostDialProceed(const CellularCallInfo &callInfo, const bool proceed)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->PostDialProceed(callInfo, proceed);
+    int errCode = cellularCallInterfacePtr_->PostDialProceed(callInfo, proceed);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("post dial continue failed, errcode:%{public}d", errCode);
         return errCode;
@@ -391,8 +376,7 @@ int CellularCallConnection::PostDialProceed(const CellularCallInfo &callInfo, co
 
 int CellularCallConnection::SendDtmf(char cDTMFCode, const std::string &phoneNum)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -408,7 +392,7 @@ int CellularCallConnection::SendDtmf(char cDTMFCode, const std::string &phoneNum
         TELEPHONY_LOGE("send dtmf return, strcpy_s fail.");
         return TELEPHONY_ERR_STRCPY_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SendDtmf(cDTMFCode, callInfo);
+    int errCode = cellularCallInterfacePtr_->SendDtmf(cDTMFCode, callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("send dtmf failed, errcode:%{public}d", errCode);
         return errCode;
@@ -428,42 +412,38 @@ int CellularCallConnection::SendDtmfString(const std::string &dtmfCodeStr, const
 
 int CellularCallConnection::SetCallTransferInfo(const CallTransferInfo &info, int32_t slotId)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return cellularCallInterfacePtr->SetCallTransferInfo(slotId, info);
+    return cellularCallInterfacePtr_->SetCallTransferInfo(slotId, info);
 }
 
 int CellularCallConnection::CanSetCallTransferTime(int32_t slotId, bool &result)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return cellularCallInterfacePtr->CanSetCallTransferTime(slotId, result);
+    return cellularCallInterfacePtr_->CanSetCallTransferTime(slotId, result);
 }
 
 int CellularCallConnection::GetCallTransferInfo(CallTransferType type, int32_t slotId)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return cellularCallInterfacePtr->GetCallTransferInfo(slotId, type);
+    return cellularCallInterfacePtr_->GetCallTransferInfo(slotId, type);
 }
 
 int CellularCallConnection::SetCallWaiting(bool activate, int32_t slotId)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SetCallWaiting(slotId, activate);
+    int errCode = cellularCallInterfacePtr_->SetCallWaiting(slotId, activate);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetCallWaiting failed, errcode:%{public}d", errCode);
         return errCode;
@@ -473,12 +453,11 @@ int CellularCallConnection::SetCallWaiting(bool activate, int32_t slotId)
 
 int CellularCallConnection::GetCallWaiting(int32_t slotId)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->GetCallWaiting(slotId);
+    int errCode = cellularCallInterfacePtr_->GetCallWaiting(slotId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetCallWaiting failed, errcode:%{public}d", errCode);
         return errCode;
@@ -488,12 +467,11 @@ int CellularCallConnection::GetCallWaiting(int32_t slotId)
 
 int CellularCallConnection::GetVideoCallWaiting(int32_t slotId, bool &enabled)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->GetVideoCallWaiting(slotId, enabled);
+    int errCode = cellularCallInterfacePtr_->GetVideoCallWaiting(slotId, enabled);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetVideoCallWaiting failed, errcode:%{public}d", errCode);
         return errCode;
@@ -503,43 +481,39 @@ int CellularCallConnection::GetVideoCallWaiting(int32_t slotId, bool &enabled)
 
 int CellularCallConnection::SetCallRestriction(const CallRestrictionInfo &info, int32_t slotId)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return cellularCallInterfacePtr->SetCallRestriction(slotId, info);
+    return cellularCallInterfacePtr_->SetCallRestriction(slotId, info);
 }
 
 int CellularCallConnection::GetCallRestriction(CallRestrictionType facType, int32_t slotId)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return cellularCallInterfacePtr->GetCallRestriction(slotId, facType);
+    return cellularCallInterfacePtr_->GetCallRestriction(slotId, facType);
 }
 
 int CellularCallConnection::SetCallRestrictionPassword(
     int32_t slotId, CallRestrictionType fac, const char *oldPassword, const char *newPassword)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return cellularCallInterfacePtr->SetCallRestrictionPassword(slotId, fac, oldPassword, newPassword);
+    return cellularCallInterfacePtr_->SetCallRestrictionPassword(slotId, fac, oldPassword, newPassword);
 }
 
 int CellularCallConnection::SetCallPreferenceMode(int32_t slotId, int32_t mode)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SetDomainPreferenceMode(slotId, mode);
+    int errCode = cellularCallInterfacePtr_->SetDomainPreferenceMode(slotId, mode);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetCallPreferenceMode failed, errcode:%{public}d", errCode);
         return errCode;
@@ -549,12 +523,11 @@ int CellularCallConnection::SetCallPreferenceMode(int32_t slotId, int32_t mode)
 
 int CellularCallConnection::RegisterCallBack(const sptr<ICallStatusCallback> &callback)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->RegisterCallManagerCallBack(callback);
+    int errCode = cellularCallInterfacePtr_->RegisterCallManagerCallBack(callback);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("registerCallBack failed, errcode:%{public}d", errCode);
         return errCode;
@@ -564,12 +537,11 @@ int CellularCallConnection::RegisterCallBack(const sptr<ICallStatusCallback> &ca
 
 int32_t CellularCallConnection::UnRegisterCallBack()
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
-        TELEPHONY_LOGE("cellularCallInterfacePtr is nullptr!");
+    if (cellularCallInterfacePtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallInterfacePtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int errCode = cellularCallInterfacePtr->UnRegisterCallManagerCallBack();
+    int errCode = cellularCallInterfacePtr_->UnRegisterCallManagerCallBack();
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UnRegisterCallBack failed, errcode:%{public}d", errCode);
         return errCode;
@@ -580,14 +552,13 @@ int32_t CellularCallConnection::UnRegisterCallBack()
 int32_t CellularCallConnection::ControlCamera(
     int32_t slotId, int32_t index, std::string &cameraId, int32_t callingUid, int32_t callingPid)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     TELEPHONY_LOGI("CtrlCamera slotId:%{public}d, callingUid:%{public}d, callingPid:%{public}d",
         slotId, callingUid, callingPid);
-    int errCode = cellularCallInterfacePtr->ControlCamera(slotId, index, cameraId);
+    int errCode = cellularCallInterfacePtr_->ControlCamera(slotId, index, cameraId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("cellularCallInterface CtrlCamera failed, errcode:%{public}d", errCode);
         return errCode;
@@ -598,12 +569,11 @@ int32_t CellularCallConnection::ControlCamera(
 int32_t CellularCallConnection::SetPreviewWindow(
     int32_t slotId, int32_t index, std::string &surfaceId, sptr<Surface> surface)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SetPreviewWindow(slotId, index, surfaceId, surface);
+    int errCode = cellularCallInterfacePtr_->SetPreviewWindow(slotId, index, surfaceId, surface);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetPreviewWindow failed, errcode:%{public}d", errCode);
         return errCode;
@@ -614,12 +584,11 @@ int32_t CellularCallConnection::SetPreviewWindow(
 int32_t CellularCallConnection::SetDisplayWindow(
     int32_t slotId, int32_t index, std::string &surfaceId, sptr<Surface> surface)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SetDisplayWindow(slotId, index, surfaceId, surface);
+    int errCode = cellularCallInterfacePtr_->SetDisplayWindow(slotId, index, surfaceId, surface);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetDisplayWindow failed, errcode:%{public}d", errCode);
         return errCode;
@@ -629,12 +598,11 @@ int32_t CellularCallConnection::SetDisplayWindow(
 
 int32_t CellularCallConnection::SetCameraZoom(float zoomRatio)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SetCameraZoom(zoomRatio);
+    int errCode = cellularCallInterfacePtr_->SetCameraZoom(zoomRatio);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetCameraZoom failed, errcode:%{public}d", errCode);
         return errCode;
@@ -644,12 +612,11 @@ int32_t CellularCallConnection::SetCameraZoom(float zoomRatio)
 
 int32_t CellularCallConnection::SetPausePicture(int32_t slotId, int32_t index, std::string &path)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SetPausePicture(slotId, index, path);
+    int errCode = cellularCallInterfacePtr_->SetPausePicture(slotId, index, path);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetPausePicture failed, errcode:%{public}d", errCode);
         return errCode;
@@ -659,12 +626,11 @@ int32_t CellularCallConnection::SetPausePicture(int32_t slotId, int32_t index, s
 
 int32_t CellularCallConnection::SetDeviceDirection(int32_t slotId, int32_t index, int32_t rotation)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SetDeviceDirection(slotId, index, rotation);
+    int errCode = cellularCallInterfacePtr_->SetDeviceDirection(slotId, index, rotation);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetDeviceDirection failed, errcode:%{public}d", errCode);
         return errCode;
@@ -674,12 +640,11 @@ int32_t CellularCallConnection::SetDeviceDirection(int32_t slotId, int32_t index
 
 int32_t CellularCallConnection::SetImsSwitchStatus(int32_t slotId, bool active)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SetImsSwitchStatus(slotId, active);
+    int errCode = cellularCallInterfacePtr_->SetImsSwitchStatus(slotId, active);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetImsSwitchStatus failed, errcode:%{public}d", errCode);
         return errCode;
@@ -689,12 +654,11 @@ int32_t CellularCallConnection::SetImsSwitchStatus(int32_t slotId, bool active)
 
 int32_t CellularCallConnection::GetImsSwitchStatus(int32_t slotId, bool &enabled)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->GetImsSwitchStatus(slotId, enabled);
+    int errCode = cellularCallInterfacePtr_->GetImsSwitchStatus(slotId, enabled);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetImsSwitchStatus failed, errcode:%{public}d", errCode);
         return errCode;
@@ -704,12 +668,11 @@ int32_t CellularCallConnection::GetImsSwitchStatus(int32_t slotId, bool &enabled
 
 int32_t CellularCallConnection::GetCarrierVtConfig(int32_t slotId, bool &enabled)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->GetCarrierVtConfig(slotId, enabled);
+    int errCode = cellularCallInterfacePtr_->GetCarrierVtConfig(slotId, enabled);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetCarrierVtConfig failed, errcode:%{public}d", errCode);
         return errCode;
@@ -719,12 +682,11 @@ int32_t CellularCallConnection::GetCarrierVtConfig(int32_t slotId, bool &enabled
 
 int32_t CellularCallConnection::SetVoNRState(int32_t slotId, int32_t state)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SetVoNRState(slotId, state);
+    int errCode = cellularCallInterfacePtr_->SetVoNRState(slotId, state);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetVoNRState failed, errcode:%{public}d", errCode);
         return errCode;
@@ -734,12 +696,11 @@ int32_t CellularCallConnection::SetVoNRState(int32_t slotId, int32_t state)
 
 int32_t CellularCallConnection::GetVoNRState(int32_t slotId, int32_t &state)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->GetVoNRState(slotId, state);
+    int errCode = cellularCallInterfacePtr_->GetVoNRState(slotId, state);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetVoNRState failed, errcode:%{public}d", errCode);
         return errCode;
@@ -749,12 +710,11 @@ int32_t CellularCallConnection::GetVoNRState(int32_t slotId, int32_t &state)
 
 int32_t CellularCallConnection::SendUpdateCallMediaModeRequest(const CellularCallInfo &callInfo, ImsCallMode mode)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SendUpdateCallMediaModeRequest(callInfo, mode);
+    int errCode = cellularCallInterfacePtr_->SendUpdateCallMediaModeRequest(callInfo, mode);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("send media modify request failed, errcode:%{public}d", errCode);
         return errCode;
@@ -764,12 +724,11 @@ int32_t CellularCallConnection::SendUpdateCallMediaModeRequest(const CellularCal
 
 int32_t CellularCallConnection::SendUpdateCallMediaModeResponse(const CellularCallInfo &callInfo, ImsCallMode mode)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SendUpdateCallMediaModeResponse(callInfo, mode);
+    int errCode = cellularCallInterfacePtr_->SendUpdateCallMediaModeResponse(callInfo, mode);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("send media modify request failed, errcode:%{public}d", errCode);
         return errCode;
@@ -779,12 +738,11 @@ int32_t CellularCallConnection::SendUpdateCallMediaModeResponse(const CellularCa
 
 int32_t CellularCallConnection::SetImsConfig(ImsConfigItem item, const std::string &value, int32_t slotId)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SetImsConfig(slotId, item, value);
+    int errCode = cellularCallInterfacePtr_->SetImsConfig(slotId, item, value);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetImsConfig for string value failed, errcode:%{public}d", errCode);
         return errCode;
@@ -794,12 +752,11 @@ int32_t CellularCallConnection::SetImsConfig(ImsConfigItem item, const std::stri
 
 int32_t CellularCallConnection::SetImsConfig(ImsConfigItem item, int32_t value, int32_t slotId)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SetImsConfig(slotId, item, value);
+    int errCode = cellularCallInterfacePtr_->SetImsConfig(slotId, item, value);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetImsConfig for int value failed, errcode:%{public}d", errCode);
         return errCode;
@@ -809,12 +766,11 @@ int32_t CellularCallConnection::SetImsConfig(ImsConfigItem item, int32_t value, 
 
 int32_t CellularCallConnection::GetImsConfig(ImsConfigItem item, int32_t slotId)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->GetImsConfig(slotId, item);
+    int errCode = cellularCallInterfacePtr_->GetImsConfig(slotId, item);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetImsConfig failed, errcode:%{public}d", errCode);
         return errCode;
@@ -824,12 +780,11 @@ int32_t CellularCallConnection::GetImsConfig(ImsConfigItem item, int32_t slotId)
 
 int32_t CellularCallConnection::SetImsFeatureValue(FeatureType type, int32_t value, int32_t slotId)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SetImsFeatureValue(slotId, type, value);
+    int errCode = cellularCallInterfacePtr_->SetImsFeatureValue(slotId, type, value);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetImsFeatureValue failed, errcode:%{public}d", errCode);
         return errCode;
@@ -839,12 +794,11 @@ int32_t CellularCallConnection::SetImsFeatureValue(FeatureType type, int32_t val
 
 int32_t CellularCallConnection::GetImsFeatureValue(FeatureType type, int32_t slotId)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->GetImsFeatureValue(slotId, type);
+    int errCode = cellularCallInterfacePtr_->GetImsFeatureValue(slotId, type);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetImsFeatureValue failed, errcode:%{public}d", errCode);
         return errCode;
@@ -854,12 +808,11 @@ int32_t CellularCallConnection::GetImsFeatureValue(FeatureType type, int32_t slo
 
 int32_t CellularCallConnection::InviteToConference(const std::vector<std::string> &numberList, int32_t slotId)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->InviteToConference(slotId, numberList);
+    int errCode = cellularCallInterfacePtr_->InviteToConference(slotId, numberList);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("InviteToConference failed, errcode:%{public}d", errCode);
         return errCode;
@@ -869,12 +822,11 @@ int32_t CellularCallConnection::InviteToConference(const std::vector<std::string
 
 int32_t CellularCallConnection::SetMute(int32_t mute, int32_t slotId)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SetMute(slotId, mute);
+    int errCode = cellularCallInterfacePtr_->SetMute(slotId, mute);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetMute failed, errcode:%{public}d", errCode);
         return errCode;
@@ -884,12 +836,11 @@ int32_t CellularCallConnection::SetMute(int32_t mute, int32_t slotId)
 
 int CellularCallConnection::CloseUnFinishedUssd(int32_t slotId)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->CloseUnFinishedUssd(slotId);
+    int errCode = cellularCallInterfacePtr_->CloseUnFinishedUssd(slotId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("CloseUnFinishedUssd failed, errcode:%{public}d", errCode);
         return errCode;
@@ -899,12 +850,11 @@ int CellularCallConnection::CloseUnFinishedUssd(int32_t slotId)
 
 int CellularCallConnection::CancelCallUpgrade(int32_t slotId, int32_t index)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->CancelCallUpgrade(slotId, index);
+    int errCode = cellularCallInterfacePtr_->CancelCallUpgrade(slotId, index);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("CancelCallUpgrade failed, errcode:%{public}d", errCode);
         return errCode;
@@ -914,12 +864,11 @@ int CellularCallConnection::CancelCallUpgrade(int32_t slotId, int32_t index)
 
 int CellularCallConnection::RequestCameraCapabilities(int32_t slotId, int32_t index)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->RequestCameraCapabilities(slotId, index);
+    int errCode = cellularCallInterfacePtr_->RequestCameraCapabilities(slotId, index);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RequestCameraCapabilities failed, errcode:%{public}d", errCode);
         return errCode;
@@ -958,12 +907,11 @@ int32_t CellularCallConnection::ClearAllCalls()
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(DELAY_TIME));
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t errCode = cellularCallInterfacePtr->ClearAllCalls(callsInfo);
+    int32_t errCode = cellularCallInterfacePtr_->ClearAllCalls(callsInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ClearAllCalls fail, errcode:%{public}d", errCode);
     }
@@ -1019,12 +967,11 @@ void CellularCallConnection::SystemAbilityListener::OnRemoveSystemAbility(
 
 int32_t CellularCallConnection::SendUssdResponse(int32_t slotId, const std::string &content)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t errCode = cellularCallInterfacePtr->SendUssdResponse(slotId, content);
+    int32_t errCode = cellularCallInterfacePtr_->SendUssdResponse(slotId, content);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SendUssdResponse failed, errcode:%{public}d", errCode);
         return errCode;
@@ -1034,23 +981,21 @@ int32_t CellularCallConnection::SendUssdResponse(int32_t slotId, const std::stri
 
 bool CellularCallConnection::IsMmiCode(int32_t slotId, std::string &number)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return cellularCallInterfacePtr->IsMmiCode(slotId, number);
+    return cellularCallInterfacePtr_->IsMmiCode(slotId, number);
 }
 
 #ifdef SUPPORT_RTT_CALL
 int32_t CellularCallConnection::SetRttCapability(int32_t slotId, bool isEnable)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int errCode = cellularCallInterfacePtr->SetRttCapability(slotId, isEnable);
+    int errCode = cellularCallInterfacePtr_->SetRttCapability(slotId, isEnable);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetRttCapability failed, errcode:%{public}d", errCode);
         return errCode;
@@ -1060,14 +1005,13 @@ int32_t CellularCallConnection::SetRttCapability(int32_t slotId, bool isEnable)
 
 int CellularCallConnection::UpdateImsRttCallMode(const CellularCallInfo &callInfo, ImsRTTCallMode mode)
 {
-    auto cellularCallInterfacePtr = GetCellCallInterface();
-    if (cellularCallInterfacePtr == nullptr) {
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t slotId = callInfo.slotId;
     int32_t callId = callInfo.index;
-    int errCode = cellularCallInterfacePtr->UpdateImsRttCallMode(slotId, callId, mode);
+    int errCode = cellularCallInterfacePtr_->UpdateImsRttCallMode(slotId, callId, mode);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateImsRttCallMode failed, errcode:%{public}d", errCode);
         return errCode;
@@ -1075,16 +1019,5 @@ int CellularCallConnection::UpdateImsRttCallMode(const CellularCallInfo &callInf
     return TELEPHONY_SUCCESS;
 }
 #endif
-
-sptr<CellularCallInterface> CellularCallConnection::GetCellCallInterface()
-{
-    std::lock_guard<ffrt::recursive_mutex> lock(clientLock_);
-    if (cellularCallInterfacePtr_ == nullptr) {
-        if (ReConnectService() != TELEPHONY_SUCCESS) {
-            return nullptr;
-        }
-    }
-    return cellularCallInterfacePtr_;
-}
 } // namespace Telephony
 } // namespace OHOS

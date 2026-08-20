@@ -894,6 +894,7 @@ int32_t NapiCallAbilityCallback::UpdateMmiCodeResultsInfo(const MmiCodeInfo &inf
     }
     mmiCodeWorker->info = info;
     mmiCodeWorker->callback = mmiCodeCallback_;
+    lock.unlock();
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         delete mmiCodeWorker;

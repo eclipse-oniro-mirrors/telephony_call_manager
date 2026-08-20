@@ -590,7 +590,6 @@ private:
     void Clean();
     void NotifyDeath();
     int32_t ClearAllCalls();
-    sptr<CellularCallInterface> GetCellCallInterface();
 
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
