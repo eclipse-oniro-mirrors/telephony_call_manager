@@ -875,7 +875,7 @@ int32_t NapiCallAbilityCallback::UpdateAsyncResultsInfo(
 
 int32_t NapiCallAbilityCallback::UpdateMmiCodeResultsInfo(const MmiCodeInfo &info)
 {
-    std::lock_guard<std::mutex> lock(mmiCodeCallbackMutex_);
+    std::unique_lock<std::mutex> lock(mmiCodeCallbackMutex_);
     if (mmiCodeCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("mmiCodeCallback is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
