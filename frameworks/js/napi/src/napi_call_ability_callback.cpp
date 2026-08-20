@@ -102,11 +102,13 @@ void NapiCallAbilityCallback::UnRegisterCallStateCallback()
 
 void NapiCallAbilityCallback::RegisterMmiCodeCallback(EventCallback eventCallback)
 {
+    std::lock_guard<std::mutex> lock(mmiCodeCallbackMutex_);
     mmiCodeCallback_ = eventCallback;
 }
 
 void NapiCallAbilityCallback::UnRegisterMmiCodeCallback()
 {
+    std::lock_guard<std::mutex> lock(mmiCodeCallbackMutex_);
     if (mmiCodeCallback_.callbackRef) {
         (void)memset_s(&mmiCodeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
@@ -873,6 +875,7 @@ int32_t NapiCallAbilityCallback::UpdateAsyncResultsInfo(
 
 int32_t NapiCallAbilityCallback::UpdateMmiCodeResultsInfo(const MmiCodeInfo &info)
 {
+    std::lock_guard<std::mutex> lock(mmiCodeCallbackMutex_);
     if (mmiCodeCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("mmiCodeCallback is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;

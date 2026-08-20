@@ -27,6 +27,7 @@ constexpr const char* SOFTNET_SESSION_NAME = "ohos.telephony.callmanager.interop
 void InteroperableServerManager::OnDeviceOnline(const std::string &networkId, const std::string &devName,
                                                 uint16_t devType)
 {
+    std::lock_guard<ffrt::mutex> lock(sessionMutex_);
     TELEPHONY_LOGI("server session manager OnDeviceOnline");
     if (session_ != nullptr) {
         return;
@@ -41,6 +42,7 @@ void InteroperableServerManager::OnDeviceOnline(const std::string &networkId, co
 void InteroperableServerManager::OnDeviceOffline(const std::string &networkId, const std::string &devName,
                                                  uint16_t devType)
 {
+    std::lock_guard<ffrt::mutex> lock(sessionMutex_);
     TELEPHONY_LOGI("server session manager OnDeviceOffline");
     if (session_ == nullptr) {
         return;

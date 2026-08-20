@@ -202,6 +202,7 @@ private:
     using CallResultReportIdProcessorFunc = std::function<int32_t(AppExecFwk::PacMap &resultInfo)>;
     std::map<CallResultReportId, CallResultReportIdProcessorFunc> memberFuncMap_;
     int32_t getCallTransferReason_ = -1;
+    std::mutex mmiCodeCallbackMutex_;
     std::mutex getTransferCallbackMutex_;
     std::mutex setTransferCallbackMutex_;
     std::mutex getRestrictionCallbackMutex_;

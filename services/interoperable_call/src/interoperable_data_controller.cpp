@@ -55,6 +55,7 @@ void InteroperableDataController::OnReceiveMsg(const char* data, uint32_t dataLe
  
 void InteroperableDataController::SetMuted(bool isMute)
 {
+    std::lock_guard<ffrt::mutex> lock(sessionMutex_);
     if (session_ == nullptr) {
         TELEPHONY_LOGE("session is null");
         return;
@@ -69,6 +70,7 @@ void InteroperableDataController::SetMuted(bool isMute)
  
 void InteroperableDataController::MuteRinger()
 {
+    std::lock_guard<ffrt::mutex> lock(sessionMutex_);
     if (session_ == nullptr) {
         TELEPHONY_LOGE("session is null");
         return;
@@ -162,6 +164,7 @@ bool InteroperableDataController::GetBoolValue(const cJSON *msg, const std::stri
 
 void InteroperableDataController::SendRequisiteDataToPeer(int32_t slotId, const std::string &phoneNum)
 {
+    std::lock_guard<ffrt::mutex> lock(sessionMutex_);
     if (session_ == nullptr) {
         TELEPHONY_LOGE("session is null");
         return;
@@ -277,6 +280,7 @@ std::string InteroperableDataController::CreateQueryRequisitesDataMsg(Interopera
 
 void InteroperableDataController::SendRequisiteDataQueryToPeer(const std::string &phoneNum)
 {
+    std::lock_guard<ffrt::mutex> lock(sessionMutex_);
     TELEPHONY_LOGI("SendQueryRequisitesDataMsgWithPhoneNum enter");
     if (session_ == nullptr || !session_->IsReady()) {
         TELEPHONY_LOGE("session invalid");
@@ -334,6 +338,7 @@ int32_t InteroperableDataController::GetBtSlotIdByPhoneNumber(const std::string 
 
 bool InteroperableDataController::IsSlotIdVisible()
 {
+    std::lock_guard<ffrt::mutex> lock(sessionMutex_);
     if (session_ == nullptr || !session_->IsReady()) {
         TELEPHONY_LOGE("session invalid");
         return false;
