@@ -70,7 +70,6 @@ protected:
 protected:
     std::shared_ptr<SessionAdapter> session_{nullptr};
     std::atomic<bool> isSlotIdVisible_{false};
-    ffrt::mutex sessionMutex_{};
 
 private:
     void HandleMuted(const cJSON *msg);

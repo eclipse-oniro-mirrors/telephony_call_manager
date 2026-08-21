@@ -29,14 +29,11 @@ void InteroperableClientManager::OnCallCreated(const sptr<CallBase> &call, const
  
 void InteroperableClientManager::OnCallDestroyed()
 {
-    {
-        std::lock_guard<ffrt::mutex> sessionLock(sessionMutex_);
-        if (session_ != nullptr) {
-            TELEPHONY_LOGI("disconnect session_");
-            session_->Disconnect();
-            session_.reset();
-            session_ = nullptr;
-        }
+    if (session_ != nullptr) {
+        TELEPHONY_LOGI("disconnect session_");
+        session_->Disconnect();
+        session_.reset();
+        session_ = nullptr;
     }
     std::unique_lock<ffrt::mutex> lock(mutex_);
     phoneNum_ = "";
@@ -44,7 +41,6 @@ void InteroperableClientManager::OnCallDestroyed()
  
 void InteroperableClientManager::ConnectRemote(const std::string &networkId)
 {
-    std::lock_guard<ffrt::mutex> lock(sessionMutex_);
     if (session_ != nullptr) {
         return;
     }
