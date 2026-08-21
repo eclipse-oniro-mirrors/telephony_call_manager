@@ -972,6 +972,7 @@ int32_t CallManagerService::SetPreviewWindow(int32_t callId, std::string &surfac
             }
             ret = PrivacyKit::StartUsingPermission(callerToken, "ohos.permission.CAMERA");
             if (ret != 0) {
+                PrivacyKit::StopUsingPermission(callerToken, "ohos.permission.CAMERA");
                 TELEPHONY_LOGE("StartUsingPermission faild!");
             }
         }
