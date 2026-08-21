@@ -200,6 +200,7 @@ public:
     bool IsThermalProtectionRequired();
     bool IsEmergencyCall(const sptr<CallBase> &call);
 #endif
+    static bool GetIsWearableDevice();
 
 private:
     void CallStateObserve();
@@ -279,6 +280,7 @@ private:
     bool shouldDisconnect = true;
     bool ReduceRingToneVolume_ = false;
     static std::atomic<bool> alarmSeted_;
+    static bool isWearableDevice_;
     std::vector<int32_t> preloadedCallUiRequestPids_ = {};
     struct AnsweredCallQueue {
         bool hasCall = false;

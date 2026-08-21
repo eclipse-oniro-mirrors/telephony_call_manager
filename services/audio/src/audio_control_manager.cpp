@@ -130,7 +130,13 @@ void AudioControlManager::UpdateForegroundLiveCall()
         }
         TELEPHONY_LOGI("Resume waiting to ringing");
         StopWaitingTone();
-        PlayRingtone();
+        auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+        if (callControlManager != nullptr && callControlManager->GetIsWearableDevice() &&
+            callControlManager->IsNotWearOnWrist()) {
+            PlayForNoRing();
+        } else {
+            PlayRingtone();
+        }
     }
 }
 

@@ -500,6 +500,75 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_012, Function | MediumTe
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
+/**
+ * @tc.number   Telephony_AudioControlManager_013
+ * @tc.name     test UpdateForegroundLiveCall PlayForNoRing branch
+ * @tc.desc     Function test - cover wearable device not wearing on wrist branch
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_013, Function | MediumTest | Level3)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    auto callControl = DelayedSingleton<CallControlManager>::GetInstance();
+    ASSERT_NE(audioControl, nullptr);
+    ASSERT_NE(callControl, nullptr);
+    CallControlManager::isWearableDevice_ = true;
+    callControl->SetWearState(WEAR_STATUS_OFF);
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo dialPara;
+    sptr<CallBase> waitingCall = new IMSCall(dialPara);
+    waitingCall->callId_ = 1;
+    waitingCall->SetSlotId(0);
+    waitingCall->SetTelCallState(TelCallState::CALL_STATUS_WAITING);
+    waitingCall->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::AddOneCallObject(waitingCall);
+    audioControl->UpdateForegroundLiveCall();
+    ASSERT_TRUE(audioControl->isPlayForNoRing_);
+    CallObjectManager::DeleteOneCallObject(waitingCall);
+    CallControlManager::isWearableDevice_ = false;
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
+ * @tc.number   Telephony_AudioControlManager_014
+ * @tc.name     test UpdateForegroundLiveCall PlayRingtone branch
+ * @tc.desc     Function test - cover wearable device wearing on wrist or non-wearable branch
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_014, Function | MediumTest | Level3)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    auto callControl = DelayedSingleton<CallControlManager>::GetInstance();
+    ASSERT_NE(audioControl, nullptr);
+    ASSERT_NE(callControl, nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    CallControlManager::isWearableDevice_ = true;
+    callControl->SetWearState(WEAR_STATUS_ON);
+    DialParaInfo dialPara;
+    sptr<CallBase> waitingCall = new IMSCall(dialPara);
+    waitingCall->callId_ = 1;
+    waitingCall->SetSlotId(0);
+    waitingCall->SetTelCallState(TelCallState::CALL_STATUS_WAITING);
+    waitingCall->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::AddOneCallObject(waitingCall);
+    audioControl->UpdateForegroundLiveCall();
+    ASSERT_TRUE(audioControl->isPlayForNoRing_);
+    CallControlManager::isWearableDevice_ = false;
+    callControl->SetWearState(WEAR_STATUS_INVALID);
+    CallObjectManager::callObjectPtrList_.clear();
+    CallControlManager::isWearableDevice_ = true;
+    callControl->SetWearState(WEAR_STATUS_INVALID);
+    sptr<CallBase> waitingCall2 = new IMSCall(dialPara);
+    waitingCall2->callId_ = 2;
+    waitingCall2->SetSlotId(0);
+    waitingCall2->SetTelCallState(TelCallState::CALL_STATUS_WAITING);
+    waitingCall2->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::AddOneCallObject(waitingCall2);
+    audioControl->UpdateForegroundLiveCall();
+    ASSERT_FALSE(audioControl->isPlayForNoRing_);
+    CallObjectManager::DeleteOneCallObject(waitingCall2);
+    CallControlManager::isWearableDevice_ = false;
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
 #ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
 /**
  * @tc.number Telephony_AudioControlManager_sos_noringback_tone

@@ -70,6 +70,8 @@ static const int32_t SATCOMM_UID = 1096;
 static const int32_t THERMAL_UID = 5528;
 static const int32_t CRITICAL_THERMAL_LEVEL = 4;
 #endif
+bool CallControlManager::isWearableDevice_ = false;
+constexpr char DEVICE_TYPE_WEARABLE[] = "wearable";
 using namespace OHOS::EventFwk;
 CallControlManager::CallControlManager()
     : callStateListenerPtr_(nullptr), CallRequestHandlerPtr_(nullptr), incomingCallWakeup_(nullptr),
@@ -106,6 +108,8 @@ bool CallControlManager::Init()
     }
     DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIPOrRestart();
     CallManagerHisysevent::InitTelephonyExtWrapper();
+    std::string deviceType = CallManagerUtils::GetSystemParameter("const.product.devicetype", "");
+    isWearableDevice_ = (deviceType == DEVICE_TYPE_WEARABLE);
     return true;
 }
 
@@ -2455,5 +2459,10 @@ bool CallControlManager::IsThermalProtectionRequired()
     return (thermalLevel_ >= CRITICAL_THERMAL_LEVEL);
 }
 #endif
+
+bool CallControlManager::GetIsWearableDevice()
+{
+    return isWearableDevice_;
+}
 } // namespace Telephony
 } // namespace OHOS
