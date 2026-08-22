@@ -850,4 +850,93 @@ HWTEST_F(ZeroBranch9Test, Telephony_CallManager_DisconnectCallLocaly_ImsCall, Te
     callControlManager->DisconnectAllCalls(true, false, false);
     callObjectManager->ReportCallDisconnected(call);
 }
+
+/**
+ * @tc.number   Telephony_CallStateUpdated_ResetDeviceByUser
+ * @tc.name     CallStateUpdated resets isSetAudioDeviceByUser_ when totalCalls_ becomes empty
+ * @tc.desc     Branch: totalCalls_.empty() → isSetAudioDeviceByUser_ = false; not empty → unchanged
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_CallStateUpdated_ResetDeviceByUser, TestSize.Level1)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    EXPECT_NE(audioControl, nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    audioControl->totalCalls_.clear();
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callId = 0;
+    dialParaInfo.index = 0;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    call->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::AddOneCallObject(call);
+    audioControl->isSetAudioDeviceByUser_ = true;
+    audioControl->CallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING,
+        TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_TRUE(audioControl->isSetAudioDeviceByUser_);
+    audioControl->CallStateUpdated(call, TelCallState::CALL_STATUS_ACTIVE,
+        TelCallState::CALL_STATUS_DISCONNECTED);
+    EXPECT_FALSE(audioControl->isSetAudioDeviceByUser_);
+    CallObjectManager::DeleteOneCallObject(call);
+    audioControl->totalCalls_.clear();
+    audioControl->isSetAudioDeviceByUser_ = false;
+}
+ 
+/**
+ * @tc.number   Telephony_UpdateDeviceForForegroundCall_SetByUser
+ * @tc.name     UpdateDeviceForForegroundCall does not change device when isSetAudioDeviceByUser_ is true
+ * @tc.desc     Branch: isSetAudioDeviceByUser_==true → !isSetAudioDeviceByUser_==false → SetAudioDevice skipped
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_UpdateDeviceForForegroundCall_SetByUser, TestSize.Level1)
+{
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_IMS;
+    dialParaInfo.callState = TelCallState::CALL_STATUS_ACTIVE;
+    dialParaInfo.videoState = VideoStateType::TYPE_VOICE;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    CallObjectManager::callObjectPtrList_.emplace_back(call);
+    CallAudioMode callAudioMode;
+    callAudioMode.audioMode = 1;
+    callAudioMode.audioScene = 1;
+    audioDeviceManager->SetCallAudioMode(callAudioMode);
+    audioDeviceManager->isWiredHeadsetConnected_ = false;
+    CallStateToApp tmpVoIPCallState = callControlManager->VoIPCallState_;
+    callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_ANSWERED;
+    call->SetIsAnsweredByPhone(true);
+    audioControlManager->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
+    audioControlManager->UpdateDeviceType(call);
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
+    callAudioMode.audioMode = 0;
+    audioDeviceManager->SetCallAudioMode(callAudioMode);
+    audioControlManager->isSetAudioDeviceByUser_ = true;
+    audioControlManager->UpdateDeviceType(call);
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
+    audioControlManager->isSetAudioDeviceByUser_ = false;
+    audioControlManager->UpdateDeviceType(call);
+    EXPECT_EQ(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_EARPIECE);
+    callControlManager->VoIPCallState_ = tmpVoIPCallState;
+    audioControlManager->isSetAudioDeviceByUser_ = false;
+    CallObjectManager::callObjectPtrList_.clear();
+}
+ 
+/**
+ * @tc.number   Telephony_UpdateDeviceType_CrsWithVideoCall
+ * @tc.name     UpdateDeviceType with CRS type and video call, SetSpeakerDeactive is skipped
+ * @tc.desc     Branch: CrsType==CRS_TYPE && IsVideoCall==true → SetSpeakerDeactive not called
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_UpdateDeviceType_CrsWithVideoCall, TestSize.Level1)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    EXPECT_NE(audioControl, nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo dialParaInfo;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    call->SetCallType(CallType::TYPE_IMS);
+    call->SetCrsType(CRS_TYPE);
+    call->SetVideoStateType(VideoStateType::TYPE_VIDEO);
+    CallObjectManager::AddOneCallObject(call);
+    ASSERT_NO_THROW(audioControl->UpdateDeviceType(call));
+    CallObjectManager::DeleteOneCallObject(call);
+}
 }

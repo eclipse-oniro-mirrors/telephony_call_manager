@@ -161,7 +161,7 @@ private:
     ffrt::mutex mutex_;
     std::recursive_mutex toneStateLock_;
     sptr<CallBase> frontCall_ = nullptr;
-    bool isSetAudioDeviceByUser_ = false;
+    std::atomic<bool> isSetAudioDeviceByUser_ = false;
     bool isScoTemporarilyDisabled_ = false;
     int32_t voiceVolume_ = -1;
     AudioDeviceType initCrsDeviceType_ = AudioDeviceType::DEVICE_UNKNOWN;

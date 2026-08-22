@@ -195,6 +195,9 @@ void AudioControlManager::CallStateUpdated(
         isIncomingConflict_ = false;
     }
     UpdateForegroundLiveCall();
+    if (totalCalls_.empty()) {
+        isSetAudioDeviceByUser_ = false;
+    }
 }
 
 void AudioControlManager::VideoStateUpdated(
@@ -275,7 +278,6 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
         if (IsExternalAudioDevice(initDeviceType)) {
             device.deviceType = initDeviceType;
         }
-        TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
         SetAudioDevice(device);
     } else if (!isAudioOnSink && !isSetAudioDeviceByUser_ && IsVideoCall(priorVideoState) &&
                !IsVideoCall(nextVideoState)) {
@@ -283,7 +285,6 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
         if (IsExternalAudioDevice(initDeviceType)) {
             device.deviceType = initDeviceType;
         }
-        TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
         SetAudioDevice(device);
     }
 }
@@ -304,6 +305,13 @@ void AudioControlManager::UpdateDeviceType(const sptr<CallBase> &callObjectPtr)
         TELEPHONY_LOGE("other call not need control audio");
         return;
     }
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    if (audioDeviceManager == nullptr) {
+        return;
+    }
+    if (foregroundCall->GetCrsType() == CRS_TYPE && !IsVideoCall(foregroundCall->GetVideoStateType())) {
+        audioDeviceManager->SetSpeakerDeactive();
+    }
     UpdateDeviceForForegroundCall(foregroundCall);
 }
 
@@ -319,7 +327,6 @@ void AudioControlManager::UpdateDeviceForForegroundCall(const sptr<CallBase> &fo
         if (IsExternalAudioDevice(initDeviceType)) {
             device.deviceType = initDeviceType;
         }
-        TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
         SetAudioDevice(device);
         return;
     }
@@ -344,7 +351,7 @@ void AudioControlManager::UpdateDeviceForForegroundCall(const sptr<CallBase> &fo
     AudioDeviceType currentDeviceType = audioDeviceManager->GetCurrentAudioDevice();
     TELEPHONY_LOGI("GetCurrentAudioDevice: %{public}d,initDeviceType: %{public}d",
         static_cast<int32_t>(currentDeviceType), static_cast<int32_t>(initDeviceType));
-    if (initDeviceType != currentDeviceType) {
+    if ((initDeviceType != currentDeviceType) && !isSetAudioDeviceByUser_) {
         device.deviceType = initDeviceType;
         SetAudioDevice(device);
     }
