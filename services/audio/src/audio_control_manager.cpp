@@ -344,14 +344,17 @@ void AudioControlManager::UpdateDeviceForForegroundCall(const sptr<CallBase> &fo
     if (!foregroundCall->GetAnsweredByPhone() || distributedCallManager->IsDistributedCarDeviceOnline()) {
         return;
     }
-    if (audioDeviceManager->IsSpeakerMode() && !isSetAudioDeviceByUser_) {
+    if (isSetAudioDeviceByUser_) {
+        return;
+    }
+    if (audioDeviceManager->IsSpeakerMode()) {
         audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
         return;
     }
     AudioDeviceType currentDeviceType = audioDeviceManager->GetCurrentAudioDevice();
     TELEPHONY_LOGI("GetCurrentAudioDevice: %{public}d,initDeviceType: %{public}d",
         static_cast<int32_t>(currentDeviceType), static_cast<int32_t>(initDeviceType));
-    if ((initDeviceType != currentDeviceType) && !isSetAudioDeviceByUser_) {
+    if ((initDeviceType != currentDeviceType)) {
         device.deviceType = initDeviceType;
         SetAudioDevice(device);
     }
