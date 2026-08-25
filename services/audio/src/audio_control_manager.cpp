@@ -344,7 +344,7 @@ void AudioControlManager::UpdateDeviceForForegroundCall(const sptr<CallBase> &fo
     if (!foregroundCall->GetAnsweredByPhone() || distributedCallManager->IsDistributedCarDeviceOnline()) {
         return;
     }
-    if (audioDeviceManager->IsSpeakerMode()) {
+    if (audioDeviceManager->IsSpeakerMode() && !isSetAudioDeviceByUser_) {
         audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
         return;
     }
