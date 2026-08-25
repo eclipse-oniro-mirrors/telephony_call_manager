@@ -354,7 +354,7 @@ void AudioControlManager::UpdateDeviceForForegroundCall(const sptr<CallBase> &fo
     AudioDeviceType currentDeviceType = audioDeviceManager->GetCurrentAudioDevice();
     TELEPHONY_LOGI("GetCurrentAudioDevice: %{public}d,initDeviceType: %{public}d",
         static_cast<int32_t>(currentDeviceType), static_cast<int32_t>(initDeviceType));
-    if ((initDeviceType != currentDeviceType)) {
+    if (initDeviceType != currentDeviceType) {
         device.deviceType = initDeviceType;
         SetAudioDevice(device);
     }
