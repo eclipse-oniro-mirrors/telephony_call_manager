@@ -191,6 +191,36 @@ HWTEST_F(ReportCallInfoHandlerTest, ReportCallInfoHandler_UpdateCallsReportInfo_
 }
 
 /**
+ * @tc.number   ReportCallInfoHandler_UpdateCallsReportInfo_SetRttState
+ * @tc.name     Test UpdateCallsReportInfo with SetRttState called for existing call
+ * @tc.desc     Function test - cover SetRttState called when call exists
+ */
+HWTEST_F(ReportCallInfoHandlerTest, ReportCallInfoHandler_UpdateCallsReportInfo_SetRttState, TestSize.Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_TRUE(handler != nullptr);
+    handler->Init();
+    ASSERT_TRUE(handler->callStatusManagerPtr_ != nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    CallDetailsInfo info;
+    info.slotId = VALID_SLOT_ID;
+    CallDetailInfo detailInfo;
+    detailInfo.callType = CallType::TYPE_IMS;
+    detailInfo.state = TelCallState::CALL_STATUS_ACTIVE;
+    detailInfo.index = 1;
+    detailInfo.rttState = RttCallState::RTT_STATE_YES;
+    info.callVec.push_back(detailInfo);
+    DialParaInfo dialParaInfo;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    call->SetCallId(1);
+    call->SetSlotId(VALID_SLOT_ID);
+    CallObjectManager::AddOneCallObject(call);
+    int32_t ret = handler->UpdateCallsReportInfo(info);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
  * @tc.number   ReportCallInfoHandler_UpdateDisconnectedCause_0100
  * @tc.name     Test UpdateDisconnectedCause with null callStatusManagerPtr_
  * @tc.desc     Boundary test
