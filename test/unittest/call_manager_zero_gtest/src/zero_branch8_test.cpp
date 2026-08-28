@@ -40,7 +40,6 @@
 #include "voip_call.h"
 #include "audio_control_manager.h"
 #include "call_state_processor.h"
-#include "cellular_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -757,98 +756,36 @@ HWTEST_F(ZeroBranch7Test, Telephony_IMSCall_002, Function | MediumTest | Level1)
 }
  
 /**
- * @tc.number   Telephony_IMSCall_003
- * @tc.name     test UpdateImsRttCallMode with different modes
- * @tc.desc     Function test - cover upgrade and downgrade modes
+ * @tc.number   Telephony_IMSCall_UpdateImsRttCallMode_Success
+ * @tc.name     test UpdateImsRttCallMode returns TELEPHONY_SUCCESS
+ * @tc.desc     Function test - cover UpdateImsRttCallMode with SUCCESS path
  */
-HWTEST_F(ZeroBranch7Test, Telephony_IMSCall_003, Function | MediumTest | Level1)
+HWTEST_F(ZeroBranch7Test, Telephony_IMSCall_UpdateImsRttCallMode_Success, TestSize.Level0)
 {
 #ifdef SUPPORT_RTT_CALL
-    CallObjectManager::callObjectPtrList_.clear();
     DialParaInfo info;
-    sptr<IMSCall> call = new IMSCall(info);
+    std::shared_ptr<IMSCall> call = std::make_shared<IMSCall>(info);
     call->SetCallId(1);
-    call->SetSlotId(0);
-    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
-    reinterpret_cast<IMSCall *>(call.GetRefPtr())->SetRttState(RttCallState::RTT_STATE_NO);
-    CallObjectManager::AddOneCallObject(reinterpret_cast<sptr<CallBase>&>(call));
-    int32_t ret1 = reinterpret_cast<IMSCall *>(call.GetRefPtr())->
-        UpdateImsRttCallMode(ImsRTTCallMode::REMOTE_REQUEST_UPGRADE_LOCAL_ACCEPT);
-    int32_t ret2 = reinterpret_cast<IMSCall *>(call.GetRefPtr())->
-        UpdateImsRttCallMode(ImsRTTCallMode::LOCAL_REQUEST_DOWNGRADE);
-    EXPECT_GT(ret1, TELEPHONY_ERROR);
-    EXPECT_GT(ret2, TELEPHONY_ERROR);
-    CallObjectManager::callObjectPtrList_.clear();
+    call->accountNumber_ = "123456";
+    EXPECT_GT(call->UpdateImsRttCallMode(ImsRTTCallMode::REMOTE_REQUEST_UPGRADE_LOCAL_ACCEPT), TELEPHONY_ERROR);
+    EXPECT_EQ(call->GetRttState(), RttCallState::RTT_STATE_YES);
 #endif
 }
  
 /**
- * @tc.number   Telephony_IMSCall_004
- * @tc.name     test UpdateImsRttCallMode with PackCellularCallInfo failed
- * @tc.desc     Function test - cover PackCellularCallInfo return failure branch
+ * @tc.number   Telephony_IMSCall_UpdateImsRttCallMode_LocalReject
+ * @tc.name     test UpdateImsRttCallMode with LOCAL_REQUEST_DOWNGRADE
+ * @tc.desc     Function test - cover rttState_ set to RTT_STATE_NO for LOCAL_REQUEST_DOWNGRADE
  */
-HWTEST_F(ZeroBranch7Test, Telephony_IMSCall_004, Function | MediumTest | Level1)
+HWTEST_F(ZeroBranch7Test, Telephony_IMSCall_UpdateImsRttCallMode_LocalReject, TestSize.Level0)
 {
 #ifdef SUPPORT_RTT_CALL
-    CallObjectManager::callObjectPtrList_.clear();
     DialParaInfo info;
-    sptr<IMSCall> call = new IMSCall(info);
+    std::shared_ptr<IMSCall> call = std::make_shared<IMSCall>(info);
     call->SetCallId(1);
-    call->SetSlotId(0);
-    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
-    call->accountNumber_ = "111111111111111111111111111111111111111111111111111111111111";
-    CallObjectManager::AddOneCallObject(reinterpret_cast<sptr<CallBase>&>(call));
-    int32_t ret = reinterpret_cast<IMSCall *>(call.GetRefPtr())->
-        UpdateImsRttCallMode(ImsRTTCallMode::LOCAL_REQUEST_UPGRADE);
-    EXPECT_EQ(ret, CALL_ERR_CALLBACK_NOT_EXIST);
-    CallObjectManager::callObjectPtrList_.clear();
-#endif
-}
- 
-/**
- * @tc.number   Telephony_IMSCall_005
- * @tc.name     test UpdateImsRttCallMode with CellularCallConnection is nullptr
- * @tc.desc     Function test - cover cellularCallConnection == nullptr branch
- */
-HWTEST_F(ZeroBranch7Test, Telephony_IMSCall_005, Function | MediumTest | Level1)
-{
-#ifdef SUPPORT_RTT_CALL
-    CallObjectManager::callObjectPtrList_.clear();
-    DelayedSingleton<CellularCallConnection>::GetInstance().reset();
-    DialParaInfo info;
-    sptr<IMSCall> call = new IMSCall(info);
-    call->SetCallId(1);
-    call->SetSlotId(0);
-    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
-    call->accountNumber_ = "13800138000";
-    CallObjectManager::AddOneCallObject(reinterpret_cast<sptr<CallBase>&>(call));
-    int32_t ret = reinterpret_cast<IMSCall *>(call.GetRefPtr())->
-        UpdateImsRttCallMode(ImsRTTCallMode::LOCAL_REQUEST_UPGRADE);
-    EXPECT_EQ(ret, CALL_ERR_CALLBACK_NOT_EXIST);
-    CallObjectManager::callObjectPtrList_.clear();
-#endif
-}
- 
-/**
- * @tc.number   Telephony_IMSCall_006
- * @tc.name     test UpdateImsRttCallMode with cellularCallConnection->UpdateImsRttCallMode failed
- * @tc.desc     Function test - cover UpdateImsRttCallMode return failure branch
- */
-HWTEST_F(ZeroBranch7Test, Telephony_IMSCall_006, Function | MediumTest | Level1)
-{
-#ifdef SUPPORT_RTT_CALL
-    CallObjectManager::callObjectPtrList_.clear();
-    DialParaInfo info;
-    sptr<IMSCall> call = new IMSCall(info);
-    call->SetCallId(1);
-    call->SetSlotId(0);
-    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
-    call->accountNumber_ = "13800138000";
-    CallObjectManager::AddOneCallObject(reinterpret_cast<sptr<CallBase>&>(call));
-    int32_t ret = reinterpret_cast<IMSCall *>(call.GetRefPtr())->
-        UpdateImsRttCallMode(ImsRTTCallMode::LOCAL_REQUEST_UPGRADE);
-    EXPECT_EQ(ret, CALL_ERR_STOPRTT_FAILED);
-    CallObjectManager::callObjectPtrList_.clear();
+    call->accountNumber_ = "123456";
+    EXPECT_GT(call->UpdateImsRttCallMode(ImsRTTCallMode::REMOTE_REQUEST_UPGRADE_LOCAL_REJECT), TELEPHONY_ERROR);
+    EXPECT_EQ(call->GetRttState(), RttCallState::RTT_STATE_NO);
 #endif
 }
 

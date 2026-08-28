@@ -48,6 +48,7 @@ ohos_unittest("rtt_call_test") {
   external_deps = [
     "cJSON:cjson",
     "core_service:ffrt_mocked",
+    "image_framework:image",
     "libphonenumber:phonenumber_standard",
     "protobuf:protobuf_lite",
   ]

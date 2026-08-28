@@ -328,11 +328,11 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_004, TestSize.Level0
 #endif
 
 /**
- * @tc.number   Telephony_CallManagerClient_004
+ * @tc.number   Telephony_CallManagerClient_005
  * @tc.name     test error nullptr branch
  * @tc.desc     Function test
  */
-HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_004, TestSize.Level0)
+HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_005, TestSize.Level0)
 {
     std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
     std::u16string str = u"";

@@ -614,33 +614,35 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_005, Function | MediumTest
 }
 
 /**
- * @tc.number   Telephony_CallControlManager_016
- * @tc.name     test CallControlManager HangUpOtherCall with HasRttCall
- * @tc.desc     Function test - cover HasRttCall() == true branch
+ * @tc.number   Telephony_CallControlManager_HangUpOtherCall_HasRttCall
+ * @tc.name     HangUpOtherCall_HasRttCall
+ * @tc.desc     When has RTT call, should hang up other calls and return true
  */
-HWTEST_F(ZeroBranch2Test, Telephony_CallControlManager_016, Function | MediumTest | Level1)
+HWTEST_F(ZeroBranch2Test, Telephony_CallControlManager_HangUpOtherCall_HasRttCall, Function | MediumTest | Level1)
 {
-#ifdef NOT_SUPPORT_MULTICALL
+#ifdef SUPPORT_RTT_CALL
     CallObjectManager::callObjectPtrList_.clear();
-    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
-    DialParaInfo activePara;
-    sptr<CallBase> activeCall = new IMSCall(activePara);
-    activeCall->callId_ = 0;
-    activeCall->SetCallIndex(0);
-    activeCall->SetSlotId(0);
-    activeCall->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
-    activeCall->SetCallType(CallType::TYPE_IMS);
-    reinterpret_cast<IMSCall *>(activeCall.GetRefPtr())->SetRttState(RttCallState::RTT_STATE_YES);
-    CallObjectManager::callObjectPtrList_.push_back(activeCall);
-    DialParaInfo incomingPara;
-    sptr<CallBase> incomingCall = new IMSCall(incomingPara);
-    incomingCall->callId_ = 1;
-    incomingCall->SetCallIndex(1);
-    incomingCall->SetSlotId(0);
-    incomingCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
-    incomingCall->SetCallType(CallType::TYPE_IMS);
-    CallObjectManager::callObjectPtrList_.push_back(incomingCall);
-    EXPECT_TRUE(callControlManager->HangUpOtherCall(1));
+    DialParaInfo dialInfo;
+    sptr<CallBase> csCall = new CSCall(dialInfo);
+    csCall->callId_ = 1;
+    csCall->callType_ = CallType::TYPE_CS;
+    csCall->SetSlotId(0);
+    csCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    csCall->SetAccountNumber("12345678901");
+    CallObjectManager::AddOneCallObject(csCall);
+    sptr<CallBase> rttCallBase = new IMSCall(dialInfo);
+    sptr<IMSCall> rttCall = reinterpret_cast<IMSCall *>(rttCallBase.GetRefPtr());
+    rttCall->callId_ = 2;
+    rttCall->callType_ = CallType::TYPE_IMS;
+    rttCall->SetSlotId(0);
+    rttCall->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    rttCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    rttCall->SetRttState(RttCallState::RTT_STATE_YES);
+    CallObjectManager::AddOneCallObject(rttCallBase);
+    CallControlManager callControlManager;
+    int32_t answerCallId = 1;
+    bool result = callControlManager.HangUpOtherCall(answerCallId);
+    EXPECT_TRUE(result);
     CallObjectManager::callObjectPtrList_.clear();
 #endif
 }
@@ -1493,5 +1495,27 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_DialPolicy_005, Function | Medium
     EXPECT_EQ(mCallPolicy.CheckCallLimit(true, VideoStateType::TYPE_VOICE), TELEPHONY_SUCCESS);
     EXPECT_EQ(mCallPolicy.CheckCallLimit(true, VideoStateType::TYPE_VIDEO), TELEPHONY_SUCCESS);
 }
+
+/**
+ * @tc.number   Telephony_CallObjectManager_HasRttCall_HasRttCall
+ * @tc.name     HasRttCall_HasRttCall
+ * @tc.desc     When has RTT call, should return true
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_HasRttCall_HasRttCall, Function | MediumTest | Level1)
+{
+#ifdef SUPPORT_RTT_CALL
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo dialInfo;
+    sptr<CallBase> rttCallBase = new IMSCall(dialInfo);
+    sptr<IMSCall> rttCall = reinterpret_cast<IMSCall *>(rttCallBase.GetRefPtr());
+    rttCall->callId_ = 1;
+    rttCall->SetCallType(CallType::TYPE_IMS);
+    rttCall->SetRttState(RttCallState::RTT_STATE_YES);
+    CallObjectManager::AddOneCallObject(rttCallBase);
+    EXPECT_TRUE(CallObjectManager::HasRttCall());
+    CallObjectManager::callObjectPtrList_.clear();
+#endif
+}
+
 } // namespace Telephony
 } // namespace OHOS

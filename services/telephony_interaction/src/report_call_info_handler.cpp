@@ -178,12 +178,23 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
         detailInfo.accountId = (*it).accountId;
         detailInfo.state = (*it).state;
         detailInfo.callMode = (*it).callMode;
+#ifdef SUPPORT_RTT_CALL
+        detailInfo.index = (*it).index;
+        detailInfo.rttState = (*it).rttState;
+#endif
     }
     if (detailInfo.state == TelCallState::CALL_STATUS_INCOMING) {
         CallManagerHisysevent::WriteIncomingCallFaultEvent(info.slotId, static_cast<int32_t>(detailInfo.callType),
             static_cast<int32_t>(detailInfo.callMode), CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE,
             "ID HANDLER_UPDATE_CALL_INFO_LIST");
     }
+#ifdef SUPPORT_RTT_CALL
+    sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(detailInfo.index);
+    if (call != nullptr) {
+        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+        imsCall->SetRttState(detailInfo.rttState);
+    }
+#endif
     return TELEPHONY_SUCCESS;
 }
 
