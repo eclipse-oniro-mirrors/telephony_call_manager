@@ -190,6 +190,7 @@ void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::StartDet
             return;
         }
         OHOS::AntiFraudService::AntiFraudResult fraudResult = antiFraudResult.voiceDetectionResult;
+        fraudResult.voiceText = fraudDetectText_;
         std::make_shared<AntiFraudCloudService>(resultPhoneNum)->UploadPostRequest(fraudResult);
     }
 }
