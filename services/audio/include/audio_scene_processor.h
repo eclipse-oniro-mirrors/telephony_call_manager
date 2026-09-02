@@ -67,6 +67,10 @@ private:
 #ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
     void PlaySosSoundTone(AudioEvent event);
 #endif
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    void HandleTransferCallRing(bool isNeedSilent, bool &isTransferCallPlay);
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

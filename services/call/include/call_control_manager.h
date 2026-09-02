@@ -231,6 +231,12 @@ private:
     void ResumeWaitingToRinging(int32_t numActive, int32_t numHeld);
     sptr<CallBase> GetRingCall(int32_t callId, int32_t videoState);
     void PostPendingHangupProtectTask(int32_t callId);
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    void HandleTransferCallReportInfo(const sptr<CallBase> &call, bool &isForbidden);
+    void ProcessTransferCall(int32_t callId, const sptr<CallBase> call);
+#endif
+
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
     public:

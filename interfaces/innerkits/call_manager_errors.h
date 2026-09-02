@@ -372,6 +372,10 @@ enum PROTOCOL_ERROR_TYPE {
      * Indicates service or option not implemented.
      */
     CALL_ERR_OPTION_NOT_IMPLEMENTED,
+    /**
+     * Indicates forbidden dial call when transfer call alive.
+     */
+    CALL_ERR_TRANSFER_CALL_ALIVE_FORBIDDEN_DIAL,
 };
 } // namespace Telephony
 } // namespace OHOS

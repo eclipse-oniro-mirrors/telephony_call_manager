@@ -77,6 +77,10 @@
 #include "wired_headset.h"
 #include "call_status_policy.h"
 #include "edm_call_policy.h"
+#include "call_manager_utils.h"
+#include "core_service_client.h"
+#include <gmock/gmock.h>
+#include "mock_i_core_service.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1496,6 +1500,932 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_DialPolicy_005, Function | Medium
     EXPECT_EQ(mCallPolicy.CheckCallLimit(true, VideoStateType::TYPE_VIDEO), TELEPHONY_SUCCESS);
 }
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+/**
+ * @tc.number   CallRecordsHandler_AddTransferCallInfo_NotBluetooth
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddTransferCallInfo_NotBluetooth, TestSize.Level0)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_CS;
+    sptr<CallBase> call = new CSCall(dialParaInfo);
+    DataShare::DataShareValuesBucket bucket;
+    handler->AddTransferCallInfo(call, bucket);
+}
+
+/**
+ * @tc.number   CallRecordsHandler_AddTransferCallInfo_NotTransferCall
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddTransferCallInfo_NotTransferCall, TestSize.Level0)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "00:00:00:00:00:00", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(false);
+    DataShare::DataShareValuesBucket bucket;
+    handler->AddTransferCallInfo(call, bucket);
+}
+
+/**
+ * @tc.number   CallRecordsHandler_AddTransferCallInfo_TransferCallNotAllowed
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddTransferCallInfo_TransferCallNotAllowed, TestSize.Level0)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "00:00:00:00:00:00", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    btCall->SetIsTransferCallAllow(false);
+    DataShare::DataShareValuesBucket bucket;
+    handler->AddTransferCallInfo(call, bucket);
+}
+
+/**
+ * @tc.number   CallRecordsHandler_AddTransferCallInfo_EmptyRemoteAddr
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddTransferCallInfo_EmptyRemoteAddr, TestSize.Level0)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    btCall->SetIsTransferCallAllow(true);
+    DataShare::DataShareValuesBucket bucket;
+    handler->AddTransferCallInfo(call, bucket);
+}
+
+/**
+ * @tc.number   CallRecordsHandler_AddTransferCallInfo_EmptyRemoteName
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddTransferCallInfo_EmptyRemoteName, TestSize.Level0)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "AA:BB:CC:DD:EE:FF", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    btCall->SetIsTransferCallAllow(true);
+    DataShare::DataShareValuesBucket bucket;
+    handler->AddTransferCallInfo(call, bucket);
+}
+
+/**
+ * @tc.number   CallRecordsHandler_AddTransferCallInfo_Success
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddTransferCallInfo_Success, TestSize.Level0)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "AA:BB:CC:DD:EE:FF", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    btCall->SetIsTransferCallAllow(true);
+    btCall->SetRemoteName("TestDevice");
+    DataShare::DataShareValuesBucket bucket;
+    handler->AddTransferCallInfo(call, bucket);
+}
+
+/**
+ * @tc.number   CallRecordsHandler_GetRealSlotId_TransferCall
+ * @tc.name     test transfer call branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_GetRealSlotId_TransferCall, TestSize.Level0)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "AA:BB:CC:DD:EE:FF", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    int32_t slotId = 1;
+    int32_t simType = 0;
+    int32_t simIndex = 1;
+    handler->GetRealSlotId(call, simType, simIndex, slotId);
+    EXPECT_EQ(slotId, 0);
+}
+
+/**
+ * @tc.number   CallRecordsHandler_GetRealSlotId_NotTransferCall
+ * @tc.name     test not transfer call branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_GetRealSlotId_NotTransferCall, TestSize.Level0)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "AA:BB:CC:DD:EE:FF", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(false);
+    int32_t slotId = 1;
+    int32_t simType = 0;
+    int32_t simIndex = 1;
+    handler->GetRealSlotId(call, simType, simIndex, slotId);
+    EXPECT_NE(slotId, 0);
+}
+
+/**
+ * @tc.number   CallRecordsHandler_GetRealSlotId_NotBluetooth
+ * @tc.name     test not bluetooth call branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_GetRealSlotId_NotBluetooth, TestSize.Level0)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_CS;
+    sptr<CallBase> call = new CSCall(dialParaInfo);
+    int32_t slotId = 1;
+    int32_t simType = 0;
+    int32_t simIndex = 1;
+    handler->GetRealSlotId(call, simType, simIndex, slotId);
+    EXPECT_NE(slotId, 0);
+}
+
+/**
+ * @tc.number   ReportCallInfoHandler_IsVoipTransferCall_NonTransferType
+ * @tc.name     Test IsVoipTransferCall with non-transfer call type
+ * @tc.desc     When callType is not TYPE_BLUETOOTH, return false
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_IsVoipTransferCall_NonTransferType, Function | MediumTest | Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_CS;
+    EXPECT_FALSE(handler->IsVoipTransferCall(info));
+}
+
+/**
+ * @tc.number   ReportCallInfoHandler_IsVoipTransferCall_HasPhoneNum
+ * @tc.name     Test IsVoipTransferCall with phone number present
+ * @tc.desc     When callType is TYPE_BLUETOOTH but phoneNum is not empty, return false
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_IsVoipTransferCall_HasPhoneNum, Function | MediumTest | Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    std::string originalValue = system::GetParameter("const.product.devicetype", "");
+    system::SetParameter("const.product.devicetype", "phone");
+    (void)memset_s(info.phoneNum, sizeof(info.phoneNum), 0, sizeof(info.phoneNum));
+    const char *testNum = "10086";
+    (void)memcpy_s(info.phoneNum, sizeof(info.phoneNum), testNum, strlen(testNum));
+    EXPECT_FALSE(handler->IsVoipTransferCall(info));
+    system::SetParameter("const.product.devicetype", originalValue);
+}
+
+/**
+ * @tc.number   ReportCallInfoHandler_IsVoipTransferCall_IsVoipTransfer
+ * @tc.name     Test IsVoipTransferCall with empty phone number
+ * @tc.desc     When callType is TYPE_BLUETOOTH and phoneNum is empty, return true
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_IsVoipTransferCall_IsVoipTransfer, Function | MediumTest | Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    std::string originalValue = system::GetParameter("const.product.devicetype", "");
+    system::SetParameter("const.product.devicetype", "phone");
+    (void)memset_s(info.phoneNum, sizeof(info.phoneNum), 0, sizeof(info.phoneNum));
+    EXPECT_TRUE(handler->IsVoipTransferCall(info));
+    system::SetParameter("const.product.devicetype", originalValue);
+}
+
+/**
+ * @tc.number   ReportCallInfoHandler_IsHostAnswerTransferCall_InvalidState
+ * @tc.name     Test IsHostAnswerTransferCall with invalid state
+ * @tc.desc     When state is not ACTIVE or HOLDING, return false
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_IsHostAnswerTransferCall_InvalidState, Function | MediumTest | Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_INCOMING;
+    EXPECT_FALSE(handler->IsHostAnswerTransferCall(info));
+}
+
+/**
+ * @tc.number   ReportCallInfoHandler_IsHostAnswerTransferCall_NullCall
+ * @tc.name     Test IsHostAnswerTransferCall when call not found
+ * @tc.desc     When GetOneCallObjectByIndexSlotIdAndCallType returns nullptr, return false
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_IsHostAnswerTransferCall_NullCall, Function | MediumTest | Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.index = 9999;
+    info.accountId = 99;
+    CallObjectManager::callObjectPtrList_.clear();
+    EXPECT_FALSE(handler->IsHostAnswerTransferCall(info));
+}
+
+/**
+ * @tc.number   ReportCallInfoHandler_IsHostAnswerTransferCall_NotTransferCall
+ * @tc.name     Test IsHostAnswerTransferCall when call is not transfer call
+ * @tc.desc     When call->IsTransferCall() returns false, return false
+ */
+HWTEST_F(
+    ZeroBranch2Test, ReportCallInfoHandler_IsHostAnswerTransferCall_NotTransferCall, Function | MediumTest | Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.index = 1;
+    info.accountId = 0;
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo dialInfo;
+    dialInfo.callType = CallType::TYPE_BLUETOOTH;
+    std::string macAddr = "00:11:22:33:44:55";
+    sptr<BluetoothCall> btCall = new BluetoothCall(dialInfo, macAddr, 0);
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(false);
+    btCall->SetCallId(1);
+    CallObjectManager::callObjectPtrList_.push_back(btCall);
+    EXPECT_FALSE(handler->IsHostAnswerTransferCall(info));
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
+ * @tc.number   ReportCallInfoHandler_IsHostAnswerTransferCall_AnsweredByPhone
+ * @tc.name     Test IsHostAnswerTransferCall when answered by phone
+ * @tc.desc     When call->GetAnsweredByPhone() returns true, return false
+ */
+HWTEST_F(
+    ZeroBranch2Test, ReportCallInfoHandler_IsHostAnswerTransferCall_AnsweredByPhone, Function | MediumTest | Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.index = 1;
+    info.accountId = 0;
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo dialInfo;
+    dialInfo.callType = CallType::TYPE_BLUETOOTH;
+    std::string macAddr = "00:11:22:33:44:55";
+    sptr<BluetoothCall> btCall = new BluetoothCall(dialInfo, macAddr, 0);
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    btCall->SetCallId(1);
+    btCall->SetIsAnsweredByPhone(true);
+    CallObjectManager::callObjectPtrList_.push_back(btCall);
+    std::string originalValue = system::GetParameter("const.product.devicetype", "");
+    system::SetParameter("const.product.devicetype", "phone");
+    EXPECT_FALSE(handler->IsHostAnswerTransferCall(info));
+    CallObjectManager::callObjectPtrList_.clear();
+    system::SetParameter("const.product.devicetype", originalValue);
+}
+
+/**
+ * @tc.number   ReportCallInfoHandler_IsHostAnswerTransferCall_IsHostAnswer
+ * @tc.name     Test IsHostAnswerTransferCall when all conditions met
+ * @tc.desc     When state is ACTIVE, call is transfer and not answered by phone, return true
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_IsHostAnswerTransferCall_IsHostAnswer, Function | MediumTest | Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.index = 1;
+    info.accountId = 0;
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo dialInfo;
+    dialInfo.accountId = 0;
+    dialInfo.index = 1;
+    dialInfo.callType = CallType::TYPE_BLUETOOTH;
+    std::string macAddr = "00:11:22:33:44:55";
+    sptr<BluetoothCall> btCall = new BluetoothCall(dialInfo, macAddr, 0);
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    btCall->SetCallId(1);
+    btCall->SetIsAnsweredByPhone(false);
+    CallObjectManager::callObjectPtrList_.push_back(btCall);
+    std::string originalValue = system::GetParameter("const.product.devicetype", "");
+    system::SetParameter("const.product.devicetype", "phone");
+    EXPECT_TRUE(handler->IsHostAnswerTransferCall(info));
+    CallObjectManager::callObjectPtrList_.clear();
+    system::SetParameter("const.product.devicetype", originalValue);
+}
+
+/**
+ * @tc.number   ReportCallInfoHandler_DisconnectTransferCall_ManagerValid
+ * @tc.name     Test DisconnectTransferCall with valid manager
+ * @tc.desc     When callStatusManagerPtr_ is valid, submit task successfully
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_DisconnectTransferCall_ManagerValid, Function | MediumTest | Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    handler->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    info.index = 1;
+    handler->DisconnectTransferCall(info);
+    sleep(1);
+    handler->callStatusManagerPtr_ = nullptr;
+}
+
+/**
+ * @tc.number   ReportCallInfoHandler_DisconnectTransferCall_ManagerNull
+ * @tc.name     Test DisconnectTransferCall with null manager
+ * @tc.desc     When callStatusManagerPtr_ is null, log error inside submitted task
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_DisconnectTransferCall_ManagerNull, Function | MediumTest | Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    handler->callStatusManagerPtr_ = nullptr;
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    info.index = 1;
+    handler->DisconnectTransferCall(info);
+    sleep(1);
+}
+
+/**
+ * @tc.number   ReportCallInfoHandler_UpdateCallReportInfo_IsVoipTransferCall
+ * @tc.name     Test UpdateCallReportInfo when IsVoipTransferCall is true
+ * @tc.desc     When call is VoIP transfer call, return TELEPHONY_SUCCESS directly
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_UpdateCallReportInfo_IsVoipTransferCall, Function | MediumTest | Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    handler->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    (void)memset_s(info.phoneNum, sizeof(info.phoneNum), 0, sizeof(info.phoneNum));
+    std::string originalValue = system::GetParameter("const.product.devicetype", "");
+    system::SetParameter("const.product.devicetype", "phone");
+    int32_t ret = handler->UpdateCallReportInfo(info);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    handler->callStatusManagerPtr_ = nullptr;
+    system::SetParameter("const.product.devicetype", originalValue);
+}
+
+/**
+ * @tc.number   ReportCallInfoHandler_UpdateCallReportInfo_IsHostAnswerTransferCall
+ * @tc.name     Test UpdateCallReportInfo when IsHostAnswerTransferCall is true
+ * @tc.desc     When host answered transfer call, disconnect transfer call and return SUCCESS
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_UpdateCallReportInfo_IsHostAnswerTransferCall,
+    Function | MediumTest | Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    handler->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.index = 1;
+    info.accountId = 0;
+    const char *testNum = "10086";
+    (void)memset_s(info.phoneNum, sizeof(info.phoneNum), 0, sizeof(info.phoneNum));
+    (void)memcpy_s(info.phoneNum, sizeof(info.phoneNum), testNum, strlen(testNum));
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo dialInfo;
+    dialInfo.callType = CallType::TYPE_BLUETOOTH;
+    std::string macAddr = "00:11:22:33:44:55";
+    sptr<BluetoothCall> btCall = new BluetoothCall(dialInfo, macAddr, 0);
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    btCall->SetCallId(1);
+    btCall->SetIsAnsweredByPhone(false);
+    CallObjectManager::callObjectPtrList_.push_back(btCall);
+    std::string originalValue = system::GetParameter("const.product.devicetype", "");
+    system::SetParameter("const.product.devicetype", "phone");
+    int32_t ret = handler->UpdateCallReportInfo(info);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    sleep(1);
+    CallObjectManager::callObjectPtrList_.clear();
+    handler->callStatusManagerPtr_ = nullptr;
+    system::SetParameter("const.product.devicetype", originalValue);
+}
+
+/**
+ * @tc.number   ReportCallInfoHandler_UpdateCallReportInfo_NormalFlow
+ * @tc.name     Test UpdateCallReportInfo normal flow (not VoIP transfer, not host answer)
+ * @tc.desc     When neither IsVoipTransferCall nor IsHostAnswerTransferCall, continue normal logic
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_UpdateCallReportInfo_NormalFlow, Function | MediumTest | Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    handler->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_CS;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.index = 1;
+    info.accountId = 0;
+    const char *testNum = "10086";
+    (void)memset_s(info.phoneNum, sizeof(info.phoneNum), 0, sizeof(info.phoneNum));
+    (void)memcpy_s(info.phoneNum, sizeof(info.phoneNum), testNum, strlen(testNum));
+    int32_t ret = handler->UpdateCallReportInfo(info);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    handler->callStatusManagerPtr_ = nullptr;
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_CallRecordsHandler_AddCallLogInfo_MissedTransferCallSkip
+ * @tc.name     CallRecordsHandler_AddCallLogInfo_MissedTransferCallSkip
+ * @tc.desc     When call is transfer call and missed call, return SUCCESS without inserting
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddCallLogInfo_MissedTransferCallSkip, TestSize.Level1)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "AA:BB:CC:DD:EE:FF", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    btCall->SetCallDirection(CallDirection::CALL_DIRECTION_IN);
+    btCall->SetAnswerType(CallAnswerType::CALL_ANSWER_MISSED);
+    CallRecordInfo info;
+    info.slotId = 0;
+    int32_t ret = handler->AddCallLogInfo(call, info);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_CallRecordsHandler_AddCallLogInfo_NotTransferCall
+ * @tc.name     CallRecordsHandler_AddCallLogInfo_NotTransferCall
+ * @tc.desc     When call is not transfer call and add info
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddCallLogInfo_NotTransferCall, TestSize.Level1)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "AA:BB:CC:DD:EE:FF", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(false);
+    btCall->SetCallDirection(CallDirection::CALL_DIRECTION_IN);
+    btCall->SetAnswerType(CallAnswerType::CALL_ANSWER_MISSED);
+    CallRecordInfo info;
+    info.slotId = 0;
+    int32_t ret = handler->AddCallLogInfo(call, info);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_CallRecordsHandler_AddCallLogInfo_TransferCallNotMissed
+ * @tc.name     CallRecordsHandler_AddCallLogInfo_TransferCallNotMissed
+ * @tc.desc     When call is transfer call but not missed, continue AddTransferCallInfo flow
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddCallLogInfo_TransferCallNotMissed, TestSize.Level1)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "AA:BB:CC:DD:EE:FF", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    btCall->SetCallDirection(CallDirection::CALL_DIRECTION_IN);
+    btCall->SetAnswerType(CallAnswerType::CALL_ANSWER_ACTIVED);
+    CallRecordInfo info;
+    info.slotId = 0;
+    (void)handler->AddCallLogInfo(call, info);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NonTransferType
+ * @tc.name     ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NonTransferType
+ * @tc.desc     When callType is not transfer type, return false
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NonTransferType, TestSize.Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_CS;
+    EXPECT_FALSE(handler->IsHostDialMeIgnoreTransferCall(info));
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_ShortNumber
+ * @tc.name     ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_ShortNumber
+ * @tc.desc     When phone number length is less than 11, return false
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_ShortNumber, TestSize.Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    std::string originalValue = system::GetParameter("const.product.devicetype", "");
+    system::SetParameter("const.product.devicetype", "phone");
+    (void)memset_s(info.phoneNum, sizeof(info.phoneNum), 0, sizeof(info.phoneNum));
+    (void)memcpy_s(info.phoneNum, sizeof(info.phoneNum), "123456", strlen("123456"));
+    EXPECT_FALSE(handler->IsHostDialMeIgnoreTransferCall(info));
+    system::SetParameter("const.product.devicetype", originalValue);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_MatchNumber0
+ * @tc.name     ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_MatchNumber0
+ * @tc.desc     When phone number matches number0 (self number), return true
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_MatchNumber0, TestSize.Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    std::string originalValue = system::GetParameter("const.product.devicetype", "");
+    system::SetParameter("const.product.devicetype", "phone");
+    sptr<MockICoreService> mockCoreService = new MockICoreService();
+    ON_CALL(*mockCoreService, GetSimTelephoneNumber(0, testing::_))
+        .WillByDefault(testing::DoAll(
+            testing::SetArgReferee<1>(std::u16string(u"12345678901")),
+            testing::Return(TELEPHONY_SUCCESS)));
+    CoreServiceClient::GetInstance().proxy_ = mockCoreService;
+    (void)memset_s(info.phoneNum, sizeof(info.phoneNum), 0, sizeof(info.phoneNum));
+    (void)memcpy_s(info.phoneNum, sizeof(info.phoneNum), "12345678901", strlen("12345678901"));
+    EXPECT_TRUE(handler->IsHostDialMeIgnoreTransferCall(info));
+    CoreServiceClient::GetInstance().proxy_ = nullptr;
+    system::SetParameter("const.product.devicetype", originalValue);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NotMatchNumber0
+ * @tc.name     ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NotMatchNumber0
+ * @tc.desc     When phone number not matches number0 (self number)
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NotMatchNumber0, TestSize.Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    std::string originalValue = system::GetParameter("const.product.devicetype", "");
+    system::SetParameter("const.product.devicetype", "phone");
+    sptr<MockICoreService> mockCoreService = new MockICoreService();
+    ON_CALL(*mockCoreService, GetSimTelephoneNumber(0, testing::_))
+        .WillByDefault(testing::DoAll(
+            testing::SetArgReferee<1>(std::u16string(u"12345678999")),
+            testing::Return(TELEPHONY_SUCCESS)));
+    CoreServiceClient::GetInstance().proxy_ = mockCoreService;
+    (void)memset_s(info.phoneNum, sizeof(info.phoneNum), 0, sizeof(info.phoneNum));
+    (void)memcpy_s(info.phoneNum, sizeof(info.phoneNum), "12345678901", strlen("12345678901"));
+    EXPECT_FALSE(handler->IsHostDialMeIgnoreTransferCall(info));
+    CoreServiceClient::GetInstance().proxy_ = nullptr;
+    system::SetParameter("const.product.devicetype", originalValue);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_MatchNumber1
+ * @tc.name     ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_MatchNumber1
+ * @tc.desc     When phone number matches number1, return true
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_MatchNumber1, TestSize.Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    std::string originalValue = system::GetParameter("const.product.devicetype", "");
+    system::SetParameter("const.product.devicetype", "phone");
+    sptr<MockICoreService> mockCoreService = new MockICoreService();
+    ON_CALL(*mockCoreService, GetSimTelephoneNumber(1, testing::_))
+        .WillByDefault(testing::DoAll(
+                testing::SetArgReferee<1>(std::u16string(u"12345678901")),
+                testing::Return(TELEPHONY_SUCCESS)));
+    CoreServiceClient::GetInstance().proxy_ = mockCoreService;
+    (void)memset_s(info.phoneNum, sizeof(info.phoneNum), 0, sizeof(info.phoneNum));
+    (void)memcpy_s(info.phoneNum, sizeof(info.phoneNum), "12345678901", strlen("12345678901"));
+    EXPECT_TRUE(handler->IsHostDialMeIgnoreTransferCall(info));
+    CoreServiceClient::GetInstance().proxy_ = nullptr;
+    system::SetParameter("const.product.devicetype", originalValue);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NotMatchNumber1
+ * @tc.name     ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NotMatchNumber1
+ * @tc.desc     When phone number not matches number1 (self number)
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NotMatchNumber1, TestSize.Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    std::string originalValue = system::GetParameter("const.product.devicetype", "");
+    system::SetParameter("const.product.devicetype", "phone");
+    sptr<MockICoreService> mockCoreService = new MockICoreService();
+    ON_CALL(*mockCoreService, GetSimTelephoneNumber(1, testing::_))
+        .WillByDefault(testing::DoAll(
+            testing::SetArgReferee<1>(std::u16string(u"12345678999")),
+            testing::Return(TELEPHONY_SUCCESS)));
+    CoreServiceClient::GetInstance().proxy_ = mockCoreService;
+    (void)memset_s(info.phoneNum, sizeof(info.phoneNum), 0, sizeof(info.phoneNum));
+    (void)memcpy_s(info.phoneNum, sizeof(info.phoneNum), "12345678901", strlen("12345678901"));
+    EXPECT_FALSE(handler->IsHostDialMeIgnoreTransferCall(info));
+    CoreServiceClient::GetInstance().proxy_ = nullptr;
+    system::SetParameter("const.product.devicetype", originalValue);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NotMatchNumber1_1
+ * @tc.name     ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NotMatchNumber1_1
+ * @tc.desc     When phone number not matches number1 (self number)
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NotMatchNumber1_1, TestSize.Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    std::string originalValue = system::GetParameter("const.product.devicetype", "");
+    system::SetParameter("const.product.devicetype", "phone");
+    sptr<MockICoreService> mockCoreService = new MockICoreService();
+    ON_CALL(*mockCoreService, GetSimTelephoneNumber(1, testing::_))
+        .WillByDefault(testing::DoAll(
+            testing::SetArgReferee<1>(std::u16string(u"12345")),
+            testing::Return(TELEPHONY_SUCCESS)));
+    CoreServiceClient::GetInstance().proxy_ = mockCoreService;
+    (void)memset_s(info.phoneNum, sizeof(info.phoneNum), 0, sizeof(info.phoneNum));
+    (void)memcpy_s(info.phoneNum, sizeof(info.phoneNum), "12345678901", strlen("12345678901"));
+    EXPECT_FALSE(handler->IsHostDialMeIgnoreTransferCall(info));
+    CoreServiceClient::GetInstance().proxy_ = nullptr;
+    system::SetParameter("const.product.devicetype", originalValue);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NoMatch
+ * @tc.name     ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NoMatch
+ * @tc.desc     When phone number does not match any self number, return false
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_IsHostDialMeIgnoreTransferCall_NoMatch, TestSize.Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    std::string originalValue = system::GetParameter("const.product.devicetype", "");
+    system::SetParameter("const.product.devicetype", "phone");
+    (void)memset_s(info.phoneNum, sizeof(info.phoneNum), 0, sizeof(info.phoneNum));
+    (void)memcpy_s(info.phoneNum, sizeof(info.phoneNum), "99988887777", strlen("99988887777"));
+    EXPECT_FALSE(handler->IsHostDialMeIgnoreTransferCall(info));
+    system::SetParameter("const.product.devicetype", originalValue);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_ReportCallInfoHandler_UpdateCallReportInfo_HostDialMeIgnoreTransferCall
+ * @tc.name     ReportCallInfoHandler_UpdateCallReportInfo_HostDialMeIgnoreTransferCall
+ * @tc.desc     When IsHostDialMeIgnoreTransferCall returns true, call DisconnectScoByTransferControl
+ */
+HWTEST_F(ZeroBranch2Test, ReportCallInfoHandler_UpdateCallReportInfo_HostDialMeIgnoreTransferCall, TestSize.Level1)
+{
+    auto handler = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    ASSERT_NE(handler, nullptr);
+    handler->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    (void)memset_s(info.phoneNum, sizeof(info.phoneNum), 0, sizeof(info.phoneNum));
+    std::string originalValue = system::GetParameter("const.product.devicetype", "");
+    system::SetParameter("const.product.devicetype", "phone");
+    int32_t ret = handler->UpdateCallReportInfo(info);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    handler->callStatusManagerPtr_ = nullptr;
+    system::SetParameter("const.product.devicetype", originalValue);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_CallRecordsHandler_AddCallLogInfo_NullCallDataPtr
+ * @tc.name     CallRecordsHandler_AddCallLogInfo_NullCallDataPtr
+ * @tc.desc     When callDataPtr_ is nullptr, return TELEPHONY_ERR_LOCAL_PTR_NULL
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddCallLogInfo_NullCallDataPtr, TestSize.Level1)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    handler->callDataPtr_ = nullptr;
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "AA:BB:CC:DD:EE:FF", 0);
+    CallRecordInfo info;
+    info.slotId = 0;
+    int32_t ret = handler->AddCallLogInfo(call, info);
+    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_CallRecordsHandler_GetRealSlotId_NullCallObjectPtr
+ * @tc.name     CallRecordsHandler_GetRealSlotId_NullCallObjectPtr
+ * @tc.desc     When callObjectPtr is nullptr, slotId is set to 0
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_GetRealSlotId_NullCallObjectPtr, TestSize.Level1)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    sptr<CallBase> call = nullptr;
+    int32_t slotId = 1;
+    handler->GetRealSlotId(call, static_cast<int32_t>(SimType::PSIM), 0, slotId);
+    EXPECT_EQ(slotId, 0);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_CallRecordsHandler_IsMissedCall_IncomingAnswerActiveAiAuto
+ * @tc.name     CallRecordsHandler_IsMissedCall_IncomingAnswerActiveAiAuto
+ * @tc.desc     When call is incoming with CALL_ANSWER_ACTIVED and IsAiAutoAnswer is true, return false
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_IsMissedCall_IncomingAnswerActiveAiAuto, TestSize.Level1)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "AA:BB:CC:DD:EE:FF", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetCallDirection(CallDirection::CALL_DIRECTION_IN);
+    btCall->SetAnswerType(CallAnswerType::CALL_ANSWER_ACTIVED);
+    btCall->SetAiAutoAnswer(true);
+    bool result = handler->IsMissedCall(call);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_CallRecordsHandler_AddTransferCallInfo_NullCallObject
+ * @tc.name     CallRecordsHandler_AddTransferCallInfo_NullCallObject
+ * @tc.desc     When callObjectPtr is nullptr, AddTransferCallInfo returns early
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddTransferCallInfo_NullCallObject, TestSize.Level1)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    sptr<CallBase> call = nullptr;
+    DataShare::DataShareValuesBucket bucket;
+    handler->AddTransferCallInfo(call, bucket);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_CallRecordsHandler_AddTransferCallInfo_NonBluetoothType
+ * @tc.name     CallRecordsHandler_AddTransferCallInfo_NonBluetoothType
+ * @tc.desc     When callType is not TYPE_BLUETOOTH, AddTransferCallInfo returns early
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddTransferCallInfo_NonBluetoothType, TestSize.Level1)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_CS;
+    sptr<CallBase> call = new CSCall(dialParaInfo);
+    DataShare::DataShareValuesBucket bucket;
+    handler->AddTransferCallInfo(call, bucket);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_CallRecordsHandler_AddTransferCallInfo_NotTransferCall
+ * @tc.name     CallRecordsHandler_AddTransferCallInfo_NotTransferCall2
+ * @tc.desc     When call is not a transfer call, AddTransferCallInfo returns early
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddTransferCallInfo_NotTransferCall2, TestSize.Level1)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "AA:BB:CC:DD:EE:FF", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(false);
+    DataShare::DataShareValuesBucket bucket;
+    handler->AddTransferCallInfo(call, bucket);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_CallRecordsHandler_AddTransferCallInfo_TransferForbidden
+ * @tc.name     CallRecordsHandler_AddTransferCallInfo_TransferForbidden
+ * @tc.desc     When transfer call is forbidden, AddTransferCallInfo returns early
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddTransferCallInfo_TransferForbidden, TestSize.Level1)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "AA:BB:CC:DD:EE:FF", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    btCall->SetIsTransferCallAllow(true);
+    DataShare::DataShareValuesBucket bucket;
+    handler->AddTransferCallInfo(call, bucket);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_CallRecordsHandler_AddTransferCallInfo_EmptyRemoteAddr
+ * @tc.name     CallRecordsHandler_AddTransferCallInfo_EmptyRemoteAddr2
+ * @tc.desc     When remoteAddr is empty, AddTransferCallInfo still adds device info to bucket
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddTransferCallInfo_EmptyRemoteAddr2, TestSize.Level1)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    DataShare::DataShareValuesBucket bucket;
+    handler->AddTransferCallInfo(call, bucket);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_CallRecordsHandler_AddTransferCallInfo_EmptyRemoteName
+ * @tc.name     CallRecordsHandler_AddTransferCallInfo_EmptyRemoteName2
+ * @tc.desc     When remoteName is empty, AddTransferCallInfo still adds device info to bucket
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddTransferCallInfo_EmptyRemoteName2, TestSize.Level1)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "AA:BB:CC:DD:EE:FF", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    DataShare::DataShareValuesBucket bucket;
+    handler->AddTransferCallInfo(call, bucket);
+}
+
+/**
+ * @tc.number   ZeroBranch2Test_CallRecordsHandler_AddTransferCallInfo_Success
+ * @tc.name     CallRecordsHandler_AddTransferCallInfo_Success2
+ * @tc.desc     When transfer call has valid remoteAddr and remoteName, all info is added to bucket
+ */
+HWTEST_F(ZeroBranch2Test, CallRecordsHandler_AddTransferCallInfo_Success2, TestSize.Level1)
+{
+    auto handler = std::make_shared<CallRecordsHandler>();
+    ASSERT_NE(handler, nullptr);
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_BLUETOOTH;
+    sptr<CallBase> call = new BluetoothCall(dialParaInfo, "AA:BB:CC:DD:EE:FF", 0);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    btCall->SetRemoteName("TestDevice");
+    DataShare::DataShareValuesBucket bucket;
+    handler->AddTransferCallInfo(call, bucket);
+}
+#endif
 /**
  * @tc.number   Telephony_CallObjectManager_HasRttCall_HasRttCall
  * @tc.name     HasRttCall_HasRttCall

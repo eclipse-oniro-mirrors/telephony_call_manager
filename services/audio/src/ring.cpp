@@ -21,6 +21,7 @@
 #include "audio_player.h"
 #include "call_base.h"
 #include "call_control_manager.h"
+#include "call_manager_utils.h"
 #include "telephony_log_wrapper.h"
 #include "cpp/task_ext.h"
 namespace OHOS {
@@ -97,7 +98,7 @@ void Ring::Init()
 #endif
 }
 
-int32_t Ring::Play(int32_t slotId, std::string ringtonePath, Media::HapticStartupMode mode)
+int32_t Ring::Play(int32_t slotId, std::string ringtonePath, Media::HapticStartupMode mode, bool isTransferCall)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
     if (SystemSoundManager_ == nullptr || audioPlayer_ == nullptr) {
@@ -107,8 +108,18 @@ int32_t Ring::Play(int32_t slotId, std::string ringtonePath, Media::HapticStartu
     const std::shared_ptr<AbilityRuntime::Context> context;
     Media::RingtoneType type = slotId == DEFAULT_SIM_SLOT_ID ? Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0 :
         Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
-    TELEPHONY_LOGI("ringtonePath: %{public}s", ringtonePath.c_str());
+    TELEPHONY_LOGI("ringtonePath: %{public}s, isTransferCall=%{public}d", ringtonePath.c_str(), isTransferCall);
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    if (isTransferCall) {
+        RingtonePlayer_ = SystemSoundManager_->GetSpecificRingTonePlayer(
+            context, type, ringtonePath, AudioStandard::StreamUsage::STREAM_USAGE_VOICE_TRANSFER_RINGTONE);
+        TELEPHONY_LOGI("playringTone with stream STREAM_USAGE_VOICE_TRANSFER_RINGTONE");
+    } else {
+        RingtonePlayer_ = SystemSoundManager_->GetSpecificRingTonePlayer(context, type, ringtonePath);
+    }
+#else
     RingtonePlayer_ = SystemSoundManager_->GetSpecificRingTonePlayer(context, type, ringtonePath);
+#endif
     if (RingtonePlayer_ == nullptr) {
         TELEPHONY_LOGE("get RingtonePlayer failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

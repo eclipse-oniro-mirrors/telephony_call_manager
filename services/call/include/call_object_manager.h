@@ -49,6 +49,7 @@ public:
     static sptr<CallBase> GetOneCallObjectByIndexSlotIdAndCallType(int32_t index, int32_t slotId, CallType callType,
         int32_t phoneIndex);
     static sptr<CallBase> GetOneCallObjectByVoipCallId(std::string voipCallId, std::string bundleName, int32_t uid);
+    static sptr<CallBase> GetDialingCall();
     static void UpdateOneCallObjectByCallId(int32_t callId, TelCallState nextCallState);
     static int32_t UpdateOneVoipCallObjectByCallId(int32_t callId, TelCallState nextCallState);
     static int32_t HasNewCall();
@@ -108,6 +109,15 @@ public:
 #ifdef NOT_SUPPORT_MULTICALL
     static bool HasBtCallWithDifferentNumber(const std::string &accountNumber);
 #endif
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    static bool HasNonTransferCall();
+    static sptr<CallBase> GetIncomingBtTransferCall();
+    static bool HasTransferCall();
+    static sptr<CallBase> GetOtherBtTransferCall(int32_t excludeCallId);
+#endif
+
+    static void ConnectAbilityIfNeed(sptr<CallBase> &call);
 
 protected:
     static ffrt::condition_variable cv_;

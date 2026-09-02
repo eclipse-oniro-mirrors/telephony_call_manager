@@ -25,6 +25,9 @@
 #include "voip_call_manager_proxy.h"
 #include "call_status_callback.h"
 #include "cellular_call_proxy.h"
+#include "transfer_control_callback_proxy.h"
+#include "transfer_control_callback.h"
+#include "call_manager_info.h"
 
 namespace OHOS::Telephony {
 using namespace testing::ext;
@@ -476,6 +479,168 @@ HWTEST_F(SpecialBranch3Test, Telephony_VoipCallManagerProxy_ReportCallAttributeC
     EXPECT_EQ(Proxy->ReportCallAttributeChange(callAttribute, userProfile, reason),
         TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+/**
+ * @tc.number   SpecialBranch3Test_CallManagerServiceProxy_RegisterTransferController_NullCallback
+ * @tc.name     CallManagerServiceProxy_RegisterTransferController_NullCallback
+ * @tc.desc     When callback is nullptr, return TELEPHONY_ERR_ARGUMENT_INVALID
+ */
+HWTEST_F(SpecialBranch3Test, CallManagerServiceProxy_RegisterTransferController_NullCallback, TestSize.Level1)
+{
+    sptr<IRemoteObject> impl;
+    CallManagerServiceProxy proxy(impl);
+    EXPECT_EQ(proxy.RegisterTransferController(nullptr), TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+/**
+ * @tc.number   SpecialBranch3Test_CallManagerServiceProxy_RegisterTransferController_WriteTokenFail
+ * @tc.name     CallManagerServiceProxy_RegisterTransferController_WriteTokenFail
+ * @tc.desc     When IPC fails after WriteInterfaceToken (null remote), return error
+ */
+HWTEST_F(SpecialBranch3Test, CallManagerServiceProxy_RegisterTransferController_WriteTokenFail, TestSize.Level1)
+{
+    sptr<IRemoteObject> impl;
+    CallManagerServiceProxy proxy(impl);
+    sptr<ITransferControlCallback> callback =
+        (std::make_unique<TransferControlCallback>()).release();
+    EXPECT_NE(callback, nullptr);
+    int32_t result = proxy.RegisterTransferController(callback);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   SpecialBranch3Test_CallManagerServiceProxy_RegisterTransferController_SendRequestFail
+ * @tc.name     CallManagerServiceProxy_RegisterTransferController_SendRequestFail
+ * @tc.desc     When IPC SendRequest fails, return error code
+ */
+HWTEST_F(SpecialBranch3Test, CallManagerServiceProxy_RegisterTransferController_SendRequestFail, TestSize.Level1)
+{
+    sptr<MockRemoteObject> remote = new MockRemoteObject(-1);
+    CallManagerServiceProxy proxy(remote);
+    sptr<ITransferControlCallback> callback =
+        (std::make_unique<TransferControlCallback>()).release();
+    EXPECT_NE(callback, nullptr);
+    int32_t result = proxy.RegisterTransferController(callback);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   SpecialBranch3Test_CallManagerServiceProxy_RegisterTransferController_Success
+ * @tc.name     CallManagerServiceProxy_RegisterTransferController_Success
+ * @tc.desc     With MockRemoteObject, test RegisterTransferController success path
+ */
+HWTEST_F(SpecialBranch3Test, CallManagerServiceProxy_RegisterTransferController_Success, TestSize.Level1)
+{
+    sptr<MockRemoteObject> remote = new MockRemoteObject(0);
+    CallManagerServiceProxy proxy(remote);
+    sptr<ITransferControlCallback> callback =
+        (std::make_unique<TransferControlCallback>()).release();
+    EXPECT_NE(callback, nullptr);
+    int32_t result = proxy.RegisterTransferController(callback);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   SpecialBranch3Test_CallManagerServiceProxy_UnRegisterTransferController_Success
+ * @tc.name     CallManagerServiceProxy_UnRegisterTransferController_Success
+ * @tc.desc     With MockRemoteObject, test UnRegisterTransferController success path
+ */
+HWTEST_F(SpecialBranch3Test, CallManagerServiceProxy_UnRegisterTransferController_Success, TestSize.Level1)
+{
+    sptr<MockRemoteObject> remote = new MockRemoteObject(0);
+    CallManagerServiceProxy proxy(remote);
+    int32_t result = proxy.UnRegisterTransferController();
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   SpecialBranch3Test_TransferControlCallbackProxy_OnGetTransferResult_WriteTokenFail
+ * @tc.name     TransferControlCallbackProxy_OnGetTransferResult_WriteTokenFail
+ * @tc.desc     When WriteInterfaceToken fails, return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL
+ */
+HWTEST_F(SpecialBranch3Test, TransferControlCallbackProxy_OnGetTransferResult_WriteTokenFail, TestSize.Level1)
+{
+    sptr<IRemoteObject> impl;
+    TransferControlCallbackProxy proxy(impl);
+    TransferCallInfo info;
+    TransferResultInfo resultInfo;
+    int32_t result = proxy.OnGetTransferResult(info, resultInfo);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   SpecialBranch3Test_TransferControlCallbackProxy_OnGetTransferResult_SendRequestFail
+ * @tc.name     TransferControlCallbackProxy_OnGetTransferResult_SendRequestFail
+ * @tc.desc     When IPC SendRequest fails, return error code
+ */
+HWTEST_F(SpecialBranch3Test, TransferControlCallbackProxy_OnGetTransferResult_SendRequestFail, TestSize.Level1)
+{
+    sptr<MockRemoteObject> remote = new MockRemoteObject(-1);
+    TransferControlCallbackProxy proxy(remote);
+    TransferCallInfo info;
+    TransferResultInfo resultInfo;
+    int32_t result = proxy.OnGetTransferResult(info, resultInfo);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   SpecialBranch3Test_TransferControlCallbackProxy_OnGetTransferResult_Success
+ * @tc.name     TransferControlCallbackProxy_OnGetTransferResult_Success
+ * @tc.desc     With MockRemoteObject, test OnGetTransferResult success path
+ */
+HWTEST_F(SpecialBranch3Test, TransferControlCallbackProxy_OnGetTransferResult_Success, TestSize.Level1)
+{
+    sptr<MockRemoteObject> remote = new MockRemoteObject(0);
+    TransferControlCallbackProxy proxy(remote);
+    TransferCallInfo info;
+    TransferResultInfo resultInfo;
+    int32_t result = proxy.OnGetTransferResult(info, resultInfo);
+    EXPECT_EQ(result, 0);
+}
+
+/**
+ * @tc.number   SpecialBranch3Test_TransferControlCallbackProxy_OnUpdateTransferCall_WriteTokenFail
+ * @tc.name     TransferControlCallbackProxy_OnUpdateTransferCall_WriteTokenFail
+ * @tc.desc     When WriteInterfaceToken fails, return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL
+ */
+HWTEST_F(SpecialBranch3Test, TransferControlCallbackProxy_OnUpdateTransferCall_WriteTokenFail, TestSize.Level1)
+{
+    sptr<IRemoteObject> impl;
+    TransferControlCallbackProxy proxy(impl);
+    TransferCallInfo info;
+    int32_t result = proxy.OnUpdateTransferCall(info);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   SpecialBranch3Test_TransferControlCallbackProxy_OnUpdateTransferCall_SendRequestFail
+ * @tc.name     TransferControlCallbackProxy_OnUpdateTransferCall_SendRequestFail
+ * @tc.desc     When IPC SendRequest fails, return error code
+ */
+HWTEST_F(SpecialBranch3Test, TransferControlCallbackProxy_OnUpdateTransferCall_SendRequestFail, TestSize.Level1)
+{
+    sptr<MockRemoteObject> remote = new MockRemoteObject(-1);
+    TransferControlCallbackProxy proxy(remote);
+    TransferCallInfo info;
+    int32_t result = proxy.OnUpdateTransferCall(info);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   SpecialBranch3Test_TransferControlCallbackProxy_OnUpdateTransferCall_Success
+ * @tc.name     TransferControlCallbackProxy_OnUpdateTransferCall_Success
+ * @tc.desc     With MockRemoteObject, test OnUpdateTransferCall success path
+ */
+HWTEST_F(SpecialBranch3Test, TransferControlCallbackProxy_OnUpdateTransferCall_Success, TestSize.Level1)
+{
+    sptr<MockRemoteObject> remote = new MockRemoteObject(0);
+    TransferControlCallbackProxy proxy(remote);
+    TransferCallInfo info;
+    int32_t result = proxy.OnUpdateTransferCall(info);
+    EXPECT_EQ(result, 0);
+}
+#endif
 
 HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_MakeCallWithToken_001, TestSize.Level0)
 {

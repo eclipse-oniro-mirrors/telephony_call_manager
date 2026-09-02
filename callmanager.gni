@@ -20,6 +20,7 @@ declare_args() {
   call_manager_sos_no_ringback_tone = false
   call_manager_watch_call_blocking = false
   call_manager_thermal_protection = false
+  call_manager_call_transfer = true
 }
 
 call_manager_path = "//base/telephony/call_manager"
@@ -382,4 +383,12 @@ if (call_manager_watch_call_blocking) {
 if (call_manager_thermal_protection) {
   print("callmanager thermal protection")
   call_manager_defines += [ "CALL_MANAGER_THERMAL_PROTECTION" ]
+}
+
+if (call_manager_call_transfer) {
+  print("callmanager call transfer")
+  call_manager_defines += [ "CALL_MANAGER_CALL_TRANSFER" ]
+  call_manager_sources += [
+    "${call_manager_path}/services/call_report/src/transfer_control_callback_proxy.cpp",
+  ]
 }

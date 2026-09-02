@@ -1997,6 +1997,72 @@ int32_t CallManagerService::GetCallTransferInfo(const std::string number, CallTr
     }
 }
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+int32_t CallManagerService::RegisterTransferController(const sptr<ITransferControlCallback> callback)
+{
+    TELEPHONY_LOGI("CallManagerService::RegisterTransferController");
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("CallManagerService::RegisterTransferController Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("CallManagerService::RegisterTransferController Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("input argumet is null.");
+        return TELEPHONY_ERR_ARGUMENT_NULL;
+    }
+
+    return DelayedSingleton<BluetoothCallConnection>::GetInstance()->RegisterTransferController(callback);
+}
+
+int32_t CallManagerService::UnRegisterTransferController()
+{
+    TELEPHONY_LOGI("CallManagerService::UnRegisterTransferController");
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("CallManagerService::UnRegisterTransferController Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("CallManagerService::UnRegisterTransferController Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+
+    return DelayedSingleton<BluetoothCallConnection>::GetInstance()->UnRegisterTransferController();
+}
+
+int32_t CallManagerService::NotifyTransferCallContact(const std::string &contactName)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("CallManagerService::NotifyTransferCallContact Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("CallManagerService::NotifyTransferCallContact Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+
+    sptr<CallBase> call = CallObjectManager::GetIncomingBtTransferCall();
+    if (call != nullptr && callStatusManagerPtr_ != nullptr) {
+        TELEPHONY_LOGI("have incoming BT transfer call");
+        return callStatusManagerPtr_->NotifyTransferCallContact(contactName, call);
+    }
+    TELEPHONY_LOGI("No incoming BT transfer call, cache ANCS contact name");
+    auto btConn = DelayedSingleton<BluetoothCallConnection>::GetInstance();
+    if (btConn == nullptr) {
+        TELEPHONY_LOGI("BluetoothCallConnection is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_NULL;
+    }
+    btConn->CacheAncsContactName(contactName);
+    return TELEPHONY_SUCCESS;
+}
+#endif
+
 int32_t CallManagerService::MakeCallWithToken(std::string number, AppExecFwk::PacMap &options, std::string &token)
 {
     std::string hexToken = challengeTokenMgr_.GenerateToken();

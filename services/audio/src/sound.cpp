@@ -31,13 +31,13 @@ Sound::~Sound()
     }
 }
 
-int32_t Sound::Play()
+int32_t Sound::Play(const AudioStandard::StreamUsage streamUsage)
 {
     if (audioPlayer_ == nullptr) {
         TELEPHONY_LOGE("audioPlayer_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return audioPlayer_->Play(TYPE_SOUND);
+    return audioPlayer_->Play(TYPE_SOUND, streamUsage);
 }
 
 int32_t Sound::Stop()

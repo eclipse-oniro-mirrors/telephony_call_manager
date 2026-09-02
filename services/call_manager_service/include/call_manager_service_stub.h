@@ -47,6 +47,11 @@ private:
     void InitOttServiceRequest();
     void InitVoipOperationRequest();
     void InitBluetoothOperationRequest();
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    void InitTransferControlRequest();
+#endif
+
     int32_t SetTimer(uint32_t code);
     void CancelTimer(int32_t id);
 
@@ -145,6 +150,13 @@ private:
     int32_t OnRejectCallNoParam(MessageParcel &data, MessageParcel &reply);
     int32_t OnHangUpCallNoParam(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetTransferNumberByNumber(MessageParcel &data, MessageParcel &reply);
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    int32_t OnRegisterTransferControl(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUnRegisterTransferControl(MessageParcel &data, MessageParcel &reply);
+    int32_t OnNotifyTransferCallContact(MessageParcel &data, MessageParcel &reply);
+#endif
+
     int32_t OnCheckCallRecordingPermission(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;

@@ -139,9 +139,16 @@ int32_t CallPolicy::ValidateVideoState(VideoStateType videoState)
 int32_t CallPolicy::CheckCallLimit(bool isEcc, VideoStateType videoState)
 {
     if (!isEcc) {
+#ifdef CALL_MANAGER_CALL_TRANSFER
+        if (CallObjectManager::HasTransferCall()) {
+            TELEPHONY_LOGE("CallPolicy::CheckCallLimit CALL_ERR_TRANSFER_CALL_ALIVE_FORBIDDEN_DIAL");
+            return CALL_ERR_TRANSFER_CALL_ALIVE_FORBIDDEN_DIAL;
+        }
         if (IsVoiceCallValid(videoState) != TELEPHONY_SUCCESS || HasNewCall() != TELEPHONY_SUCCESS) {
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
         }
+#endif
+
         bool hasEccCall = false;
         if (HasEmergencyCall(hasEccCall) == TELEPHONY_ERR_SUCCESS && hasEccCall) {
             TELEPHONY_LOGE("during emergency call, calling is prohibited");

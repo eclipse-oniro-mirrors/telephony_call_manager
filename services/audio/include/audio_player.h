@@ -70,10 +70,10 @@ public:
     AudioPlayer() = default;
     ~AudioPlayer() = default;
     bool InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStreamType streamType);
-    bool InitRenderer();
+    bool InitRenderer(AudioStandard::StreamUsage streamUsage);
     bool InitCapturer();
     int32_t Play(const std::string &path, AudioStandard::AudioStreamType streamType, PlayerType playerType);
-    int32_t Play(PlayerType playerType);
+    int32_t Play(PlayerType playerType, AudioStandard::StreamUsage streamUsage);
     void ReleaseRenderer();
     void ReleaseCapturer();
     void SetStop(PlayerType playerType, bool state);

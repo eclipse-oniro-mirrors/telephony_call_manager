@@ -186,7 +186,8 @@ bool AudioSceneProcessor::SwitchDialing()
         return false;
     }
     audioDeviceManager->SetAudioDeviceByAudioMode(false, false);
-    if (!audioControlManager->PlaySoundtone()) {
+    sptr<CallBase> callObjectPtr = CallObjectManager::GetDialingCall();
+    if (!audioControlManager->PlaySoundtone(callObjectPtr)) {
         TELEPHONY_LOGE("PlaySoundtone fail");
     }
     audioControlManager->UpdateDeviceTypeForVideoDialing();
@@ -209,6 +210,31 @@ bool AudioSceneProcessor::SwitchAlerting()
     TELEPHONY_LOGI("current call state : alerting state");
     return true;
 }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+void AudioSceneProcessor::HandleTransferCallRing(bool isNeedSilent, bool &isTransferCallPlay)
+{
+    isTransferCallPlay = false;
+    if (isNeedSilent) {
+        return;
+    }
+
+    sptr<CallBase> transferCall = CallObjectManager::GetIncomingBtTransferCall();
+    if (transferCall == nullptr) {
+        return;
+    }
+
+    TELEPHONY_LOGI("AudioSceneProcessor::HandleTransferCallRing start play ring");
+    auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+    if (audioControlManager == nullptr) {
+        return;
+    }
+
+    audioControlManager->StopRingtone();
+    audioControlManager->PlayRingtone();
+    isTransferCallPlay = true;
+}
+#endif
 
 bool AudioSceneProcessor::SwitchIncoming()
 {
@@ -238,8 +264,12 @@ bool AudioSceneProcessor::SwitchIncoming()
         bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
         bool isNeedSilent = CallObjectManager::IsNeedSilentInDoNotDisturbMode();
         bool isNotWearWatch = callControlManager->IsNotWearOnWrist();
+        bool isTransferCallPlay = false;
+#ifdef CALL_MANAGER_CALL_TRANSFER
+        HandleTransferCallRing(isNeedSilent, isTransferCallPlay);
+#endif
         audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
-        if (!isStartBroadcast && !isNeedSilent && !isNotWearWatch) {
+        if (!isStartBroadcast && !isNeedSilent && !isNotWearWatch && !isTransferCallPlay) {
             TELEPHONY_LOGI("broadcast switch and doNotDisturbMode close, start play system ring");
             audioControlManager->StopRingtone();
             // play ringtone while incoming state
@@ -324,7 +354,8 @@ void AudioSceneProcessor::PlaySosSoundTone(AudioEvent event)
                 TELEPHONY_LOGE("audioControlManager is nullptr");
                 return;
             }
-            audioControlManager->PlaySoundtone();
+            sptr<CallBase> callObjectPtr = CallObjectManager::GetOneCallObject(activeCallId);
+            audioControlManager->PlaySoundtone(callObjectPtr);
         }
     }
 }

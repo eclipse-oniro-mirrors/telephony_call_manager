@@ -96,6 +96,7 @@
 #include "fold_status_manager.h"
 #include "audio_control_manager.h"
 #include "call_state_processor.h"
+#include "transfer_control_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1121,6 +1122,54 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_026, TestSize.Level0)
     EXPECT_NE(ret, 0);
 }
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+/**
+ * @tc.number   SpecialBranch0Test_CallManagerServiceStub_OnRegisterTransferControl_NullRemote
+ * @tc.name     CallManagerServiceStub_OnRegisterTransferControl_NullRemote
+ * @tc.desc     When ReadRemoteObject returns nullptr, return error code
+ */
+HWTEST_F(SpecialBranch0Test, CallManagerServiceStub_OnRegisterTransferControl_NullCallback, TestSize.Level1)
+{
+    auto service = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(service != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t result = service->OnRegisterTransferControl(data, reply);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   SpecialBranch0Test_CallManagerServiceStub_OnRegisterTransferControl_Success
+ * @tc.name     CallManagerServiceStub_OnRegisterTransferControl_Success
+ * @tc.desc     Normal path with valid callback remote object
+ */
+HWTEST_F(SpecialBranch0Test, CallManagerServiceStub_OnRegisterTransferControl_Success, TestSize.Level1)
+{
+    auto service = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(service != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    sptr<MockRemoteObject> remote = new MockRemoteObject(0);
+    data.WriteRemoteObject(remote);
+    int32_t result = service->OnRegisterTransferControl(data, reply);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   SpecialBranch0Test_CallManagerServiceStub_OnUnRegisterTransferControl_Success
+ * @tc.name     CallManagerServiceStub_OnUnRegisterTransferControl_Success
+ * @tc.desc     Normal path for OnUnRegisterTransferControl
+ */
+HWTEST_F(SpecialBranch0Test, CallManagerServiceStub_OnUnRegisterTransferControl_Success, TestSize.Level1)
+{
+    auto service = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(service != nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t result = service->OnUnRegisterTransferControl(data, reply);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+}
+
 /**
  * @tc.number   SpecialBranch0Test_CallManagerServiceStub_OnSetRegMmiCodeCallbackState_Success
  * @tc.name     CallManagerServiceStub_OnSetRegMmiCodeCallbackState_Success
@@ -1135,6 +1184,193 @@ HWTEST_F(SpecialBranch0Test, CallManagerServiceStub_OnSetRegMmiCodeCallbackState
     int32_t result = service->OnSetRegMmiCodeCallbackState(data, reply);
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
+
+/**
+ * @tc.number   SpecialBranch1Test_CallManagerService_RegisterTransferController_NonSystemApp
+ * @tc.name     CallManagerService_RegisterTransferController_NonSystemApp
+ * @tc.desc     When caller is not system app, return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API
+ */
+HWTEST_F(SpecialBranch0Test, CallManagerService_RegisterTransferController_NonSystemApp, TestSize.Level1)
+{
+    auto service = std::make_shared<CallManagerService>();
+    EXPECT_NE(service, nullptr);
+    sptr<ITransferControlCallback> callback = nullptr;
+    int32_t result = service->RegisterTransferController(callback);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   SpecialBranch1Test_CallManagerService_RegisterTransferController_PermissionDenied
+ * @tc.name     CallManagerService_RegisterTransferController_PermissionDenied
+ * @tc.desc     When caller lacks SET_TELEPHONY_STATE permission, return TELEPHONY_ERR_PERMISSION_ERR
+ */
+HWTEST_F(SpecialBranch0Test, CallManagerService_RegisterTransferController_PermissionDenied, TestSize.Level1)
+{
+    auto service = std::make_shared<CallManagerService>();
+    EXPECT_NE(service, nullptr);
+    sptr<ITransferControlCallback> callback = nullptr;
+    int32_t result = service->RegisterTransferController(callback);
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   SpecialBranch1Test_CallManagerService_RegisterTransferController_NullCallback
+ * @tc.name     CallManagerService_RegisterTransferController_NullCallback
+ * @tc.desc     When callback is nullptr, return TELEPHONY_ERR_ARGUMENT_NULL
+ */
+HWTEST_F(SpecialBranch0Test, CallManagerService_RegisterTransferController_NullCallback, TestSize.Level1)
+{
+    const char *perms[1] = { "ohos.permission.SET_TELEPHONY_STATE" };
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = 1,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = perms,
+        .acls = nullptr,
+        .processName = "SpecialBranch1Test",
+        .aplStr = "system_basic",
+    };
+    uint64_t tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+
+    auto service = std::make_shared<CallManagerService>();
+    EXPECT_NE(service, nullptr);
+    sptr<ITransferControlCallback> callback = nullptr;
+    int32_t result = service->RegisterTransferController(callback);
+    EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_NULL);
+
+    const char *origPerms[1] = { "ohos.permission.WRITE_CALL_LOG" };
+    NativeTokenInfoParams origInfo = {
+        .dcapsNum = 0,
+        .permsNum = 1,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = origPerms,
+        .acls = nullptr,
+        .processName = "SpecialBranch1Test",
+        .aplStr = "system_basic",
+    };
+    uint64_t origTokenId = GetAccessTokenId(&origInfo);
+    SetSelfTokenID(origTokenId);
+    Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+}
+
+/**
+ * @tc.number   SpecialBranch1Test_CallManagerService_RegisterTransferController_Success
+ * @tc.name     CallManagerService_RegisterTransferController_Success
+ * @tc.desc     Normal path for RegisterTransferController with valid callback
+ */
+HWTEST_F(SpecialBranch0Test, CallManagerService_RegisterTransferController_Success, TestSize.Level1)
+{
+    const char *perms[1] = { "ohos.permission.SET_TELEPHONY_STATE" };
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = 1,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = perms,
+        .acls = nullptr,
+        .processName = "SpecialBranch1Test",
+        .aplStr = "system_basic",
+    };
+    uint64_t tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+
+    auto service = std::make_shared<CallManagerService>();
+    EXPECT_NE(service, nullptr);
+    sptr<ITransferControlCallback> callback = new TransferControlCallback();
+    EXPECT_NE(callback, nullptr);
+    int32_t result = service->RegisterTransferController(callback);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+
+    const char *origPerms[1] = { "ohos.permission.WRITE_CALL_LOG" };
+    NativeTokenInfoParams origInfo = {
+        .dcapsNum = 0,
+        .permsNum = 1,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = origPerms,
+        .acls = nullptr,
+        .processName = "SpecialBranch1Test",
+        .aplStr = "system_basic",
+    };
+    uint64_t origTokenId = GetAccessTokenId(&origInfo);
+    SetSelfTokenID(origTokenId);
+    Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+}
+
+/**
+ * @tc.number   SpecialBranch1Test_CallManagerService_UnRegisterTransferController_NonSystemApp
+ * @tc.name     CallManagerService_UnRegisterTransferController_NonSystemApp
+ * @tc.desc     When caller is not system app, return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API
+ */
+HWTEST_F(SpecialBranch0Test, CallManagerService_UnRegisterTransferController_NonSystemApp, TestSize.Level1)
+{
+    auto service = std::make_shared<CallManagerService>();
+    EXPECT_NE(service, nullptr);
+    int32_t result = service->UnRegisterTransferController();
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   SpecialBranch1Test_CallManagerService_UnRegisterTransferController_PermissionDenied
+ * @tc.name     CallManagerService_UnRegisterTransferController_PermissionDenied
+ * @tc.desc     When caller lacks SET_TELEPHONY_STATE permission, return TELEPHONY_ERR_PERMISSION_ERR
+ */
+HWTEST_F(SpecialBranch0Test, CallManagerService_UnRegisterTransferController_PermissionDenied, TestSize.Level1)
+{
+    auto service = std::make_shared<CallManagerService>();
+    EXPECT_NE(service, nullptr);
+    int32_t result = service->UnRegisterTransferController();
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   SpecialBranch1Test_CallManagerService_UnRegisterTransferController_Success
+ * @tc.name     CallManagerService_UnRegisterTransferController_Success
+ * @tc.desc     Normal path for UnRegisterTransferController with proper permissions
+ */
+HWTEST_F(SpecialBranch0Test, CallManagerService_UnRegisterTransferController_Success, TestSize.Level1)
+{
+    const char *perms[1] = { "ohos.permission.SET_TELEPHONY_STATE" };
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = 1,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = perms,
+        .acls = nullptr,
+        .processName = "SpecialBranch1Test",
+        .aplStr = "system_basic",
+    };
+    uint64_t tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+
+    auto service = std::make_shared<CallManagerService>();
+    EXPECT_NE(service, nullptr);
+    int32_t result = service->UnRegisterTransferController();
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+
+    const char *origPerms[1] = { "ohos.permission.WRITE_CALL_LOG" };
+    NativeTokenInfoParams origInfo = {
+        .dcapsNum = 0,
+        .permsNum = 1,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = origPerms,
+        .acls = nullptr,
+        .processName = "SpecialBranch1Test",
+        .aplStr = "system_basic",
+    };
+    uint64_t origTokenId = GetAccessTokenId(&origInfo);
+    SetSelfTokenID(origTokenId);
+    Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+}
+#endif
 
 /**
  * @tc.number   Telephony_SpamCallAdapter_DetectSpamCal

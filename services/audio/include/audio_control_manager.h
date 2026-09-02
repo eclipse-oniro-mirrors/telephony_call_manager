@@ -85,7 +85,7 @@ public:
     void StopVibrator();
     bool IsSoundPlaying();
     bool StopSoundtone();
-    bool PlaySoundtone();
+    bool PlaySoundtone(const sptr<CallBase> &callObjectPtr);
     void PlayCallEndedTone();
     void HandleNotNormalRingerMode();
     bool IsDistributeCallSinkStatus();
@@ -108,7 +108,7 @@ public:
 private:
     RingState ringState_ = RingState::STOPPED;
     void HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState);
-    void ApplyFocusForBlueToothCall(TelCallState nextState);
+    void ApplyFocusForBlueToothCall(const sptr<CallBase> &callObjectPtr, TelCallState nextState);
     void HandlePriorState(sptr<CallBase> &callObjectPtr, TelCallState priorState);
     void HandleCallStateUpdatedForVoip(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
     bool PreHandleAnswerdState(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
@@ -118,7 +118,8 @@ private:
     sptr<CallBase> GetCallBase(int32_t callId);
     AudioInterruptState audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
     bool ShouldPlayRingtone() const;
-    bool DealCrsScene(const AudioStandard::AudioRingerMode &ringMode, int32_t accountId);
+    bool DealCrsScene(const sptr<CallBase> incomingCall, const AudioStandard::AudioRingerMode &ringMode,
+        int32_t accountId);
     bool IsEmergencyCallExists();
     void UpdateForegroundLiveCall();
     void ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr);

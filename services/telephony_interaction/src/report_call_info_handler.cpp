@@ -25,6 +25,11 @@
 #include "antifraud_service.h"
 #include "thread"
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+#include "call_manager_utils.h"
+#include "bluetooth_call_connection.h"
+#endif
+
 namespace OHOS {
 namespace Telephony {
 namespace {
@@ -56,6 +61,22 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
         return TELEPHONY_SUCCESS;
     }
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    if (IsVoipTransferCall(info)) {
+        return TELEPHONY_SUCCESS;
+    }
+
+    if (IsHostDialMeIgnoreTransferCall(info)) {
+        DelayedSingleton<BluetoothCallConnection>::GetInstance()->DisconnectScoByTransferControl();
+        return TELEPHONY_SUCCESS;
+    }
+
+    if (IsHostAnswerTransferCall(info)) {
+        DisconnectTransferCall(info);
+        return TELEPHONY_SUCCESS;
+    }
+#endif
+
 #ifdef NOT_SUPPORT_MULTICALL
     if (CallObjectManager::IsCallExist(TelCallState::CALL_STATUS_ACTIVE) &&
         info.state == TelCallState::CALL_STATUS_ACTIVE && info.callType == CallType::TYPE_BLUETOOTH) {
@@ -79,6 +100,97 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
     });
     return TELEPHONY_SUCCESS;
 }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+bool ReportCallInfoHandler::IsVoipTransferCall(const CallDetailInfo &info)
+{
+    if (!CallManagerUtils::IsTransferCall(info.callType)) {
+        return false;
+    }
+
+    if (strlen(info.phoneNum) > 0) {
+        return false;
+    }
+
+    TELEPHONY_LOGI("ReportCallInfoHandler::IsVoipTransferCall");
+    return true;
+}
+
+bool ReportCallInfoHandler::IsHostDialMeIgnoreTransferCall(const CallDetailInfo &info)
+{
+    if (!CallManagerUtils::IsTransferCall(info.callType)) {
+        return false;
+    }
+
+    std::string number = std::string(info.phoneNum);
+    if (number.size() < PHONE_NUMBER_LEN_DEFAULT) {
+        return false;
+    }
+
+    std::string number0 = CallManagerUtils::GetSelfPhoneNumber(0);
+    std::string number1 = CallManagerUtils::GetSelfPhoneNumber(1);
+    if (number0.size() >= PHONE_NUMBER_LEN_DEFAULT) {
+        if (number.find(number0) != std::string::npos) {
+            TELEPHONY_LOGI("ReportCallInfoHandler::IsHostDialMeIgnoreTransferCall number0");
+            return true;
+        }
+    }
+
+    if (number1.size() >= PHONE_NUMBER_LEN_DEFAULT) {
+        if (number.find(number1) != std::string::npos) {
+            TELEPHONY_LOGI("ReportCallInfoHandler::IsHostDialMeIgnoreTransferCall number1");
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool ReportCallInfoHandler::IsHostAnswerTransferCall(const CallDetailInfo &info)
+{
+    if (info.state != TelCallState::CALL_STATUS_ACTIVE &&
+        info.state != TelCallState::CALL_STATUS_HOLDING) {
+        return false;
+    }
+
+    sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(
+        info.index, info.accountId, CallType::TYPE_BLUETOOTH, info.phoneIndex);
+    if (call == nullptr) {
+        TELEPHONY_LOGI("ReportCallInfoHandler::IsHostAnswerTransferCall, maybe had local released");
+        return false;
+    }
+
+    if (!call->IsTransferCall()) {
+        return false;
+    }
+
+    if (call->GetAnsweredByPhone()) {
+        return false;
+    }
+
+    TELEPHONY_LOGI("ReportCallInfoHandler::IsHostAnswerTransferCall");
+    return true;
+}
+
+void ReportCallInfoHandler::DisconnectTransferCall(const CallDetailInfo &info)
+{
+    CallDetailInfo callDetailInfo = info;
+    callDetailInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
+    std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
+    TELEPHONY_LOGW("ReportCallInfoHandler::DisconnectTransferCall submit task enter");
+    reportCallInfoQueue.submit([callStatusManagerPtr, callDetailInfo]() {
+        std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
+        if (managerPtr == nullptr) {
+            TELEPHONY_LOGE("ReportCallInfoHandler::DisconnectTransferCall managerPtr is null");
+            return;
+        }
+        auto ret = managerPtr->HandleCallReportInfo(callDetailInfo);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("ReportCallInfoHandler::DisconnectTransferCall failed! ret:%{public}d", ret);
+        }
+    });
+}
+#endif
 
 #ifdef NOT_SUPPORT_MULTICALL
 void ReportCallInfoHandler::DisconnectBtCallWhenPhoneAnswered(const CallDetailInfo &info)

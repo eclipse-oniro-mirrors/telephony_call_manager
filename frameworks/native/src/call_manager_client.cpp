@@ -34,21 +34,23 @@ CallManagerClient::~CallManagerClient() {}
 
 void CallManagerClient::Init(int32_t systemAbilityId)
 {
-    if (g_callManagerProxy == nullptr) {
+    if (!isInit_.load()) {
         g_callManagerProxy = DelayedSingleton<CallManagerProxy>::GetInstance();
         if (g_callManagerProxy == nullptr) {
             TELEPHONY_LOGE("g_callManagerProxy is nullptr");
             return;
         }
         g_callManagerProxy->Init(systemAbilityId);
+        isInit_.store(true);
     }
     TELEPHONY_LOGI("CallManagerClient init success!");
 }
 
 void CallManagerClient::UnInit()
 {
-    if (g_callManagerProxy != nullptr) {
+    if (isInit_.load()) {
         g_callManagerProxy->UnInit();
+        isInit_.store(false);
     } else {
         TELEPHONY_LOGE("init first please!");
     }
@@ -962,6 +964,62 @@ int32_t CallManagerClient::GetCallTransferInfo(const std::string number, CallTra
         return TELEPHONY_ERR_UNINIT;
     }
 }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+int32_t CallManagerClient::RegisterTransferController(std::unique_ptr<TransferControl> transferControl)
+{
+    TELEPHONY_LOGI("CallManagerClient::RegisterTransferController");
+    if (transferControl == nullptr) {
+        TELEPHONY_LOGE("CallManagerClient::RegisterTransferController transferControl is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+
+    if (g_callManagerProxy == nullptr) {
+        TELEPHONY_LOGE("CallManagerClient::RegisterTransferController g_callManagerProxy is nullptr");
+        return TELEPHONY_ERR_UNINIT;
+    }
+
+    return g_callManagerProxy->RegisterTransferController(transferControl);
+}
+
+int32_t CallManagerClient::UnRegisterTransferController()
+{
+    if (g_callManagerProxy == nullptr) {
+        TELEPHONY_LOGE("CallManagerClient::UnRegisterTransferController g_callManagerProxy is nullptr");
+        return TELEPHONY_ERR_UNINIT;
+    }
+
+    return g_callManagerProxy->UnRegisterTransferController();
+}
+
+int32_t CallManagerClient::NotifyTransferCallContact(const std::string contactName)
+{
+    if (g_callManagerProxy == nullptr) {
+        TELEPHONY_LOGE("CallManagerClient::NotifyTransferCallContact g_callManagerProxy is nullptr");
+        return TELEPHONY_ERR_UNINIT;
+    }
+
+    return g_callManagerProxy->NotifyTransferCallContact(contactName);
+}
+#else
+int32_t CallManagerClient::RegisterTransferController(std::unique_ptr<TransferControl> transferControl)
+{
+    TELEPHONY_LOGE("CallManagerClient::RegisterTransferController CALL_MANAGER_CALL_TRANSFER is false");
+    return TELEPHONY_ERR_UNINIT;
+}
+
+int32_t CallManagerClient::UnRegisterTransferController()
+{
+    TELEPHONY_LOGE("CallManagerClient::UnRegisterTransferController CALL_MANAGER_CALL_TRANSFER is false");
+    return TELEPHONY_ERR_UNINIT;
+}
+
+int32_t CallManagerClient::NotifyTransferCallContact(const std::string contactName)
+{
+    TELEPHONY_LOGE("CallManagerClient::NotifyTransferCallContact CALL_MANAGER_CALL_TRANSFER is false");
+    return TELEPHONY_ERR_UNINIT;
+}
+#endif
 
 bool CallManagerClient::CheckCallRecordingPermission(const std::string& cellularRecordPhoneNum,
     const std::string& cellularRecordToken)
