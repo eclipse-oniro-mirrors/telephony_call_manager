@@ -50,7 +50,7 @@ int32_t CallRecordsHandler::AddCallLogInfo(const sptr<CallBase> &callObjectPtr, 
         info.numberMarkInfo.markType, displayName.length());
     MakeCallLogInsertBucket(bucket, info, displayName, numberLocation);
     if (info.callDuration <= 0) {
-        TELEPHONY_LOGE("talkDuration abnormal negative or 0");
+        TELEPHONY_LOGW("talkDuration abnormal negative or is 0");
     }
     bool ret = callDataPtr_->Insert(bucket);
     if (!ret) {
