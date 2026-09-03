@@ -48,6 +48,8 @@ ohos_shared_library("cj_telephony_call_ffi") {
     "node:node_header_notice",
   ]
 
+  version_script = "libcj_telephony_call_ffi.map"
+
   part_name = "call_manager"
   subsystem_name = "telephony"
   innerapi_tags = [ "platformsdk" ]
