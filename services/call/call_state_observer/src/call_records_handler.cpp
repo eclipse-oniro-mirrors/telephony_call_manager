@@ -49,6 +49,9 @@ int32_t CallRecordsHandler::AddCallLogInfo(const sptr<CallBase> &callObjectPtr, 
     TELEPHONY_LOGI("callLog Insert begin, markType: %{public}d, displayName length: %{public}zu",
         info.numberMarkInfo.markType, displayName.length());
     MakeCallLogInsertBucket(bucket, info, displayName, numberLocation);
+    if (info.callDuration <= 0) {
+        TELEPHONY_LOGE("talkDuration abnormal negative or 0");
+    }
     bool ret = callDataPtr_->Insert(bucket);
     if (!ret) {
         TELEPHONY_LOGE("add call log database fail!");
