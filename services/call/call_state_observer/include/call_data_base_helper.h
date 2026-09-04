@@ -71,6 +71,12 @@ constexpr const char *CALL_IS_CNAP = "is_cnap";
 constexpr const char *PERSONAL_RINGTONE = "personal_ringtone";
 constexpr const char *PERSONAL_NOTIFICATION_RINGTONE = "personal_notification_ringtone";
 constexpr const char *CALL_USE_NEWCALLBOX = "new_calling";
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+constexpr const char *CALL_DEVICE_NAME = "call_device_name";
+constexpr const char *CALL_DEVICE_ID = "call_device_id";
+#endif
+
 constexpr const char *PHONE_INDEX = "phone_index";
 constexpr const char *DEVICE_NAME = "device_name";
 

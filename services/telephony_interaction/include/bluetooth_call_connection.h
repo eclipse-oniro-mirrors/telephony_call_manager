@@ -22,8 +22,17 @@
 #include "singleton.h"
 #include "bluetooth_hfp_hf.h"
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+#include "i_transfer_control_callback.h"
+#endif
+
 namespace OHOS {
 namespace Telephony {
+#ifdef CALL_MANAGER_CALL_TRANSFER
+class BluetoothCall;
+class CallBase;
+#endif
+
 class BluetoothCallConnection : public std::enable_shared_from_this<BluetoothCallConnection> {
     DECLARE_DELAYED_SINGLETON(BluetoothCallConnection)
 
@@ -45,6 +54,26 @@ public:
     void SetHfpContactName(const std::string &hfpPhoneNumber, const std::string &hfpContactName);
     std::string GetHfpContactName(const std::string &hfpPhoneNumber);
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    void NotifyTransferCall(const sptr<BluetoothCall> call);
+    void UpdateTransferCall(sptr<BluetoothCall> call);
+    void NotifyLocalAliveAndTransferIncoming();
+
+    int32_t RegisterTransferController(const sptr<ITransferControlCallback> &callback);
+    int32_t UnRegisterTransferController();
+    void ScoDisconnectedEndTransferCall();
+    void CacheAncsContactName(const std::string &contactName);
+    std::string ConsumeAncsContactName();
+    void StartHfpWaitContactTask(sptr<BluetoothCall> call);
+    void CancelHfpWaitContactTask();
+    void NotifyAncsContactArrived(const std::string &contactName, sptr<BluetoothCall> call);
+    bool HasAncsAlreadyArrived();
+    bool IsAncsPhoneNumber();
+    void NotifyFirstTransferCallSwitchBack(const sptr<BluetoothCall> secondActiveCall);
+    void DisconnectScoByTransferControl();
+    void HandleTransferCallSwitchBack(const sptr<CallBase> &activeCall);
+#endif
+
 private:
     std::string macAddress_;
     std::string secondaryPhoneMacAddress_;
@@ -53,6 +82,20 @@ private:
     std::string hfpPhoneNumber_;
     std::string hfpContactName_;
     ffrt::mutex mutex_;
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    void GetTransferCallInfo(const sptr<BluetoothCall> call, TransferCallInfo &transferCallInfo);
+
+    sptr<ITransferControlCallback> transferControlCallback_ = nullptr;
+    std::list<CallDetailInfo> cachedTransferCallList_;
+    std::map<int32_t, std::string> cachedTransferContactMap_;
+    std::string ancsContactName_;
+    bool ancsAlreadyArrived_ = false;
+    bool isAncsNotifiedPhoneNumber = false;
+    ffrt::mutex ancsMutex_;
+    ffrt::task_handle hfpWaitContactHandle_ = nullptr;
+    ffrt::task_handle ancsCacheTimeoutHandle_ = nullptr;
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

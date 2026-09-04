@@ -20,9 +20,15 @@
 #include "call_manager_inner_type.h"
 #include "ffrt.h"
 #include "call_number_utils.h"
+#include "core_service_client.h"
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+#include "bluetooth_call.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t ESIM_SLOT_ID = 1;
 CallRecordsHandler::CallRecordsHandler() : callDataPtr_(nullptr)
 {
     callDataPtr_ = DelayedSingleton<CallDataBaseHelper>::GetInstance();
@@ -30,6 +36,22 @@ CallRecordsHandler::CallRecordsHandler() : callDataPtr_(nullptr)
         TELEPHONY_LOGE("callDataPtr_ is nullptr!");
     }
 }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+bool CallRecordsHandler::IsMissedTransferCall(const sptr<CallBase> &callObjectPtr)
+{
+    if (!callObjectPtr->IsTransferCall()) {
+        return false;
+    }
+
+    if (!IsMissedCall(callObjectPtr)) {
+        return false;
+    }
+
+    TELEPHONY_LOGI("CallRecordsHandler::IsMissedTransferCall");
+    return true;
+}
+#endif
 
 int32_t CallRecordsHandler::AddCallLogInfo(const sptr<CallBase> &callObjectPtr, const CallRecordInfo &info)
 {
@@ -49,6 +71,13 @@ int32_t CallRecordsHandler::AddCallLogInfo(const sptr<CallBase> &callObjectPtr, 
     TELEPHONY_LOGI("callLog Insert begin, markType: %{public}d, displayName length: %{public}zu",
         info.numberMarkInfo.markType, displayName.length());
     MakeCallLogInsertBucket(bucket, info, displayName, numberLocation);
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    if (IsMissedTransferCall(callObjectPtr)) {
+        return TELEPHONY_SUCCESS;
+    }
+
+    AddTransferCallInfo(callObjectPtr, bucket);
+#endif
     bool ret = callDataPtr_->Insert(bucket);
     if (!ret) {
         TELEPHONY_LOGE("add call log database fail!");
@@ -60,6 +89,68 @@ int32_t CallRecordsHandler::AddCallLogInfo(const sptr<CallBase> &callObjectPtr, 
         PublishMissedCall(callObjectPtr);
     }
     return TELEPHONY_SUCCESS;
+}
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+void CallRecordsHandler::AddTransferCallInfo(const sptr<CallBase> &callObjectPtr,
+    DataShare::DataShareValuesBucket &bucket)
+{
+    if (callObjectPtr == nullptr) {
+        TELEPHONY_LOGE("CallRecordsHandler::AddTransferCallInfo callObjectPtr is nullptr");
+        return;
+    }
+
+    if (callObjectPtr->GetCallType() != CallType::TYPE_BLUETOOTH) {
+        return;
+    }
+
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(callObjectPtr.GetRefPtr());
+    if (!btCall->IsTransferCall()) {
+        TELEPHONY_LOGI("CallRecordsHandler::AddTransferCallInfo not transfer call");
+        return;
+    }
+
+    if (btCall->IsTransferCallAndForbidden()) {
+        TELEPHONY_LOGI("CallRecordsHandler::AddTransferCallInfo not allow transfer call");
+        return;
+    }
+
+    std::string remoteAddr = btCall->GetRemoteAddr();
+    if (remoteAddr.empty()) {
+        TELEPHONY_LOGE("CallRecordsHandler::AddTransferCallInfo remoteAddr is empty");
+    }
+
+    std::string remoteName = btCall->GetRemoteName();
+    if (remoteName.empty()) {
+        TELEPHONY_LOGE("CallRecordsHandler::AddTransferCallInfo remoteName is empty");
+    }
+
+    TELEPHONY_LOGI("CallRecordsHandler::AddTransferCallInfo");
+    bucket.Put(CALL_DEVICE_ID, remoteAddr);
+    bucket.Put(CALL_DEVICE_NAME, remoteName);
+}
+#endif
+
+void CallRecordsHandler::GetRealSlotId(const sptr<CallBase> &callObjectPtr, int32_t simType, int32_t simIndex,
+    int32_t &slotId)
+{
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    if (callObjectPtr == nullptr || callObjectPtr->IsTransferCall()) {
+        TELEPHONY_LOGI("CallRecordsHandler::GetRealSlotId, IsTransferCall");
+        slotId = 0;
+        return;
+    }
+#endif
+
+    SimLabel simLabel;
+    if (DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimLabel(ESIM_SLOT_ID, simLabel) !=
+        TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGI("GetSimLabel fail.");
+        return;
+    }
+    if (simType == static_cast<int32_t>(SimType::PSIM) && simLabel.simType == SimType::ESIM) {
+        slotId = simIndex - 1;
+    }
 }
 
 bool CallRecordsHandler::IsMissedCall(const sptr<CallBase> &callObjectPtr)

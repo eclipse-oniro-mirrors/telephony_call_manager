@@ -244,6 +244,10 @@ struct CallReportInfo {
      */
     int32_t imsDomain = 0;
     /**
+     * Remote Bluetooth real mac address
+     */
+    std::string remoteBluetoothAddr = "";
+    /**
      * Indicates the phone index.
      * - 0：Primary phone
      * - 1：Secondary phone
@@ -981,6 +985,19 @@ struct CallRestrictionInfo {
      * Indicates the mode of call restriction.
      */
     CallRestrictionMode mode = CallRestrictionMode::RESTRICTION_MODE_DEACTIVATION;
+};
+
+struct TransferCallInfo {
+    std::string devMac = "";
+    uint32_t callId = 0;
+    CallDirection callDirect = CallDirection::CALL_DIRECTION_UNKNOW;
+    TelCallState callState = TelCallState::CALL_STATUS_UNKNOWN;
+    CallType callType = CallType::TYPE_BLUETOOTH;
+};
+
+struct TransferResultInfo {
+    std::string deviceShowName = "";
+    uint32_t secPolicy = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

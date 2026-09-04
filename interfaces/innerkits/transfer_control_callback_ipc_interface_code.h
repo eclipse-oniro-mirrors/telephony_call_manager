@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,38 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef TELEPHONY_AUDIO_SOUND_H
-#define TELEPHONY_AUDIO_SOUND_H
-
-#include <memory>
-
-#include "audio_renderer.h"
-
-#include "audio_player.h"
-#include "audio_proxy.h"
+#ifndef TRANSFER_CONTROL_CALLBACK_IPC_INTERFACE_CODE_H
+#define TRANSFER_CONTROL_CALLBACK_IPC_INTERFACE_CODE_H
 
 namespace OHOS {
 namespace Telephony {
-enum class SoundState {
-    SOUNDING,
-    STOPPED,
-};
-/**
- * @class Sound
- * plays call sound.
- */
-class Sound {
-public:
-    Sound();
-    virtual ~Sound();
-    void Init();
-    int32_t Play(const AudioStandard::StreamUsage streamUsage);
-    int32_t Stop();
-    void ReleaseRenderer();
-
-private:
-    AudioPlayer *audioPlayer_ = nullptr;
+enum TransferControlInterfaceCode {
+    IS_TRANSFER_CALL_ALLOW,
+    UPDATE_TRANSFER_CALL,
+    DISCONNECT_SCO,
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif
+#endif // TRANSFER_CONTROL_CALLBACK_IPC_INTERFACE_CODE_H

@@ -48,6 +48,10 @@ CallManagerServiceStub::CallManagerServiceStub()
     InitOttServiceRequest();
     InitVoipOperationRequest();
     InitBluetoothOperationRequest();
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    InitTransferControlRequest();
+#endif
     memberFuncMap_[INTERFACE_GET_PROXY_OBJECT_PTR] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetProxyObjectPtr(data, reply); };
 }
@@ -286,6 +290,18 @@ void CallManagerServiceStub::InitBluetoothOperationRequest()
             return OnRegisterBluetoothCallManagerCallbackPtr(data, reply);
         };
 }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+void CallManagerServiceStub::InitTransferControlRequest()
+{
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REGISTER_TRANSFER_CONTROLLER)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRegisterTransferControl(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UNREGISTER_TRANSFER_CONTROLLER)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUnRegisterTransferControl(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_NOTIFY_TRANSFER_CALL_CONTACT)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnNotifyTransferCallContact(data, reply); };
+}
+#endif
 
 int32_t CallManagerServiceStub::OnRegisterVoipCallManagerCallback(MessageParcel &data, MessageParcel &reply)
 {
@@ -1703,6 +1719,55 @@ int32_t CallManagerServiceStub::OnGetTransferNumberByNumber(MessageParcel &data,
     }
     return TELEPHONY_SUCCESS;
 }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+int32_t CallManagerServiceStub::OnRegisterTransferControl(MessageParcel &data, MessageParcel &reply)
+{
+    TELEPHONY_LOGI("CallManagerServiceStub::OnRegisterTransferControl");
+    int32_t result = TELEPHONY_ERR_FAIL;
+    sptr<IRemoteObject> remote = data.ReadRemoteObject();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("CallManagerServiceStub::OnRegisterTransferControl remote is nullptr.");
+        reply.WriteInt32(result);
+        return result;
+    }
+
+    sptr<ITransferControlCallback> callback = iface_cast<ITransferControlCallback>(remote);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("CallManagerServiceStub::OnRegisterTransferControl callback is nullptr.");
+        reply.WriteInt32(result);
+        return result;
+    }
+
+    result = RegisterTransferController(callback);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t CallManagerServiceStub::OnUnRegisterTransferControl(MessageParcel &data, MessageParcel &reply)
+{
+    TELEPHONY_LOGI("CallManagerServiceStub::OnUnRegisterTransferControl");
+    int32_t result = TELEPHONY_ERR_FAIL;
+    result = UnRegisterTransferController();
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+
+    return result;
+}
+
+int32_t CallManagerServiceStub::OnNotifyTransferCallContact(MessageParcel &data, MessageParcel &reply)
+{
+    std::string contactName = data.ReadString();
+    int32_t result = NotifyTransferCallContact(contactName);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+#endif
 
 int32_t CallManagerServiceStub::OnCheckCallRecordingPermission(MessageParcel &data, MessageParcel &reply)
 {

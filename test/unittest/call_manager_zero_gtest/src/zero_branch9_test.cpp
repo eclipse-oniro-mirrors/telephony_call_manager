@@ -137,7 +137,8 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_002, TestSize.Level1)
     audioControl->SetAudioDevice(device);
     device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
     audioControl->SetAudioDevice(device);
-    audioControl->PlaySoundtone();
+    sptr<CallBase> call = nullptr;
+    audioControl->PlaySoundtone(call);
     audioControl->GetInitAudioDeviceType();
     audioControl->SetMute(false);
     audioControl->MuteRinger();
@@ -227,7 +228,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_005, TestSize.Level0)
     call->SetCallType(CallType::TYPE_BLUETOOTH);
     EXPECT_TRUE(audioControl->IsBtCallDisconnected());
     audioControl->SetRingToneVolume(0.0f);
-    audioControl->PlaySoundtone();
+    audioControl->PlaySoundtone(call);
     audioControl->SetRingToneVolume(0.0f);
     audioControl->SetRingToneVolume(0.5f);
     audioControl->SetRingToneVolume(1.5f);
@@ -440,14 +441,14 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
     audioControl->HandleWirelessAudioDevice(device);
     device.deviceType = AudioDeviceType::DEVICE_NEARLINK;
     audioControl->HandleWirelessAudioDevice(device);
-    audioControl->DealCrsScene(AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL, mDialParaInfo.accountId);
+    audioControl->DealCrsScene(call, AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL, mDialParaInfo.accountId);
     audioControl->AdjustVolumesForCrs();
     sptr<CallBase> imsCall = new IMSCall(mDialParaInfo);
     imsCall->SetIsAnsweredByPhone(true);
     EXPECT_NO_THROW(audioControl->HandleCallStateUpdated(imsCall, TelCallState::CALL_STATUS_INCOMING,
         TelCallState::CALL_STATUS_ACTIVE));
     audioControl->isCrsVibrating_ = false;
-    audioControl->DealCrsScene(AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE, mDialParaInfo.accountId);
+    audioControl->DealCrsScene(call, AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE, mDialParaInfo.accountId);
     EXPECT_FALSE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_INCOMING,
         TelCallState::CALL_STATUS_ANSWERED));
     EXPECT_FALSE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_INCOMING,

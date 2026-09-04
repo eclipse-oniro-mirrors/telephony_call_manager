@@ -28,6 +28,11 @@
 #include "i_call_ability_callback.h"
 #include "i_call_status_callback.h"
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+#include "transfer_control.h"
+#include "i_transfer_control_callback.h"
+#endif
+
 namespace OHOS {
 namespace Telephony {
 extern "C" {
@@ -138,6 +143,12 @@ public:
     virtual int32_t GetCallTransferInfo(const std::string number, CallTransferType type) = 0;
     virtual bool CheckCallRecordingPermission(const std::string& cellularRecordPhoneNum,
         const std::string& cellularRecordToken) = 0;
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    virtual int32_t RegisterTransferController(const sptr<ITransferControlCallback> callback) = 0;
+    virtual int32_t UnRegisterTransferController() = 0;
+    virtual int32_t NotifyTransferCallContact(const std::string &contactName) = 0;
+#endif
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallManagerService");

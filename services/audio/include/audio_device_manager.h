@@ -84,6 +84,11 @@ public:
     void SetAudioDeviceByAudioMode(bool isVoipCall, bool isIncomingCall);
     void SetSpeakerDeactive();
     bool IsSpeakerMode();
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    bool IsBluetoothHeadsetConnect();
+#endif
+
 private:
     bool EnableBtSco();
     bool EnableNearlink();
@@ -108,6 +113,12 @@ private:
     void UpdateBtHearingAidDevice(std::string &address, std::string &deviceName);
 #endif
     bool UpdateDeviceName(const std::string &macAddress, const std::string &deviceName, AudioDeviceType deviceType);
+    void UpdateDeviceTypeForBtCall(sptr<CallBase> call, std::vector<AudioDevice> &transferCallIgnoreDeviceList);
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    void UpdateTransferCallDeviceBegin(std::vector<AudioDevice> &transferCallIgnoreDeviceList);
+    void UpdateTransferCallDeviceEnd(sptr<CallBase> call, std::vector<AudioDevice> &transferCallIgnoreDeviceList);
+#endif
     ffrt::mutex mutex_;
     ffrt::mutex infoMutex_;
     AudioDeviceType audioDeviceType_;

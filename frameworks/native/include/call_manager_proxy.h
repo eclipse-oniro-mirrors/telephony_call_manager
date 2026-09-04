@@ -37,6 +37,11 @@
 #include "common_event_support.h"
 #endif
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+#include "transfer_control.h"
+#include "transfer_control_callback.h"
+#endif
+
 namespace OHOS {
 namespace Telephony {
 class CallManagerProxy : public std::enable_shared_from_this<CallManagerProxy> {
@@ -144,6 +149,12 @@ public:
     int32_t HangUpCall();
     int32_t GetCallTransferInfo(const std::string number, CallTransferType type);
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    int32_t RegisterTransferController(std::unique_ptr<TransferControl> &transferControl);
+    int32_t UnRegisterTransferController();
+    int32_t NotifyTransferCallContact(const std::string contactName);
+#endif
+
 private:
     int32_t ConnectService();
     void DisconnectService();
@@ -190,6 +201,11 @@ private:
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
 #ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
     std::unique_ptr<CallManagerCallback> callBack_ = nullptr;
+#endif
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    sptr<TransferControlCallback> transferControlCallbackPtr_ = nullptr;
+    std::atomic<bool> isTransferCbRegistered_ = false;
 #endif
 };
 } // namespace Telephony

@@ -39,6 +39,10 @@
 #include "int_wrapper.h"
 #include "voip_call.h"
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+#include "bluetooth_call.h"
+#endif
+
 namespace OHOS {
 namespace Telephony {
 using namespace AudioStandard;
@@ -507,7 +511,7 @@ void AudioControlManager::HandleCallStateUpdated(
     if (priorState == nextState) {
         TELEPHONY_LOGI("prior state equals next state");
         if (callObjectPtr->GetCallType() == CallType::TYPE_BLUETOOTH) {
-            ApplyFocusForBlueToothCall(nextState);
+            ApplyFocusForBlueToothCall(callObjectPtr, nextState);
         }
         return;
     }
@@ -591,7 +595,7 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
 }
 
-void AudioControlManager::ApplyFocusForBlueToothCall(TelCallState nextState)
+void AudioControlManager::ApplyFocusForBlueToothCall(const sptr<CallBase> &callObjectPtr, TelCallState nextState)
 {
     if (nextState == TelCallState::CALL_STATUS_ACTIVE || nextState == TelCallState::CALL_STATUS_ALERTING) {
         if (!IsScoTemporarilyDisabled()) {
@@ -599,7 +603,7 @@ void AudioControlManager::ApplyFocusForBlueToothCall(TelCallState nextState)
         }
         TELEPHONY_LOGI("first call state %{public}d from cellphone", nextState);
         if (soundState_ == SoundState::STOPPED) {
-            PlaySoundtone();
+            PlaySoundtone(callObjectPtr);
         }
     }
 }
@@ -665,19 +669,21 @@ void AudioControlManager::ProcessSoundtone(sptr<CallBase> &callObjectPtr)
     if (!callObjectPtr->GetAnsweredByPhone()) {
         minMulityCall = MIN_DC_MULITY_ACTIVE_CALL_COUNT;
     }
-    if (((CallObjectManager::GetCurrentCallNum() - ringCallCount) < minMulityCall)) {
-        if (isCrsStartSoundTone_ == true) {
-            if (callObjectPtr->GetAnsweredByPhone()) {
-                ResumeCrsSoundTone();
-            }
-        } else {
-            TELEPHONY_LOGI("local ring  MT call is answer, now playsoundtone");
-            StopSoundtone();
-            PlaySoundtone();
-            if (callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
-                TELEPHONY_LOGI("mute when mt call is answer");
-                DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(true);
-            }
+    if (((CallObjectManager::GetCurrentCallNum() - ringCallCount) >= minMulityCall)) {
+        return;
+    }
+
+    if (isCrsStartSoundTone_ == true) {
+        if (callObjectPtr->GetAnsweredByPhone()) {
+            ResumeCrsSoundTone();
+        }
+    } else {
+        TELEPHONY_LOGI("local ring  MT call is answer, now playsoundtone");
+        StopSoundtone();
+        PlaySoundtone(callObjectPtr);
+        if (callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+            TELEPHONY_LOGI("mute when mt call is answer");
+            DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(true);
         }
     }
 }
@@ -965,7 +971,7 @@ bool AudioControlManager::PlayRingtone()
     ContactInfo contactInfo = incomingCall->GetCallerInfo();
     AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
     if (incomingCall->GetCrsType() == CRS_TYPE) {
-        return DealCrsScene(ringMode, info.accountId);
+        return DealCrsScene(incomingCall, ringMode, info.accountId);
     }
     if (CallObjectManager::IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
@@ -1017,7 +1023,15 @@ void AudioControlManager::PlayRing(const sptr<CallBase>& incomingCall, const Cal
         return;
     }
     if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
+#ifdef CALL_MANAGER_CALL_TRANSFER
+        if (incomingCall->IsTransferCall()) {
+            ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST, true);
+        } else {
+            ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST);
+        }
+#else
         ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST);
+#endif
     } else {
         ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::DEFAULT);
     }
@@ -1053,7 +1067,8 @@ bool AudioControlManager::PlayForNoRing()
     return isStarted;
 }
 
-bool AudioControlManager::DealCrsScene(const AudioStandard::AudioRingerMode &ringMode, int32_t accountId)
+bool AudioControlManager::DealCrsScene(const sptr<CallBase> incomingCall,
+    const AudioStandard::AudioRingerMode &ringMode, int32_t accountId)
 {
     std::lock_guard<ffrt::mutex> lock(crsMutex_);
     if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)
@@ -1077,7 +1092,7 @@ bool AudioControlManager::DealCrsScene(const AudioStandard::AudioRingerMode &rin
             TELEPHONY_LOGI("crs ring tone should be speaker");
             SetAudioDevice(device);
         }
-        if (PlaySoundtone()) {
+        if (PlaySoundtone(incomingCall)) {
             TELEPHONY_LOGI("type_crs palySoundTone in normal mode");
             AdjustVolumesForCrs();
             return true;
@@ -1161,8 +1176,12 @@ bool AudioControlManager::ShouldPlaySoundTone()
     return true;
 }
 
-bool AudioControlManager::PlaySoundtone()
+bool AudioControlManager::PlaySoundtone(const sptr<CallBase> &callObjectPtr)
 {
+    if (callObjectPtr == nullptr) {
+        TELEPHONY_LOGE("AudioControlManager::PlaySoundtone callObjectPtr is nullptr");
+        return false;
+    }
     if (!ShouldPlaySoundTone()) {
         return false;
     }
@@ -1177,7 +1196,14 @@ bool AudioControlManager::PlaySoundtone()
             return false;
         }
     }
-    if (sound_->Play() != TELEPHONY_SUCCESS) {
+    StreamUsage streamUsage = StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    if (callObjectPtr->IsTransferCall()) {
+        streamUsage = StreamUsage::STREAM_USAGE_VOICE_TRANSFER_COMMUNICATION;
+        TELEPHONY_LOGI("playsoundtone with stream STREAM_USAGE_VOICE_TRANSFER_COMMUNICATION");
+    }
+#endif
+    if (sound_->Play(streamUsage) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play soundtone failed");
         return false;
     }

@@ -175,6 +175,15 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
     std::string bundleInfo = "";
     CallAttributeInfo newInfo = info;
     UpdateBtCallSlotId(newInfo);
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    auto callPtr = CallObjectManager::GetOneCallObject(info.callId);
+    if (callPtr != nullptr && callPtr->IsTransferCallAndForbidden()) {
+        TELEPHONY_LOGI("CallAbilityReportProxy::ReportCallStateInfo IsTransferCallAndForbidden");
+        return TELEPHONY_SUCCESS;
+    }
+#endif
+
     std::lock_guard<ffrt::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {

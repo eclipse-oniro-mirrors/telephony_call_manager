@@ -254,6 +254,8 @@ private:
     static std::unordered_set<int32_t> callIdSet_;
 };
 
+#ifndef CALL_ABILITY_CALLBACK_STUB_H
+#define CALL_ABILITY_CALLBACK_STUB_H
 class CallAbilityCallbackStub : public IRemoteStub<ICallAbilityCallback> {
 public:
     CallAbilityCallbackStub();
@@ -383,6 +385,7 @@ private:
 private:
     std::map<uint32_t, CallAbilityCallbackFunc> memberFuncMap_;
 };
+#endif
 
 class CallManagerCallBackStub : public CallManagerCallback {
 public:

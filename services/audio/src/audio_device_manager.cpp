@@ -34,6 +34,10 @@
 #endif
 #include "bluetooth_call_connection.h"
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+#include "bluetooth_call.h"
+#endif
+
 namespace OHOS {
 namespace Telephony {
 using namespace AudioStandard;
@@ -170,6 +174,26 @@ bool AudioDeviceManager::UpdateDeviceName(const std::string &macAddress, const s
     return false;
 }
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+bool AudioDeviceManager::IsBluetoothHeadsetConnect()
+{
+    std::lock_guard<ffrt::mutex> lock(infoMutex_);
+    std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
+    while (it != info_.audioDeviceList.end()) {
+        if (it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+            it->deviceType == AudioDeviceType::DEVICE_NEARLINK ||
+            it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID) {
+            TELEPHONY_LOGI("AudioDeviceManager::IsBluetoothHeadsetConnect");
+            return true;
+        }
+
+        it++;
+    }
+
+    return false;
+}
+#endif
+
 void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType,
     const std::string &deviceName)
 {
@@ -220,7 +244,7 @@ void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDev
         SetDeviceAvailable(deviceType, true);
     }
     ReportAudioDeviceInfo();
-    TELEPHONY_LOGI("AddAudioDeviceList success");
+    TELEPHONY_LOGI("AddAudioDeviceList success, deviceType=%{public}d", deviceType);
 }
 
 void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType)
@@ -749,7 +773,6 @@ int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
     }
     info_.callId = call->GetCallID();
     CallType currentCallType = call->GetCallType();
-    TelCallState currentTelCallState = call->GetTelCallState();
     if (currentCallType == CallType::TYPE_VOIP || currentCallType == CallType::TYPE_BLUETOOTH) {
         info_.isMuted = call->IsMuted();
     } else {
@@ -758,18 +781,10 @@ int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
     if (currentCallType == CallType::TYPE_VOIP) {
         info_.isMicDisabled = call->IsMicDisabled();
     }
+
+    std::vector<AudioDevice> transferCallIgnoreDeviceList = {};
     AudioDeviceType deviceType = info_.currentAudioDevice.deviceType;
-    if (currentCallType == CallType::TYPE_BLUETOOTH &&
-        (currentTelCallState == TelCallState::CALL_STATUS_ACTIVE ||
-        currentTelCallState == TelCallState::CALL_STATUS_DIALING ||
-        currentTelCallState == TelCallState::CALL_STATUS_ALERTING)) {
-        bool state = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetBtCallScoConnected();
-        if (state) {
-            info_.currentAudioDevice.deviceType = AudioDeviceType::DEVICE_SPEAKER;
-        } else {
-            info_.currentAudioDevice.deviceType = AudioDeviceType::DEVICE_EARPIECE;
-        }
-    }
+    UpdateDeviceTypeForBtCall(call, transferCallIgnoreDeviceList);
     TELEPHONY_LOGI("report audio device info, currentAudioDeviceType:%{public}d, "
         "mute:%{public}d, mic disabled:%{public}d, callId:%{public}d",
         info_.currentAudioDevice.deviceType, info_.isMuted, info_.isMicDisabled, info_.callId);
@@ -778,8 +793,84 @@ int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
         static_cast<int32_t>(info_.currentAudioDevice.deviceType));
     int32_t ret = DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
     info_.currentAudioDevice.deviceType = deviceType;
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    UpdateTransferCallDeviceEnd(call, transferCallIgnoreDeviceList);
+#endif
+
     return ret;
 }
+
+void AudioDeviceManager::UpdateDeviceTypeForBtCall(sptr<CallBase> call,
+    std::vector<AudioDevice> &transferCallIgnoreDeviceList)
+{
+    CallType currentCallType = call->GetCallType();
+    if (currentCallType != CallType::TYPE_BLUETOOTH) {
+        return;
+    }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    if (call->IsTransferCall()) {
+        UpdateTransferCallDeviceBegin(transferCallIgnoreDeviceList);
+        return;
+    }
+#endif
+
+    TelCallState currentTelCallState = call->GetTelCallState();
+    if (currentTelCallState != TelCallState::CALL_STATUS_ACTIVE &&
+        currentTelCallState != TelCallState::CALL_STATUS_DIALING &&
+        currentTelCallState != TelCallState::CALL_STATUS_ALERTING) {
+        return;
+    }
+
+    bool isBtCallScoConnected = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetBtCallScoConnected();
+    if (isBtCallScoConnected) {
+        info_.currentAudioDevice.deviceType = AudioDeviceType::DEVICE_SPEAKER;
+    } else {
+        info_.currentAudioDevice.deviceType = AudioDeviceType::DEVICE_EARPIECE;
+    }
+}
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+void AudioDeviceManager::UpdateTransferCallDeviceBegin(std::vector<AudioDevice> &transferCallIgnoreDeviceList)
+{
+    transferCallIgnoreDeviceList.clear();
+    std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
+    while (it != info_.audioDeviceList.end()) {
+        if (it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+            it->deviceType == AudioDeviceType::DEVICE_NEARLINK ||
+            it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID ||
+            it->deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
+            TELEPHONY_LOGI("AudioDeviceManager::UpdateTransferCallDeviceBegin, deviceType=%{public}d", it->deviceType);
+            transferCallIgnoreDeviceList.push_back(std::move(*it));
+            it = info_.audioDeviceList.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    if (info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+        info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_NEARLINK ||
+        info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID ||
+        info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
+        TELEPHONY_LOGI("AudioDeviceManager::UpdateTransferCallDeviceBegin, deviceType=%{public}d",
+            info_.currentAudioDevice.deviceType);
+        info_.currentAudioDevice.deviceType = AudioDeviceType::DEVICE_EARPIECE;
+    }
+}
+
+void AudioDeviceManager::UpdateTransferCallDeviceEnd(sptr<CallBase> call,
+    std::vector<AudioDevice> &transferCallIgnoreDeviceList)
+{
+    std::vector<AudioDevice>::iterator it = transferCallIgnoreDeviceList.begin();
+    while (it != transferCallIgnoreDeviceList.end()) {
+        TELEPHONY_LOGI("AudioDeviceManager::UpdateTransferCallDeviceEnd, deviceType=%{public}d", it->deviceType);
+        info_.audioDeviceList.push_back(std::move(*it));
+        it = transferCallIgnoreDeviceList.erase(it);
+    }
+    transferCallIgnoreDeviceList.clear();
+}
+#endif
 
 AudioDeviceType AudioDeviceManager::GetCurrentAudioDevice()
 {

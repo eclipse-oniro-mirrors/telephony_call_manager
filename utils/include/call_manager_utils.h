@@ -16,11 +16,16 @@
 #ifndef CALL_MANAGER_UTILS_H
 #define CALL_MANAGER_UTILS_H
 
+#include "call_manager_info.h"
+
+#include "call_base.h"
+#include "message_parcel.h"
 #include "bundle_mgr_proxy.h"
 
 namespace OHOS {
 namespace Telephony {
 
+constexpr int32_t PHONE_NUMBER_LEN_DEFAULT = 11;
 struct CallAttributeInfo;
 
 class CallManagerUtils {
@@ -30,8 +35,18 @@ public:
     static __attribute__((noinline)) bool IsBundleInstalled(const std::string &bundleName, int32_t userId);
     static __attribute__((noinline)) std::string GetSystemParameter(
         const std::string &key, const std::string &defaultVal);
+    static bool IsWearableDevice();
+    static bool IsTransferControlEnable();
+    static bool IsPurePhoneNumber(const std::string &s);
+    static bool IsTransferCall(CallType type);
+
+    static std::string GetSelfPhoneNumber(uint32_t slotId);
 
 private:
+    static bool IsValidLength(const std::string &s);
+    static bool IsValidCharBeforeOpenBracket(const std::string &s, size_t i);
+    static bool IsValidCharAfterCloseBracket(const std::string &s, size_t i);
+    static bool HasMinDigits(size_t digitCount, bool hasLeadingPlus);
     static bool IsForcedReportVoiceCall(const CallAttributeInfo &info);
     static void WriteVoipCallInfo(const CallAttributeInfo &info, MessageParcel &messageParcel);
 };

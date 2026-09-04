@@ -22,6 +22,8 @@
 namespace OHOS {
 namespace Telephony {
 
+const int32_t FLAG_UNHOLD = 3;
+
 BluetoothCall::BluetoothCall(DialParaInfo &info, const std::string &macAddress, const int32_t &phoneIndex)
     : CarrierCall(info)
 {
@@ -95,17 +97,52 @@ int32_t BluetoothCall::HangUpCall()
     }
     Bluetooth::HandsFreeUnitCall call;
     Bluetooth::BluetoothRemoteDevice device(macAddress_);
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    if (IsTransferCall() && GetTelCallState() == TelCallState::CALL_STATUS_HOLDING) {
+        TELEPHONY_LOGI("BluetoothCall::HangUpCall BTHF_CLIENT_CALL_ACTION_CHLD_0");
+        profile->RejectIncomingCall(device);
+        return TELEPHONY_SUCCESS;
+    }
+#endif
+
     profile->FinishActiveCall(device, call);
     return TELEPHONY_SUCCESS;
 }
 
 int32_t BluetoothCall::HoldCall()
 {
+    TELEPHONY_LOGI("BluetoothCall::HoldCall");
+    Bluetooth::HandsFreeUnit *profile = Bluetooth::HandsFreeUnit::GetProfile();
+    if (profile == nullptr) {
+        TELEPHONY_LOGE("profile is nullptr");
+        return -1;
+    }
+
+    if (macAddress_.empty()) {
+        TELEPHONY_LOGE("error: macAddress is empty");
+    }
+
+    Bluetooth::BluetoothRemoteDevice device(macAddress_);
+    profile->HoldActiveCall(device);
     return TELEPHONY_SUCCESS;
 }
 
 int32_t BluetoothCall::UnHoldCall()
 {
+    TELEPHONY_LOGI("BluetoothCall::UnHoldCall");
+    Bluetooth::HandsFreeUnit *profile = Bluetooth::HandsFreeUnit::GetProfile();
+    if (profile == nullptr) {
+        TELEPHONY_LOGE("profile is nullptr");
+        return -1;
+    }
+
+    if (macAddress_.empty()) {
+        TELEPHONY_LOGE("error: macAddress is empty");
+    }
+
+    Bluetooth::BluetoothRemoteDevice device(macAddress_);
+    profile->AcceptIncomingCall(device, FLAG_UNHOLD);
     return TELEPHONY_SUCCESS;
 }
 
@@ -212,6 +249,68 @@ int32_t BluetoothCall::StartDtmf(char str)
     profile->SendDTMFTone(device, code);
     return TELEPHONY_SUCCESS;
 }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+bool BluetoothCall::IsTransferCall()
+{
+    return isTransferCall_;
+}
+
+bool BluetoothCall::IsTransferCallAndForbidden()
+{
+    return isTransferCall_ && !isTransferCallAllow_;
+}
+
+void BluetoothCall::SetIsTransferCall(const bool &isTransferCall)
+{
+    isTransferCall_ = isTransferCall;
+}
+
+void BluetoothCall::SetIsTransferCallAllow(const bool &isAllow)
+{
+    isTransferCallAllow_ = isAllow;
+}
+
+void BluetoothCall::SetRemoteName(const std::string &remoteName)
+{
+    remoteName_ = remoteName;
+}
+
+void BluetoothCall::SetTransferCallContactName(const std::string &contactName)
+{
+    transferCallContactName_ = contactName;
+}
+
+void BluetoothCall::SetIsBluetoothHeadsetWarned(const bool &isWarn)
+{
+    isBluetoothHeadsetWarned_ = isWarn;
+}
+
+bool BluetoothCall::IsTransferCallAllow()
+{
+    return isTransferCallAllow_;
+}
+
+bool BluetoothCall::IsBluetoothHeadsetWarned()
+{
+    return isBluetoothHeadsetWarned_;
+}
+
+std::string BluetoothCall::GetRemoteName()
+{
+    return remoteName_;
+}
+
+std::string BluetoothCall::GetRemoteAddr()
+{
+    return macAddress_;
+}
+
+std::string BluetoothCall::GetTransferCallContactName()
+{
+    return transferCallContactName_;
+}
+#endif
 
 int32_t BluetoothCall::GetPhoneIndex()
 {

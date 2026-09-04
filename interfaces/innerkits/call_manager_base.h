@@ -510,6 +510,10 @@ enum class CallAbilityEventId {
      */
     EVENT_LOCAL_ALERTING = 23,
     /**
+     * Indicates that local has call and using bluetooth device, then tranfer call incoming
+     */
+    EVENT_LOCAL_ALIVE_AND_TRANSFER_INCOMING = 24,
+    /**
      * Indicates that answer voip call from BT.
      */
     EVENT_ANSWER_VOIP_CALL = 255,

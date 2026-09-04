@@ -885,6 +885,12 @@ public:
      */
     int32_t GetCallTransferInfo(const std::string number, CallTransferType type) override;
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    int32_t RegisterTransferController(const sptr<ITransferControlCallback> callback) override;
+    int32_t UnRegisterTransferController() override;
+    int32_t NotifyTransferCallContact(const std::string &contactName) override;
+#endif
+
     /**
      * CheckCallRecordingPermission
      *
