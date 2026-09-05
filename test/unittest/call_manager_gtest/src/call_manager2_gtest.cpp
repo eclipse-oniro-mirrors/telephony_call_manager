@@ -26,7 +26,11 @@
 #include "call_manager_service.h"
 #include "surface_utils.h"
 #include "telephony_types.h"
+#include "transfer_control.h"
 #include "voip_call.h"
+#include "transfer_control_mock.h"
+#include "i_call_manager_service_mock.h"
+#include "call_manager_proxy.h"
 
 using namespace OHOS::Bluetooth;
 namespace OHOS {
@@ -949,6 +953,151 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0400, Function | Med
     EXPECT_CALL(*samgr, GetSystemAbility(testing::_)).WillRepeatedly(testing::Return(remoteObject));
 
     EXPECT_NE(bluetoothCallClient.AnswerCall(), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number: CallManagerClient_Init_FirstInit
+ * @tc.name: Test CallManagerClient Init when isInit_ is false
+ * @tc.desc: Verify that Init sets isInit_ to true when called for the first time
+ */
+HWTEST_F(ClientErrorBranchTest, CallManagerClient_Init_FirstInit, TestSize.Level1)
+{
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    client->isInit_.store(false);
+    client->Init(0);
+    EXPECT_TRUE(client->isInit_.load());
+}
+
+/**
+ * @tc.number: CallManagerClient_Init_AlreadyInit
+ * @tc.name: Test CallManagerClient Init when isInit_ is true
+ * @tc.desc: Verify that Init skips initialization when isInit_ is already true
+ */
+HWTEST_F(ClientErrorBranchTest, CallManagerClient_Init_AlreadyInit, TestSize.Level1)
+{
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    client->isInit_.store(true);
+    client->Init(0);
+    EXPECT_TRUE(client->isInit_.load());
+}
+
+/**
+ * @tc.number: CallManagerClient_UnInit_Initiated
+ * @tc.name: Test CallManagerClient UnInit when isInit_ is true
+ * @tc.desc: Verify that UnInit sets isInit_ to false when isInit_ is true
+ */
+HWTEST_F(ClientErrorBranchTest, CallManagerClient_UnInit_Initiated, TestSize.Level1)
+{
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    client->isInit_.store(true);
+    client->UnInit();
+    EXPECT_FALSE(client->isInit_.load());
+}
+
+/**
+ * @tc.number: CallManagerClient_UnInit_NotInitiated
+ * @tc.name: Test CallManagerClient UnInit when isInit_ is false
+ * @tc.desc: Verify that UnInit logs error when isInit_ is false and does not change state
+ */
+HWTEST_F(ClientErrorBranchTest, CallManagerClient_UnInit_NotInitiated, TestSize.Level1)
+{
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    client->isInit_.store(false);
+    client->UnInit();
+    EXPECT_FALSE(client->isInit_.load());
+}
+
+/**
+ * @tc.number: CallManagerClient_RegisterTransferController_NullTransferControl
+ * @tc.name: Test RegisterTransferController with null transferControl
+ * @tc.desc: Verify that RegisterTransferController returns TELEPHONY_ERR_ARGUMENT_INVALID
+ * when transferControl is nullptr
+ */
+HWTEST_F(ClientErrorBranchTest, CallManagerClient_RegisterTransferController_NullTransferControl, TestSize.Level1)
+{
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    int32_t result = client->RegisterTransferController(nullptr);
+    EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+/**
+ * @tc.number: CallManagerClient_RegisterTransferController_ProxyNull
+ * @tc.name: Test RegisterTransferController when g_callManagerProxy is nullptr
+ * @tc.desc: Verify that RegisterTransferController returns TELEPHONY_ERR_UNINIT when g_callManagerProxy is nullptr
+ */
+HWTEST_F(ClientErrorBranchTest, CallManagerClient_RegisterTransferController_ProxyNull, TestSize.Level1)
+{
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    client->isInit_.store(true);
+    auto transferControl = std::make_unique<MockTransferControl>();
+    int32_t result = client->RegisterTransferController(std::move(transferControl));
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number: CallManagerClient_UnRegisterTransferController_ProxyNull
+ * @tc.name: Test UnRegisterTransferController when g_callManagerProxy is nullptr
+ * @tc.desc: Verify that UnRegisterTransferController returns TELEPHONY_ERR_UNINIT when g_callManagerProxy is nullptr
+ */
+HWTEST_F(ClientErrorBranchTest, CallManagerClient_UnRegisterTransferController_ProxyNull, TestSize.Level1)
+{
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    client->isInit_.store(true);
+    int32_t result = client->UnRegisterTransferController();
+    EXPECT_NE(result, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number: CallManagerClient_RegisterTransferController_Success
+ * @tc.name: Test RegisterTransferController success path
+ * @tc.desc: Verify that RegisterTransferController delegates to proxy when g_callManagerProxy is valid
+ */
+HWTEST_F(ClientErrorBranchTest, CallManagerClient_RegisterTransferController_Success, TestSize.Level1)
+{
+    auto proxy = DelayedSingleton<CallManagerProxy>::GetInstance();
+    EXPECT_NE(proxy, nullptr);
+    proxy->isTransferCbRegistered_.store(false);
+    auto originalService = proxy->callManagerServicePtr_;
+    sptr<MockICallManagerService> mockService = new MockICallManagerService();
+    EXPECT_NE(mockService, nullptr);
+    EXPECT_CALL(*mockService, RegisterTransferController(testing::_))
+        .WillOnce(testing::Return(TELEPHONY_SUCCESS));
+    proxy->callManagerServicePtr_ = mockService;
+
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    client->isInit_.store(false);
+    client->Init(0);
+    auto transferControl = std::make_unique<MockTransferControl>();
+    int32_t result = client->RegisterTransferController(std::move(transferControl));
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+    proxy->callManagerServicePtr_ = originalService;
+    proxy->isTransferCbRegistered_.store(false);
+    proxy->transferControlCallbackPtr_ = nullptr;
+}
+
+/**
+ * @tc.number: CallManagerClient_UnRegisterTransferController_Success
+ * @tc.name: Test UnRegisterTransferController success path
+ * @tc.desc: Verify that UnRegisterTransferController delegates to proxy when g_callManagerProxy is valid
+ */
+HWTEST_F(ClientErrorBranchTest, CallManagerClient_UnRegisterTransferController_Success, TestSize.Level1)
+{
+    auto proxy = DelayedSingleton<CallManagerProxy>::GetInstance();
+    EXPECT_NE(proxy, nullptr);
+    proxy->isTransferCbRegistered_.store(true);
+    auto originalService = proxy->callManagerServicePtr_;
+    sptr<MockICallManagerService> mockService = new MockICallManagerService();
+    EXPECT_NE(mockService, nullptr);
+    EXPECT_CALL(*mockService, UnRegisterTransferController())
+        .WillOnce(testing::Return(TELEPHONY_SUCCESS));
+    proxy->callManagerServicePtr_ = mockService;
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    client->isInit_.store(false);
+    client->Init(0);
+    int32_t result = client->UnRegisterTransferController();
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+    proxy->callManagerServicePtr_ = originalService;
+    proxy->isTransferCbRegistered_.store(false);
 }
 } // namespace Telephony
 } // namespace OHOS

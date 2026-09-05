@@ -409,6 +409,25 @@ public:
     {
         return TELEPHONY_SUCCESS;
     }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    int32_t RegisterTransferController(const sptr<ITransferControlCallback> callback) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t UnRegisterTransferController() override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t NotifyTransferCallContact(const std::string &contactName) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+#endif
+
     int32_t MakeCallWithToken(std::string number, AppExecFwk::PacMap &options, std::string &token) override
     {
         return TELEPHONY_SUCCESS;

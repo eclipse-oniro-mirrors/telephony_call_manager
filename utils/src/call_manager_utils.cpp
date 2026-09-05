@@ -18,6 +18,7 @@
 #include "bundle_mgr_interface.h"
 #include "call_manager_base.h"
 #include "call_object_manager.h"
+#include "core_service_client.h"
 #include "iservice_registry.h"
 #include "parameters.h"
 #include "system_ability_definition.h"
@@ -25,6 +26,8 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr size_t MIN_LENGTH = 5;
+constexpr size_t MAX_LENGTH = 20;
 
 bool CallManagerUtils::IsForcedReportVoiceCall(const CallAttributeInfo &info)
 {
@@ -123,6 +126,138 @@ __attribute__((noinline)) std::string CallManagerUtils::GetSystemParameter(
     const std::string &key, const std::string &defaultVal)
 {
     return system::GetParameter(key, defaultVal);
+}
+
+bool CallManagerUtils::IsWearableDevice()
+{
+    std::string devicetype = OHOS::system::GetParameter("const.product.devicetype", "");
+    if (devicetype == "wearable") {
+        return true;
+    }
+
+    return false;
+}
+
+bool CallManagerUtils::IsTransferControlEnable()
+{
+    return OHOS::system::GetBoolParameter("persist.telephony.transfer_control_enable", true);
+}
+
+bool CallManagerUtils::IsValidLength(const std::string &s)
+{
+    return !s.empty() && s.length() >= MIN_LENGTH && s.length() <= MAX_LENGTH;
+}
+
+bool CallManagerUtils::IsValidCharBeforeOpenBracket(const std::string &s, size_t i)
+{
+    if (i == 0) {
+        return true;
+    }
+    unsigned char prev = static_cast<unsigned char>(s[i - 1]);
+    return std::isdigit(prev) || prev == ' ' || prev == '-';
+}
+
+bool CallManagerUtils::IsValidCharAfterCloseBracket(const std::string &s, size_t i)
+{
+    if (i >= s.length() - 1) {
+        return true;
+    }
+    unsigned char next = static_cast<unsigned char>(s[i + 1]);
+    return std::isdigit(next) || next == ' ' || next == '-';
+}
+
+bool CallManagerUtils::HasMinDigits(size_t digitCount, bool hasLeadingPlus)
+{
+    constexpr size_t MIN_DIGITS = 5;
+    constexpr size_t MIN_DIGITS_WITH_PLUS = 8;
+    if (digitCount < MIN_DIGITS) {
+        return false;
+    }
+    if (hasLeadingPlus && digitCount < MIN_DIGITS_WITH_PLUS) {
+        return false;
+    }
+    return true;
+}
+
+bool CallManagerUtils::IsPurePhoneNumber(const std::string &s)
+{
+    if (!IsValidLength(s)) {
+        return false;
+    }
+    size_t digitCount = 0;
+    bool hasLeadingPlus = false;
+    int bracketBalance = 0;
+    for (size_t i = 0; i < s.length(); ++i) {
+        unsigned char c = static_cast<unsigned char>(s[i]);
+        if (std::isdigit(c)) {
+            ++digitCount;
+            continue;
+        }
+        if (c == '+') {
+            if (i != 0 || hasLeadingPlus) {
+                return false;
+            }
+            hasLeadingPlus = true;
+            continue;
+        }
+        if (c == '-' || c == ' ') {
+            continue;
+        }
+        if (c == '(') {
+            ++bracketBalance;
+            if (!IsValidCharBeforeOpenBracket(s, i)) {
+                return false;
+            }
+            continue;
+        }
+        if (c == ')') {
+            --bracketBalance;
+            if (!IsValidCharAfterCloseBracket(s, i)) {
+                return false;
+            }
+            if (bracketBalance < 0) {
+                return false;
+            }
+            continue;
+        }
+        return false;
+    }
+    if (bracketBalance != 0) {
+        return false;
+    }
+    return HasMinDigits(digitCount, hasLeadingPlus);
+}
+
+bool CallManagerUtils::IsTransferCall(CallType type)
+{
+    if (type != CallType::TYPE_BLUETOOTH) {
+        return false;
+    }
+
+    if (IsWearableDevice()) {
+        return false;
+    }
+
+    return true;
+}
+
+std::string CallManagerUtils::GetSelfPhoneNumber(uint32_t slotId)
+{
+    std::u16string telephoneNumber;
+    CoreServiceClient::GetInstance().GetSimTelephoneNumber(slotId, telephoneNumber);
+    if (telephoneNumber.empty()) {
+        return std::string("");
+    }
+
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+    std::string result = convert.to_bytes(telephoneNumber);
+    uint32_t len = result.length();
+    if (len < PHONE_NUMBER_LEN_DEFAULT) {
+        return std::string("");
+    }
+
+    std::string lastPart = result.substr(len - PHONE_NUMBER_LEN_DEFAULT);
+    return lastPart;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -61,7 +61,7 @@ bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStr
     return true;
 }
 
-bool AudioPlayer::InitRenderer()
+bool AudioPlayer::InitRenderer(const AudioStandard::StreamUsage streamUsage)
 {
     AudioStandard::AudioRendererOptions rendererOptions;
     rendererOptions.streamInfo.samplingRate = AudioStandard::AudioSamplingRate::SAMPLE_RATE_96000;
@@ -69,7 +69,7 @@ bool AudioPlayer::InitRenderer()
     rendererOptions.streamInfo.format = AudioStandard::AudioSampleFormat::SAMPLE_U8;
     rendererOptions.streamInfo.channels = AudioStandard::AudioChannel::MONO;
     rendererOptions.rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_SPEECH;
-    rendererOptions.rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+    rendererOptions.rendererInfo.streamUsage = streamUsage;
     rendererOptions.rendererInfo.rendererFlags = RENDERER_FLAG;
     audioRenderer_ = AudioStandard::AudioRenderer::Create(rendererOptions);
     if (audioRenderer_ == nullptr) {
@@ -175,10 +175,10 @@ void AudioPlayer::StartPlayLoop(FILE *wavFile, wav_hdr wavHeader, uint8_t *buffe
     }
 }
 
-int32_t AudioPlayer::Play(PlayerType playerType)
+int32_t AudioPlayer::Play(PlayerType playerType, const AudioStandard::StreamUsage streamUsage)
 {
     SetStop(playerType, false);
-    if (!InitRenderer() || !InitCapturer()) {
+    if (!InitRenderer(streamUsage) || !InitCapturer()) {
         TELEPHONY_LOGE("audio renderer and capturer init failed");
         return TELEPHONY_ERR_UNINIT;
     }

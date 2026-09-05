@@ -81,6 +81,9 @@ public:
 #ifdef SUPPORT_RTT_CALL
     void HandleRttEventInfo(const ImsRTTEventType &eventType);
 #endif
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    int32_t NotifyTransferCallContact(const std::string &contactName, sptr<CallBase> &call);
+#endif
 
 private:
     void InitCallBaseEvent();
@@ -194,6 +197,8 @@ private:
     void InitWatchSystemServiceWrapper();
     void DeInitWatchSystemServiceWrapper();
 #endif
+    void UpdateCallStateOfSatellite(sptr<CallBase> &call, TelCallState priorState, TelCallState nextState);
+    void JudgingAnswerTimeOut(sptr<CallBase> &call, TelCallState priorState, TelCallState nextState);
 
 private:
     CallDetailInfo callReportInfo_;

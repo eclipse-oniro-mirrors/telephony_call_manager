@@ -77,6 +77,7 @@
 #include "wired_headset.h"
 #include "call_status_policy.h"
 #include "bluetooth_call.h"
+#include "call_records_handler.h"
 #include "datashare_helper.h"
 #include "incoming_flash_reminder.h"
 

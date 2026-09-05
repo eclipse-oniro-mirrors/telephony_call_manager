@@ -53,9 +53,36 @@ public:
     int32_t StartDtmf(char str) override;
     int32_t GetPhoneIndex();
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    bool IsTransferCall() override;
+    bool IsTransferCallAndForbidden() override;
+
+    void SetIsTransferCall(const bool &isTransferCall);
+    void SetIsTransferCallAllow(const bool &isAllow);
+    void SetRemoteName(const std::string &remoteName);
+    void SetTransferCallContactName(const std::string &contactName);
+    void SetIsBluetoothHeadsetWarned(const bool &isWarn);
+
+    bool IsTransferCallAllow();
+    bool IsBluetoothHeadsetWarned();
+
+    std::string GetRemoteName();
+    std::string GetRemoteAddr();
+    std::string GetTransferCallContactName();
+#endif
+
 private:
     int32_t phoneIndex_ = 0;
     std::string  macAddress_ = "";
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    std::string remoteName_ = "";
+    std::string transferCallContactName_ = "";
+    std::atomic<bool> isTransferCall_ = false;
+    std::atomic<bool> isTransferCallAllow_ = true;
+    ffrt::mutex contactNameMutex_;
+    std::atomic<bool> isBluetoothHeadsetWarned_ = false;
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

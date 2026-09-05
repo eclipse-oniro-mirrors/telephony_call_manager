@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
+const int32_t MAX_CONTACT_NAME_LEN = 255;
 CallManagerServiceProxy::CallManagerServiceProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<ICallManagerService>(impl)
 {}
@@ -1694,6 +1695,59 @@ int32_t CallManagerServiceProxy::GetCallTransferInfo(const std::string number, C
     }
     return replyParcel.ReadInt32();
 }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+int32_t CallManagerServiceProxy::RegisterTransferController(const sptr<ITransferControlCallback> callback)
+{
+    TELEPHONY_LOGI("CallManagerServiceProxy::RegisterTransferController");
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("CallManagerServiceProxy::RegisterTransferController callback is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("CallManagerServiceProxy::RegisterTransferController write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    dataParcel.WriteRemoteObject(callback->AsObject());
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_REGISTER_TRANSFER_CONTROLLER, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("CallManagerServiceProxy::RegisterTransferController error:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallManagerServiceProxy::UnRegisterTransferController()
+{
+    TELEPHONY_LOGI("CallManagerServiceProxy::UnRegisterTransferController");
+    return SendRequest(INTERFACE_UNREGISTER_TRANSFER_CONTROLLER);
+}
+
+int32_t CallManagerServiceProxy::NotifyTransferCallContact(const std::string &contactName)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("WriteInterfaceToken failed");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (contactName.empty() || contactName.length() > MAX_CONTACT_NAME_LEN) {
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    dataParcel.WriteString(contactName);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_NOTIFY_TRANSFER_CALL_CONTACT, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("NotifyTransferCallContact error:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+#endif
 
 bool CallManagerServiceProxy::CheckCallRecordingPermission(const std::string& cellularRecordPhoneNum,
     const std::string& cellularRecordToken)

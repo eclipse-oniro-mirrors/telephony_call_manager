@@ -47,6 +47,13 @@ private:
     void DisconnectBtCallWhenPhoneAnswered(const CallDetailInfo &info);
 #endif
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    bool IsVoipTransferCall(const CallDetailInfo &info);
+    bool IsHostDialMeIgnoreTransferCall(const CallDetailInfo &info);
+    bool IsHostAnswerTransferCall(const CallDetailInfo &info);
+    void DisconnectTransferCall(const CallDetailInfo &info);
+#endif
+
 private:
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_;
 };

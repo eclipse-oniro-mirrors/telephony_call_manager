@@ -1991,5 +1991,79 @@ int32_t CallManagerProxy::GetCallTransferInfo(const std::string number, CallTran
     }
     return TELEPHONY_SUCCESS;
 }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+int32_t CallManagerProxy::RegisterTransferController(std::unique_ptr<TransferControl> &transferControl)
+{
+    TELEPHONY_LOGI("CallManagerProxy::RegisterTransferController");
+    if (transferControl == nullptr) {
+        TELEPHONY_LOGE("CallManagerProxy::RegisterTransferController transferControl is nullptr");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+
+    if (isTransferCbRegistered_.load()) {
+        TELEPHONY_LOGE("CallManagerProxy::RegisterTransferController you have already register callback yet!");
+        return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
+    }
+
+    std::shared_lock<ffrt::shared_mutex> lock(clientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("CallManagerProxy::RegisterTransferController callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    transferControlCallbackPtr_ = sptr<TransferControlCallback>::MakeSptr();
+    if (transferControlCallbackPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallManagerProxy::RegisterTransferController transferControlCallbackPtr_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    int32_t ret = callManagerServicePtr_->RegisterTransferController(transferControlCallbackPtr_);
+    if (ret != TELEPHONY_SUCCESS) {
+        transferControlCallbackPtr_ = nullptr;
+        TELEPHONY_LOGE("CallManagerProxy::RegisterTransferController ret: %{public}d", ret);
+        return ret;
+    }
+
+    transferControlCallbackPtr_->SetProcessCallback(std::move(transferControl));
+    isTransferCbRegistered_.store(true);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerProxy::UnRegisterTransferController()
+{
+    TELEPHONY_LOGI("CallManagerProxy::UnRegisterTransferController");
+    std::lock_guard<ffrt::shared_mutex> lock(clientLock_);
+    if (!isTransferCbRegistered_.load()) {
+        TELEPHONY_LOGE("CallManagerProxy::UnRegisterTransferController you haven't register callback yet");
+        return TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL;
+    }
+
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("CallManagerProxy::UnRegisterTransferController callManagerServicePtr_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    int32_t ret = callManagerServicePtr_->UnRegisterTransferController();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("CallManagerProxy::UnRegisterTransferController failed, ret: %{public}d", ret);
+        return ret;
+    }
+
+    transferControlCallbackPtr_ = nullptr;
+    isTransferCbRegistered_.store(false);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerProxy::NotifyTransferCallContact(const std::string contactName)
+{
+    std::shared_lock<ffrt::shared_mutex> lock(clientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return callManagerServicePtr_->NotifyTransferCallContact(contactName);
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

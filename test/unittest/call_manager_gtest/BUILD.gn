@@ -91,6 +91,7 @@ ohos_unittest("tel_call_manager2_gtest") {
   include_dirs = [
     "${CALL_MANAGER_PATH}/interfaces/innerkits",
     "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
+    "${CALL_MANAGER_PATH}/test/mock",
   ]
   include_dirs += call_manager_include_dirs
 

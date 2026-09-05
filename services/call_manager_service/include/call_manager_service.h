@@ -933,6 +933,12 @@ public:
      */
     int32_t GetCallTransferInfo(const std::string number, CallTransferType type) override;
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    int32_t RegisterTransferController(const sptr<ITransferControlCallback> callback) override;
+    int32_t UnRegisterTransferController() override;
+    int32_t NotifyTransferCallContact(const std::string &contactName) override;
+#endif
+
     /**
      * @brief Check if recording permission is allowed for the call
      * @param cellularRecordPhoneNum[in], phone number of the call to check
@@ -949,6 +955,7 @@ private:
     int32_t HandleCeliaAutoAnswerCall(int32_t callId, bool enable);
     int32_t HandleVoIPCallEvent(int32_t callId, std::string &eventName);
     void BtCallWaitSlotId(AppExecFwk::PacMap &dialInfo, const std::u16string &number);
+    int32_t HandleDialCall(std::u16string number, AppExecFwk::PacMap &extras);
     bool CheckSetTelephonyStatePermission();
     bool CheckCallerIsSystemApp();
 

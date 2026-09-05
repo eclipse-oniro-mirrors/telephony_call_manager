@@ -21,6 +21,7 @@
 
 #include "call_manager_callback.h"
 #include "i_call_status_callback.h"
+#include "transfer_control.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -788,7 +789,27 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t GetCallTransferInfo(const std::string number, CallTransferType type);
+    /**
+     * @brief Register transfer controller callback
+     *
+     * @param transferControl[in], callback function pointer
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t RegisterTransferController(std::unique_ptr<TransferControl> transferControl);
 
+    /**
+     * @brief unregister transfer call callback
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UnRegisterTransferController();
+    /**
+     * @brief Notify transfer call contact name
+     *
+     * @param contactName[in], contact name for transfer call
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t NotifyTransferCallContact(const std::string contactName);
     /**
      * @brief Check if recording permission is allowed for the call
      *
@@ -798,6 +819,9 @@ public:
      */
     bool CheckCallRecordingPermission(const std::string& cellularRecordPhoneNum,
         const std::string& cellularRecordToken);
+
+private:
+    std::atomic<bool> isInit_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -23,6 +23,7 @@
       *CellularCallProxy*;
       *ICallStatusCallback*;
       *NearlinkCallClient*;
+      *TransferControlCallback*;
       *VoipCallConnection*;
       *VoipCallManagerProxy*;
     };

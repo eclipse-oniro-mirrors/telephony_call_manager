@@ -60,6 +60,12 @@
 #ifdef NOT_SUPPORT_MULTICALL
 #include "core_service_client.h"
 #endif
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+#include "bluetooth_call.h"
+#include "bluetooth_call_connection.h"
+#endif
+
 namespace OHOS {
 namespace Telephony {
 std::atomic<bool> CallControlManager::alarmSeted_ = false;
@@ -271,6 +277,11 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState, bool 
     if (call == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    ProcessTransferCall(callId, call);
+#endif
+
     auto ringCallId = call->GetCallID();
     call->SetAnsweredCall(true);
     ReportPhoneUEInSuperPrivacy(CALL_ANSWER_IN_SUPER_PRIVACY);
@@ -635,6 +646,13 @@ bool CallControlManager::NotifyNewCallCreated(sptr<CallBase> &callObjectPtr)
         TELEPHONY_LOGE("callObjectPtr is null!");
         return false;
     }
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    bool isForbidden = false;
+    HandleTransferCallReportInfo(callObjectPtr, isForbidden);
+    if (isForbidden) {
+        return true;
+    }
+#endif
     if (callStateListenerPtr_ != nullptr) {
         callStateListenerPtr_->NewCallCreated(callObjectPtr);
     }
@@ -650,6 +668,49 @@ bool CallControlManager::NotifyCallDestroyed(const DisconnectedDetails &details)
     return false;
 }
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+void CallControlManager::ProcessTransferCall(int32_t callId, const sptr<CallBase> answerCall)
+{
+    sptr<CallBase> call = GetOtherBtTransferCall(callId);
+    if (call == nullptr) {
+        return;
+    }
+
+    TelCallState state = call->GetTelCallState();
+    TELEPHONY_LOGI("CallControlManager::ProcessTransferCall, state=%{public}d", state);
+    if (state == TelCallState::CALL_STATUS_INCOMING) {
+        RejectCall(call->GetCallID(), true, u"TransferCallConflict");
+    } else {
+        HangUpCall(call->GetCallID());
+    }
+
+    if (!answerCall->IsTransferCall()) {
+        auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
+        audioControlManager->StopSoundtone();
+        audioControlManager->PlaySoundtone(answerCall);
+    }
+}
+
+void CallControlManager::HandleTransferCallReportInfo(const sptr<CallBase> &call, bool &isForbidden)
+{
+    if (call == nullptr || call->GetCallType() != CallType::TYPE_BLUETOOTH) {
+        return;
+    }
+
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    if (!btCall->IsTransferCall()) {
+        return;
+    }
+
+    DelayedSingleton<BluetoothCallConnection>::GetInstance()->NotifyTransferCall(btCall);
+    if (!btCall->IsTransferCallAllow()) {
+        isForbidden = true;
+        TELEPHONY_LOGI("CallControlManager::HandleTransferCallReportInfo not allow transfer call");
+        return;
+    }
+}
+#endif
+
 bool CallControlManager::NotifyCallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
@@ -657,6 +718,16 @@ bool CallControlManager::NotifyCallStateUpdated(
         TELEPHONY_LOGE("NotifyCallStateUpdated null ptr!");
         return false;
     }
+
+    #ifdef CALL_MANAGER_CALL_TRANSFER
+    bool isForbidden = false;
+    HandleTransferCallReportInfo(callObjectPtr, isForbidden);
+    if (isForbidden) {
+        TELEPHONY_LOGI("CallControlManager::NotifyCallStateUpdated ignore transfer call");
+        return true;
+    }
+#endif
+
     HILOG_COMM_INFO("NotifyCallStateUpdated priorState:%{public}d,nextState:%{public}d", priorState, nextState);
     callStateListenerPtr_->CallStateUpdated(callObjectPtr, priorState, nextState);
     if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
@@ -712,6 +783,16 @@ bool CallControlManager::NotifyIncomingCallAnswered(sptr<CallBase> &callObjectPt
     if (callObjectPtr == nullptr) {
         return false;
     }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    bool isForbidden = false;
+    HandleTransferCallReportInfo(callObjectPtr, isForbidden);
+    if (isForbidden) {
+        TELEPHONY_LOGI("CallControlManager::NotifyIncomingCallAnswered ignore transfer call");
+        return true;
+    }
+#endif
+
     if (callStateListenerPtr_ != nullptr) {
         callStateListenerPtr_->IncomingCallActivated(callObjectPtr);
         return true;
@@ -725,6 +806,16 @@ bool CallControlManager::NotifyIncomingCallRejected(
     if (callObjectPtr == nullptr) {
         return false;
     }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    bool isForbidden = false;
+    HandleTransferCallReportInfo(callObjectPtr, isForbidden);
+    if (isForbidden) {
+        TELEPHONY_LOGI("CallControlManager::NotifyIncomingCallRejected ignore transfer call");
+        return true;
+    }
+#endif
+
     if (callStateListenerPtr_ != nullptr) {
         callStateListenerPtr_->IncomingCallHungUp(callObjectPtr, isSendSms, content);
         return true;

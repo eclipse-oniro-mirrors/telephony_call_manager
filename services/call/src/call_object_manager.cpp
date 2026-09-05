@@ -28,6 +28,10 @@
 #include "fold_status_manager.h"
 #include "bluetooth_call.h"
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+#include "bluetooth_call.h"
+#endif
+
 namespace OHOS {
 namespace Telephony {
 std::list<sptr<CallBase>> CallObjectManager::callObjectPtrList_;
@@ -63,18 +67,7 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
             return CALL_ERR_PHONE_CALL_ALREADY_EXISTS;
         }
     }
-    CallAttributeInfo info;
-    call->GetCallAttributeInfo(info);
-    int32_t state;
-    bool isVoIPCallExists = false;
-    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
-    if (state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
-        isVoIPCallExists = true;
-    }
-    if (callObjectPtrList_.size() == NO_CALL_EXIST && (!isVoIPCallExists || info.isEcc)) {
-        DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
-    }
-    callObjectPtrList_.emplace_back(call);
+    ConnectAbilityIfNeed(call);
     if (callObjectPtrList_.size() == ONE_CALL_EXIST) {
         DelayedSingleton<CallWiredHeadSet>::GetInstance()->Init();
         if (callObjectPtrList_.front()->GetTelCallState() == TelCallState::CALL_STATUS_DIALING) {
@@ -88,6 +81,21 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
     TELEPHONY_LOGI("AddOneCallObject success! callId:%{public}d,call list size:%{public}zu", call->GetCallID(),
         callObjectPtrList_.size());
     return TELEPHONY_SUCCESS;
+}
+
+void CallObjectManager::ConnectAbilityIfNeed(sptr<CallBase> &call)
+{
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    if (call->IsTransferCallAndForbidden()) {
+        TELEPHONY_LOGI("CallObjectManager::ConnectAbilityIfNeed transfer call not allow");
+        return;
+    }
+#endif
+
+    CallAttributeInfo info;
+    call->GetCallAttributeInfo(info);
+    int32_t state;
+    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
 }
 
 int32_t CallObjectManager::AddOneVoipCallObject(CallAttributeInfo info)
@@ -708,6 +716,18 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndex(int32_t index)
     return nullptr;
 }
 
+sptr<CallBase> CallObjectManager::GetDialingCall()
+{
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
+    for (; it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetTelCallState() == TelCallState::CALL_STATUS_DIALING) {
+            return (*it);
+        }
+    }
+    return nullptr;
+}
+
 sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexAndSlotId(int32_t index, int32_t slotId)
 {
     std::lock_guard<ffrt::mutex> lock(listMutex_);
@@ -1177,5 +1197,69 @@ bool CallObjectManager::HasRttCall()
 #endif
     return false;
 }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+bool CallObjectManager::HasTransferCall()
+{
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
+    for (const sptr<CallBase> &call : callObjectPtrList_) {
+        if (call == nullptr) {
+            continue;
+        }
+
+        if (call->IsTransferCall()) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool CallObjectManager::HasNonTransferCall()
+{
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
+    for (const sptr<CallBase> &call : callObjectPtrList_) {
+        if (call == nullptr) {
+            continue;
+        }
+
+        if (!call->IsTransferCall()) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+sptr<CallBase> CallObjectManager::GetIncomingBtTransferCall()
+{
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
+    for (const sptr<CallBase> &call : callObjectPtrList_) {
+        if (call == nullptr || !call->IsTransferCall()) {
+            continue;
+        }
+        TelCallState callState = call->GetTelCallState();
+        if (callState == TelCallState::CALL_STATUS_INCOMING || callState == TelCallState::CALL_STATUS_WAITING) {
+            return call;
+        }
+    }
+    return nullptr;
+}
+
+sptr<CallBase> CallObjectManager::GetOtherBtTransferCall(int32_t excludeCallId)
+{
+    std::lock_guard<ffrt::mutex> lock(listMutex_);
+    for (const sptr<CallBase> &call : callObjectPtrList_) {
+        if (call == nullptr || !call->IsTransferCall()) {
+            continue;
+        }
+        if (call->GetCallID() == excludeCallId) {
+            continue;
+        }
+        return call;
+    }
+    return nullptr;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

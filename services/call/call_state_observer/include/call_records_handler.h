@@ -40,8 +40,14 @@ private:
     void MakeCallLogInsertBucket(DataShare::DataShareValuesBucket &bucket,
         const CallRecordInfo &info, std::string displayName, std::string numberLocation);
     void DeleteCallLogForLimit(const CallRecordInfo &info);
+    void GetRealSlotId(const sptr<CallBase> &callObjectPtr, int32_t simType, int32_t simIndex, int32_t &slotId);
     bool IsMissedCall(const sptr<CallBase> &callObjectPtr);
     void PublishMissedCall(const sptr<CallBase> &callObjectPtr);
+    void AddTransferCallInfo(const sptr<CallBase> &callObjectPtr, DataShare::DataShareValuesBucket &bucket);
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    bool IsMissedTransferCall(const sptr<CallBase> &callObjectPtr);
+#endif
 
 private:
     std::shared_ptr<CallDataBaseHelper> callDataPtr_;

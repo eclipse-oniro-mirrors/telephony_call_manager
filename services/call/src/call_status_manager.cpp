@@ -64,6 +64,10 @@
 #include "watch_lite_call_manager_node.h"
 #endif
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+#include "call_manager_utils.h"
+#endif
+
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t INIT_INDEX = 0;
@@ -214,7 +218,6 @@ void CallStatusManager::HandleBluetoothCallReportInfo(const CallDetailInfo &info
         AddOneCallObject(call);
         DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     }
-    return;
 }
 
 void CallStatusManager::SetImsDomainInfo(const sptr<CallBase> call, int32_t imsDomain)
@@ -670,6 +673,48 @@ bool CallStatusManager::SetBluetoothCallContactInfo(sptr<CallBase> &call, Contac
     }
     return false;
 }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+int32_t CallStatusManager::NotifyTransferCallContact(const std::string &contactName, sptr<CallBase> &call)
+{
+    TELEPHONY_LOGI("CallStatusManager::NotifyTransferCallContact");
+    BluetoothCall *btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    if (btCall == nullptr) {
+        TELEPHONY_LOGE("btCall is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    auto btConn = DelayedSingleton<BluetoothCallConnection>::GetInstance();
+    if (btConn == nullptr) {
+        TELEPHONY_LOGE("btConn is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    ContactInfo contactInfo = call->GetCallerInfo();
+    if (contactInfo.name.empty()) {
+        bool isPurePhone = CallManagerUtils::IsPurePhoneNumber(contactName);
+        auto callNumberUtils = DelayedSingleton<CallNumberUtils>::GetInstance();
+
+        if (isPurePhone) {
+            std::string hfpPhoneNum = call->GetAccountNumber();
+            btConn->CancelHfpWaitContactTask();
+            if (callNumberUtils != nullptr &&
+                callNumberUtils->RemoveSeparatorsPhoneNumber(contactName) ==
+                callNumberUtils->RemoveSeparatorsPhoneNumber(hfpPhoneNum)) {
+                TELEPHONY_LOGI("ANCS phone number same as HFP, trigger yellow page query");
+                callNumberUtils->YellowPageAndMarkUpdate(call);
+                return TELEPHONY_SUCCESS;
+            }
+        }
+        btConn->NotifyAncsContactArrived(contactName, btCall);
+        if (isPurePhone && callNumberUtils != nullptr) {
+            TELEPHONY_LOGI("ANCS phone number different from HFP, refresh and trigger yellow page query");
+            callNumberUtils->YellowPageAndMarkUpdate(call);
+        }
+    } else {
+        btConn->CancelHfpWaitContactTask();
+    }
+    return TELEPHONY_SUCCESS;
+}
+#endif
 
 int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call, bool isBlock)
 {
@@ -1711,6 +1756,23 @@ void CallStatusManager::AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum
     }
 }
 
+void CallStatusManager::UpdateCallStateOfSatellite(sptr<CallBase> &call, TelCallState priorState,
+    TelCallState nextState)
+{
+    if (call->GetCallType() == CallType::TYPE_SATELLITE) {
+        DelayedSingleton<SatelliteCallControl>::GetInstance()->
+            HandleSatelliteCallStateUpdate(call, priorState, nextState);
+    }
+}
+
+void CallStatusManager::JudgingAnswerTimeOut(sptr<CallBase> &call, TelCallState priorState, TelCallState nextState)
+{
+    if (priorState == TelCallState::CALL_STATUS_INCOMING && nextState == TelCallState::CALL_STATUS_ACTIVE) {
+        DelayedSingleton<CallManagerHisysevent>::GetInstance()->JudgingAnswerTimeOut(
+            call->GetSlotId(), call->GetCallID(), static_cast<int32_t>(call->GetVideoStateType()));
+    }
+}
+
 int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState nextState)
 {
     TELEPHONY_LOGW("UpdateCallState start");
@@ -1723,14 +1785,8 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
     TELEPHONY_LOGI(
         "callIndex:%{public}d, callId:%{public}d, priorState:%{public}d, nextState:%{public}d, videoState:%{public}d",
         call->GetCallIndex(), call->GetCallID(), priorState, nextState, videoState);
-    if (call->GetCallType() == CallType::TYPE_SATELLITE) {
-        DelayedSingleton<SatelliteCallControl>::GetInstance()->
-            HandleSatelliteCallStateUpdate(call, priorState, nextState);
-    }
-    if (priorState == TelCallState::CALL_STATUS_INCOMING && nextState == TelCallState::CALL_STATUS_ACTIVE) {
-        DelayedSingleton<CallManagerHisysevent>::GetInstance()->JudgingAnswerTimeOut(
-            call->GetSlotId(), call->GetCallID(), static_cast<int32_t>(call->GetVideoStateType()));
-    }
+    UpdateCallStateOfSatellite(call, priorState, nextState);
+    JudgingAnswerTimeOut(call, priorState, nextState);
     int32_t ret = call->SetTelCallState(nextState);
     UpdateOneCallObjectByCallId(call->GetCallID(), nextState);
     if (ret != TELEPHONY_SUCCESS && ret != CALL_ERR_NOT_NEW_STATE) {
@@ -2075,6 +2131,14 @@ sptr<CallBase> CallStatusManager::CreateNewCallByCallTypeEx(
             } else {
                 callPtr = (std::make_unique<BluetoothCall>(paraInfo, macAddress, info.phoneIndex)).release();
             }
+#ifdef CALL_MANAGER_CALL_TRANSFER
+            sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(callPtr.GetRefPtr());
+            if (CallManagerUtils::IsTransferCall(CallType::TYPE_BLUETOOTH)) {
+                TELEPHONY_LOGI("CallStatusManager::CreateNewCallByCallTypeEx, IsTransferCall");
+                btCall->SetIsTransferCall(true);
+                DelayedSingleton<BluetoothCallConnection>::GetInstance()->UpdateTransferCall(btCall);
+            }
+#endif
             break;
         }
         default:

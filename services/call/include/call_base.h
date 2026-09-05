@@ -169,6 +169,11 @@ public:
     bool isNonVirtualCall();
     void SetNonVirtualCall(bool isNonVirtualCall);
 
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    virtual bool IsTransferCall() {return false;}
+    virtual bool IsTransferCallAndForbidden() {return false;}
+#endif
+
 protected:
     int32_t callId_;
     CallType callType_;
