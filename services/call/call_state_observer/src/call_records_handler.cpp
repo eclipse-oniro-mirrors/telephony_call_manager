@@ -71,6 +71,10 @@ int32_t CallRecordsHandler::AddCallLogInfo(const sptr<CallBase> &callObjectPtr, 
     TELEPHONY_LOGI("callLog Insert begin, markType: %{public}d, displayName length: %{public}zu",
         info.numberMarkInfo.markType, displayName.length());
     MakeCallLogInsertBucket(bucket, info, displayName, numberLocation);
+    if (info.callDuration <= 0) {
+        TELEPHONY_LOGE("talkDuration abnormal negative or is 0");
+    }
+
 #ifdef CALL_MANAGER_CALL_TRANSFER
     if (IsMissedTransferCall(callObjectPtr)) {
         return TELEPHONY_SUCCESS;
