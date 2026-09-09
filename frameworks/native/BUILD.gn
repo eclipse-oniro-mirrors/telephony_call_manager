@@ -78,6 +78,13 @@ ohos_shared_library("tel_call_manager_api") {
     "samgr:samgr_proxy",
   ]
 
+  if (defined(global_parts_info) &&
+    defined(global_parts_info.hiviewdfx_api_meterics)) {
+      external_deps += [
+        "api_metrics:histogrammanger",
+      ]
+  }
+
   cflags_cc = [
     "-Wunused",
     "-Wunreachable-code",

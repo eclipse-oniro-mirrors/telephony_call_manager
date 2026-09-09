@@ -956,7 +956,8 @@ int32_t CallControlManager::SetCallRestrictionPassword(
     }
 }
 
-int32_t CallControlManager::GetCallTransferInfo(int32_t slotId, CallTransferType type)
+int32_t CallControlManager::GetCallTransferInfo(int32_t slotId, CallTransferType type,
+    bool isIncludeCallForwardingNumber)
 {
     int32_t ret = CallPolicy::GetCallTransferInfoPolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
@@ -964,7 +965,7 @@ int32_t CallControlManager::GetCallTransferInfo(int32_t slotId, CallTransferType
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
-        return callSettingManagerPtr_->GetCallTransferInfo(slotId, type);
+        return callSettingManagerPtr_->GetCallTransferInfo(slotId, type, isIncludeCallForwardingNumber);
     } else {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1592,8 +1593,8 @@ void CallControlManager::HandleVoipIncoming(int32_t &numActive, int32_t callId, 
     }
     NotifyVoipCallStateUpdated(info, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
     AddOneVoipCallObject(info);
-    bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(false);
-    TELEPHONY_LOGI("SetVirtualCall res: %{public}d.", res);
+    bool res = DelayedSingleton<AudioControlManager>GetInstance()->SetRemoteControlEnable(true);
+    TELEPHONY_LOGI("SetRemoteControlEnable res: %{public}d.", res);
 }
 
 int32_t CallControlManager::HandleVoipDisconnected(int32_t &numActive, int32_t numHeld, int32_t callId,
@@ -1611,8 +1612,8 @@ int32_t CallControlManager::HandleVoipDisconnected(int32_t &numActive, int32_t n
         SendBtCallState(numActive, numHeld, state, phoneNumber);
     int32_t carrierCallId = ERR_ID;
     IsCallExist(TelCallState::CALL_STATUS_WAITING, carrierCallId);
-    bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(true);
-    TELEPHONY_LOGI("SetVirtualCall res: %{public}d.", res);
+    bool res = DelayedSingleton<AudioControlManager>GetInstance()->SetRemoteControlEnable(false);
+    TELEPHONY_LOGI("SetRemoteControlEnable res: %{public}d.", res);
     if (carrierCallId != ERR_ID) {
         TELEPHONY_LOGI("SetVoIPCallInfo handle cs call sucessed");
         sptr<CallBase> call = GetOneCallObject(carrierCallId);
@@ -1646,8 +1647,8 @@ void CallControlManager::HandleVoipDialing(int32_t callId, const std::string &ph
     info.callDirection = CallDirection::CALL_DIRECTION_OUT;
     AddOneVoipCallObject(info);
     NotifyVoipCallStateUpdated(info, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_DIALING);
-    bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(false);
-    TELEPHONY_LOGI("SetVirtualCall res = %{public}d.", res);
+    bool res = DelayedSingleton<AudioControlManager>GetInstance()->SetRemoteControlEnable(true);
+    TELEPHONY_LOGI("SetRemoteControlEnable res = %{public}d.", res);
 }
 
 void CallControlManager::HandleVoipAlerting(int32_t callId, const std::string &phoneNumber)
@@ -1668,8 +1669,8 @@ void CallControlManager::HandleVoipAlerting(int32_t callId, const std::string &p
         info.callDirection = CallDirection::CALL_DIRECTION_OUT;
         AddOneVoipCallObject(info);
         NotifyVoipCallStateUpdated(info, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_DIALING);
-        bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(false);
-        TELEPHONY_LOGI("SetVirtualCall res = %{public}d.", res);
+        bool res = DelayedSingleton<AudioControlManager>GetInstance()->SetRemoteControlEnable(true);
+        TELEPHONY_LOGI("SetRemoteControlEnable res = %{public}d.", res);
     }
 }
 
@@ -2355,6 +2356,10 @@ void CallControlManager::StartFlashRemind()
             }
         );
     }
+    if (!incomingFlashReminder_.IsFlashRemindNecessary()) {
+        incomingFlashReminder_ = nullptr;
+        return;
+    }
     incomingFlashReminder_->StartFlashRemind();
 }
 
@@ -2381,10 +2386,9 @@ void CallControlManager::ClearFlashReminder()
     incomingFlashReminder_ = nullptr;
 }
 
-bool CallControlManager::SetVirtualCall(bool isVirtual)
+bool CallControlManager::SetRemoteControlEnable(bool isRemoteControlEnable)
 {
-    TELEPHONY_LOGI("Virtualcall SetVirtualCall: %{public}d.", isVirtual);
-    return DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(isVirtual);
+    return DelayedSingleton<AudioControlManager>GetInstance()->SetRemoteControlEnable(isRemoteControlEnable);
 }
 
 void CallControlManager::SetReduceRingToneVolume(bool reduceRingToneVolume)

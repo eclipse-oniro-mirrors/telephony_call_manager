@@ -196,6 +196,7 @@ void CallRecordsHandler::DeleteCallLogForLimit(const CallRecordInfo &info)
 void CallRecordsHandler::MakeCallLogInsertBucket(DataShare::DataShareValuesBucket &bucket,
     const CallRecordInfo &info, std::string displayName, std::string numberLocation)
 {
+    bucket.Put(CALL_TYPE_SATELLITE, info.satelliteCallType);
     bucket.Put(CALL_PHONE_NUMBER, std::string(info.phoneNumber));
     bucket.Put(CALL_DISPLAY_NAME, displayName);
     bucket.Put(CALL_DIRECTION, static_cast<int32_t>(info.directionType));

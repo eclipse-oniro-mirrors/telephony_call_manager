@@ -43,10 +43,12 @@
                 "ability_base",
                 "ability_runtime",
                 "access_token",
+                "api_metrics",
                 "bluetooth",
                 "c_utils",
                 "cellular_data",
                 "common_event_service",
+                "config_policy",
                 "core_service",
                 "cJSON",
                 "data_share",
@@ -102,7 +104,6 @@
                 "service_group": [
                     "//base/telephony/call_manager:tel_call_manager",
                     "//base/telephony/call_manager/sa_profile:call_manager_sa_profile",
-                    "//base/telephony/call_manager/services/deps_adapter:tel_cm_deps_adapter",
                     "//base/telephony/call_manager/services/etc/init:telecom_trust",
                     "//base/telephony/call_manager/services/etc/init:telecom.cfg"
                 ]

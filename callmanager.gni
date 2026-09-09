@@ -15,8 +15,8 @@ declare_args() {
   call_manager_feature_hfp_async_enable = false
   call_manager_feature_not_support_multicall = false
   call_manager_feature_support_dsoftbus = true
-  call_manager_feature_support_rtt = false
   call_manager_feature_support_hearing_aid = true
+  call_manager_feature_support_rtt = false
   call_manager_sos_no_ringback_tone = false
   call_manager_watch_call_blocking = false
   call_manager_thermal_protection = false
@@ -272,6 +272,7 @@ if (defined(global_parts_info) &&
 if (defined(global_parts_info) &&
     defined(global_parts_info.telephony_sms_mms) &&
     global_parts_info.telephony_sms_mms) {
+  call_manager_external_deps += [ "sms_mms:tel_sms_mms_api" ]
   call_manager_defines += [ "ABILITY_SMS_SUPPORT" ]
 }
 
@@ -335,13 +336,28 @@ if (defined(global_parts_info) &&
 if (defined(global_parts_info) &&
     defined(global_parts_info.theme_screenlock_mgr) &&
     global_parts_info.theme_screenlock_mgr) {
+  call_manager_external_deps += [ "screenlock_mgr:screenlock_client" ]
   call_manager_defines += [ "ABILITY_SCREENLOCKMGR_SUPPORT" ]
 }
 
 if (defined(global_parts_info) &&
     defined(global_parts_info.multimedia_camera_framework) &&
     global_parts_info.multimedia_camera_framework) {
+    call_manager_external_deps += [ "camera_framework:camera_framework" ]
 }
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.customization_config_policy) &&
+    global_parts_info.customization_config_policy) {
+  call_manager_external_deps += [ "config_policy:configpolicy_util" ]
+  call_manager_defines += [ "CONFIG_POLICY_ENABLE" ]
+}
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.hiviewdfx_api_meterics)) {
+      call_manager_defines += [ "API_METRICS_SUPPORT" ]
+}
+
 
 if (call_manager_feature_hfp_async_enable) {
   print("Support hfp async enable.")

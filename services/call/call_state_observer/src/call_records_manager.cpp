@@ -301,6 +301,7 @@ void CallRecordsManager::CopyCallInfoToRecord(const CallAttributeInfo &info, Cal
     data.countryCode = DEFAULT_COUNTRY_CODE;
     data.slotId = info.accountId;
     data.callType = info.callType;
+    data.satelliteCallType = info.satelliteCallType;
     data.phoneIndex = info.phoneIndex;
     // use original call type for video call record
     int32_t callFeatures = GetCallFeatures(info);

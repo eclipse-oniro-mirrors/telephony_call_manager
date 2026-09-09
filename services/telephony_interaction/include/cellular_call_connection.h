@@ -212,7 +212,7 @@ public:
      * @param slotId[in], The slot id
      * @return Returns 0 on success, others on failure.
      */
-    int GetCallTransferInfo(CallTransferType type, int32_t slotId);
+    int GetCallTransferInfo(CallTransferType type, int32_t slotId, bool isIncludeCallForwardingNumber);
 
     /**
      * SetCallWaiting

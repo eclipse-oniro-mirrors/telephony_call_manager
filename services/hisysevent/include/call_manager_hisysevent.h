@@ -49,6 +49,7 @@ enum class IncomingCallType {
     IMS_VOICE_INCOMING = 0,
     IMS_VIDEO_INCOMING,
     CS_VOICE_INCOMING,
+    EMC_RESUCE_INCOMING,
 };
 
 class CallManagerHisysevent : public TelephonyHiSysEvent {

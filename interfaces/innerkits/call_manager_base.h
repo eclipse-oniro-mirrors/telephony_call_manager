@@ -860,6 +860,19 @@ enum class PhoneOrWatchDial {
     WATCH_DIAL = 1,
 };
 
+/**
+ * @brief Indicates satellite call type for satellite call.
+ */
+enum class SatCallType {
+    /** Indicates satellite off. */
+    SAT_CALL_TYPE_OFF = 0,
+
+    /** Indicates the tiantong satellite call type. */
+    SAT_CALL_TYPE_TTS = 1,
+
+    /** Indicates the fengxinzi satellite call type. */
+    SAT_CALL_TYPE_FXZ = 2,
+};
 
 /**
  * @brief Indicates RTT call state.

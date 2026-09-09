@@ -17,8 +17,9 @@
 #define TELEPHONY_RTT_CALL_LISTENER_H
 
 #include <cstdint>
-
+#ifdef ABILITY_SMS_SUPPORT
 #include "call_state_listener_base.h"
+#endif
 #include "ims_call.h"
 
 namespace OHOS {

@@ -57,6 +57,7 @@ constexpr const char *CALL_CONTENT_TYPE = "content_type";
 constexpr const char *CALL_PHONE = "phone";
 constexpr const char *CALL_SLOT_ID = "slot_id";
 constexpr const char *CALL_FEATURES = "features";
+constexpr const char *CALL_TYPE_SATELLITE = "hw_is_satellite";
 constexpr const char *CALL_MARK_TYPE = "mark_type";
 constexpr const char *CALL_MARK_CONTENT = "mark_content";
 constexpr const char *CALL_IS_CLOUD_MARK = "is_cloud_mark";

@@ -811,8 +811,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_002, TestSize.Level0)
     ASSERT_NE(callControlManager->SetCallRestriction(INVALID_CALLID, callRestrictionInfo), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->SetCallRestriction(slotId, callRestrictionInfo), TELEPHONY_SUCCESS);
     CallTransferType callTransferType = CallTransferType::TRANSFER_TYPE_BUSY;
-    ASSERT_NE(callControlManager->GetCallTransferInfo(INVALID_CALLID, callTransferType), TELEPHONY_SUCCESS);
-    ASSERT_NE(callControlManager->GetCallTransferInfo(slotId, callTransferType), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->GetCallTransferInfo(INVALID_CALLID, callTransferType, true), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->GetCallTransferInfo(slotId, callTransferType, true), TELEPHONY_SUCCESS);
     CallTransferInfo info;
     ASSERT_NE(callControlManager->SetCallTransferInfo(INVALID_CALLID, info), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->SetCallTransferInfo(slotId, info), TELEPHONY_SUCCESS);
@@ -866,8 +866,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_003, TestSize.Level0)
     ASSERT_NE(callControlManager->SetCallRestriction(INVALID_CALLID, callRestrictionInfo), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->SetCallRestriction(SIM1_SLOTID, callRestrictionInfo), TELEPHONY_SUCCESS);
     CallTransferType callTransferType = CallTransferType::TRANSFER_TYPE_BUSY;
-    ASSERT_NE(callControlManager->GetCallTransferInfo(INVALID_CALLID, callTransferType), TELEPHONY_SUCCESS);
-    ASSERT_NE(callControlManager->GetCallTransferInfo(SIM1_SLOTID, callTransferType), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->GetCallTransferInfo(INVALID_CALLID, callTransferType, true), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->GetCallTransferInfo(SIM1_SLOTID, callTransferType, true), TELEPHONY_SUCCESS);
     CallTransferInfo callTransferInfo;
     ASSERT_NE(callControlManager->SetCallTransferInfo(INVALID_CALLID, callTransferInfo), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->SetCallTransferInfo(SIM1_SLOTID, callTransferInfo), TELEPHONY_SUCCESS);
@@ -1000,7 +1000,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_005, TestSize.Level0)
     callControlManager->SetVoIPCallState(3);
     callControlManager->SetVoIPCallState(2);
     callControlManager->DisconnectAllCalls();
-    callControlManager->SetVirtualCall(true);
+    callControlManager->SetRemoteControlEnable(true);
     callControlManager->PreloadCallUi(true, callingPid);
     callControlManager->PreloadCallUi(false, callingPid);
     callControlManager->SetRegMmiCodeCallbackState(true);
@@ -1306,7 +1306,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_012, Function | MediumTes
     EXPECT_EQ(callControlManager->SetCallRestriction(-1, restrictionInfo), CALL_ERR_INVALID_SLOT_ID);
     EXPECT_EQ(callControlManager->SetCallRestrictionPassword(-1, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING,
         "", ""), CALL_ERR_INVALID_SLOT_ID);
-    EXPECT_EQ(callControlManager->GetCallTransferInfo(-1, CallTransferType::TRANSFER_TYPE_UNCONDITIONAL),
+    EXPECT_EQ(callControlManager->GetCallTransferInfo(-1, CallTransferType::TRANSFER_TYPE_UNCONDITIONAL, true),
         CALL_ERR_INVALID_SLOT_ID);
     CallTransferInfo callTransferInfo;
     EXPECT_EQ(callControlManager->SetCallTransferInfo(-1, callTransferInfo), CALL_ERR_INVALID_SLOT_ID);

@@ -741,7 +741,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CellularCallConnection_001, Function | Mediu
     ASSERT_NE(cellularCallConnection->StartDtmf('a', mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(cellularCallConnection->StopDtmf(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(cellularCallConnection->GetCallTransferInfo(
-        CallTransferType::TRANSFER_TYPE_BUSY, 0), TELEPHONY_ERR_SUCCESS);
+        CallTransferType::TRANSFER_TYPE_BUSY, 0, true), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(cellularCallConnection->SetCallWaiting(true, 0), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(cellularCallConnection->GetCallWaiting(0), TELEPHONY_ERR_SUCCESS);
     CallRestrictionInfo mCallRestrictionInfo;

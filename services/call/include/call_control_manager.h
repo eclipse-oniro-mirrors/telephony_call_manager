@@ -112,7 +112,7 @@ public:
     int32_t SetCallRestriction(int32_t slotId, CallRestrictionInfo &info);
     int32_t SetCallRestrictionPassword(
         int32_t slotId, CallRestrictionType fac, const char *oldPassword, const char *newPassword);
-    int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type);
+    int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type, bool isIncludeCallForwardingNumber);
     int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info);
     int32_t CanSetCallTransferTime(int32_t slotId, bool &result);
     int32_t SetCallPreferenceMode(int32_t slotId, int32_t mode);
@@ -182,7 +182,7 @@ public:
     void SetRegMmiCodeCallbackState(bool isReg);
     void StopFlashRemind();
     void ClearFlashReminder();
-    bool SetVirtualCall(bool isVirtual);
+    bool SetRemoteControlEnable(bool isRemoteControlEnable);
 #ifdef NOT_SUPPORT_MULTICALL
     bool HangUpOtherCall(int32_t answerCallId);
     void HangUpOtherCallByAnswerCallID(int32_t answerCallId, bool autoAnswerState = false);

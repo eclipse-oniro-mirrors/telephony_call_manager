@@ -51,6 +51,7 @@ constexpr int32_t VOICE_TYPE = 0;
 constexpr int32_t CRS_TYPE = 2;
 constexpr int32_t CALL_ENDED_PLAY_TIME = 300;
 constexpr uint64_t UNMUTE_SOUNDTONE_DELAY_TIME = 500000;
+constexpr int32_t WAIT_TONE_STOPPED_TIME = 1000; // ms
 const int16_t MIN_MULITY_ACTIVE_CALL_COUNT = 1;
 const int16_t MIN_DC_MULITY_ACTIVE_CALL_COUNT = 2;
 const int32_t AUDIO_EVENT_MUTED_RINGTONE = 4;
@@ -955,6 +956,20 @@ bool AudioControlManager::IsSystemVideoRing(sptr<CallBase> &callObjectPtr)
     }
 }
 
+bool AudioControlManager::SetRemoteControlEnable(bool isRemoteControlEnable)
+{
+    bool res = AudioStandard::AudioSystemManager::GetInstance()->SetVirtualCall(!isRemoteControlEnable);
+    TELEPHONY_LOGI("SetRemoteControlEnable: %{public}d, res: %{public}d.", isRemoteControlEnable, res);
+    return res;
+}
+
+bool AudioControlManager::GetRemoteControlEnable()
+{
+    bool isRemoteControlEnable = !AudioStandard::AudioSystemManager::GetInstance()->GetVirtualCall();
+    TELEPHONY_LOGI("GetRemoteControlEnable res: %{public}d.", isRemoteControlEnable);
+    return isRemoteControlEnable;
+}
+
 bool AudioControlManager::PlayRingtone()
 {
     if (!ShouldPlayRingtone()) {
@@ -1221,6 +1236,15 @@ bool AudioControlManager::StopSoundtone()
         TELEPHONY_LOGE("sound_ is nullptr");
         return false;
     }
+    {
+        std::unique_lock<ffrt::recursive_mutex> lock(toneStateLock_);
+        while (toneState_ != ToneState::STOPPED) {
+            if (toneStateCv_.wait_for(lock, std::chrono::milliseconds(WAIT_TONE_STOPPED_TIME)) ==
+                std::cv_status::timeout) {
+                break;
+            }
+        }
+    }
     DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(false);
     if (sound_->Stop() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("stop soundtone failed");
@@ -1478,12 +1502,22 @@ void AudioControlManager::PlayCallEndedTone()
         return;
     }
     toneState_ = ToneState::CALLENDED;
-    std::this_thread::sleep_for(std::chrono::milliseconds(CALL_ENDED_PLAY_TIME));
-    toneState_ = ToneState::TONEING;
-    if (StopCallTone() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("stop call ended tone failed");
-        return;
-    }
+    lock.unlock();
+
+    std::weak_ptr<AudioControlManager> weakPtr = shared_from_this();
+    ffrt::submit([weakPtr]() {
+        std::shared_ptr<AudioControlManager> audioControlPtr = weakPtr.lock();
+        if (audioControlPtr == nullptr) {
+            return;
+        }
+        std::lock_guard<ffrt::recursive_mutex> lock(audioControlPtr->toneStateLock_);
+        std::this_thread::sleep_for(std::chrono::milliseconds(CALL_ENDED_PLAY_TIME));
+        toneState_ = ToneState::TONEING;
+        if (StopCallTone() != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("stop call ended tone failed");
+            return;
+        }
+    });
 }
 
 void AudioControlManager::HandleNotNormalRingerMode()
@@ -1618,25 +1652,28 @@ int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
 int32_t AudioControlManager::StopCallTone()
 {
     TELEPHONY_LOGI("stop call tone enter");
-    std::lock_guard<std::recursive_mutex> lock(toneStateLock_);
-    if (toneState_ == ToneState::STOPPED) {
-        TELEPHONY_LOGI("tone is already stopped");
-        return TELEPHONY_SUCCESS;
+    {
+        std::lock_guard<std::recursive_mutex> lock(toneStateLock_);
+        if (toneState_ == ToneState::STOPPED) {
+            TELEPHONY_LOGI("tone is already stopped");
+            return TELEPHONY_SUCCESS;
+        }
+        if (toneState_ == ToneState::CALLENDED) {
+            TELEPHONY_LOGE("call ended tone is running");
+            return CALL_ERR_AUDIO_TONE_STOP_FAILED;
+        }
+        if (tone_ == nullptr) {
+            TELEPHONY_LOGE("tone_ is nullptr");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        if (tone_->Stop() != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("stop calltone failed");
+            return CALL_ERR_AUDIO_TONE_STOP_FAILED;
+        }
+        tone_->ReleaseRenderer();
+        toneState_ = ToneState::STOPPED;
     }
-    if (toneState_ == ToneState::CALLENDED) {
-        TELEPHONY_LOGE("call ended tone is running");
-        return CALL_ERR_AUDIO_TONE_STOP_FAILED;
-    }
-    if (tone_ == nullptr) {
-        TELEPHONY_LOGE("tone_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (tone_->Stop() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("stop calltone failed");
-        return CALL_ERR_AUDIO_TONE_STOP_FAILED;
-    }
-    tone_->ReleaseRenderer();
-    toneState_ = ToneState::STOPPED;
+    toneStateCv_.notify_one();
     TELEPHONY_LOGI("stop call tone success");
     return TELEPHONY_SUCCESS;
 }
