@@ -413,7 +413,7 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
             INVALID_PARAMETER, callId, TELEPHONY_ERR_LOCAL_PTR_NULL, "Reject call is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (callId == INVALID_CALLID) { 
+    if (callId == INVALID_CALLID) {
         callId = call->GetCallID();
     }
 
