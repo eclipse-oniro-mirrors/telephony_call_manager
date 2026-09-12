@@ -148,6 +148,7 @@ private:
     int32_t OnSetCallAudioMode(MessageParcel &data, MessageParcel &reply);
     int32_t OnAcceptCallNoParam(MessageParcel &data, MessageParcel &reply);
     int32_t OnRejectCallNoParam(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRejectCallWithType(MessageParcel &data, MessageParcel &reply);
     int32_t OnHangUpCallNoParam(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetTransferNumberByNumber(MessageParcel &data, MessageParcel &reply);
 

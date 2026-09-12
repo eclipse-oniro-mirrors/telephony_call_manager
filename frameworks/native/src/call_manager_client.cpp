@@ -945,6 +945,16 @@ int32_t CallManagerClient::RejectCall()
     }
 }
 
+int32_t CallManagerClient::RejectCall(RejectType rejectType)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->RejectCall(rejectType);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t CallManagerClient::HangUpCall()
 {
     if (g_callManagerProxy != nullptr) {

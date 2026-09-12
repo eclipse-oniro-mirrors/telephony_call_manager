@@ -30,6 +30,18 @@
 #include "call_manager_info.h"
 
 namespace OHOS::Telephony {
+namespace {
+void TestRejectCall(const sptr<IRemoteObject> &remote, int32_t expected)
+{
+    CallManagerServiceProxy proxy(remote);
+    std::u16string textMessage = u"test";
+    EXPECT_EQ(proxy.RejectCall(0, false, textMessage), expected);
+    EXPECT_EQ(proxy.RejectCall(0, true, textMessage), expected);
+    EXPECT_EQ(proxy.RejectCall(), expected);
+    EXPECT_EQ(proxy.RejectCall(RejectType::CALL_REJECT_NORMAL), expected);
+    EXPECT_EQ(proxy.RejectCall(RejectType::CALL_REJECT_MISSED_CALL), expected);
+}
+} // namespce
 using namespace testing::ext;
 class SpecialBranch3Test : public testing::Test {
 public:
@@ -202,6 +214,39 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_003, TestSize.Lev
     EXPECT_NE(proxy.SendRttMessage(callId, message), TELEPHONY_SUCCESS);
     EXPECT_NE(proxy.SetRttCapability(slotId, isEnable), TELEPHONY_SUCCESS);
 #endif
+}
+
+/**
+ * @tc.number   Telephony_CallManagerServiceProxy_004
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_004, TestSize.Level1)
+{
+    sptr<IRemoteObject> impl;
+    TestRejectCall(impl, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerServiceProxy_005
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_005, TestSize.Level1)
+{
+    sptr<MockRemoteObject> remote = new MockRemoteObject(-1);
+    TestRejectCall(remote, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerServiceProxy_006
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_006, TestSize.Level1)
+{
+    sptr<MockRemoteObject> remote = new MockRemoteObject(0);
+    TestRejectCall(remote, TELEPHONY_SUCCESS);
 }
 
 /**

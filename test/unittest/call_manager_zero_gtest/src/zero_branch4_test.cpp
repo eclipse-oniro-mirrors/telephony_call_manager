@@ -774,6 +774,18 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_002, TestSize.Level0)
     ASSERT_GT(callManagerClient->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_ERROR);
 }
 
+/**
+ * @tc.number   Telephony_CallManagerClient_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_004, TestSize.Level0)
+{
+    std::shared_ptr<CallManagarClient> callManagerClient = std::make_shared<CallManagarClient>();
+    callManagerClient->UnInit();
+    EXPECT_EQ(callManagerClient->RejectCall(RejectType::CALL_REJECT_NORMAL), TELEPHONY_ERR_UNINIT);
+}
+
 #ifdef SUPPORT_RTT_CALL
 /**
  * @tc.number   Telephony_CallManagerClient_003

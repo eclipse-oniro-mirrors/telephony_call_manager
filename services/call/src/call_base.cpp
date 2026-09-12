@@ -132,7 +132,11 @@ int32_t CallBase::AnswerCallBase()
 int32_t CallBase::RejectCallBase()
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    answerType_ = CallAnswerType::CALL_ANSWER_REJECT;
+    if (isRejectTypeMissed_) {
+        answerType_ = CallAnswerType::CALL_ANSWER_MISSED;
+    } else {
+        answerType_ = CallAnswerType::CALL_ANSWER_REJECT;
+    }
     return TELEPHONY_SUCCESS;
 }
 
@@ -603,6 +607,12 @@ void CallBase::SetAnswerType(CallAnswerType answerType)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
     answerType_ = answerType;
+}
+
+void CallBase::SetRejectTypeMissed(bool flag)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    isRejectTypeMissed_ = flag;
 }
 
 CallAnswerType CallBase::GetAnswerType()

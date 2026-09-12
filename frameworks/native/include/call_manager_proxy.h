@@ -146,6 +146,7 @@ public:
     int32_t SetCallAudioMode(int32_t mode, int32_t scenarios);
     int32_t AnswerCall();
     int32_t RejectCall();
+    int32_t RejectCall(RejectType rejectType);
     int32_t HangUpCall();
     int32_t GetCallTransferInfo(const std::string number, CallTransferType type);
 

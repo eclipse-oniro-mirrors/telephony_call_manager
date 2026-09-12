@@ -1381,5 +1381,45 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_003, TestSize.Level0)
     data.RewindRead(0);
     ASSERT_EQ(callStatusCallback->OnUpdateCallReportInfo(data, reply), TELEPHONY_SUCCESS);
 }
+
+/**
+ * @tc.number   ZeroBranch5Test_CallManagerProxy_RejectCallWithType_Normal
+ * @tc.name     CallManagerProxy_RejectCallWithType_Normal
+ * @tc.desc     When IPC call succeeds with CALL_REJECT_NORMAL, return TELEPHONY_SUCCESS
+ */
+HWTEST_F(ZeroBranch5Test, CallManagerProxy_RejectCallWithType_Normal, Function | MediumTest | Level1)
+{
+    auto proxy = DelayedSingleton<CallManagerProxy>::GetInstance();
+    EXPECT_NE(proxy, nullptr);
+    auto originalService = proxy->callManagerServicePtr_;
+    sptr<MockICallManagerService> mockService = new MockICallManagerService();
+    EXPECT_NE(mockService, nullptr);
+    EXPECT_CALL(*mockService, RejectCall(RejectType::CALL_REJECT_NORMAL))
+        .WillOnce(testing::Return(TELEPHONY_SUCCESS));
+    proxy->callManagerServicePtr_ = mockService;
+    int32_t result = proxy->RejectCall(RejectType::CALL_REJECT_NORMAL);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+    proxy->callManagerServicePtr_ = originalService;
+}
+
+/**
+ * @tc.number   ZeroBranch5Test_CallManagerProxy_RejectCallWithType_IpcFail
+ * @tc.name     CallManagerProxy_RejectCallWithType_IpcFail
+ * @tc.desc     When IPC call fails, error code is returned directly without retry
+ */
+HWTEST_F(ZeroBranch5Test, CallManagerProxy_RejectCallWithType_IpcFail, Function | MediumTest | Level1)
+{
+    auto proxy = DelayedSingleton<CallManagerProxy>::GetInstance();
+    EXPECT_NE(proxy, nullptr);
+    auto originalService = proxy->callManagerServicePtr_;
+    sptr<MockICallManagerService> mockService = new MockICallManagerService();
+    EXPECT_NE(mockService, nullptr);
+    EXPECT_CALL(*mockService, RejectCall(RejectType::CALL_REJECT_NORMAL))
+        .WillOnce(testing::Return(TELEPHONY_ERR_PERMISSION_ERR));
+    proxy->callManagerServicePtr_ = mockService;
+    int32_t result = proxy->RejectCall(RejectType::CALL_REJECT_NORMAL);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    proxy->callManagerServicePtr_ = originalService;
+}
 } // namespace Telephony
 } // namespace OHOS
