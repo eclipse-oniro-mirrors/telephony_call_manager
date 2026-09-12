@@ -294,7 +294,7 @@ HWTEST_F(CallManagerServiceTest, CallManagerService_RejectCall_0400, TestSize.Le
  * @tc.name     test RejectCall with reject type without reject permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerServiceTest, CallManagerService_RejectCall_0400, TestSize.Level1)
+HWTEST_F(CallManagerServiceTest, CallManagerService_RejectCall_0500, TestSize.Level1)
 {
     SystemAppNoRejectPermToken token;
     int32_t ret = service_->RejectCall(RejectType::CALL_REJECT_MISSED_CALL);
