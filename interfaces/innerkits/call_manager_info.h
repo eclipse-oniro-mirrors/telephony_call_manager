@@ -972,7 +972,7 @@ enum class CallRestrictionMode {
 /**
  * @brief Indicates the type of call reject.
  */
- enum class RejectType {
+enum class RejectType {
     /**
      * Indicates call reject is normal.
      */
@@ -981,7 +981,7 @@ enum class CallRestrictionMode {
      * Indicates call reject but add missed call log.
      */
     CALL_REJECT_MISSED_CALL,
- };
+};
 
 /**
  * @brief Indicates the information of call restriction.
