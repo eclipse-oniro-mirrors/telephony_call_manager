@@ -37,8 +37,8 @@ HapInfoParams rejectInfoParamsFalse = {
 };
 
 PermissionDef testRejectPlaceCallDef = {
-    .permission = "ohos.permission.PLACE_CALL",
-    .bundlename = "tel_call_manager_service_gtest",
+    .permissionName = "ohos.permission.PLACE_CALL",
+    .bundleName = "tel_call_manager_service_gtest",
     .grantMode = 1,
     .label = "label",
     .labelId = 1,
