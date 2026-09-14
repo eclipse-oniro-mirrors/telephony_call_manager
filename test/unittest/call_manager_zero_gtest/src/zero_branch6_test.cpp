@@ -62,6 +62,7 @@
 #include "voip_call.h"
 #include "call_manager_proxy.h"
 #include "call_manager_service.h"
+#include "i_call_manager_service_mock.h"
 #include "accesstoken_kit.h"
 #include "token_setproc.h"
 #include "nativetoken_kit.h"
