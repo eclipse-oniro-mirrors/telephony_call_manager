@@ -435,7 +435,7 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
     }
     if (rejectType == RejectType::CALL_REJECT_MISSED_CALL) {
         TELEPHONY_LOGI("reject call and mark it as missed call");
-        call->SetRejectTypeMissed(true);
+        call->SetRejectType(rejectType);
         if (missedCallNotification_ != nullptr) {
             missedCallNotification_->PublishMissedCallEvent(call);
         }
