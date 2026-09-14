@@ -100,7 +100,7 @@ public:
     void SetRingBeginTime(time_t ringBeginTime);
     void SetRingEndTime(time_t ringEndTime);
     void SetAnswerType(CallAnswerType answerType);
-    void SetRejectTypeMissed(bool flag);
+    void SetRejectType(RejectType rejectType);
     time_t GetCallCreateTime();
     CallAnswerType GetAnswerType();
     void SetCallId(int32_t callId);
@@ -237,7 +237,7 @@ private:
     int32_t imsDomain_ = 0;
     bool isMicDisabled_;
     bool isApCauseReported_{false};
-    bool isRejectTypeMissed_{false};
+    RejectType rejectType_;
 };
 } // namespace Telephony
 } // namespace OHOS
