@@ -321,16 +321,11 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBase_RejectType_001, Function | MediumTe
 {
     DialParaInfo info;
     sptr<CallBase> rejectCall = new IMSCall(info);
-    EXPECT_FALSE(rejectCall->isRejectTypeMissed_);
     EXPECT_EQ(rejectCall->RejectCallBase(), TELEPHONY_SUCCESS);
     EXPECT_EQ(rejectCall->GetAnswerType(), CallAnswerType::CALL_ANSWER_REJECT);
-    rejectCall->SetRejectTypeMissed(true);
-    EXPECT_TRUE(rejectCall->isRejectTypeMissed_);
+    rejectCall->SetRejectType(RejectType::CALL_REJECT_MISSED_CALL);
     EXPECT_EQ(rejectCall->RejectCallBase(), TELEPHONY_SUCCESS);
     EXPECT_EQ(rejectCall->GetAnswerType(), CallAnswerType::CALL_ANSWER_MISSED);
-    rejectCall->SetRejectTypeMissed(false);
-    EXPECT_EQ(rejectCall->RejectCallBase(), TELEPHONY_SUCCESS);
-    EXPECT_EQ(rejectCall->GetAnswerType(), CallAnswerType::CALL_ANSWER_REJECT);
 }
 
 static bool g_receiveUnknownEvent = false;
