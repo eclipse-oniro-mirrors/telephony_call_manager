@@ -108,7 +108,6 @@ void CallManagerServiceStub::InitCallBasicRequest()
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REJECT_CALL_WITH_TYPE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnRejectCallWithType(data, reply); };
 }
-}
 
 void CallManagerServiceStub::InitCallUtilsRequest()
 {
