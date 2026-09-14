@@ -781,7 +781,7 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_002, TestSize.Level0)
  */
 HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_004, TestSize.Level0)
 {
-    std::shared_ptr<CallManagarClient> callManagerClient = std::make_shared<CallManagarClient>();
+    std::shared_ptr<CallManagerClient> callManagerClient = std::make_shared<CallManagerClient>();
     callManagerClient->UnInit();
     EXPECT_EQ(callManagerClient->RejectCall(RejectType::CALL_REJECT_NORMAL), TELEPHONY_ERR_UNINIT);
 }
