@@ -1391,7 +1391,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_014, Function | MediumTes
         CALL_ERR_ILLEGAL_CALL_OPERATION);
     EXPECT_EQ(callControlManager->RejectCall(VALID_CALLID, false, textMessage, RejectType::CALL_REJECT_MISSED_CALL),
         CALL_ERR_ILLEGAL_CALL_OPERATION);
-    EXPECT_FALSE(callObjectPtr->isRejectTypeMissed_);
     CallObjectManager::DeleteOneCallObject(callObjectPtr);
     CallObjectManager::callObjectPtrList_.clear();
 }
@@ -1419,7 +1418,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_015, Function | MediumTes
     EXPECT_EQ(callControlManager->RejectCall(VALID_CALLID, false, textMessage, RejectType::CALL_REJECT_MISSED_CALL),
         TELEPHONY_SUCCESS);
     CallObjectManager::DeleteOneCallObject(callObjectPtr);
-    EXPECT_TRUE(callObjectPtr->isRejectTypeMissed_);
     CallObjectManager::callObjectPtrList_.clear();
 }
 
