@@ -126,6 +126,8 @@ private:
     int32_t ReportSetRestrictionPassword(AppExecFwk::PacMap &resultInfo);
     int32_t ReportGetTransferInfo(AppExecFwk::PacMap &resultInfo);
     int32_t ReportSetTransferInfo(AppExecFwk::PacMap &resultInfo);
+    static void AddCallbackRef(EventCallback& callback);
+    static void RemoveCallbackRef(EventCallback& callback);
     static void ReportWaitAndLimitInfoWork(uv_work_t *work, int32_t status);
     static void ReportWaitAndLimitInfo(AppExecFwk::PacMap &resultInfo, EventCallback supplementInfo);
     static void ReportSupplementInfoWork(uv_work_t *work, int32_t status);
