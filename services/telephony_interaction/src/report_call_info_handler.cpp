@@ -323,7 +323,6 @@ void ReportCallInfoHandler::ProcessCallReportDetails(const CallDetailsInfo &info
         imsCall->SetRttState(detailInfo.rttState);
     }
 #endif
-    return TELEPHONY_SUCCESS;
 }
 
 int32_t ReportCallInfoHandler::UpdateDisconnectedCause(const DisconnectedDetails &details)
