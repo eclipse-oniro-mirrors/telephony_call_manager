@@ -84,7 +84,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBroadcastSubscriber_001, TestSize.Level0
     subscriber.ConnectCallUiSuperPrivacyModeBroadcast(eventData);
     subscriber.UpdateBluetoothDeviceName(eventData);
     subscriber.UpdateNearlinkDeviceName(eventData);
-    subscriber.ConnectCallUiUserSwitchedBroadcast(eventData);
+    subscriber.HandleUserSwicth(eventData);
     ASSERT_NE(sizeof(eventData), 0);
 }
 

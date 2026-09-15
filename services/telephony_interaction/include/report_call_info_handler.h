@@ -43,6 +43,7 @@ public:
 
 private:
     void BuildCallDetailsInfo(CallDetailsInfo &info, CallDetailsInfo &callDetailsInfo);
+    void ProcessCallReportDetails(const CallDetailsInfo &info, const CallDetailInfo &detailInfo);
 #ifdef NOT_SUPPORT_MULTICALL
     void DisconnectBtCallWhenPhoneAnswered(const CallDetailInfo &info);
 #endif

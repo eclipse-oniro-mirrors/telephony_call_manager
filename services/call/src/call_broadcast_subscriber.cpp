@@ -52,7 +52,7 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
     memberFuncMap_[NEARLINK_REMOTEDEVICE_NAME_UPDATE] =
         [this](const EventFwk::CommonEventData &data) { UpdateNearlinkDeviceName(data); };
     memberFuncMap_[USER_SWITCHED] =
-        [this](const EventFwk::CommonEventData &data) { ConnectCallUiUserSwitchedBroadcast(data); };
+        [this](const EventFwk::CommonEventData &data) { HandleUserSwicth(data); };
     memberFuncMap_[SHUTDOWN] =
         [this](const EventFwk::CommonEventData &data) { ShutdownBroadcast(data); };
     memberFuncMap_[HSDR_EVENT] =
@@ -197,8 +197,9 @@ void CallBroadcastSubscriber::UpdateNearlinkDeviceName(const EventFwk::CommonEve
     DelayedSingleton<AudioDeviceManager>::GetInstance()->UpdateNearlinkDeviceName(macAddress, deviceName);
 }
 
-void CallBroadcastSubscriber::ConnectCallUiUserSwitchedBroadcast(const EventFwk::CommonEventData &data)
+void CallBroadcastSubscriber::HandleUserSwicth(const EventFwk::CommonEventData &data)
 {
+    CallStatusManager::ResetUserSetupCompleteValue(DEVICE_PROVISION_UNDEF);
     if (!DelayedSingleton<CallConnectAbility>::GetInstance()->GetConnectFlag()) {
         TELEPHONY_LOGE("is not connected");
         return;

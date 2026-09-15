@@ -61,7 +61,7 @@ private:
     void ConnectCallUiSuperPrivacyModeBroadcast(const EventFwk::CommonEventData &data);
     void UpdateBluetoothDeviceName(const EventFwk::CommonEventData &data);
     void UpdateNearlinkDeviceName(const EventFwk::CommonEventData &data);
-    void ConnectCallUiUserSwitchedBroadcast(const EventFwk::CommonEventData &data);
+    void HandleUserSwicth(const EventFwk::CommonEventData &data);
     void ShutdownBroadcast(const EventFwk::CommonEventData &data);
     void HsdrEventBroadcast(const EventFwk::CommonEventData &data);
     void HfpConnectBroadcast(const EventFwk::CommonEventData &data);

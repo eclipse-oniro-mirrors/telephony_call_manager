@@ -263,11 +263,39 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
         TELEPHONY_LOGE("callStatusManagerPtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+ 
+    CallDetailInfo detailInfo;
+    detailInfo.state = TelCallState::CALL_STATUS_UNKNOWN;
+    for (const auto &callDetail : info.callVec) {
+        detailInfo.callType = callDetail.callType;
+        detailInfo.accountId = callDetail.accountId;
+        detailInfo.state = callDetail.state;
+        detailInfo.callMode = callDetail.callMode;
+#ifdef SUPPORT_RTT_CALL
+        detailInfo.index = callDetail.index;
+        detailInfo.rttState = callDetail.rttState;
+#endif
+    }
 
+    if (CallStatusManager::GetDevProvisioned() != DEVICE_PROVISION_VALID ||
+        CallStatusManager::GetDevUserSetupCompleteValue() != DEVICE_PROVISION_VALID) {
+        sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(detailInfo.index);
+        CallManagerHisysevent::ReportCallDropChrEvent(info.slotId, detailInfo.index, DROP_CALL_BY_OOBE);
+        call->SetApCauseReported(true);
+        TELEPHONY_LOGE("UpdateCallsReportInfo call not report in OOBE");
+        return TELEPHONY_SUCCESS;
+    }
+
+    ProcessCallReportDetails(info, detailInfo);
+    return TELEPHONY_SUCCESS;
+}
+
+void ReportCallInfoHandler::ProcessCallReportDetails(const CallDetailsInfo &info, const CallDetailInfo &detailInfo)
+{
     CallDetailsInfo callDetailsInfo;
     callDetailsInfo.slotId = info.slotId;
     (void)memcpy_s(callDetailsInfo.bundleName, kMaxBundleNameLen, info.bundleName, kMaxBundleNameLen);
-    BuildCallDetailsInfo(info, callDetailsInfo);
+    BuildCallDetailsInfo(const_cast<CallDetailsInfo &>(info), callDetailsInfo);
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
     TELEPHONY_LOGW("UpdateCallsReportInfo submit task enter");
     reportCallInfoQueue.submit([callStatusManagerPtr, callDetailsInfo]() {
@@ -282,24 +310,12 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
         }
     });
 
-    CallDetailInfo detailInfo;
-    detailInfo.state = TelCallState::CALL_STATUS_UNKNOWN;
-    std::vector<CallDetailInfo>::iterator it = info.callVec.begin();
-    for (; it != info.callVec.end(); ++it) {
-        detailInfo.callType = (*it).callType;
-        detailInfo.accountId = (*it).accountId;
-        detailInfo.state = (*it).state;
-        detailInfo.callMode = (*it).callMode;
-#ifdef SUPPORT_RTT_CALL
-        detailInfo.index = (*it).index;
-        detailInfo.rttState = (*it).rttState;
-#endif
-    }
     if (detailInfo.state == TelCallState::CALL_STATUS_INCOMING) {
         CallManagerHisysevent::WriteIncomingCallFaultEvent(info.slotId, static_cast<int32_t>(detailInfo.callType),
             static_cast<int32_t>(detailInfo.callMode), CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE,
             "ID HANDLER_UPDATE_CALL_INFO_LIST");
     }
+
 #ifdef SUPPORT_RTT_CALL
     sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(detailInfo.index);
     if (call != nullptr) {

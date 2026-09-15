@@ -500,7 +500,6 @@ void DataShareReadyEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 #ifdef SUPPORT_MUTE_BY_DATABASE
         InteroperableSettingsHandler::RegisterObserver();
 #endif
-        CallStatusManager::RegisterObserver();
     }
 }
 
