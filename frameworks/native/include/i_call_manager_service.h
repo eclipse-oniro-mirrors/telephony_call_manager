@@ -139,6 +139,7 @@ public:
     virtual int32_t SetCallAudioMode(int32_t mode, int32_t scenarios) = 0;
     virtual int32_t AnswerCall() = 0;
     virtual int32_t RejectCall() = 0;
+    virtual int32_t RejectCall(RejectType rejectType) = 0;
     virtual int32_t HangUpCall() = 0;
     virtual int32_t GetCallTransferInfo(const std::string number, CallTransferType type) = 0;
     virtual bool CheckCallRecordingPermission(const std::string& cellularRecordPhoneNum,

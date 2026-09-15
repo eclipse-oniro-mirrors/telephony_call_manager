@@ -45,7 +45,7 @@ CallBase::CallBase(DialParaInfo &info)
       blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams), isAnswered_(false),
       detectDetails_(""), phoneOrWatch_(info.phoneOrWatch), isCustomAccessibility_(info.isCustomAccessibility),
       token_(info.token), isAiAutoAnswer_(false), isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox),
-      imsDomain_(0), isMicDisabled_(false)
+      imsDomain_(0), isMicDisabled_(false), rejectType_(RejectType::CALL_REJECT_NORMAL)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -64,7 +64,8 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1),
       extraParams_(info.extraParams), isAnswered_(false), detectDetails_(""), phoneOrWatch_(info.phoneOrWatch),
       isCustomAccessibility_(info.isCustomAccessibility), token_(info.token), isAiAutoAnswer_(false),
-      isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox), imsDomain_(0), isMicDisabled_(false)
+      isForcedReportVoiceCall_(false), newCallUseBox_(info.newCallUseBox), imsDomain_(0), isMicDisabled_(false),
+      rejectType_(RejectType::CALL_REJECT_NORMAL)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -132,7 +133,11 @@ int32_t CallBase::AnswerCallBase()
 int32_t CallBase::RejectCallBase()
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    answerType_ = CallAnswerType::CALL_ANSWER_REJECT;
+    if (rejectType_ == RejectType::CALL_REJECT_MISSED_CALL) {
+        answerType_ = CallAnswerType::CALL_ANSWER_MISSED;
+    } else {
+        answerType_ = CallAnswerType::CALL_ANSWER_REJECT;
+    }
     return TELEPHONY_SUCCESS;
 }
 
@@ -603,6 +608,12 @@ void CallBase::SetAnswerType(CallAnswerType answerType)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
     answerType_ = answerType;
+}
+
+void CallBase::SetRejectType(RejectType rejectType)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    rejectType_ = rejectType;
 }
 
 CallAnswerType CallBase::GetAnswerType()

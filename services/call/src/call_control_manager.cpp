@@ -399,20 +399,21 @@ int32_t CallControlManager::CarrierAndVoipConflictProcess(int32_t callId, TelCal
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage)
+int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage,
+                                       RejectType rejectType)
 {
     if (CallRequestHandlerPtr_ == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
+    sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("call is nullptr");
+        CallManagerHisysevent::WriteHangUpFaultEvent(
+            INVALID_PARAMETER, callId, TELEPHONY_ERR_LOCAL_PTR_NULL, "Reject call is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     if (callId == INVALID_CALLID) {
-        sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-        if (call == nullptr) {
-            TELEPHONY_LOGE("call is nullptr");
-            CallManagerHisysevent::WriteHangUpFaultEvent(
-                INVALID_PARAMETER, callId, TELEPHONY_ERR_LOCAL_PTR_NULL, "Reject call is nullptr");
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
         callId = call->GetCallID();
     }
 
@@ -431,6 +432,13 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RejectCall failed!");
         return ret;
+    }
+    if (rejectType == RejectType::CALL_REJECT_MISSED_CALL) {
+        TELEPHONY_LOGI("reject call and mark it as missed call");
+        call->SetRejectType(rejectType);
+        if (missedCallNotification_ != nullptr) {
+            missedCallNotification_->PublishMissedCallEvent(call);
+        }
     }
     CallManagerHisysevent::WriteVoipCallStatisticalEvent(callId, "MtBannerReject");
     ReportPhoneUEInSuperPrivacy(CALL_REJECT_IN_SUPER_PRIVACY);

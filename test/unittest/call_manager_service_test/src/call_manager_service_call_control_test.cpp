@@ -17,6 +17,90 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace {
+using namespace Security::AccessToken;
+
+HapInfoParams rejectInfoParams = {
+    .bundleName = "tel_call_manager_service_gtest",
+    .userID = 1,
+    .instIndex = 0,
+    .appIDDesc = "test",
+    .isSystemApp = true,
+};
+
+HapInfoParams rejectInfoParamsFalse = {
+    .bundleName = "tel_call_manager_service_gtest",
+    .userID = 1,
+    .instIndex = 0,
+    .appIDDesc = "test",
+    .isSystemApp = false,
+};
+
+PermissionDef testRejectPlaceCallDef = {
+    .permissionName = "ohos.permission.PLACE_CALL",
+    .bundleName = "tel_call_manager_service_gtest",
+    .grantMode = 1,
+    .label = "label",
+    .labelId = 1,
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testRejectPlaceCallState = {
+    .grantFlags = { 2 },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.PLACE_CALL",
+    .resDeviceID = { "local" },
+};
+
+HapPolicyParams rejectPolicyParams = {
+    .apl = APL_SYSTEM_BASIC,
+    .domain = "test.domain",
+    .permList = { testRejectPlaceCallDef },
+    .permStateList = { testRejectPlaceCallState },
+};
+
+class NonSystemAppToken {
+public:
+    NonSystemAppToken()
+    {
+        currentID_ = GetSelfTokenID();
+        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(rejectInfoParamsFalse, rejectPolicyParams);
+        accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
+        SetSelfTokenID(tokenIdEx.tokenIDEx);
+    }
+    ~NonSystemAppToken()
+    {
+        AccessTokenKit::DeleteToken(accessID_);
+        SetSelfTokenID(currentID_);
+    }
+
+private:
+    AccessTokenID currentID_ = 0;
+    AccessTokenID accessID_ = 0;
+};
+
+class SystemAppNoRejectPermToken {
+public:
+    SystemAppNoRejectPermToken()
+    {
+        currentID_ = GetSelfTokenID();
+        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(rejectInfoParams, rejectPolicyParams);
+        accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
+        SetSelfTokenID(tokenIdEx.tokenIDEx);
+    }
+    ~SystemAppNoRejectPermToken()
+    {
+        AccessTokenKit::DeleteToken(accessID_);
+        SetSelfTokenID(currentID_);
+    }
+
+private:
+    AccessTokenID currentID_ = 0;
+    AccessTokenID accessID_ = 0;
+};
+} // namespace
 
 /**
  * @tc.number   CallManagerService_DialCall_0100
@@ -125,6 +209,18 @@ HWTEST_F(CallManagerServiceTest, CallManagerService_RejectCall_0200, TestSize.Le
 }
 
 /**
+ * @tc.number   CallManagerService_RejectCall_0300
+ * @tc.name     test RejectCall with normal reject type
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerServiceTest, CallManagerService_RejectCall_0300, TestSize.Level1)
+{
+    SetCallControlManagerNull();
+    int32_t ret = service_->RejectCall(RejectType::CALL_REJECT_NORMAL);
+    EXPECT_EQ(ret, TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+/**
  * @tc.number   CallManagerService_HangUpCall_0100
  * @tc.name     test HangUpCall with null callControlManagerPtr_
  * @tc.desc     Function test
@@ -179,6 +275,30 @@ HWTEST_F(CallManagerServiceTest, CallManagerService_MakeCall_0100, TestSize.Leve
 {
     int32_t ret = service_->MakeCall("10086");
     EXPECT_NE(ret, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+}
+
+/**
+ * @tc.number   CallManagerService_RejectCall_0400
+ * @tc.name     test RejectCall with reject type by non-system app
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerServiceTest, CallManagerService_RejectCall_0400, TestSize.Level1)
+{
+    NonSystemAppToken token;
+    int32_t ret = service_->RejectCall(RejectType::CALL_REJECT_NORMAL);
+    EXPECT_EQ(ret, TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+}
+
+/**
+ * @tc.number   CallManagerService_RejectCall_0500
+ * @tc.name     test RejectCall with reject type without reject permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerServiceTest, CallManagerService_RejectCall_0500, TestSize.Level1)
+{
+    SystemAppNoRejectPermToken token;
+    int32_t ret = service_->RejectCall(RejectType::CALL_REJECT_MISSED_CALL);
+    EXPECT_EQ(ret, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 } // namespace Telephony

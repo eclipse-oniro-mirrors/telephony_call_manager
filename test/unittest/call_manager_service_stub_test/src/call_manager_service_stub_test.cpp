@@ -401,6 +401,10 @@ public:
     {
         return TELEPHONY_SUCCESS;
     }
+    int32_t RejectCall(RejectType rejectType) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
     int32_t HangUpCall() override
     {
         return TELEPHONY_SUCCESS;
@@ -1131,6 +1135,19 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRejectCallNoParam_
 
     int32_t result = stub->OnRejectCallNoParam(data, reply);
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnRejectCallWithType_0100, TestSize.Level1)
+{
+    sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
+    MessageParcel data;
+    MessageParcel reply;
+
+    data.WriteInt32(static_cast<int32_t>(RejectType::CALL_REJECT_NORMAL));
+
+    int32_t result = stub->OnRejectCallWithType(data, reply);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+    EXPECT_EQ(reply.ReadInt32(), TELEPHONY_SUCCESS);
 }
 
 HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnHangUpCallNoParam_0100, TestSize.Level1)

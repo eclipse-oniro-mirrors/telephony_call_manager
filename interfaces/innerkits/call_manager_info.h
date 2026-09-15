@@ -970,6 +970,20 @@ enum class CallRestrictionMode {
 };
 
 /**
+ * @brief Indicates the type of call reject.
+ */
+enum class RejectType {
+    /**
+     * Indicates call reject is normal.
+     */
+    CALL_REJECT_NORMAL = 0,
+    /**
+     * Indicates call reject but add missed call log.
+     */
+    CALL_REJECT_MISSED_CALL,
+};
+
+/**
  * @brief Indicates the information of call restriction.
  */
 struct CallRestrictionInfo {

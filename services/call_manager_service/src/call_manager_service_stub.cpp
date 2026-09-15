@@ -105,6 +105,8 @@ void CallManagerServiceStub::InitCallBasicRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnRejectCallNoParam(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_DISCONNECT_CALL_NO_PARAM)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnHangUpCallNoParam(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REJECT_CALL_WITH_TYPE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRejectCallWithType(data, reply); };
 }
 
 void CallManagerServiceStub::InitCallUtilsRequest()
@@ -1688,6 +1690,17 @@ int32_t CallManagerServiceStub::OnRejectCallNoParam(MessageParcel &data, Message
 {
     int32_t result = RejectCall();
     TELEPHONY_LOGI("OnRejectCallNoParam:result = %{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CallManagerServiceStub::OnRejectCallWithType(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t rejectType = data.ReadInt32();
+    int32_t result = RejectCall(static_cast<RejectType>(rejectType));
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
