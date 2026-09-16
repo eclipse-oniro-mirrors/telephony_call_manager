@@ -582,7 +582,6 @@ int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &in
         RemoveCallbackRef(callback);
         return TELEPHONY_ERROR;
     }
-    RemoveCallbackRef(callback);
     return TELEPHONY_SUCCESS;
 }
 
@@ -605,7 +604,6 @@ int32_t NapiCallAbilityCallback::UpdateMeeTimeStateInfo(const CallAttributeInfo 
         RemoveCallbackRef(callback);
         return TELEPHONY_ERROR;
     }
-    RemoveCallbackRef(callback);
     return TELEPHONY_SUCCESS;
 }
 
