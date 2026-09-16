@@ -90,12 +90,16 @@ NapiCallAbilityCallback::~NapiCallAbilityCallback()
 
 void NapiCallAbilityCallback::RegisterCallStateCallback(EventCallback stateCallback)
 {
+    std::lock_guard<std::mutex> lock(callStateCallbackMutex_);
     stateCallback_ = stateCallback;
 }
 
 void NapiCallAbilityCallback::UnRegisterCallStateCallback()
 {
+    std::lock_guard<std::mutex> lock(callStateCallbackMutex_);
     if (stateCallback_.callbackRef) {
+        napi_delete_reference(stateCallback_.env, stateCallback.callbackRef);
+        napi_delete_reference(stateCallback_.env, stateCallback_.thisVar);
         (void)memset_s(&stateCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -110,6 +114,8 @@ void NapiCallAbilityCallback::UnRegisterMmiCodeCallback()
 {
     std::lock_guard<std::mutex> lock(mmiCodeCallbackMutex_);
     if (mmiCodeCallback_.callbackRef) {
+        napi_delete_reference(mmiCodeCallback_.env, mmiCodeCallback_.callbackRef);
+        napi_delete_reference(mmiCodeCallback_.env, mmiCodeCallback_.thisVar);
         (void)memset_s(&mmiCodeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -555,19 +561,28 @@ void NapiCallAbilityCallback::RemoveCallbackRef(EventCallback& callback)
 
 int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &info)
 {
-    if (stateCallback_.thisVar == nullptr) {
-        return CALL_ERR_CALLBACK_NOT_EXIST;
+    EventCallback callback;
+    {
+        std::lock_guard<std::mutex> lock(callStateCallbackMutex_);
+        if (stateCallback_.thisVar == nullptr) {
+            return CALL_ERR_CALLBACK_NOT_EXIST;
+        }
+        callback = stateCallback_;
     }
+    AddCallbackRef(callback);
     auto callStateWorker = std::make_shared<CallStateWorker>();
     callStateWorker->info = info;
-    callStateWorker->callback = stateCallback_;
+    callStateWorker->callback = callback;
     auto task = [callStateWorker]() {
         ReportCallState(callStateWorker->info, callStateWorker->callback);
+        RemoveCallbackRef(callStateWorker->callback);
     };
-    if (napi_status::napi_ok != napi_send_event(stateCallback_.env, task, napi_eprio_high)) {
+    if (napi_status::napi_ok != napi_send_event(callback.env, task, napi_eprio_high)) {
         TELEPHONY_LOGE("napi_send_event: Failed to Send UpdateCallStateInfo Event");
+        RemoveCallbackRef(callback);
         return TELEPHONY_ERROR;
     }
+    RemoveCallbackRef(callback);
     return TELEPHONY_SUCCESS;
 }
 
@@ -576,16 +591,21 @@ int32_t NapiCallAbilityCallback::UpdateMeeTimeStateInfo(const CallAttributeInfo 
     if (meeTimeStateCallback_.thisVar == nullptr) {
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
+    EventCallback callback = meeTimeStateCallback_;
+    AddCallbackRef(callback);
     auto meeTimeStateWorker = std::make_shared<MeeTimeStateWorker>();
     meeTimeStateWorker->info = info;
-    meeTimeStateWorker->callback = meeTimeStateCallback_;
+    meeTimeStateWorker->callback = callback;
     auto task = [meeTimeStateWorker]() {
         ReportCallState(meeTimeStateWorker->info, meeTimeStateWorker->callback);
+        RemoveCallbackRef(meeTimeStateWorker->callback);
     };
-    if (napi_status::napi_ok != napi_send_event(meeTimeStateCallback_.env, task, napi_eprio_high)) {
+    if (napi_status::napi_ok != napi_send_event(callback.env, task, napi_eprio_high)) {
         TELEPHONY_LOGE("napi_send_event: Failed to Send UpdateMeeTimeStateInfo Event");
+        RemoveCallbackRef(callback);
         return TELEPHONY_ERROR;
     }
+    RemoveCallbackRef(callback);
     return TELEPHONY_SUCCESS;
 }
 

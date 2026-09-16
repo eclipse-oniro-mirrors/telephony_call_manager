@@ -212,6 +212,7 @@ private:
     std::mutex closeUnfinishedUssdCallbackMutex_;
     std::mutex setWaitingCallbackMutex_;
     std::mutex getWaitingCallbackMutex_;
+    std::mutex callStateCallbackMutex_;
 #ifdef SUPPORT_RTT_CALL
     ffrt::mutex rttCallEvtChangeCallbackMutex_;
     ffrt::mutex rttCallErrCauseCallbackMutex_;
