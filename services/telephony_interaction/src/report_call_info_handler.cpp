@@ -280,8 +280,10 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
     if (CallStatusManager::GetDevProvisioned() != DEVICE_PROVISION_VALID ||
         CallStatusManager::GetDevUserSetupCompleteValue() != DEVICE_PROVISION_VALID) {
         sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(detailInfo.index);
-        CallManagerHisysevent::ReportCallDropChrEvent(info.slotId, detailInfo.index, DROP_CALL_BY_OOBE);
-        call->SetApCauseReported(true);
+        if (call != nullptr) {
+            CallManagerHisysevent::ReportCallDropChrEvent(info.slotId, detailInfo.index, DROP_CALL_BY_OOBE);
+            call->SetApCauseReported(true);
+        }
         TELEPHONY_LOGE("UpdateCallsReportInfo call not report in OOBE");
         return TELEPHONY_SUCCESS;
     }
