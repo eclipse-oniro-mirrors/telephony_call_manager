@@ -98,7 +98,7 @@ void NapiCallAbilityCallback::UnRegisterCallStateCallback()
 {
     std::lock_guard<std::mutex> lock(callStateCallbackMutex_);
     if (stateCallback_.callbackRef) {
-        napi_delete_reference(stateCallback_.env, stateCallback.callbackRef);
+        napi_delete_reference(stateCallback_.env, stateCallback_.callbackRef);
         napi_delete_reference(stateCallback_.env, stateCallback_.thisVar);
         (void)memset_s(&stateCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
