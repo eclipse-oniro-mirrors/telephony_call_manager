@@ -254,14 +254,14 @@ void ReportCallInfoHandler::BuildCallDetailsInfo(CallDetailsInfo &info, CallDeta
         callDetailInfo.rttChannelId = (*iter).rttChannelId;
         callDetailInfo.imsDomain = (*iter).imsDomain;
         callDetailsInfo.callVec.push_back(callDetailInfo);
-    }
 #ifdef SUPPORT_RTT_CALL
-    sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(callDetailInfo.index);
-    if (call != nullptr) {
-        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
-        imsCall->SetRttState(callDetailInfo.rttState);
-    }
+        sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(callDetailInfo.index);
+        if (call != nullptr && callDetailInfo.callType == CallType::TYPE_IMS) {
+            sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+            imsCall->SetRttState(callDetailInfo.rttState);
+        }
 #endif
+    }
 }
 
 int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
@@ -277,15 +277,13 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
     BuildCallDetailsInfo(info, callDetailsInfo);
     if (CallStatusManager::GetDevProvisioned() != DEVICE_PROVISION_VALID ||
         CallStatusManager::GetDevUserSetupCompleteValue() != DEVICE_PROVISION_VALID) {
-        CallDetailInfo detailInfo;
-        detailInfo.state = TelCallState::CALL_STATUS_UNKNOWN;
         std::vector<CallDetailInfo>::iterator it = info.callVec.begin();
         for (; it != info.callVec.end(); ++it) {
-            detailInfo.state = (*it).state;
-            detailInfo.index = (*it).index;
-        }
-        if (detailInfo.state == TelCallState::CALL_STATUS_INCOMING) {
-            CallManagerHisysevent::ReportCallDropChrEvent(info.slotId, detailInfo.index, DROP_CALL_BY_OOBE);
+            TelCallState state = (*it).state;
+            int32_t index = (*it).index;
+            if (state == TelCallState::CALL_STATUS_INCOMING) {
+                CallManagerHisysevent::ReportCallDropChrEvent(info.slotId, index, DROP_CALL_BY_OOBE);
+            }
         }
         TELEPHONY_LOGE("UpdateCallsReportInfo call not report in OOBE");
         return TELEPHONY_SUCCESS;
