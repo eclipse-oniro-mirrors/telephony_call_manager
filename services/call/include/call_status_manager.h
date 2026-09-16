@@ -72,7 +72,7 @@ public:
     static int32_t GetDevUserSetupCompleteValue();
     static void UpdateDevProvisioned();
     static void UpdateUserSetupCompleteValue();
-    static void ResetUserSetupCompleteValue(int32_t userSetupComplete);
+    static void ResetUserSetupCompleteValue();
 #ifdef SUPPORT_RTT_CALL
     void HandleRttEventInfo(const ImsRTTEventType &eventType);
 #endif

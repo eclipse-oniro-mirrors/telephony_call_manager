@@ -199,7 +199,7 @@ void CallBroadcastSubscriber::UpdateNearlinkDeviceName(const EventFwk::CommonEve
 
 void CallBroadcastSubscriber::HandleUserSwicth(const EventFwk::CommonEventData &data)
 {
-    CallStatusManager::ResetUserSetupCompleteValue(DEVICE_PROVISION_UNDEF);
+    CallStatusManager::ResetUserSetupCompleteValue();
     if (!DelayedSingleton<CallConnectAbility>::GetInstance()->GetConnectFlag()) {
         TELEPHONY_LOGE("is not connected");
         return;

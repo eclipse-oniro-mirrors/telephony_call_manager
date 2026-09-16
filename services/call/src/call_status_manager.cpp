@@ -2927,9 +2927,9 @@ void CallStatusManager::UpdateDevProvisioned()
 #endif
 }
 
-void CallStatusManager::ResetUserSetupCompleteValue(int32_t userSetupComplete)
+void CallStatusManager::ResetUserSetupCompleteValue()
 {
-    userSetupComplete_ = userSetupComplete;
+    userSetupComplete_ = DEVICE_PROVISION_UNDEF;
 }
  
 int32_t CallStatusManager::GetDevUserSetupCompleteValue()
