@@ -339,6 +339,19 @@ HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_011, Function | Medi
     std::string rspMsg = sourceController->CreateCurrentDataRspMsg(num, isMuted, direction);
     ASSERT_FALSE(rspMsg.empty());
     cJSON_Delete(msg);
+
+    // invalid item type: negative
+    sourceController->queryInfo_.clear();
+    msg = cJSON_Parse("{ \"itemType\": -1, \"num\": \"123456\" }");
+    ASSERT_NO_THROW(sourceController->HandleDataQueryMsg(msg));
+    EXPECT_TRUE(sourceController->queryInfo_.empty());
+    cJSON_Delete(msg);
+
+    // invalid item type: out of range (>= MAX)
+    msg = cJSON_Parse("{ \"itemType\": 2, \"num\": \"123456\" }");
+    ASSERT_NO_THROW(sourceController->HandleDataQueryMsg(msg));
+    EXPECT_TRUE(sourceController->queryInfo_.empty());
+    cJSON_Delete(msg);
 }
 
 /**
@@ -518,6 +531,167 @@ HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_017, Function | Medi
     CallObjectManager::callObjectPtrList_.clear();
     ASSERT_NO_THROW(sourceController->OnCallDestroyed());
     ASSERT_NO_THROW(sourceController->ProcessCallInfo(imsCall, DistributedDataType::NAME));
+}
+
+/**
+ * @tc.number   Telephony_DistributedDataTest_WithValidSession
+ * @tc.name     test source controller handle current data query with valid session
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_WithValidSession, Function | Level1)
+{
+    DialParaInfo mDialParaInfo;
+    sptr<CallBase> imsCall = new IMSCall(mDialParaInfo);
+    imsCall->callType_ = CallType::TYPE_IMS;
+    imsCall->SetAccountNumber("123456");
+    CallObjectManager::callObjectPtrList_.push_back(imsCall);
+    auto sourceController = std::make_shared<DistributedDataSourceController>();
+    // session is null, should not send
+    cJSON *msg = cJSON_Parse("{ \"num\": \"123456\" }");
+    ASSERT_NO_THROW(sourceController->HandleCurrentDataQueryMsg(msg));
+    cJSON_Delete(msg);
+    // session is valid, should send via sessionMutex_ path
+    std::shared_ptr<ISessionCallback> callback = std::make_shared<DataSessionCallbackTest>();
+    sourceController->session_ = DelayedSingleton<TransmissionManager>::GetInstance()->CreateServerSession(callback);
+    sourceController->session_->socket_ = INVALID_SOCKET_ID + 1;
+    msg = cJSON_Parse("{ \"num\": \"123456\" }");
+    ASSERT_NO_THROW(sourceController->HandleCurrentDataQueryMsg(msg));
+    cJSON_Delete(msg);
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
+ * @tc.number   Telephony_DistributedDataTest_DestroyedWithMutex
+ * @tc.name     test data sink controller on call destroyed with session mutex
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_DestroyedWithMutex, Function | Level1)
+{
+    // OnCallDestroyed with session_ not null (sessionMutex_ branch)
+    auto controller = std::make_shared<DistributedDataSinkController>();
+    std::shared_ptr<ISessionCallback> callback = std::make_shared<DataSessionCallbackTest>();
+    controller->session_ = DelayedSingleton<TransmissionManager>::GetInstance()->CreateServerSession(callback);
+    DialParaInfo mDialParaInfo;
+    sptr<CallBase> csCall = new CSCall(mDialParaInfo);
+    csCall->SetCallType(CallType::TYPE_CS);
+    CallObjectManager::callObjectPtrList_.emplace_back(csCall);
+    ASSERT_NO_THROW(controller->OnCallDestroyed());
+    EXPECT_TRUE(controller->session_ == nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    // OnCallDestroyed with session_ already null
+    ASSERT_NO_THROW(controller->OnCallDestroyed());
+    EXPECT_TRUE(controller->session_ == nullptr);
+}
+
+/**
+ * @tc.number   Telephony_DistributedDataTest_SetMutedWithMutex
+ * @tc.name     test data controller set muted and mute ringer with session mutex
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_SetMutedWithMutex, Function | Level1)
+{
+    auto controller = std::make_shared<DistributedDataSinkController>();
+    // session is null -> sessionMutex_ path, early return
+    controller->session_ = nullptr;
+    ASSERT_NO_THROW(controller->SetMuted(false));
+    ASSERT_NO_THROW(controller->MuteRinger());
+    // session is valid -> sessionMutex_ path, send msg
+    std::shared_ptr<ISessionCallback> callback = std::make_shared<DataSessionCallbackTest>();
+    controller->session_ = DelayedSingleton<TransmissionManager>::GetInstance()->CreateServerSession(callback);
+    controller->session_->socket_ = INVALID_SOCKET_ID + 1;
+    ASSERT_NO_THROW(controller->SetMuted(false));
+    ASSERT_NO_THROW(controller->MuteRinger());
+    // session valid, SetMuted true
+    ASSERT_NO_THROW(controller->SetMuted(true));
+}
+
+/**
+ * @tc.number   Telephony_DistributedDataTest_QueryReqWithMutex
+ * @tc.name     test data sink controller send data query req with session mutex
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_QueryReqWithMutex, Function | Level1)
+{
+    auto controller = std::make_shared<DistributedDataSinkController>();
+    // session is null -> sessionMutex_ path, early return
+    ASSERT_NO_THROW(controller->SendDataQueryReq());
+    ASSERT_NO_THROW(controller->SendCurrentDataQueryReq());
+    // session valid but not ready
+    std::shared_ptr<ISessionCallback> callback = std::make_shared<DataSessionCallbackTest>();
+    controller->session_ = DelayedSingleton<TransmissionManager>::GetInstance()->CreateServerSession(callback);
+    ASSERT_NO_THROW(controller->SendDataQueryReq());
+    // session ready with query info
+    controller->session_->socket_ = INVALID_SOCKET_ID + 1;
+    controller->queryInfo_["13512345678"] = 2;
+    ASSERT_NO_THROW(controller->SendDataQueryReq());
+    EXPECT_EQ(controller->queryInfo_["13512345678"], 0);
+    // SendCurrentDataQueryReq with session valid
+    DialParaInfo mDialParaInfo;
+    sptr<CallBase> call = (std::make_unique<IMSCall>(mDialParaInfo)).release();
+    call->callType_ = CallType::TYPE_IMS;
+    call->SetAccountNumber("123456");
+    CallObjectManager::callObjectPtrList_.emplace_back(call);
+    ASSERT_NO_THROW(controller->SendCurrentDataQueryReq());
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
+ * @tc.number   Telephony_DistributedDataTest_OnlineWithMutex
+ * @tc.name     test data sink controller send data query req with session mutex
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_OnlineWithMutex, Function | Level1)
+{
+    std::string devId = "UnitTestDeviceId";
+    std::string devName = "UnitTestDeviceName";
+    AudioDeviceType deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+    auto sourceController = std::make_shared<DistributedDataSourceController>();
+    // OnDeviceOnline with session null -> create session via sessionMutex_
+    ASSERT_NO_THROW(sourceController->OnDeviceOnline(devId, devName, deviceType));
+    EXPECT_TRUE(sourceController->session_ != nullptr);
+    // OnDeviceOnline again with session not null -> return via sessionMutex_
+    ASSERT_NO_THROW(sourceController->OnDeviceOnline(devId, devName, deviceType));
+    // OnDeviceOffline -> destroy session via sessionMutex_
+    ASSERT_NO_THROW(sourceController->OnDeviceOffline(devId, devName, deviceType));
+    EXPECT_TRUE(sourceController->session_ == nullptr);
+    // OnDeviceOffline again with session null
+    ASSERT_NO_THROW(sourceController->OnDeviceOffline(devId, devName, deviceType));
+}
+
+/**
+ * @tc.number   Telephony_DistributedDataTest_QueryMsbBoundary
+ * @tc.name     test source controller handle data query msg boundary
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_QueryMsbBoundary, Function | Level1)
+{
+    auto sourceController = std::make_shared<DistributedDataSourceController>();
+    // missing itemType
+    cJSON *msg = cJSON_Parse("{ \"num\": \"123456\" }");
+    ASSERT_NO_THROW(sourceController->HandleDataQueryMsg(msg));
+    EXPECT_TRUE(sourceController->queryInfo_.empty());
+    cJSON_Delete(msg);
+    // valid itemType 0 (NAME)
+    msg = cJSON_Parse("{ \"itemType\": 0, \"num\": \"123456\" }");
+    ASSERT_NO_THROW(sourceController->HandleDataQueryMsg(msg));
+    EXPECT_FALSE(sourceController->queryInfo_.empty());
+    sourceController->queryInfo_.clear();
+    cJSON_Delete(msg);
+    // valid itemType 1 (LOCATION)
+    msg = cJSON_Parse("{ \"itemType\": 1, \"num\": \"123456\" }");
+    ASSERT_NO_THROW(sourceController->HandleDataQueryMsg(msg));
+    EXPECT_FALSE(sourceController->queryInfo_.empty());
+    sourceController->queryInfo_.clear();
+    cJSON_Delete(msg);
+    // missing num
+    msg = cJSON_Parse("{ \"itemType\": 0 }");
+    ASSERT_NO_THROW(sourceController->HandleDataQueryMsg(msg));
+    EXPECT_TRUE(sourceController->queryInfo_.empty());
+    cJSON_Delete(msg);
+    msg = cJSON_Parse("{ \"itemType\": 1, \"num\": \"\" }");
+    ASSERT_NO_THROW(sourceController->HandleDataQueryMsg(msg));
+    EXPECT_TRUE(sourceController->queryInfo_.empty());
+    cJSON_Delete(msg);
 }
 
 } // namespace Telephony

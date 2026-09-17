@@ -21,9 +21,6 @@
 #include "call_object_manager.h"
 #include "telephony_log_wrapper.h"
 #include "nlohmann/json.hpp"
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-#include "bluetooth_device.h"
-#endif
 
 using json = nlohmann::json;
 
@@ -31,11 +28,6 @@ namespace OHOS {
 namespace Telephony {
 using namespace AudioStandard;
 namespace {
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-const int32_t DEFAULT_DCALL_HFP_FLAG_VALUE = -1;
-const int32_t DCALL_BT_HEADSET_UNWEAR_ACTION = 1;
-#endif
-
 const size_t INT32_MIN_ID_LENGTH = 3;
 const size_t INT32_SHORT_ID_LENGTH = 20;
 const size_t INT32_PLAINTEXT_LENGTH = 4;
@@ -187,15 +179,6 @@ std::string DistributedCallManager::GetDevIdFromAudioDevice(const AudioDevice& d
 int32_t DistributedCallManager::AddDCallDevice(const std::string& devId)
 {
     TELEPHONY_LOGI("add dcall device, devId: %{public}s.", GetAnonyString(devId).c_str());
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-    {
-        std::lock_guard<ffrt::mutex> lock(mutex_);
-        if (dcallHfpListener_ == nullptr) {
-            dcallHfpListener_ = std::make_shared<DCallHfpListener>();
-            Bluetooth::HandsFreeAudioGateway::GetProfile()->RegisterObserver(dcallHfpListener_);
-        }
-    }
-#endif
     std::lock_guard<ffrt::mutex> lock(onlineDeviceMtx_);
 
     auto iter = onlineDCallDevices_.find(devId);
@@ -371,6 +354,7 @@ void DistributedCallManager::DealDisconnectCall()
 
 bool DistributedCallManager::IsDistributedCarDeviceOnline()
 {
+    std::lock_guard<ffrt::mutex> lock(onlineDeviceMtx_);
     if (onlineDCallDevices_.size() > 0) {
         return true;
     }
@@ -446,9 +430,12 @@ void DistributedCallManager::SwitchOffDCallDeviceSync()
 
 bool DistributedCallManager::IsSelectVirtualModem()
 {
-    if (onlineDCallDevices_.size() <= 0) {
-        TELEPHONY_LOGW("no dcall device");
-        return false;
+    {
+        std::lock_guard<ffrt::mutex> lock(onlineDeviceMtx_);
+        if (onlineDCallDevices_.size() <= 0) {
+            TELEPHONY_LOGW("no dcall device");
+            return false;
+        }
     }
     std::lock_guard<ffrt::mutex> lock(dcallProxyMtx_);
     if (dcallProxy_ == nullptr) {
@@ -543,23 +530,7 @@ int32_t DistributedCallManager::OnDCallDeviceOnline(const std::string &devId)
 int32_t DistributedCallManager::OnDCallDeviceOffline(const std::string &devId)
 {
     TELEPHONY_LOGI("dcall device is offline, devId: %{public}s", GetAnonyString(devId).c_str());
-    auto ret = RemoveDCallDevice(devId);
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-    bool isAllDeviceOffline = true;
-    {
-        std::lock_guard<ffrt::mutex> lock(onlineDeviceMtx_);
-        isAllDeviceOffline = onlineDCallDevices_.empty();
-    }
-    if (isAllDeviceOffline) {
-        TELEPHONY_LOGI("all dcall device offline");
-        std::lock_guard<ffrt::mutex> lock(mutex_);
-        if (dcallHfpListener_ != nullptr) {
-            Bluetooth::HandsFreeAudioGateway::GetProfile()->DeregisterObserver(dcallHfpListener_);
-            dcallHfpListener_ = nullptr;
-        }
-    }
-#endif
-    return ret;
+    return RemoveDCallDevice(devId);
 }
 
 int32_t DistributedCallManager::DistributedCallDeviceListener::OnDCallDeviceOnline(const std::string &devId)
@@ -657,25 +628,5 @@ void DCallSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, 
     DelayedSingleton<DistributedCallManager>::GetInstance()->OnDCallSystemAbilityRemoved(deviceId);
 }
 
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-void DCallHfpListener::OnHfpStackChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t action)
-{
-    TELEPHONY_LOGI("dcall hfp stack changed, action[%{public}d]", action);
-    int32_t cod = DEFAULT_DCALL_HFP_FLAG_VALUE;
-    int32_t majorClass = DEFAULT_DCALL_HFP_FLAG_VALUE;
-    int32_t majorMinorClass = DEFAULT_DCALL_HFP_FLAG_VALUE;
-    device.GetDeviceProductType(cod, majorClass, majorMinorClass);
-    bool isBtHeadset = (majorClass == Bluetooth::BluetoothDevice::MAJOR_AUDIO_VIDEO &&
-                        (majorMinorClass == Bluetooth::BluetoothDevice::AUDIO_VIDEO_HEADPHONES ||
-                         majorMinorClass == Bluetooth::BluetoothDevice::AUDIO_VIDEO_WEARABLE_HEADSET));
-    if (!isBtHeadset) {
-        return;
-    }
-    if (action == DCALL_BT_HEADSET_UNWEAR_ACTION) {
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
-    }
-}
-#endif
- 
 } // namespace Telephony
 } // namespace OHOS
