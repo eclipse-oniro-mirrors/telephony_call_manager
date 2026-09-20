@@ -98,8 +98,6 @@ void NapiCallAbilityCallback::UnRegisterCallStateCallback()
 {
     std::lock_guard<std::mutex> lock(callStateCallbackMutex_);
     if (stateCallback_.callbackRef) {
-        napi_delete_reference(stateCallback_.env, stateCallback_.callbackRef);
-        napi_delete_reference(stateCallback_.env, stateCallback_.thisVar);
         (void)memset_s(&stateCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -114,8 +112,6 @@ void NapiCallAbilityCallback::UnRegisterMmiCodeCallback()
 {
     std::lock_guard<std::mutex> lock(mmiCodeCallbackMutex_);
     if (mmiCodeCallback_.callbackRef) {
-        napi_delete_reference(mmiCodeCallback_.env, mmiCodeCallback_.callbackRef);
-        napi_delete_reference(mmiCodeCallback_.env, mmiCodeCallback_.thisVar);
         (void)memset_s(&mmiCodeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
