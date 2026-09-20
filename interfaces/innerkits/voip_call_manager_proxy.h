@@ -206,19 +206,19 @@ public:
      * @param videoState[in], the video state of the answer (VideoStateType::TYPE_VOICE or TYPE_VIDEO)
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t AnswerVoipCall(int32_t videoState) override;
+    int32_t AnswerCall(int32_t videoState) override;
     /**
      * @brief reject the current incoming voip call selected by the SA (reverse control, no callId)
      *
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t RejectVoipCall() override;
+    int32_t RejectCall() override;
     /**
      * @brief hang up the current voip call selected by the SA (reverse control, no callId)
      *
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t HangUpVoipCall() override;
+    int32_t HangUpCall() override;
 
 private:
     int32_t SendControlRequest(int32_t msgId);
