@@ -568,17 +568,17 @@ int32_t VoipCallManagerProxy::SendControlRequest(int32_t msgId, int32_t videoSta
     return replyParcel.ReadInt32();
 }
  
-int32_t VoipCallManagerProxy::AnswerVoipCall(int32_t videoState)
+int32_t VoipCallManagerProxy::AnswerCall(int32_t videoState)
 {
     return SendControlRequest(static_cast<int32_t>(INTERFACE_CONTROL_ANSWER_VOIP_CALL), videoState);
 }
  
-int32_t VoipCallManagerProxy::RejectVoipCall()
+int32_t VoipCallManagerProxy::RejectCall()
 {
     return SendControlRequest(static_cast<int32_t>(INTERFACE_CONTROL_REJECT_VOIP_CALL));
 }
  
-int32_t VoipCallManagerProxy::HangUpVoipCall()
+int32_t VoipCallManagerProxy::HangUpCall()
 {
     return SendControlRequest(static_cast<int32_t>(INTERFACE_CONTROL_HANGUP_VOIP_CALL));
 }
