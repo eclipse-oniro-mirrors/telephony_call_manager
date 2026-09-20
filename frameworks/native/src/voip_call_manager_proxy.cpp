@@ -532,5 +532,55 @@ int32_t VoipCallManagerProxy::NotifyVoIPAudioStreamStart(int32_t uid)
     }
     return replyParcel.ReadInt32();
 }
+
+int32_t VoipCallManagerProxy::SendControlRequest(int32_t msgId)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    MessageOption option;
+    MessageParcel replyParcel;
+    int32_t error = SendRequest("", msgId, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function SendControlRequest msgId:%{public}d failed! errCode:%{public}d", msgId, error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+ 
+int32_t VoipCallManagerProxy::SendControlRequest(int32_t msgId, int32_t videoState)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(videoState);
+    MessageOption option;
+    MessageParcel replyParcel;
+    int32_t error = SendRequest("", msgId, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function SendControlRequest msgId:%{public}d failed! errCode:%{public}d", msgId, error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+ 
+int32_t VoipCallManagerProxy::AnswerVoipCall(int32_t videoState)
+{
+    return SendControlRequest(static_cast<int32_t>(INTERFACE_CONTROL_ANSWER_VOIP_CALL), videoState);
+}
+ 
+int32_t VoipCallManagerProxy::RejectVoipCall()
+{
+    return SendControlRequest(static_cast<int32_t>(INTERFACE_CONTROL_REJECT_VOIP_CALL));
+}
+ 
+int32_t VoipCallManagerProxy::HangUpVoipCall()
+{
+    return SendControlRequest(static_cast<int32_t>(INTERFACE_CONTROL_HANGUP_VOIP_CALL));
+}
 } // namespace Telephony
 } // namespace OHOS
