@@ -464,6 +464,9 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
         TelCallState::CALL_STATUS_ACTIVE));
     EXPECT_FALSE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_WAITING,
         TelCallState::CALL_STATUS_ACTIVE));
+    audioControl->soundState_ = SoundState::STOPPED;
+    EXPECT_FALSE(audioControl->PreHandleAnswerdState(imsCall, TelCallState::CALL_STATUS_INCOMING,
+        TelCallState::CALL_STATUS_ANSWERED));
 }
 
 /**
