@@ -74,7 +74,6 @@ public:
     ~WearStatusObserver() = default;
     void OnChange() override;
 };
-class IncomingFlashReminder;
 class CallControlManager : public CallPolicy, public std::enable_shared_from_this<CallControlManager> {
     DECLARE_DELAYED_SINGLETON(CallControlManager)
 
@@ -182,7 +181,6 @@ public:
     void StartFlashRemind();
     void SetRegMmiCodeCallbackState(bool isReg);
     void StopFlashRemind();
-    void ClearFlashReminder();
     bool SetVirtualCall(bool isVirtual);
 #ifdef NOT_SUPPORT_MULTICALL
     bool HangUpOtherCall(int32_t answerCallId);
@@ -310,11 +308,9 @@ private:
     sptr<WearStatusObserver> wearStatusObserver_ = nullptr;
     int32_t wearStatus_ = WEAR_STATUS_INVALID;
     ffrt::mutex wearStatusMutex_;
-    ffrt::mutex reminderMutex_;
     ffrt::mutex ringToneMutex_;
     ffrt::task_handle pendingHangupHandle_ = nullptr;
     ffrt::mutex pendingHangupHandleMutex_;
-    std::shared_ptr<IncomingFlashReminder> incomingFlashReminder_ {nullptr};
 #ifdef CALL_MANAGER_THERMAL_PROTECTION
     std::atomic<int32_t> thermalLevel_ = -1;
 #endif

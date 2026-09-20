@@ -145,7 +145,6 @@ call_manager_sources = [
   "${call_manager_path}/utils/src/call_number_utils.cpp",
   "${call_manager_path}/utils/src/challenge_token_manager.cpp",
   "${call_manager_path}/utils/src/call_setting_ability_connection.cpp",
-  "${call_manager_path}/utils/src/incoming_flash_reminder.cpp",
   "${call_manager_path}/utils/src/motion_recognition.cpp",
   "${call_manager_path}/utils/src/number_identity_data_base_helper.cpp",
   "${call_manager_path}/utils/src/screen_sensor_plugin.cpp",
@@ -230,6 +229,7 @@ call_manager_external_deps += [
   "ability_runtime:extension_manager",
   "access_token:libaccesstoken_sdk",
   "access_token:libprivacy_sdk",
+  "accessibility:accessibilityconfig",
   "audio_framework:audio_capturer",
   "audio_framework:audio_client",
   "audio_framework:audio_foundation",
@@ -272,6 +272,7 @@ if (defined(global_parts_info) &&
 if (defined(global_parts_info) &&
     defined(global_parts_info.telephony_sms_mms) &&
     global_parts_info.telephony_sms_mms) {
+  call_manager_external_deps += [ "sms_mms:tel_sms_mms_api" ]
   call_manager_defines += [ "ABILITY_SMS_SUPPORT" ]
 }
 
@@ -330,12 +331,6 @@ if (defined(global_parts_info) &&
     defined(global_parts_info.msdp_user_status_awareness) &&
     global_parts_info.msdp_user_status_awareness) {
   call_manager_defines += [ "OHOS_SUBSCRIBE_USER_STATUS_ENABLE" ]
-}
-
-if (defined(global_parts_info) &&
-    defined(global_parts_info.theme_screenlock_mgr) &&
-    global_parts_info.theme_screenlock_mgr) {
-  call_manager_defines += [ "ABILITY_SCREENLOCKMGR_SUPPORT" ]
 }
 
 if (defined(global_parts_info) &&

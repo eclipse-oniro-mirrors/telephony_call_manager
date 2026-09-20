@@ -128,7 +128,6 @@ group("unittest") {
   deps += [ "call_manager_zero_gtest:tel_call_manager_zero8_gtest" ]
   deps += [ "call_manager_zero_gtest:tel_call_manager_zero9_gtest" ]
   deps += [ "call_manager_zero_gtest:tel_call_manager_zero10_gtest" ]
-  deps += [ "call_manager_zero_gtest:tel_call_manager_zero_flash_reminder_test" ]
   deps += [ "call_manager_zero_gtest:tel_call_manager_zero_super_privacy_gtest" ]
   deps += [ "call_manager_zero_gtest:tel_call_manager_zero_transfer_callback_gtest" ]
   deps += [ "ui_client:tel_call_manager_ui_test" ]
