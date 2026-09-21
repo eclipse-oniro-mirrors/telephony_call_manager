@@ -12,24 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-/*
- * DT test for CallStateReportProxy private methods:
- *   - VoIPCallState ConvertToVoipCallState(TelCallState nextState)
- *   - void ReportVoIPCallStateToRegistry(sptr<CallBase> &callObjectPtr, TelCallState nextState)
- *
- * Branch coverage design (90%+ required):
- *   ConvertToVoipCallState: 10 switch cases + default, all covered
- *     (INCOMING/WAITING -> INCOMING, DIALING, ALERTING -> OUTGOING, ANSWERED,
- *      ACTIVE, HOLDING, DISCONNECTING, DISCONNECTED, default -> IDLE)
- *   ReportVoIPCallStateToRegistry: 2 if-branches, all covered
- *     1) callObjectPtr == nullptr   -> covered (NullCall case)
- *     2) ret != TELEPHONY_SUCCESS    -> true/false both covered (UpdateFailed/Success)
- *   Note: DelayedRefSingleton::GetInstance() returns a reference which can never
- *   be null, so no singleton null-check branch exists in the implementation.
- *   Coverage: 100%
- */
- 
+
 #define private public
 #define protected public
 #include "call_state_report_proxy.h"
@@ -339,7 +322,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_I
 /**
  * @tc.number: CallStateReportProxy_ConvertToVoipCallState_UnknownDefault
  * @tc.name: Test ConvertToVoipCallState with unknown state falls to default
- * @tc.desc: Verify that CALL_STATUS_UNKNOWN (negative boundary) falls to default and is converted to VoIPCallState::IDLE
+ * @tc.desc: Verify that CALL_STATUS_UNKNOWN falls to default
  */
 HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_UnknownDefault, TestSize.Level1)
 {
@@ -354,7 +337,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_U
  */
 HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_InvalidValueDefault, TestSize.Level1)
 {
-    constexpr int32_t INVALID_STATE = 100;
+    int32_t INVALID_STATE = 100;
     VoIPCallState result = proxy_.ConvertToVoipCallState(static_cast<TelCallState>(INVALID_STATE));
     EXPECT_EQ(result, VoIPCallState::IDLE);
 }
