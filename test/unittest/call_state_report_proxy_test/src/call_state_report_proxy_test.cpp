@@ -35,6 +35,7 @@ namespace {
 int32_t g_stubUpdateResult = TELEPHONY_SUCCESS;
 int32_t g_stubUpdateCount = 0;
 VoIPCallStateInfo g_stubLastInfo = {};
+constexpr int32_t INVALID_STATE = 100;
 } // namespace
  
 static int32_t StubUpdateVoIPCallState(TelephonyStateRegistryClient *client, const VoIPCallStateInfo &info)
@@ -208,7 +209,7 @@ public:
     CallStateReportProxy proxy_;
     sptr<MockCallBase> call_ = nullptr;
 };
- 
+
 /**
  * @tc.number: CallStateReportProxy_ConvertToVoipCallState_Incoming
  * @tc.name: Test ConvertToVoipCallState with incoming state
@@ -219,7 +220,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_I
     VoIPCallState result = proxy_.ConvertToVoipCallState(TelCallState::CALL_STATUS_INCOMING);
     EXPECT_EQ(result, VoIPCallState::INCOMING);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ConvertToVoipCallState_Waiting
  * @tc.name: Test ConvertToVoipCallState with waiting state
@@ -230,7 +231,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_W
     VoIPCallState result = proxy_.ConvertToVoipCallState(TelCallState::CALL_STATUS_WAITING);
     EXPECT_EQ(result, VoIPCallState::INCOMING);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ConvertToVoipCallState_Dialing
  * @tc.name: Test ConvertToVoipCallState with dialing state
@@ -241,7 +242,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_D
     VoIPCallState result = proxy_.ConvertToVoipCallState(TelCallState::CALL_STATUS_DIALING);
     EXPECT_EQ(result, VoIPCallState::DIALING);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ConvertToVoipCallState_Alerting
  * @tc.name: Test ConvertToVoipCallState with alerting state
@@ -252,7 +253,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_A
     VoIPCallState result = proxy_.ConvertToVoipCallState(TelCallState::CALL_STATUS_ALERTING);
     EXPECT_EQ(result, VoIPCallState::OUTGOING);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ConvertToVoipCallState_Answered
  * @tc.name: Test ConvertToVoipCallState with answered state
@@ -263,7 +264,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_A
     VoIPCallState result = proxy_.ConvertToVoipCallState(TelCallState::CALL_STATUS_ANSWERED);
     EXPECT_EQ(result, VoIPCallState::ANSWERED);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ConvertToVoipCallState_Active
  * @tc.name: Test ConvertToVoipCallState with active state
@@ -274,7 +275,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_A
     VoIPCallState result = proxy_.ConvertToVoipCallState(TelCallState::CALL_STATUS_ACTIVE);
     EXPECT_EQ(result, VoIPCallState::ACTIVE);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ConvertToVoipCallState_Holding
  * @tc.name: Test ConvertToVoipCallState with holding state
@@ -285,7 +286,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_H
     VoIPCallState result = proxy_.ConvertToVoipCallState(TelCallState::CALL_STATUS_HOLDING);
     EXPECT_EQ(result, VoIPCallState::HOLDING);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ConvertToVoipCallState_Disconnecting
  * @tc.name: Test ConvertToVoipCallState with disconnecting state
@@ -296,7 +297,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_D
     VoIPCallState result = proxy_.ConvertToVoipCallState(TelCallState::CALL_STATUS_DISCONNECTING);
     EXPECT_EQ(result, VoIPCallState::DISCONNECTING);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ConvertToVoipCallState_Disconnected
  * @tc.name: Test ConvertToVoipCallState with disconnected state
@@ -307,7 +308,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_D
     VoIPCallState result = proxy_.ConvertToVoipCallState(TelCallState::CALL_STATUS_DISCONNECTED);
     EXPECT_EQ(result, VoIPCallState::DISCONNECTED);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ConvertToVoipCallState_IdleDefault
  * @tc.name: Test ConvertToVoipCallState with idle state falls to default
@@ -318,7 +319,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_I
     VoIPCallState result = proxy_.ConvertToVoipCallState(TelCallState::CALL_STATUS_IDLE);
     EXPECT_EQ(result, VoIPCallState::IDLE);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ConvertToVoipCallState_UnknownDefault
  * @tc.name: Test ConvertToVoipCallState with unknown state falls to default
@@ -329,7 +330,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_U
     VoIPCallState result = proxy_.ConvertToVoipCallState(TelCallState::CALL_STATUS_UNKNOWN);
     EXPECT_EQ(result, VoIPCallState::IDLE);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ConvertToVoipCallState_InvalidValueDefault
  * @tc.name: Test ConvertToVoipCallState with out-of-range value falls to default
@@ -337,11 +338,10 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_U
  */
 HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ConvertToVoipCallState_InvalidValueDefault, TestSize.Level1)
 {
-    int32_t INVALID_STATE = 100;
     VoIPCallState result = proxy_.ConvertToVoipCallState(static_cast<TelCallState>(INVALID_STATE));
     EXPECT_EQ(result, VoIPCallState::IDLE);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ReportVoIPCallState_NullCall
  * @tc.name: Test ReportVoIPCallStateToRegistry with null call object
@@ -354,7 +354,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ReportVoIPCallState_Null
     proxy_.ReportVoIPCallStateToRegistry(nullCall, TelCallState::CALL_STATUS_INCOMING);
     EXPECT_EQ(g_stubUpdateCount, 0);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ReportVoIPCallState_Success
  * @tc.name: Test ReportVoIPCallStateToRegistry success path
@@ -380,7 +380,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ReportVoIPCallState_Succ
     EXPECT_EQ(g_stubLastInfo.callState, VoIPCallState::INCOMING);
     EXPECT_TRUE(g_stubLastInfo.isVoiceAnswerSupported);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ReportVoIPCallState_UpdateFailed
  * @tc.name: Test ReportVoIPCallStateToRegistry when registry update fails
@@ -396,7 +396,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ReportVoIPCallState_Upda
     proxy_.ReportVoIPCallStateToRegistry(callObject, TelCallState::CALL_STATUS_ACTIVE);
     EXPECT_EQ(g_stubUpdateCount, 1);
 }
- 
+
 /**
  * @tc.number: CallStateReportProxy_ReportVoIPCallState_VideoConference
  * @tc.name: Test ReportVoIPCallStateToRegistry with video conference call
