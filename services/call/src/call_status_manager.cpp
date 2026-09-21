@@ -2952,7 +2952,7 @@ void CallStatusManager::UpdateUserSetupCompleteValue()
         return;
     }
  
-    std::string user_setup_complete {"1"};
+    std::string userSetupComplete {"1"};
     std::vector<int> activedOsAccountIds;
     OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
     if (activedOsAccountIds.empty()) {
@@ -2964,9 +2964,9 @@ void CallStatusManager::UpdateUserSetupCompleteValue()
     OHOS::Uri uri_setup(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
         + std::to_string(userId) + "?Proxy=true&key=user_setup_complete");
-    TELEPHONY_LOGI("UpdateUserSetupCompleteValue user_setup_complete = %{public}s", user_setup_complete.c_str());
-    int resp_userSetup = datashareHelper->Query(uri_setup, "user_setup_complete", user_setup_complete);
-    if (resp_userSetup == TELEPHONY_SUCCESS && (user_setup_complete == "0" || user_setup_complete.empty())) {
+    TELEPHONY_LOGI("UpdateUserSetupCompleteValue userSetupComplete = %{public}s", user_setup_complete.c_str());
+    int resp = datashareHelper->Query(uri_setup, "user_setup_complete", user_setup_complete);
+    if (resp == TELEPHONY_SUCCESS && (userSetupComplete == "0" || user_setup_complete.empty())) {
         userSetupComplete_ = DEVICE_PROVISION_INVALID;
     } else {
         userSetupComplete_ = DEVICE_PROVISION_VALID;
