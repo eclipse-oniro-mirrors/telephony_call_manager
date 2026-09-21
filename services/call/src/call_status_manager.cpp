@@ -2964,9 +2964,9 @@ void CallStatusManager::UpdateUserSetupCompleteValue()
     OHOS::Uri uri_setup(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
         + std::to_string(userId) + "?Proxy=true&key=user_setup_complete");
-    TELEPHONY_LOGI("UpdateUserSetupCompleteValue userSetupComplete = %{public}s", user_setup_complete.c_str());
-    int resp = datashareHelper->Query(uri_setup, "user_setup_complete", user_setup_complete);
-    if (resp == TELEPHONY_SUCCESS && (userSetupComplete == "0" || user_setup_complete.empty())) {
+    TELEPHONY_LOGI("UpdateUserSetupCompleteValue userSetupComplete = %{public}s", userSetupComplete.c_str());
+    int resp = datashareHelper->Query(uri_setup, "user_setup_complete", userSetupComplete);
+    if (resp == TELEPHONY_SUCCESS && (userSetupComplete == "0" || userSetupComplete.empty())) {
         userSetupComplete_ = DEVICE_PROVISION_INVALID;
     } else {
         userSetupComplete_ = DEVICE_PROVISION_VALID;
