@@ -328,6 +328,28 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
  */
  HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_008, TestSize.Level0)
 {
+    auto reportCallInfo = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    reportCallInfo->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    std::string number = "123456789";
+    memcpy_s(&info.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    info.index = 1;
+    info.state = TelCallState::CALL_STATUS_INCOMING;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    callStatusManager->deviceProvisioned_ = -1;
+    callStatusManager->GetDevProvisioned();
+    callStatusManager->deviceProvisioned_ = 0;
+    EXPECT_EQ(reportCallInfo->UpdateCallReportInfo(info), TELEPHONY_SUCCESS);
+}
+ 
+/**
+ * @tc.number   Telephony_CallStatusManager_009
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_009, TestSize.Level0)
+{
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     ASSERT_TRUE(callStatusManager != nullptr);
     callStatusManager->Init();
@@ -343,6 +365,31 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     callStatusManager->SetVideoCallState(callObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED);
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     EXPECT_NE(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusManager_010
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_010, TestSize.Level0)
+{
+    auto reportCallInfo = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    reportCallInfo->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
+    CallDetailsInfo info;
+    info.slotId = 0;
+    CallDetailInfo detailInfo;
+    std::string number = "123456789";
+    memcpy_s(&detailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    detailInfo.index = 1;
+    detailInfo.state = TelCallState::CALL_STATUS_INCOMING;
+    detailInfo.callType = CallType::TYPE_IMS;
+    info.callVec.push_back(detailInfo);
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    callStatusManager->userSetupComplete_ = -1;
+    callStatusManager->GetDevUserSetupCompleteValue();
+    callStatusManager->userSetupComplete_ = 0;
+    EXPECT_EQ(reportCallInfo->UpdateCallsReportInfo(info), TELEPHONY_SUCCESS);
 }
 
 #ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
