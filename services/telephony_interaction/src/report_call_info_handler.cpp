@@ -271,23 +271,18 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
+    bool isDevProvisioned = CallStatusManager::GetDevProvisioned() == DEVICE_PROVISION_VALID;
+    bool isOobeComplete = CallStatusManager::GetDevUserSetupCompleteValue() == DEVICE_PROVISION_VALID;
+    if (!isDevProvisioned || !isOobeComplete) {
+        ReportIncomingCallsDropChrEvents(info, isDevProvisioned, isOobeComplete);
+        TELEPHONY_LOGE("UpdateCallsReportInfo call not report in OOBE");
+        return TELEPHONY_SUCCESS;
+    }
+
     CallDetailsInfo callDetailsInfo;
     callDetailsInfo.slotId = info.slotId;
     (void)memcpy_s(callDetailsInfo.bundleName, kMaxBundleNameLen + 1, info.bundleName, kMaxBundleNameLen + 1);
     BuildCallDetailsInfo(info, callDetailsInfo);
-    if (CallStatusManager::GetDevProvisioned() != DEVICE_PROVISION_VALID ||
-        CallStatusManager::GetDevUserSetupCompleteValue() != DEVICE_PROVISION_VALID) {
-        std::vector<CallDetailInfo>::iterator it = info.callVec.begin();
-        for (; it != info.callVec.end(); ++it) {
-            TelCallState state = (*it).state;
-            int32_t index = (*it).index;
-            if (state == TelCallState::CALL_STATUS_INCOMING) {
-                CallManagerHisysevent::ReportCallDropChrEvent(info.slotId, index, DROP_CALL_BY_OOBE);
-            }
-        }
-        TELEPHONY_LOGE("UpdateCallsReportInfo call not report in OOBE");
-        return TELEPHONY_SUCCESS;
-    }
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
     TELEPHONY_LOGW("UpdateCallsReportInfo submit task enter");
     reportCallInfoQueue.submit([callStatusManagerPtr, callDetailsInfo]() {
@@ -303,6 +298,24 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
     });
 
     return TELEPHONY_SUCCESS;
+}
+
+void ReportCallInfoHandler::ReportIncomingCallsDropChrEvents(
+    const CallDetailsInfo &info, bool isDevProvisioned, bool isOobeComplete)
+{
+    for (const auto &call : info.callVec) {
+        if (call.state != TelCallState::CALL_STATUS_INCOMING) {
+            continue;
+        }
+        if (!isDevProvisioned) {
+            CallManagerHisysevent::ReportCallDropChrEvent(
+                info.slotId, call.index, DROP_CALL_BY_INVALID_DEVICE_PROPERTY);
+        }
+        if (!isOobeComplete) {
+            CallManagerHisysevent::ReportCallDropChrEvent(
+                info.slotId, call.index, DROP_CALL_BY_OOBE);
+        }
+    }
 }
 
 int32_t ReportCallInfoHandler::UpdateDisconnectedCause(const DisconnectedDetails &details)
