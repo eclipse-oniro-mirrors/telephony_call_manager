@@ -761,6 +761,18 @@ int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
     
     call->SetNonVirtualCall(!DelayedSingleton<AudioDeviceManager>::GetInstance()->GetVirtualCall());
     call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+#ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
+    std::shared_ptr<SpamCallAdapter> spamCallAdapterPtr = std::make_shared<SpamCallAdapter>();
+    bool isDetectedSpamCall = spamCallAdapterPtr->DetectSpamCall(std::string(info.phoneNum),
+        info.accountId, watchTelephonyNode_, static_cast<int32_t>(info.callType));
+    if (isDetectedSpamCall) { // blocking call when query succ
+        if (spamCallAdapterPtr->GetCallDisposition() == CallDisposition::INTERCEPTED) {
+            auto ret = call->RejectCall();
+            TELEPHONY_LOGI("RejectVoipCall ret[%{public}d]", ret);
+            return TELEPHONY_SUCCESS;
+        }
+    }
+#endif
     AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);

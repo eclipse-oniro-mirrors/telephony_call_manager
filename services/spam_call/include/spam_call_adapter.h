@@ -58,7 +58,7 @@ public:
     SpamCallAdapter();
     ~SpamCallAdapter();
     bool DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId,
-        IWatchTelephonyNode *watchTelephonyNode = nullptr);
+        IWatchTelephonyNode *watchTelephonyNode = nullptr, int32_t callType = static_cast<int32_t>(CallType::TYPE_IMS));
     void GetDetectResult(int32_t &errCode, std::string &result);
     void SetDetectResult(int32_t &errCode, std::string &result);
     void GetParseResult(bool &isBlock, NumberMarkInfo &info, int32_t &blockReason, std::string &detectDetails);
@@ -87,7 +87,8 @@ private:
     bool ParseNumberMarkInfo(cJSON *root, NumberMarkInfo &numberMarkInfo);
     bool ParseCallerResult(const std::string &dispositionJson, CallDisposition &callDisposition,
         NumberMarkInfo &numberMarkInfo);
-    void SubmitCallerStatusQuery(const std::string &phoneNumber, IWatchTelephonyNode *watchTelephonyNode);
+    void SubmitCallerStatusQuery(const std::string &phoneNumber, IWatchTelephonyNode *watchTelephonyNode,
+        int32_t callType);
 #endif
 
     int32_t errCode_ = -1;
