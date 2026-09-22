@@ -281,7 +281,10 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
 
     CallDetailsInfo callDetailsInfo;
     callDetailsInfo.slotId = info.slotId;
-    (void)memcpy_s(callDetailsInfo.bundleName, kMaxBundleNameLen + 1, info.bundleName, kMaxBundleNameLen + 1);
+    if (memcpy_s(callDetailsInfo.bundleName, kMaxBundleNameLen + 1, info.bundleName, kMaxBundleNameLen + 1) != EOK) {
+        TELEPHONY_LOGE("memcpy_s bundleName failed");
+        return TELEPHONY_ERR_MEMCPY_FAIL;
+    }
     BuildCallDetailsInfo(info, callDetailsInfo);
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
     TELEPHONY_LOGW("UpdateCallsReportInfo submit task enter");
