@@ -16,196 +16,195 @@
 #define private public
 #define protected public
 #include "call_state_report_proxy.h"
- 
+
 #include <gtest/gtest.h>
 #include <string>
- 
+
 #include "call_base.h"
 #include "call_manager_info.h"
-#include "stub.h"
 #include "telephony_errors.h"
 #include "telephony_state_registry_client.h"
 #include "voip_call_state_info.h"
- 
+
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
- 
+
 namespace {
-int32_t g_stubUpdateResult = TELEPHONY_SUCCESS;
-int32_t g_stubUpdateCount = 0;
-VoIPCallStateInfo g_stubLastInfo = {};
+int32_t g_updateResult = TELEPHONY_SUCCESS;
+int32_t g_updateCount = 0;
+VoIPCallStateInfo g_lastInfo = {};
 constexpr int32_t INVALID_STATE = 100;
 } // namespace
- 
-static int32_t StubUpdateVoIPCallState(TelephonyStateRegistryClient *client, const VoIPCallStateInfo &info)
+
+int32_t TelephonyStateRegistryClient::UpdateVoIPCallState(const VoIPCallStateInfo &info)
 {
-    ++g_stubUpdateCount;
-    g_stubLastInfo = info;
-    return g_stubUpdateResult;
+    ++g_updateCount;
+    g_lastInfo = info;
+    return g_updateResult;
 }
- 
+
 class MockCallBase : public CallBase {
 public:
     explicit MockCallBase(DialParaInfo &info) : CallBase(info) {}
     ~MockCallBase() override = default;
- 
+
     void GetCallAttributeInfo(CallAttributeInfo &info) override
     {
         info = mockAttrInfo_;
     }
- 
+
     int32_t DialingProcess() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t AnswerCall(int32_t videoState, bool isRTT) override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t RejectCall() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t HangUpCall() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t HoldCall() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t UnHoldCall() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t SwitchCall() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     bool GetEmergencyState() override
     {
         return false;
     }
- 
+
     int32_t StartDtmf(char str) override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t StopDtmf() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t PostDialProceed(bool proceed) override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t GetSlotId() override
     {
         return 0;
     }
- 
+
     int32_t CombineConference() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     void HandleCombineConferenceFailEvent() override {}
- 
+
     int32_t SeparateConference() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t KickOutFromConference() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t CanCombineConference() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t CanSeparateConference() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t CanKickOutFromConference() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t LaunchConference() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t ExitConference() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t HoldConference() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t GetMainCallId(int32_t &mainCallId) override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t GetSubCallIdList(std::vector<std::u16string> &callIdList) override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t GetCallIdListForConference(std::vector<std::u16string> &callIdList) override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t IsSupportConferenceable() override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     int32_t SetMute(int32_t mute, int32_t slotId) override
     {
         return TELEPHONY_SUCCESS;
     }
- 
+
     CallAttributeInfo mockAttrInfo_ = {};
 };
- 
+
 class CallStateReportProxyTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
- 
+
     void SetUp() override
     {
-        g_stubUpdateResult = TELEPHONY_SUCCESS;
-        g_stubUpdateCount = 0;
-        g_stubLastInfo = {};
+        g_updateResult = TELEPHONY_SUCCESS;
+        g_updateCount = 0;
+        g_lastInfo = {};
         DialParaInfo dialPara;
         call_ = new MockCallBase(dialPara);
     }
- 
+
     void TearDown() override {}
- 
+
     CallStateReportProxy proxy_;
     sptr<MockCallBase> call_ = nullptr;
 };
@@ -352,7 +351,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ReportVoIPCallState_Null
 {
     sptr<CallBase> nullCall = nullptr;
     proxy_.ReportVoIPCallStateToRegistry(nullCall, TelCallState::CALL_STATUS_INCOMING);
-    EXPECT_EQ(g_stubUpdateCount, 0);
+    EXPECT_EQ(g_updateCount, 0);
 }
 
 /**
@@ -370,15 +369,13 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ReportVoIPCallState_Succ
     call_->mockAttrInfo_.voipCallInfo.isConferenceCall = false;
     call_->mockAttrInfo_.voipCallInfo.isVoiceAnswerSupported = true;
     sptr<CallBase> callObject = call_;
-    Stub stub;
-    stub.set(ADDR(TelephonyStateRegistryClient, UpdateVoIPCallState), StubUpdateVoIPCallState);
     proxy_.ReportVoIPCallStateToRegistry(callObject, TelCallState::CALL_STATUS_INCOMING);
-    EXPECT_EQ(g_stubUpdateCount, 1);
-    EXPECT_EQ(g_stubLastInfo.appName, "com.example.voip");
-    EXPECT_EQ(g_stubLastInfo.contactName, "Alice");
-    EXPECT_EQ(g_stubLastInfo.callType, VoIPCallType::VOICE_ONE_TO_ONE);
-    EXPECT_EQ(g_stubLastInfo.callState, VoIPCallState::INCOMING);
-    EXPECT_TRUE(g_stubLastInfo.isVoiceAnswerSupported);
+    EXPECT_EQ(g_updateCount, 1);
+    EXPECT_EQ(g_lastInfo.appName, "com.example.voip");
+    EXPECT_EQ(g_lastInfo.contactName, "Alice");
+    EXPECT_EQ(g_lastInfo.callType, VoIPCallType::VOICE_ONE_TO_ONE);
+    EXPECT_EQ(g_lastInfo.callState, VoIPCallState::INCOMING);
+    EXPECT_TRUE(g_lastInfo.isVoiceAnswerSupported);
 }
 
 /**
@@ -389,12 +386,10 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ReportVoIPCallState_Succ
  */
 HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ReportVoIPCallState_UpdateFailed, TestSize.Level1)
 {
-    g_stubUpdateResult = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    g_updateResult = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     sptr<CallBase> callObject = call_;
-    Stub stub;
-    stub.set(ADDR(TelephonyStateRegistryClient, UpdateVoIPCallState), StubUpdateVoIPCallState);
     proxy_.ReportVoIPCallStateToRegistry(callObject, TelCallState::CALL_STATUS_ACTIVE);
-    EXPECT_EQ(g_stubUpdateCount, 1);
+    EXPECT_EQ(g_updateCount, 1);
 }
 
 /**
@@ -412,13 +407,11 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ReportVoIPCallState_Vide
     call_->mockAttrInfo_.voipCallInfo.isConferenceCall = true;
     call_->mockAttrInfo_.voipCallInfo.isVoiceAnswerSupported = false;
     sptr<CallBase> callObject = call_;
-    Stub stub;
-    stub.set(ADDR(TelephonyStateRegistryClient, UpdateVoIPCallState), StubUpdateVoIPCallState);
     proxy_.ReportVoIPCallStateToRegistry(callObject, TelCallState::CALL_STATUS_ACTIVE);
-    EXPECT_EQ(g_stubUpdateCount, 1);
-    EXPECT_EQ(g_stubLastInfo.callType, VoIPCallType::VIDEO_CONFERENCE);
-    EXPECT_EQ(g_stubLastInfo.callState, VoIPCallState::ACTIVE);
-    EXPECT_FALSE(g_stubLastInfo.isVoiceAnswerSupported);
+    EXPECT_EQ(g_updateCount, 1);
+    EXPECT_EQ(g_lastInfo.callType, VoIPCallType::VIDEO_CONFERENCE);
+    EXPECT_EQ(g_lastInfo.callState, VoIPCallState::ACTIVE);
+    EXPECT_FALSE(g_lastInfo.isVoiceAnswerSupported);
 }
 } // namespace Telephony
 } // namespace OHOS
