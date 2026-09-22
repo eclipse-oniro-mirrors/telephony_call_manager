@@ -221,8 +221,7 @@ public:
     int32_t HangUpCall() override;
 
 private:
-    int32_t SendControlRequest(int32_t msgId);
-    int32_t SendControlRequest(int32_t msgId, int32_t videoState);
+    int32_t SendControlRequest(int32_t msgId, int32_t videoState = -1);
     bool WriteDataParcel(MessageParcel &dataParcel, AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile);
     __attribute__((noinline)) int32_t SendRequest(const std::string &callId, int32_t msgId, MessageParcel &in,
         MessageParcel &out, MessageOption &option);
