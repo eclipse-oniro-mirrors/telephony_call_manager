@@ -34,7 +34,7 @@ ohos_unittest("tel_call_state_report_proxy_test") {
   ]
 
   include_dirs += call_manager_include_dirs
-  include_dirs += [ "${call_manager_path}/frameworks/native/include" ]
+  deps = [ "${call_manager_path}/frameworks/native:tel_call_manager_api" ]
 
   external_deps = [
     "ability_base:base",
