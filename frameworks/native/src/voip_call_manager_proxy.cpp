@@ -533,23 +533,6 @@ int32_t VoipCallManagerProxy::NotifyVoIPAudioStreamStart(int32_t uid)
     return replyParcel.ReadInt32();
 }
 
-int32_t VoipCallManagerProxy::SendControlRequest(int32_t msgId)
-{
-    MessageParcel dataParcel;
-    if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    MessageOption option;
-    MessageParcel replyParcel;
-    int32_t error = SendRequest("", msgId, dataParcel, replyParcel, option);
-    if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function SendControlRequest msgId:%{public}d failed! errCode:%{public}d", msgId, error);
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return replyParcel.ReadInt32();
-}
- 
 int32_t VoipCallManagerProxy::SendControlRequest(int32_t msgId, int32_t videoState)
 {
     MessageParcel dataParcel;
