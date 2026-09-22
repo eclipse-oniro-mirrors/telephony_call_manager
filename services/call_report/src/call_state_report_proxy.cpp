@@ -82,12 +82,7 @@ void CallStateReportProxy::SendVoipCallStateChanged(int32_t uid, TelCallState st
 
 VoIPCallType CallStateReportProxy::ConvertToVoipCallType(const CallAttributeInfo &attrInfo)
 {
-    bool isVideo = (attrInfo.videoState == VideoStateType::TYPE_VIDEO);
-    bool isConf = attrInfo.voipCallInfo.isConferenceCall;
-    if (!isVideo) {
-        return isConf ? VoIPCallType::VOICE_CONFERENCE : VoIPCallType::VOICE_ONE_TO_ONE;
-    }
-    return isConf ? VoIPCallType::VIDEO_CONFERENCE : VoIPCallType::VIDEO_ONE_TO_ONE;
+    return (attrInfo.videoState == VideoStateType::TYPE_VIDEO) ? VoIPCallType::VIDEO : VoIPCallType::VOICE;
 }
  
 VoIPCallState CallStateReportProxy::ConvertToVoipCallState(TelCallState nextState)
