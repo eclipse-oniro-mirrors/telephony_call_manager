@@ -94,8 +94,6 @@ constexpr const char *TEST_STR = "123";
 constexpr const char *LONG_STR =
     "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
     "111111111";
-constexpr const char *DEVICE_PROVISIONED_URI =
-    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 } // namespace
 
 class DemoHandler : public AppExecFwk::EventHandler {
@@ -322,6 +320,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     info.state = TelCallState::CALL_STATUS_DISCONNECTED;
     callStatusManager->HandleCallReportInfo(info);
 }
+
 /**
  * @tc.number   Telephony_CallStatusManager_008
  * @tc.name     test error branch
@@ -329,8 +328,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
  */
  HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_008, TestSize.Level0)
 {
-    Uri uri(DEVICE_PROVISIONED_URI);
-    sptr<OOBEStatusObserver> oobeStatusObserver_(new (std::nothrow) OOBEStatusObserver());
     auto reportCallInfo = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
     reportCallInfo->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
     CallDetailInfo info;
@@ -339,29 +336,13 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     info.index = 1;
     info.state = TelCallState::CALL_STATUS_INCOMING;
     info.callType = CallType::TYPE_BLUETOOTH;
-    ASSERT_TRUE(oobeStatusObserver_ != nullptr);
-    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    callStatusManager->RegisterObserver();
-    ASSERT_EQ(helper->RegisterToDataShare(uri, oobeStatusObserver_), true);
-    oobeStatusObserver_->OnChange();
-    callStatusManager->deviceProvisioned_ = -1;
-    callStatusManager->UpdateDevProvisioned();
-    EXPECT_EQ(helper->Update(uri, "device_provisioned", "0"), 0);
-    oobeStatusObserver_->OnChange();
     callStatusManager->deviceProvisioned_ = -1;
     callStatusManager->GetDevProvisioned();
-    EXPECT_EQ(helper->UnRegisterToDataShare(uri, oobeStatusObserver_), true);
-
     callStatusManager->deviceProvisioned_ = 0;
-    DialParaInfo dialParaInfo;
-    sptr<CallBase> call = new IMSCall(dialParaInfo);
-    EXPECT_TRUE(callStatusManager->ShouldRejectIncomingCall(call));
-    reportCallInfo->UpdateCallReportInfo(info);
-    callStatusManager->RegisterObserver();
-    callStatusManager->oobeStatusObserver_ = nullptr;
+    EXPECT_EQ(reportCallInfo->UpdateCallReportInfo(info), TELEPHONY_SUCCESS);
 }
-
+ 
 /**
  * @tc.number   Telephony_CallStatusManager_009
  * @tc.name     test error branch
@@ -384,6 +365,31 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     callStatusManager->SetVideoCallState(callObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED);
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     EXPECT_NE(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusManager_010
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_010, TestSize.Level0)
+{
+    auto reportCallInfo = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    reportCallInfo->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
+    CallDetailsInfo info;
+    info.slotId = 0;
+    CallDetailInfo detailInfo;
+    std::string number = "123456789";
+    memcpy_s(&detailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    detailInfo.index = 1;
+    detailInfo.state = TelCallState::CALL_STATUS_INCOMING;
+    detailInfo.callType = CallType::TYPE_IMS;
+    info.callVec.push_back(detailInfo);
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    callStatusManager->userSetupComplete_ = -1;
+    callStatusManager->GetDevUserSetupCompleteValue();
+    callStatusManager->userSetupComplete_ = 0;
+    EXPECT_EQ(reportCallInfo->UpdateCallsReportInfo(info), TELEPHONY_SUCCESS);
 }
 
 #ifdef CALL_MANAGER_WATCH_CALL_BLOCKING

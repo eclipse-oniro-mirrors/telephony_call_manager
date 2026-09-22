@@ -47,13 +47,6 @@ constexpr int32_t DEVICE_PROVISION_UNDEF = -1;
 constexpr int32_t DEVICE_PROVISION_INVALID = 0;
 constexpr int32_t DEVICE_PROVISION_VALID = 1;
 
-class OOBEStatusObserver : public AAFwk::DataAbilityObserverStub {
-public:
-    OOBEStatusObserver() = default;
-    ~OOBEStatusObserver() = default;
-    void OnChange() override;
-};
-
 class CallStatusManager : public CallStatusPolicy {
 public:
     CallStatusManager();
@@ -76,8 +69,10 @@ public:
     int32_t GetAntiFraudSlotId();
     int32_t GetAntiFraudIndex();
     static int32_t GetDevProvisioned();
-    static void RegisterObserver();
+    static int32_t GetDevUserSetupCompleteValue();
     static void UpdateDevProvisioned();
+    static void UpdateUserSetupCompleteValue();
+    static void ResetUserSetupCompleteValue();
 #ifdef SUPPORT_RTT_CALL
     void HandleRttEventInfo(const ImsRTTEventType &eventType);
 #endif
@@ -221,8 +216,8 @@ private:
     int32_t antiFraudSlotId_ = -1;
     int32_t antiFraudIndex_ = -1;
     ffrt::mutex mutex_;
-    static sptr<OOBEStatusObserver> oobeStatusObserver_;
-    static int32_t deviceProvisioned_;
+    static std::atomic<int32_t> deviceProvisioned_;
+    static std::atomic<int32_t> userSetupComplete_;
 #ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
     void *watchSystemServiceHandler_{nullptr};
     IWatchTelephonyNode *watchTelephonyNode_{nullptr};

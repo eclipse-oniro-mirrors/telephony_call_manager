@@ -78,8 +78,8 @@ const std::string ADVSECMODE_STATE = "ohos.boot.advsecmode.state";
 const std::string ANTIFRAUD_FEATURE = "const.telephony.antifraud.supported";
 const std::string PRIMARY_CONTACT = "primary_contact";
 constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
-int32_t CallStatusManager::deviceProvisioned_ = DEVICE_PROVISION_UNDEF;
-sptr<OOBEStatusObserver> CallStatusManager::oobeStatusObserver_ = nullptr;
+std::atomic<int32_t> CallStatusManager::deviceProvisioned_ = DEVICE_PROVISION_UNDEF;
+std::atomic<int32_t> CallStatusManager::userSetupComplete_ = DEVICE_PROVISION_UNDEF;
 
 CallStatusManager::CallStatusManager()
 {
@@ -2175,39 +2175,7 @@ bool CallStatusManager::ShouldRejectIncomingCall(sptr<CallBase> &call)
         return true;
     }
 #endif
-#ifdef CONFIG_FACTORY_VERSION
-    TELEPHONY_LOGI("ShouldRejectIncomingCall: CONFIG_FACTORY_VERSION is true");
     return false;
-#else
-
-    if (CallStatusManager::GetDevProvisioned() != DEVICE_PROVISION_VALID) {
-        CallManagerHisysevent::ReportCallDropChrEvent(call->GetSlotId(), call->GetCallIndex(),
-            DROP_CALL_BY_INVALID_DEVICE_PROPERTY);
-        call->SetApCauseReported(true);
-        TELEPHONY_LOGW("ShouldRejectIncomingCall: device_provisioned = 0");
-        return true;
-    }
-    auto datashareHelper = SettingsDataShareHelper::GetInstance();
-    std::string user_setup_complete {"1"};
-    std::vector<int> activedOsAccountIds;
-    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
-    if (activedOsAccountIds.empty()) {
-        TELEPHONY_LOGW("ShouldRejectIncomingCall: activedOsAccountIds is empty");
-        return false;
-    }
-    int userId = activedOsAccountIds[0];
-    OHOS::Uri uri_setup(
-        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
-        + std::to_string(userId) + "?Proxy=true&key=user_setup_complete");
-    int resp_userSetup = datashareHelper->Query(uri_setup, "user_setup_complete", user_setup_complete);
-    if (resp_userSetup == TELEPHONY_SUCCESS && (user_setup_complete == "0" || user_setup_complete.empty())) {
-        CallManagerHisysevent::ReportCallDropChrEvent(call->GetSlotId(), call->GetCallIndex(), DROP_CALL_BY_OOBE);
-        call->SetApCauseReported(true);
-        TELEPHONY_LOGW("ShouldRejectIncomingCall: user_setup_complete = 0");
-        return true;
-    }
-    return false;
-#endif
 }
 
 bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, const CallDetailInfo &info)
@@ -2936,28 +2904,9 @@ bool CallStatusManager::RefreshDialingStateByOtherState(sptr<CallBase> &call, co
     return true;
 }
 
-void OOBEStatusObserver::OnChange()
-{
-    TELEPHONY_LOGE("OOBEStatusObserver::OnChange enter");
-    CallStatusManager::UpdateDevProvisioned();
-}
-
-void CallStatusManager::RegisterObserver()
-{
-    if (oobeStatusObserver_ != nullptr) {
-        return;
-    }
-    oobeStatusObserver_ = new OOBEStatusObserver();
-    OHOS::Uri OOBEStatusUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI + "&key=device_provisioned");
-    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
-    if (!helper->RegisterToDataShare(OOBEStatusUri, oobeStatusObserver_)) {
-        TELEPHONY_LOGE("RegisterObserver failed");
-    }
-}
-
 int32_t CallStatusManager::GetDevProvisioned()
 {
-    if (deviceProvisioned_ == DEVICE_PROVISION_UNDEF) {
+    if (deviceProvisioned_ != DEVICE_PROVISION_VALID) {
         UpdateDevProvisioned();
     }
     return deviceProvisioned_;
@@ -2965,6 +2914,11 @@ int32_t CallStatusManager::GetDevProvisioned()
 
 void CallStatusManager::UpdateDevProvisioned()
 {
+#ifdef CONFIG_FACTORY_VERSION
+    TELEPHONY_LOGI("UpdateDevProvisioned: CONFIG_FACTORY_VERSION is true");
+    deviceProvisioned_ = DEVICE_PROVISION_VALID;
+    return;
+#else
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
     if (datashareHelper == nullptr) {
         TELEPHONY_LOGE("datashareHelper is null");
@@ -2982,6 +2936,54 @@ void CallStatusManager::UpdateDevProvisioned()
             deviceProvisioned_ = DEVICE_PROVISION_VALID;
         }
     }
+#endif
+}
+
+void CallStatusManager::ResetUserSetupCompleteValue()
+{
+    userSetupComplete_ = DEVICE_PROVISION_UNDEF;
+}
+ 
+int32_t CallStatusManager::GetDevUserSetupCompleteValue()
+{
+    if (userSetupComplete_ != DEVICE_PROVISION_VALID) {
+        UpdateUserSetupCompleteValue();
+    }
+    return userSetupComplete_;
+}
+ 
+void CallStatusManager::UpdateUserSetupCompleteValue()
+{
+#ifdef CONFIG_FACTORY_VERSION
+    userSetupComplete_ = DEVICE_PROVISION_VALID;
+    return;
+#else
+    auto datashareHelper = SettingsDataShareHelper::GetInstance();
+    if (datashareHelper == nullptr) {
+        TELEPHONY_LOGE("datashareHelper is null");
+        return;
+    }
+ 
+    std::string userSetupComplete {"1"};
+    std::vector<int> activedOsAccountIds;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
+    if (activedOsAccountIds.empty()) {
+        TELEPHONY_LOGW("UpdateUserSetupCompleteValue: activedOsAccountIds is empty");
+        userSetupComplete_ = DEVICE_PROVISION_VALID;
+        return;
+    }
+    int userId = activedOsAccountIds[0];
+    OHOS::Uri uri_setup(
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
+        + std::to_string(userId) + "?Proxy=true&key=user_setup_complete");
+    TELEPHONY_LOGI("UpdateUserSetupCompleteValue userSetupComplete = %{public}s", userSetupComplete.c_str());
+    int resp = datashareHelper->Query(uri_setup, "user_setup_complete", userSetupComplete);
+    if (resp == TELEPHONY_SUCCESS && (userSetupComplete == "0" || userSetupComplete.empty())) {
+        userSetupComplete_ = DEVICE_PROVISION_INVALID;
+    } else {
+        userSetupComplete_ = DEVICE_PROVISION_VALID;
+    }
+#endif
 }
 
 void CallStatusManager::PackVoipCallInfo(DialParaInfo &paraInfo, const CallDetailInfo &info)
