@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+ 
 #define private public
 #define protected public
 #include "call_state_report_proxy.h"
@@ -31,18 +31,8 @@ namespace Telephony {
 using namespace testing::ext;
 
 namespace {
-int32_t g_updateResult = TELEPHONY_SUCCESS;
-int32_t g_updateCount = 0;
-VoIPCallStateInfo g_lastInfo = {};
 constexpr int32_t INVALID_STATE = 100;
 } // namespace
-
-int32_t TelephonyStateRegistryClient::UpdateVoIPCallState(const VoIPCallStateInfo &info)
-{
-    ++g_updateCount;
-    g_lastInfo = info;
-    return g_updateResult;
-}
 
 class MockCallBase : public CallBase {
 public:
@@ -191,14 +181,18 @@ public:
 
 class CallStateReportProxyTest : public testing::Test {
 public:
+    static int32_t updateResult_;
+    static int32_t updateCount_;
+    static VoIPCallStateInfo lastInfo_;
+
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
 
     void SetUp() override
     {
-        g_updateResult = TELEPHONY_SUCCESS;
-        g_updateCount = 0;
-        g_lastInfo = {};
+        updateResult_ = TELEPHONY_SUCCESS;
+        updateCount_ = 0;
+        lastInfo_ = {};
         DialParaInfo dialPara;
         call_ = new MockCallBase(dialPara);
     }
@@ -208,6 +202,17 @@ public:
     CallStateReportProxy proxy_;
     sptr<MockCallBase> call_ = nullptr;
 };
+
+int32_t CallStateReportProxyTest::updateResult_ = TELEPHONY_SUCCESS;
+int32_t CallStateReportProxyTest::updateCount_ = 0;
+VoIPCallStateInfo CallStateReportProxyTest::lastInfo_ = {};
+
+int32_t TelephonyStateRegistryClient::UpdateVoIPCallState(const VoIPCallStateInfo &info)
+{
+    ++CallStateReportProxyTest::updateCount_;
+    CallStateReportProxyTest::lastInfo_ = info;
+    return CallStateReportProxyTest::updateResult_;
+}
 
 /**
  * @tc.number: CallStateReportProxy_ConvertToVoipCallState_Incoming
@@ -351,7 +356,7 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ReportVoIPCallState_Null
 {
     sptr<CallBase> nullCall = nullptr;
     proxy_.ReportVoIPCallStateToRegistry(nullCall, TelCallState::CALL_STATUS_INCOMING);
-    EXPECT_EQ(g_updateCount, 0);
+    EXPECT_EQ(updateCount_, 0);
 }
 
 /**
@@ -370,12 +375,12 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ReportVoIPCallState_Succ
     call_->mockAttrInfo_.voipCallInfo.isVoiceAnswerSupported = true;
     sptr<CallBase> callObject = call_;
     proxy_.ReportVoIPCallStateToRegistry(callObject, TelCallState::CALL_STATUS_INCOMING);
-    EXPECT_EQ(g_updateCount, 1);
-    EXPECT_EQ(g_lastInfo.appName, "com.example.voip");
-    EXPECT_EQ(g_lastInfo.contactName, "Alice");
-    EXPECT_EQ(g_lastInfo.callType, VoIPCallType::VOICE_ONE_TO_ONE);
-    EXPECT_EQ(g_lastInfo.callState, VoIPCallState::INCOMING);
-    EXPECT_TRUE(g_lastInfo.isVoiceAnswerSupported);
+    EXPECT_EQ(updateCount_, 1);
+    EXPECT_EQ(lastInfo_.appName, "com.example.voip");
+    EXPECT_EQ(lastInfo_.contactName, "Alice");
+    EXPECT_EQ(lastInfo_.callType, VoIPCallType::VOICE);
+    EXPECT_EQ(lastInfo_.callState, VoIPCallState::INCOMING);
+    EXPECT_TRUE(lastInfo_.isVoiceAnswerSupported);
 }
 
 /**
@@ -386,17 +391,17 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ReportVoIPCallState_Succ
  */
 HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ReportVoIPCallState_UpdateFailed, TestSize.Level1)
 {
-    g_updateResult = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    updateResult_ = TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     sptr<CallBase> callObject = call_;
     proxy_.ReportVoIPCallStateToRegistry(callObject, TelCallState::CALL_STATUS_ACTIVE);
-    EXPECT_EQ(g_updateCount, 1);
+    EXPECT_EQ(updateCount_, 1);
 }
 
 /**
  * @tc.number: CallStateReportProxy_ReportVoIPCallState_VideoConference
  * @tc.name: Test ReportVoIPCallStateToRegistry with video conference call
  * @tc.desc: Verify that ReportVoIPCallStateToRegistry converts videoState/isConferenceCall
- *           attributes to VoIPCallType::VIDEO_CONFERENCE and passes through
+ *           attributes to VoIPCallType::VIDEO and passes through
  *           isVoiceAnswerSupported=false to the registry
  */
 HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ReportVoIPCallState_VideoConference, TestSize.Level1)
@@ -408,10 +413,10 @@ HWTEST_F(CallStateReportProxyTest, CallStateReportProxy_ReportVoIPCallState_Vide
     call_->mockAttrInfo_.voipCallInfo.isVoiceAnswerSupported = false;
     sptr<CallBase> callObject = call_;
     proxy_.ReportVoIPCallStateToRegistry(callObject, TelCallState::CALL_STATUS_ACTIVE);
-    EXPECT_EQ(g_updateCount, 1);
-    EXPECT_EQ(g_lastInfo.callType, VoIPCallType::VIDEO_CONFERENCE);
-    EXPECT_EQ(g_lastInfo.callState, VoIPCallState::ACTIVE);
-    EXPECT_FALSE(g_lastInfo.isVoiceAnswerSupported);
+    EXPECT_EQ(updateCount_, 1);
+    EXPECT_EQ(lastInfo_.callType, VoIPCallType::VIDEO);
+    EXPECT_EQ(lastInfo_.callState, VoIPCallState::ACTIVE);
+    EXPECT_FALSE(lastInfo_.isVoiceAnswerSupported);
 }
 } // namespace Telephony
 } // namespace OHOS
