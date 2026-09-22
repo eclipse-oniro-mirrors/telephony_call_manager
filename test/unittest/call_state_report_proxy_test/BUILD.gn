@@ -30,11 +30,11 @@ ohos_unittest("tel_call_state_report_proxy_test") {
 
   include_dirs = [
     "${call_manager_path}/interfaces/innerkits",
-    "${call_manager_path}/frameworks/native/include",
     "${call_manager_path}/test/unittest/call_manager_gtest/include",
   ]
 
   include_dirs += call_manager_include_dirs
+  include_dirs += [ "${call_manager_path}/frameworks/native/include" ]
 
   external_deps = [
     "ability_base:base",
