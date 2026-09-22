@@ -53,6 +53,7 @@ ohos_unittest("tel_call_state_report_proxy_test") {
     "samgr:samgr_proxy",
   ]
 
+  deps = [ "${call_manager_path}/frameworks/native:tel_call_manager_api" ]
   external_deps += call_manager_external_deps
   external_deps -= ["ffrt:libffrt"]
 
