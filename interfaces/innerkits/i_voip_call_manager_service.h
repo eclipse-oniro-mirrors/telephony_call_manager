@@ -50,6 +50,9 @@ public:
         INTERFACE_SEND_CALL_UI_EVENT_FOR_WINDOW,
         INTERFACE_NOTIFY_VOIP_START,
         INTERFACE_REPORT_CALL_ATTRIBUTE_CHANGE,
+        INTERFACE_CONTROL_ANSWER_VOIP_CALL,
+        INTERFACE_CONTROL_REJECT_VOIP_CALL,
+        INTERFACE_CONTROL_HANGUP_VOIP_CALL,
     };
     virtual ~IVoipCallManagerService() = default;
     virtual int32_t ReportCallAttributeChange(
@@ -79,6 +82,14 @@ public:
         AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason) = 0;
     virtual int32_t SendCallUiEventForWindow(AppExecFwk::PacMap &extras) = 0;
     virtual int32_t NotifyVoIPAudioStreamStart(int32_t uid) = 0;
+
+    /**
+     * Reverse-control entries for third-party wearable apps (server-side call selection,
+     * no callId argument; gated by ohos.permission.MANAGE_CALL_FOR_DEVICES on the SA side).
+     */
+    virtual int32_t AnswerCall(int32_t videoState) = 0;
+    virtual int32_t RejectCall() = 0;
+    virtual int32_t HangUpCall() = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.IVoipCallManagerService");

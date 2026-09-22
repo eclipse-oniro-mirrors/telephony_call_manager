@@ -29,6 +29,7 @@
 #include "telephony_permission.h"
 #include "telephony_state_registry_client.h"
 #include "voip_call.h"
+#include "voip_call_state_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -50,6 +51,7 @@ void CallStateReportProxy::CallStateUpdated(
             auto voipCall = static_cast<VoIPCall *>(callObjectPtr.GetRefPtr());
             SendVoipCallStateChanged(voipCall->GetVoipUid(), nextState);
         }
+        ReportVoIPCallStateToRegistry(callObjectPtr, nextState);
         return;
     }
 
@@ -76,6 +78,58 @@ void CallStateReportProxy::SendVoipCallStateChanged(int32_t uid, TelCallState st
     if (!publishResult) {
         TELEPHONY_LOGE("SendCallStateChanged PublishBroadcastEvent result fail");
     }
+}
+
+VoIPCallType CallStateReportProxy::ConvertToVoipCallType(const CallAttributeInfo &attrInfo)
+{
+    return (attrInfo.videoState == VideoStateType::TYPE_VIDEO) ? VoIPCallType::VIDEO : VoIPCallType::VOICE;
+}
+ 
+VoIPCallState CallStateReportProxy::ConvertToVoipCallState(TelCallState nextState)
+{
+    switch (nextState) {
+        case TelCallState::CALL_STATUS_INCOMING:
+        case TelCallState::CALL_STATUS_WAITING:
+            return VoIPCallState::INCOMING;
+        case TelCallState::CALL_STATUS_DIALING:
+            return VoIPCallState::DIALING;
+        case TelCallState::CALL_STATUS_ALERTING:
+            return VoIPCallState::OUTGOING;
+        case TelCallState::CALL_STATUS_ANSWERED:
+            return VoIPCallState::ANSWERED;
+        case TelCallState::CALL_STATUS_ACTIVE:
+            return VoIPCallState::ACTIVE;
+        case TelCallState::CALL_STATUS_HOLDING:
+            return VoIPCallState::HOLDING;
+        case TelCallState::CALL_STATUS_DISCONNECTING:
+            return VoIPCallState::DISCONNECTING;
+        case TelCallState::CALL_STATUS_DISCONNECTED:
+            return VoIPCallState::DISCONNECTED;
+        default:
+            return VoIPCallState::IDLE;
+    }
+}
+ 
+void CallStateReportProxy::ReportVoIPCallStateToRegistry(sptr<CallBase> &callObjectPtr, TelCallState nextState)
+{
+    if (callObjectPtr == nullptr) {
+        TELEPHONY_LOGE("ReportVoIPCallStateToRegistry callObjectPtr is nullptr");
+        return;
+    }
+    CallAttributeInfo attrInfo;
+    callObjectPtr->GetCallAttributeInfo(attrInfo);
+    VoIPCallStateInfo info;
+    info.appName = attrInfo.voipCallInfo.voipBundleName;
+    info.contactName = attrInfo.voipCallInfo.userName;
+    info.callType = ConvertToVoipCallType(attrInfo);
+    info.callState = ConvertToVoipCallState(nextState);
+    info.isVoiceAnswerSupported = attrInfo.voipCallInfo.isVoiceAnswerSupported;
+    int32_t ret = DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateVoIPCallState(info);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ReportVoIPCallStateToRegistry failed, errcode:%{public}d", ret);
+        return;
+    }
+    TELEPHONY_LOGI("ReportVoIPCallStateToRegistry state:%{public}d", static_cast<int32_t>(info.callState));
 }
 
 void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCallState nextState)
