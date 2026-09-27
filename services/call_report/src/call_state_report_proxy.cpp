@@ -247,5 +247,17 @@ int32_t CallStateReportProxy::ReportCallStateForCallId(
     TELEPHONY_LOGI("report call state:%{public}d, slotId:%{public}d", callState, slotId);
     return ret;
 }
+
+int32_t CallStateReportProxy::ReportCallTransferStatusToRegistry(int32_t slotId, bool enabled)
+{
+    int32_t ret =
+        DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateCallTransferStatus(slotId, enabled);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ReportCallTransferStatusToRegistry failed, errcode:%{public}d", ret);
+        return ret;
+    }
+    TELEPHONY_LOGI("ReportCallTransferStatusToRegistry slotId:%{public}d, enabled:%{public}d", slotId, enabled);
+    return ret;
+}
 } // namespace Telephony
 } // namespace OHOS
