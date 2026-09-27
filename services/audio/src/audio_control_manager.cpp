@@ -472,8 +472,9 @@ bool AudioControlManager::PreHandleAnswerdState(
             isIncomingToAnswer) {
             callStateProcessor->DeleteCall(callId, priorState);
             if (isIncomingToAnswer && soundState_ == SoundState::STOPPED) {
-                    TELEPHONY_LOGI("Process an extra soundtone");
-                    ProcessAudioWhenCallActive(callObjectPtr);
+                // PlaySoundTone may not have started when the first "Answered" state is received,
+                // need to retry executing PlaySoundTone here.
+                ProcessAudioWhenCallActive(callObjectPtr);
             } else {
                 TELEPHONY_LOGI("No need into audio state machine");
             }
