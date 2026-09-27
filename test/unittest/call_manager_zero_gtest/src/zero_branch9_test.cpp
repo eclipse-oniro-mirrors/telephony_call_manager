@@ -470,6 +470,53 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_011, Function | MediumTe
 }
 
 /**
+ * @tc.number   Telephony_AudioControlManager_PreHandleAnswerdState_ExtraSoundtone
+ * @tc.name     test extra soundtone branch in PreHandleAnswerdState
+ * @tc.desc     Function test - when answered incoming call is the only call, enter
+ *               ProcessAudioWhenCallActive and start SOUND stream
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_PreHandleAnswerdState_ExtraSoundtone,
+    Function | MediumTest | Level3)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    ASSERT_NE(audioControl, nullptr);
+    DialParaInfo dialInfo1;
+    dialInfo1.accountId = 0;
+    dialInfo1.callId = 1;
+    sptr<CallBase> call1 = new IMSCall(dialInfo1);
+    call1->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::AddOneCallObject(call1);
+    audioControl->HandleCallStateUpdated(call1, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_DIALING);
+    DialParaInfo dialInfo2;
+    dialInfo2.accountId = 0;
+    dialInfo2.callId = 2;
+    sptr<CallBase> call2 = new IMSCall(dialInfo2);
+    call2->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::AddOneCallObject(call2);
+    call2->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    audioControl->HandleCallStateUpdated(call2, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
+    audioControl->HandleCallStateUpdated(call2, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
+    EXPECT_EQ(audioControl->soundState_, SoundState::STOPPED);
+ 
+    audioControl->HandleCallStateUpdated(call1, TelCallState::CALL_STATUS_DIALING,
+        TelCallState::CALL_STATUS_DISCONNECTED);
+    CallObjectManager::DeleteOneCallObject(call1);
+    audioControl->HandleCallStateUpdated(call2, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
+    EXPECT_EQ(audioControl->soundState_, SoundState::SOUNDING);
+ 
+    audioControl->soundState_ = SoundState::STOPPED;
+    audioControl->ringState_ = RingState::STOPPED;
+    CallObjectManager::DeleteOneCallObject(call2);
+    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+    callStateProcessor->dialingCalls_.clear();
+    callStateProcessor->alertingCalls_.clear();
+    callStateProcessor->incomingCalls_.clear();
+    callStateProcessor->holdingCalls_.clear();
+    callStateProcessor->activeCalls_.clear();
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
+}
+
+/**
  * @tc.number   Telephony_AudioControlManager_012
  * @tc.name     test error branch
  * @tc.desc     Function test
