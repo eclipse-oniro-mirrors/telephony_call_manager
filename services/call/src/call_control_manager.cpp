@@ -37,7 +37,6 @@
 #include "cellular_call_connection.h"
 #include "common_type.h"
 #include "ims_call.h"
-#include "incoming_flash_reminder.h"
 #include "iservice_registry.h"
 #include "reject_call_sms.h"
 #include "report_call_info_handler.h"
@@ -48,6 +47,8 @@
 #include "distributed_call_manager.h"
 #include "call_superprivacy_control_manager.h"
 #include "call_voice_assistant_manager.h"
+#include "accessibility_config.h"
+#include "accessibility_def.h"
 #ifdef SUPPORT_DSOFTBUS
 #include "interoperable_communication_manager.h"
 #include "distributed_communication_manager.h"
@@ -2353,17 +2354,13 @@ void CallControlManager::UnregisterAppStateObserver()
 
 void CallControlManager::StartFlashRemind()
 {
-    std::lock_guard<ffrt::mutex> lock(reminderMutex_);
-    if (incomingFlashReminder_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
-        incomingFlashReminder_ = std::make_shared<IncomingFlashReminder>(runner,
-            []() {
-                TELEPHONY_LOGI("clear flash reminder");
-                DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
-            }
-        );
-    }
-    incomingFlashReminder_->StartFlashRemind();
+    Accessibility::BlinkResultCode blinkResult = Accessibility::BlinkResultCode::BLINK_SUCCESS;
+    Accessibility::RetError ret =
+        AccessibilityConfig::AccessibilityConfig::GetInstance().StartBlinking(
+            static_cast<int32_t>(Accessibility::BlinkingMode::CONTINUOUS_BLINK),
+            static_cast<int32_t>(Accessibility::BlinkingScenario::CALL), blinkResult);
+    TELEPHONY_LOGI("StartFlashRemind ret=%{public}d, blinkResult=%{public}d",
+        static_cast<int32_t>(ret), static_cast<int32_t>(blinkResult));
 }
 
 void CallControlManager::SetRegMmiCodeCallbackState(bool isReg)
@@ -2376,17 +2373,13 @@ void CallControlManager::SetRegMmiCodeCallbackState(bool isReg)
 
 void CallControlManager::StopFlashRemind()
 {
-    std::lock_guard<ffrt::mutex> lock(reminderMutex_);
-    if (incomingFlashReminder_ == nullptr) {
-        return;
-    }
-    incomingFlashReminder_->StopFlashRemind();
-}
-
-void CallControlManager::ClearFlashReminder()
-{
-    std::lock_guard<ffrt::mutex> lock(reminderMutex_);
-    incomingFlashReminder_ = nullptr;
+    Accessibility::BlinkResultCode blinkResult = Accessibility::BlinkResultCode::BLINK_SUCCESS;
+    Accessibility::RetError ret =
+        AccessibilityConfig::AccessibilityConfig::GetInstance().StopBlinking(
+            static_cast<int32_t>(Accessibility::BlinkingMode::CONTINUOUS_BLINK),
+            static_cast<int32_t>(Accessibility::BlinkingScenario::CALL), blinkResult);
+    TELEPHONY_LOGI("StopFlashRemind ret=%{public}d, blinkResult=%{public}d",
+        static_cast<int32_t>(ret), static_cast<int32_t>(blinkResult));
 }
 
 bool CallControlManager::SetVirtualCall(bool isVirtual)

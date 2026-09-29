@@ -58,6 +58,7 @@ ohos_unittest("tel_call_manager_special0_test") {
     "access_token:libnativetoken_shared",
     "access_token:libprivacy_sdk",
     "access_token:libtoken_setproc",
+    "accessibility:accessibilityconfig",
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
     "audio_framework:audio_foundation",
@@ -145,12 +146,6 @@ ohos_unittest("tel_call_manager_special0_test") {
       defined(global_parts_info.hiviewdfx_hicollie) &&
       global_parts_info.hiviewdfx_hicollie) {
     external_deps += [ "hicollie:libhicollie" ]
-  }
-
-  if (defined(global_parts_info) &&
-      defined(global_parts_info.theme_screenlock_mgr) &&
-      global_parts_info.theme_screenlock_mgr) {
-    external_deps += [ "screenlock_mgr:screenlock_client" ]
   }
 
   if (defined(global_parts_info) &&
@@ -204,6 +199,7 @@ ohos_unittest("tel_call_manager_special1_test") {
     "access_token:libnativetoken_shared",
     "access_token:libprivacy_sdk",
     "access_token:libtoken_setproc",
+    "accessibility:accessibilityconfig",
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
     "audio_framework:audio_foundation",
@@ -294,12 +290,6 @@ ohos_unittest("tel_call_manager_special1_test") {
   }
 
   if (defined(global_parts_info) &&
-      defined(global_parts_info.theme_screenlock_mgr) &&
-      global_parts_info.theme_screenlock_mgr) {
-    external_deps += [ "screenlock_mgr:screenlock_client" ]
-  }
-
-  if (defined(global_parts_info) &&
       defined(global_parts_info.multimedia_camera_framework) &&
       global_parts_info.multimedia_camera_framework) {
     external_deps += [ "camera_framework:camera_framework" ]
@@ -350,6 +340,7 @@ ohos_unittest("tel_call_manager_special2_test") {
     "access_token:libnativetoken_shared",
     "access_token:libprivacy_sdk",
     "access_token:libtoken_setproc",
+    "accessibility:accessibilityconfig",
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
     "audio_framework:audio_foundation",
@@ -440,12 +431,6 @@ ohos_unittest("tel_call_manager_special2_test") {
   }
 
   if (defined(global_parts_info) &&
-      defined(global_parts_info.theme_screenlock_mgr) &&
-      global_parts_info.theme_screenlock_mgr) {
-    external_deps += [ "screenlock_mgr:screenlock_client" ]
-  }
-
-  if (defined(global_parts_info) &&
       defined(global_parts_info.multimedia_camera_framework) &&
       global_parts_info.multimedia_camera_framework) {
     external_deps += [ "camera_framework:camera_framework" ]
@@ -497,6 +482,7 @@ ohos_unittest("tel_call_manager_special3_test") {
     "access_token:libnativetoken_shared",
     "access_token:libprivacy_sdk",
     "access_token:libtoken_setproc",
+    "accessibility:accessibilityconfig",
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
     "audio_framework:audio_foundation",
@@ -584,12 +570,6 @@ ohos_unittest("tel_call_manager_special3_test") {
       defined(global_parts_info.hiviewdfx_hicollie) &&
       global_parts_info.hiviewdfx_hicollie) {
     external_deps += [ "hicollie:libhicollie" ]
-  }
-
-  if (defined(global_parts_info) &&
-      defined(global_parts_info.theme_screenlock_mgr) &&
-      global_parts_info.theme_screenlock_mgr) {
-    external_deps += [ "screenlock_mgr:screenlock_client" ]
   }
 
   if (defined(global_parts_info) &&
