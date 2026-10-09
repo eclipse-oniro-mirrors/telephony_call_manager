@@ -23,6 +23,9 @@ declare_args() {
   call_manager_call_transfer = true
 }
 
+call_manager_call_transfer_status_report =
+    (target_platform == "phone" || target_platform == "tablet")
+
 call_manager_path = "//base/telephony/call_manager"
 call_manager_defines = []
 call_manager_external_deps = []
@@ -391,4 +394,9 @@ if (call_manager_call_transfer) {
   call_manager_sources += [
     "${call_manager_path}/services/call_report/src/transfer_control_callback_proxy.cpp",
   ]
+}
+
+if (call_manager_call_transfer_status_report) {
+  print("callmanager call transfer status report")
+  call_manager_defines += [ "TELEPHONY_CALL_TRANSFER_STATUS_REPORT" ]
 }

@@ -248,6 +248,7 @@ int32_t CallStateReportProxy::ReportCallStateForCallId(
     return ret;
 }
 
+#ifdef TELEPHONY_CALL_TRANSFER_STATUS_REPORT
 int32_t CallStateReportProxy::ReportCallTransferStatusToRegistry(int32_t slotId, bool enabled)
 {
     int32_t ret =
@@ -259,5 +260,6 @@ int32_t CallStateReportProxy::ReportCallTransferStatusToRegistry(int32_t slotId,
     TELEPHONY_LOGI("ReportCallTransferStatusToRegistry slotId:%{public}d, enabled:%{public}d", slotId, enabled);
     return ret;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS

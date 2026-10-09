@@ -137,6 +137,7 @@ public:
      */
     int32_t UpdateSetTransferResult(const int32_t result) override;
 
+#ifdef TELEPHONY_CALL_TRANSFER_STATUS_REPORT
     /**
      * @brief update the active call transfer status
      *
@@ -145,6 +146,7 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t UpdateCallTransferStatus(int32_t slotId, bool enabled) override;
+#endif
 
     /**
      * @brief update the response of Get CallClip
