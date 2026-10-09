@@ -307,7 +307,6 @@ int32_t CallStatusCallbackProxy::UpdateSetTransferResult(const int32_t result)
     return replyParcel.ReadInt32();
 }
 
-#ifdef TELEPHONY_CALL_TRANSFER_STATUS_REPORT
 int32_t CallStatusCallbackProxy::UpdateCallTransferStatus(int32_t slotId, bool enabled)
 {
     MessageParcel dataParcel;
@@ -325,7 +324,6 @@ int32_t CallStatusCallbackProxy::UpdateCallTransferStatus(int32_t slotId, bool e
     }
     return replyParcel.ReadInt32();
 }
-#endif
 
 int32_t CallStatusCallbackProxy::UpdateGetCallClipResult(const ClipResponse &clipResponse)
 {

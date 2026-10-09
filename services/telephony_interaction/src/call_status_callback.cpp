@@ -360,13 +360,11 @@ int32_t CallStatusCallback::UpdateSetTransferResult(const int32_t result)
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
 }
 
-#ifdef TELEPHONY_CALL_TRANSFER_STATUS_REPORT
 int32_t CallStatusCallback::UpdateCallTransferStatus(int32_t slotId, bool enabled)
 {
     TELEPHONY_LOGI("UpdateCallTransferStatus slotId=%{public}d, enabled=%{public}d", slotId, enabled);
     return DelayedSingleton<CallStateReportProxy>::GetInstance()->ReportCallTransferStatusToRegistry(slotId, enabled);
 }
-#endif
 
 int32_t CallStatusCallback::UpdateGetCallClipResult(const ClipResponse &clipResponse)
 {

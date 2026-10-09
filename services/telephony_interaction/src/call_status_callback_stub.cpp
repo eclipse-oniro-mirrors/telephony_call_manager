@@ -103,10 +103,8 @@ void CallStatusCallbackStub::InitSupplementFuncMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateGetTransferResult(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_TRANSFER)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateSetTransferResult(data, reply); };
-#ifdef TELEPHONY_CALL_TRANSFER_STATUS_REPORT
     memberFuncMap_[static_cast<uint32_t>(UPDATE_CALL_TRANSFER_STATUS)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallTransferStatus(data, reply); };
-#endif
     memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_CALL_CLIP)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateGetCallClipResult(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_CALL_CLIR)] =
@@ -464,7 +462,6 @@ int32_t CallStatusCallbackStub::OnUpdateSetTransferResult(MessageParcel &data, M
     return TELEPHONY_SUCCESS;
 }
 
-#ifdef TELEPHONY_CALL_TRANSFER_STATUS_REPORT
 int32_t CallStatusCallbackStub::OnUpdateCallTransferStatus(MessageParcel &data, MessageParcel &reply)
 {
     int32_t error = TELEPHONY_ERR_FAIL;
@@ -480,7 +477,6 @@ int32_t CallStatusCallbackStub::OnUpdateCallTransferStatus(MessageParcel &data, 
     }
     return TELEPHONY_SUCCESS;
 }
-#endif
 
 int32_t CallStatusCallbackStub::OnUpdateGetCallClipResult(MessageParcel &data, MessageParcel &reply)
 {
