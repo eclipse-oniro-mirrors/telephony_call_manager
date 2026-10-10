@@ -226,6 +226,15 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t ResetHearingAidDeviceList();
+
+    /**
+     * @brief Obtain the current voip call state
+     *
+     * @return Returns TelCallState value as int32_t in priority order:
+     *         incoming, active, answered, dialing, disconnecting, disconnected.
+     *         Returns CALL_STATUS_UNKNOWN if no voip call exists.
+     */
+    int32_t GetVoipCallState();
 };
 } // namespace Telephony
 } // namespace OHOS
