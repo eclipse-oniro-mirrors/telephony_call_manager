@@ -348,5 +348,15 @@ int32_t BluetoothCallClient::ResetHearingAidDeviceList()
     return TELEPHONY_ERR_FAIL;
 #endif
 }
+
+int32_t BluetoothCallClient::GetVoipCallState()
+{
+    if (g_bluetoothCallProxyPtr != nullptr) {
+        return g_bluetoothCallProxyPtr->GetVoipCallState();
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
