@@ -49,6 +49,7 @@ public:
 #ifdef SUPPORT_HEARING_AID
     virtual int32_t ResetBtHearingAidDeviceList() = 0;
 #endif
+    virtual int32_t GetVoipCallState() = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.IBluetoothCall");
