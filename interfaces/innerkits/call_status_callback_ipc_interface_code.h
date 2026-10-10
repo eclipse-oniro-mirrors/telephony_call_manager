@@ -65,6 +65,7 @@ enum CallStatusInterfaceCode {
     UPDATE_VOIP_EVENT_INFO,
     IMS_SUPP_EXT_CHANGE,
     VOIP_REPORT_CALL_PROCEDURE_EVENTS,
+    UPDATE_CALL_TRANSFER_STATUS,
 };
 } // namespace Telephony
 } // namespace OHOS

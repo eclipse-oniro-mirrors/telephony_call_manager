@@ -46,6 +46,7 @@ public:
     int32_t UpdateSetRestrictionPasswordResult(const int32_t result) override;
     int32_t UpdateGetTransferResult(const CallTransferResponse &response) override;
     int32_t UpdateSetTransferResult(const int32_t result) override;
+    int32_t UpdateCallTransferStatus(int32_t slotId, bool enabled) override;
     int32_t UpdateGetCallClipResult(const ClipResponse &clipResponse) override;
     int32_t UpdateGetCallClirResult(const ClirResponse &clirResponse) override;
     int32_t UpdateSetCallClirResult(const int32_t result) override;

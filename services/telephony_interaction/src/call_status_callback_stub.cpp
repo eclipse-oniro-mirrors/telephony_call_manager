@@ -103,6 +103,8 @@ void CallStatusCallbackStub::InitSupplementFuncMap()
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateGetTransferResult(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_TRANSFER)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateSetTransferResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_CALL_TRANSFER_STATUS)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallTransferStatus(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_CALL_CLIP)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateGetCallClipResult(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_CALL_CLIR)] =
@@ -453,6 +455,22 @@ int32_t CallStatusCallbackStub::OnUpdateSetTransferResult(MessageParcel &data, M
     }
     result = data.ReadInt32();
     error = UpdateSetTransferResult(result);
+    if (!reply.WriteInt32(error)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallStatusCallbackStub::OnUpdateCallTransferStatus(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t slotId = data.ReadInt32();
+    bool enabled = data.ReadBool();
+    error = UpdateCallTransferStatus(slotId, enabled);
     if (!reply.WriteInt32(error)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

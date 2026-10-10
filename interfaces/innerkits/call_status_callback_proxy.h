@@ -138,6 +138,15 @@ public:
     int32_t UpdateSetTransferResult(const int32_t result) override;
 
     /**
+     * @brief update the active call transfer status
+     *
+     * @param slotId[in], the SIM slot id
+     * @param enabled[in], whether the unconditional call transfer is enabled
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UpdateCallTransferStatus(int32_t slotId, bool enabled) override;
+
+    /**
      * @brief update the response of Get CallClip
      *
      * @param clipResponse[in], contains result, action, clipStat

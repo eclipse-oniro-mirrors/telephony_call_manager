@@ -49,6 +49,7 @@ private:
     int32_t OnUpdateSetRestrictionPasswordResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateGetTransferResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateSetTransferResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateCallTransferStatus(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateGetCallClipResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateGetCallClirResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateSetCallClirResult(MessageParcel &data, MessageParcel &reply);
