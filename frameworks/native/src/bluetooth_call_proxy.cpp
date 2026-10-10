@@ -167,6 +167,12 @@ int32_t BluetoothCallProxy::ResetBtHearingAidDeviceList()
     return SendRequest(BluetoothCallInterfaceCode::INTERFACE_BT_RESET_BT_HEARINGAID_AUDIO_DEVICE);
 }
 #endif
+
+int32_t BluetoothCallProxy::GetVoipCallState()
+{
+    return SendRequest(BluetoothCallInterfaceCode::INTERFACE_BT_GET_VOIP_CALL_STATE);
+}
+
 int32_t BluetoothCallProxy::SendRequest(BluetoothCallInterfaceCode code)
 {
     MessageParcel dataParcel;
