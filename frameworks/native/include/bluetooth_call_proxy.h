@@ -183,6 +183,14 @@ public:
      */
     int32_t ResetBtHearingAidDeviceList() override;
 #endif
+
+    /**
+     * GetVoipCallState
+     *
+     * @brief Obtain the current voip call state
+     * @return Returns TelCallState value as int32_t.
+     */
+    int32_t GetVoipCallState() override;
 private:
     int32_t SendRequest(BluetoothCallInterfaceCode code);
     int32_t SendRequest(BluetoothCallInterfaceCode code, MessageParcel &dataParcel, MessageParcel &replyParcel);
