@@ -1213,6 +1213,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_010, Function | MediumTes
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     callControlManager->Init();
     DialParaInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
     sptr<CallBase> call = (std::make_unique<IMSCall>(info)).release();
     call->SetCallType(CallType::TYPE_IMS);
     TelCallState priorState = TelCallState::CALL_STATUS_DIALING;
@@ -1243,10 +1244,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_010, Function | MediumTes
     call->SetTelCallState(TelCallState::CALL_STATUS_IDLE);
     call->SetCallId(0);
     EXPECT_EQ(callControlManager->PostDialProceed(0, false), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
-    call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
-    EXPECT_EQ(callControlManager->PostDialProceed(0, false), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
-    call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTING);
-    EXPECT_EQ(callControlManager->PostDialProceed(0, false), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
     call->SetTelCallState(TelCallState::CALL_STATUS_ANSWERED);
     EXPECT_NE(callControlManager->PostDialProceed(0, false), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
     call->SetTelCallState(TelCallState::CALL_STATUS_WAITING);
@@ -1255,6 +1252,10 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_010, Function | MediumTes
     EXPECT_NE(callControlManager->PostDialProceed(0, false), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
     call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
     EXPECT_NE(callControlManager->SetMuted(false), CALL_ERR_AUDIO_SETTING_MUTE_FAILED);
+    call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTING);
+    EXPECT_EQ(callControlManager->PostDialProceed(0, false), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
+    call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
+    EXPECT_EQ(callControlManager->PostDialProceed(0, false), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
     callControlManager->DisconnectAllCalls();
 }
 
