@@ -1436,7 +1436,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_016, Function | MediumTes
     callObjectPtr->SetCallId(VALID_CALLID);
     callObjectPtr->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
     callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
-    CallObjectManger::AddOneCallObject(callObjectPtr);
+    CallObjectManager::AddOneCallObject(callObjectPtr);
     EXPECT_EQ(callControlManager->RejectCall(VALID_CALLID, false, u"", RejectType::CALL_REJECT_MISSED_CALL),
         TELEPHONY_SUCCESS);
     EXPECT_EQ(callObjectPtr->rejectType_, RejectType::CALL_REJECT_MISSED_CALL);
