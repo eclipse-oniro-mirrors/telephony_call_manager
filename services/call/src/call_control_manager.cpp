@@ -442,7 +442,7 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
             if (missedCallNotification_ != nullptr) {
                 missedCallNotification_->PublishMissedCallEvent(call);
             }
-        } 
+        }
     }
     CallManagerHisysevent::WriteVoipCallStatisticalEvent(callId, "MtBannerReject");
     ReportPhoneUEInSuperPrivacy(CALL_REJECT_IN_SUPER_PRIVACY);
