@@ -39,10 +39,13 @@ void DistributedDataSinkController::OnCallDestroyed()
     if (carrierCallList.size() > SINGLE_CALL_COUNT) {
         return;
     }
-    if (session_ != nullptr) {
-        session_->Disconnect();
-        session_.reset();
-        session_ = nullptr;
+    {
+        std::lock_guard<ffrt::mutex> lock(sessionMutex_);
+        if (session_ != nullptr) {
+            session_->Disconnect();
+            session_.reset();
+            session_ = nullptr;
+        }
     }
 
     std::lock_guard<ffrt::mutex> lock(mutex_);
@@ -80,6 +83,7 @@ void DistributedDataSinkController::HandleRecvMsg(int32_t msgType, const cJSON *
 
 void DistributedDataSinkController::ConnectRemote(const std::string &devId)
 {
+    std::lock_guard<ffrt::mutex> lock(sessionMutex_);
     if (session_ != nullptr) {
         return;
     }
@@ -158,7 +162,12 @@ std::string DistributedDataSinkController::CreateDataReqMsg(DistributedMsgType m
 
 void DistributedDataSinkController::SendDataQueryReq()
 {
-    if (session_ == nullptr || !session_->IsReady()) {
+    std::shared_ptr<SessionAdapter> session;
+    {
+        std::lock_guard<ffrt::mutex> lock(sessionMutex_);
+        session = session_;
+    }
+    if (session == nullptr || !session->IsReady()) {
         TELEPHONY_LOGI("session not ready");
         return;
     }
@@ -175,7 +184,7 @@ void DistributedDataSinkController::SendDataQueryReq()
             if (data.empty()) {
                 continue;
             }
-            session_->SendMsg(data.c_str(), static_cast<uint32_t>(data.length()));
+            session->SendMsg(data.c_str(), static_cast<uint32_t>(data.length()));
             iter->second &= ~(DISTRIBUTED_DATA_TYPE_OFFSET_BASE << type);
         }
     }
@@ -271,7 +280,12 @@ std::string DistributedDataSinkController::CreateCurrentDataReqMsg(const std::st
 
 void DistributedDataSinkController::SendCurrentDataQueryReq()
 {
-    if (session_ == nullptr) {
+    std::shared_ptr<SessionAdapter> session;
+    {
+        std::lock_guard<ffrt::mutex> lock(sessionMutex_);
+        session = session_;
+    }
+    if (session == nullptr) {
         return;
     }
     auto calls = CallObjectManager::GetAllCallList();
@@ -288,7 +302,7 @@ void DistributedDataSinkController::SendCurrentDataQueryReq()
         if (data.empty()) {
             continue;
         }
-        session_->SendMsg(data.c_str(), static_cast<uint32_t>(data.length()));
+        session->SendMsg(data.c_str(), static_cast<uint32_t>(data.length()));
     }
 }
 

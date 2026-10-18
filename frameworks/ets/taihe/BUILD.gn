@@ -66,6 +66,7 @@ taihe_shared_library("telephony_call_taihe_native") {
     "c_utils:utils",
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "init:libbegetutil",
     "libuv:uv",

@@ -386,7 +386,7 @@ int32_t CallObjectManager::GetCarrierCallList(std::list<int32_t> &list)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallObjectManager::GetVoipCallNum(bool isOnlyIncludeNonVirtualVoIP)
+int32_t CallObjectManager::GetVoipCallNum()
 {
     int32_t count = 0;
     std::lock_guard<ffrt::mutex> lock(listMutex_);
@@ -880,11 +880,11 @@ int32_t CallObjectManager::GetCallNum(TelCallState callState, bool isIncludeVoip
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == callState) {
-            if ((*it)->GetCallType() == CallType::TYPE_VOIP &&
-                (isIncludeVoipCall ? !(*it)->isNonVirtualCall() : true)) {
+            if (!isIncludeVoipCall && (*it)->GetCallType() == CallType::TYPE_VOIP) {
                 continue;
+            } else {
+                ++num;
             }
-            ++num;
         }
     }
     TELEPHONY_LOGI("callState:%{public}d, num:%{public}d", callState, num);
@@ -905,7 +905,7 @@ int32_t CallObjectManager::GetCallCountForRemoteControl(TelCallState callState)
         }
     }
     TELEPHONY_LOGI("callState:%{public}d, num:%{public}d", callState, num);
-    return number;
+    return num;
 }
 
 std::string CallObjectManager::GetPhoneNumber(TelCallState callState)
@@ -1115,11 +1115,6 @@ std::vector<CallAttributeInfo> CallObjectManager::GetAllCallInfoList(bool isIncl
         if ((*it) == nullptr) {
             TELEPHONY_LOGE("call is nullptr");
             continue;
-        }
-
-        if ((*it)->GetCallType() == CallType::TYPE_VOIP &&
-            (isIncludeVoipCall ? !(*it)->isNonVirtualCall() : true)) {
-                continue;
         }
         (*it)->GetCallAttributeInfo(info);
         if (isIncludeVoipCall || info.callType != CallType::TYPE_VOIP) {

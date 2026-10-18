@@ -355,11 +355,10 @@ int32_t CallManagerConnect::SetCallRestriction(int32_t slotId, CallRestrictionIn
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
-int32_t CallManagerConnect::GetCallTransferInfo(int32_t slotId, CallTransferType type,
-    bool isIncludeCallForwardingNumber)
+int32_t CallManagerConnect::GetCallTransferInfo(int32_t slotId, CallTransferType type)
 {
     if (callManagerServicePtr_ != nullptr) {
-        return callManagerServicePtr_->GetCallTransferInfo(slotId, type, isIncludeCallForwardingNumber);
+        return callManagerServicePtr_->GetCallTransferInfo(slotId, type);
     }
     TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
     return TELEPHONY_ERR_LOCAL_PTR_NULL;

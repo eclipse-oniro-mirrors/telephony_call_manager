@@ -37,7 +37,6 @@
 #include "cellular_call_connection.h"
 #include "common_type.h"
 #include "ims_call.h"
-#include "incoming_flash_reminder.h"
 #include "iservice_registry.h"
 #include "reject_call_sms.h"
 #include "report_call_info_handler.h"
@@ -48,6 +47,8 @@
 #include "distributed_call_manager.h"
 #include "call_superprivacy_control_manager.h"
 #include "call_voice_assistant_manager.h"
+#include "accessibility_config.h"
+#include "accessibility_def.h"
 #ifdef SUPPORT_DSOFTBUS
 #include "interoperable_communication_manager.h"
 #include "distributed_communication_manager.h"
@@ -399,20 +400,21 @@ int32_t CallControlManager::CarrierAndVoipConflictProcess(int32_t callId, TelCal
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage)
+int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage,
+                                       RejectType rejectType)
 {
     if (CallRequestHandlerPtr_ == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
+    sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("call is nullptr");
+        CallManagerHisysevent::WriteHangUpFaultEvent(
+            INVALID_PARAMETER, callId, TELEPHONY_ERR_LOCAL_PTR_NULL, "Reject call is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     if (callId == INVALID_CALLID) {
-        sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-        if (call == nullptr) {
-            TELEPHONY_LOGE("call is nullptr");
-            CallManagerHisysevent::WriteHangUpFaultEvent(
-                INVALID_PARAMETER, callId, TELEPHONY_ERR_LOCAL_PTR_NULL, "Reject call is nullptr");
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
         callId = call->GetCallID();
     }
 
@@ -431,6 +433,13 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RejectCall failed!");
         return ret;
+    }
+    if (rejectType == RejectType::CALL_REJECT_MISSED_CALL) {
+        TELEPHONY_LOGI("reject call and mark it as missed call");
+        call->SetRejectType(rejectType);
+        if (missedCallNotification_ != nullptr) {
+            missedCallNotification_->PublishMissedCallEvent(call);
+        }
     }
     CallManagerHisysevent::WriteVoipCallStatisticalEvent(callId, "MtBannerReject");
     ReportPhoneUEInSuperPrivacy(CALL_REJECT_IN_SUPER_PRIVACY);
@@ -1593,7 +1602,7 @@ void CallControlManager::HandleVoipIncoming(int32_t &numActive, int32_t callId, 
     }
     NotifyVoipCallStateUpdated(info, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
     AddOneVoipCallObject(info);
-    bool res = DelayedSingleton<AudioControlManager>GetInstance()->SetRemoteControlEnable(true);
+    bool res = DelayedSingleton<AudioControlManager>::GetInstance()->SetRemoteControlEnable(true);
     TELEPHONY_LOGI("SetRemoteControlEnable res: %{public}d.", res);
 }
 
@@ -1612,7 +1621,7 @@ int32_t CallControlManager::HandleVoipDisconnected(int32_t &numActive, int32_t n
         SendBtCallState(numActive, numHeld, state, phoneNumber);
     int32_t carrierCallId = ERR_ID;
     IsCallExist(TelCallState::CALL_STATUS_WAITING, carrierCallId);
-    bool res = DelayedSingleton<AudioControlManager>GetInstance()->SetRemoteControlEnable(false);
+    bool res = DelayedSingleton<AudioControlManager>::GetInstance()->SetRemoteControlEnable(false);
     TELEPHONY_LOGI("SetRemoteControlEnable res: %{public}d.", res);
     if (carrierCallId != ERR_ID) {
         TELEPHONY_LOGI("SetVoIPCallInfo handle cs call sucessed");
@@ -1647,7 +1656,7 @@ void CallControlManager::HandleVoipDialing(int32_t callId, const std::string &ph
     info.callDirection = CallDirection::CALL_DIRECTION_OUT;
     AddOneVoipCallObject(info);
     NotifyVoipCallStateUpdated(info, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_DIALING);
-    bool res = DelayedSingleton<AudioControlManager>GetInstance()->SetRemoteControlEnable(true);
+    bool res = DelayedSingleton<AudioControlManager>::GetInstance()->SetRemoteControlEnable(true);
     TELEPHONY_LOGI("SetRemoteControlEnable res = %{public}d.", res);
 }
 
@@ -1669,7 +1678,7 @@ void CallControlManager::HandleVoipAlerting(int32_t callId, const std::string &p
         info.callDirection = CallDirection::CALL_DIRECTION_OUT;
         AddOneVoipCallObject(info);
         NotifyVoipCallStateUpdated(info, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_DIALING);
-        bool res = DelayedSingleton<AudioControlManager>GetInstance()->SetRemoteControlEnable(true);
+        bool res = DelayedSingleton<AudioControlManager>::GetInstance()->SetRemoteControlEnable(true);
         TELEPHONY_LOGI("SetRemoteControlEnable res = %{public}d.", res);
     }
 }
@@ -2346,21 +2355,13 @@ void CallControlManager::UnregisterAppStateObserver()
 
 void CallControlManager::StartFlashRemind()
 {
-    std::lock_guard<ffrt::mutex> lock(reminderMutex_);
-    if (incomingFlashReminder_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
-        incomingFlashReminder_ = std::make_shared<IncomingFlashReminder>(runner,
-            []() {
-                TELEPHONY_LOGI("clear flash reminder");
-                DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
-            }
-        );
-    }
-    if (!incomingFlashReminder_.IsFlashRemindNecessary()) {
-        incomingFlashReminder_ = nullptr;
-        return;
-    }
-    incomingFlashReminder_->StartFlashRemind();
+    Accessibility::BlinkResultCode blinkResult = Accessibility::BlinkResultCode::BLINK_SUCCESS;
+    Accessibility::RetError ret =
+        AccessibilityConfig::AccessibilityConfig::GetInstance().StartBlinking(
+            static_cast<int32_t>(Accessibility::BlinkingMode::CONTINUOUS_BLINK),
+            static_cast<int32_t>(Accessibility::BlinkingScenario::CALL), blinkResult);
+    TELEPHONY_LOGI("StartFlashRemind ret=%{public}d, blinkResult=%{public}d",
+        static_cast<int32_t>(ret), static_cast<int32_t>(blinkResult));
 }
 
 void CallControlManager::SetRegMmiCodeCallbackState(bool isReg)
@@ -2373,22 +2374,18 @@ void CallControlManager::SetRegMmiCodeCallbackState(bool isReg)
 
 void CallControlManager::StopFlashRemind()
 {
-    std::lock_guard<ffrt::mutex> lock(reminderMutex_);
-    if (incomingFlashReminder_ == nullptr) {
-        return;
-    }
-    incomingFlashReminder_->StopFlashRemind();
-}
-
-void CallControlManager::ClearFlashReminder()
-{
-    std::lock_guard<ffrt::mutex> lock(reminderMutex_);
-    incomingFlashReminder_ = nullptr;
+    Accessibility::BlinkResultCode blinkResult = Accessibility::BlinkResultCode::BLINK_SUCCESS;
+    Accessibility::RetError ret =
+        AccessibilityConfig::AccessibilityConfig::GetInstance().StopBlinking(
+            static_cast<int32_t>(Accessibility::BlinkingMode::CONTINUOUS_BLINK),
+            static_cast<int32_t>(Accessibility::BlinkingScenario::CALL), blinkResult);
+    TELEPHONY_LOGI("StopFlashRemind ret=%{public}d, blinkResult=%{public}d",
+        static_cast<int32_t>(ret), static_cast<int32_t>(blinkResult));
 }
 
 bool CallControlManager::SetRemoteControlEnable(bool isRemoteControlEnable)
 {
-    return DelayedSingleton<AudioControlManager>GetInstance()->SetRemoteControlEnable(isRemoteControlEnable);
+    return DelayedSingleton<AudioControlManager>::GetInstance()->SetRemoteControlEnable(isRemoteControlEnable);
 }
 
 void CallControlManager::SetReduceRingToneVolume(bool reduceRingToneVolume)

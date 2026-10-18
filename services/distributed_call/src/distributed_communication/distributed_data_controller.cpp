@@ -53,7 +53,12 @@ void DistributedDataController::OnReceiveMsg(const char* data, uint32_t dataLen)
 
 void DistributedDataController::SetMuted(bool isMute)
 {
-    if (session_ == nullptr) {
+    std::shared_ptr<SessionAdapter> session;
+    {
+        std::lock_guard<ffrt::mutex> lock(sessionMutex_);
+        session = session_;
+    }
+    if (session == nullptr) {
         TELEPHONY_LOGE("session is null");
         return;
     }
@@ -62,12 +67,17 @@ void DistributedDataController::SetMuted(bool isMute)
     if (data.empty()) {
         return;
     }
-    session_->SendMsg(data.c_str(), static_cast<uint32_t>(data.length()));
+    session->SendMsg(data.c_str(), static_cast<uint32_t>(data.length()));
 }
 
 void DistributedDataController::MuteRinger()
 {
-    if (session_ == nullptr) {
+    std::shared_ptr<SessionAdapter> session;
+    {
+        std::lock_guard<ffrt::mutex> lock(sessionMutex_);
+        session = session_;
+    }
+    if (session == nullptr) {
         return;
     }
     TELEPHONY_LOGI("send mute ringer");
@@ -75,7 +85,7 @@ void DistributedDataController::MuteRinger()
     if (data.empty()) {
         return;
     }
-    session_->SendMsg(data.c_str(), static_cast<uint32_t>(data.length()));
+    session->SendMsg(data.c_str(), static_cast<uint32_t>(data.length()));
 }
 
 bool DistributedDataController::GetInt32Value(const cJSON *msg, const std::string &name, int32_t &value)

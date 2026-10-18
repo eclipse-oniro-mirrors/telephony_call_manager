@@ -146,6 +146,7 @@ public:
     int32_t SetCallAudioMode(int32_t mode, int32_t scenarios);
     int32_t AnswerCall();
     int32_t RejectCall();
+    int32_t RejectCall(RejectType rejectType);
     int32_t HangUpCall();
     int32_t GetCallTransferInfo(const std::string number, CallTransferType type);
 
@@ -192,12 +193,12 @@ private:
 
 private:
     int32_t systemAbilityId_;
-    ffrt::shared_mutex clientLock_;
+    ffrt::shared_mutex clientLock_{};
     bool registerStatus_;
     bool initStatus_;
     sptr<ICallManagerService> callManagerServicePtr_ = nullptr;
     sptr<CallAbilityCallback> callAbilityCallbackPtr_ = nullptr;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
 #ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
     std::unique_ptr<CallManagerCallback> callBack_ = nullptr;

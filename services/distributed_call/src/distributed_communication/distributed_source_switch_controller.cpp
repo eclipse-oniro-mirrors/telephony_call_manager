@@ -39,7 +39,13 @@ void DistributedSourceSwitchController::OnDeviceOnline(const std::string &devId,
     std::lock_guard<ffrt::mutex> lock(mutex_);
     if (hfpListener_ == nullptr) {
         hfpListener_ = std::make_shared<DcCallSourceHfpListener>();
-        Bluetooth::HandsFreeAudioGateway::GetProfile()->RegisterObserver(hfpListener_);
+        auto profile = Bluetooth::HandsFreeAudioGateway::GetProfile();
+        if (profile != nullptr) {
+            profile->RegisterObserver(hfpListener_);
+        } else {
+            TELEPHONY_LOGE("hfp ag profile is null");
+            hfpListener_ = nullptr;
+        }
     }
 #endif
 }
@@ -57,7 +63,10 @@ void DistributedSourceSwitchController::OnDeviceOffline(const std::string &devId
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     std::lock_guard<ffrt::mutex> lock(mutex_);
     if (hfpListener_ != nullptr) {
-        Bluetooth::HandsFreeAudioGateway::GetProfile()->DeregisterObserver(hfpListener_);
+        auto profile = Bluetooth::HandsFreeAudioGateway::GetProfile();
+        if (profile != nullptr) {
+            profile->DeregisterObserver(hfpListener_);
+        }
         hfpListener_ = nullptr;
     }
 #endif
@@ -74,9 +83,14 @@ void DistributedSourceSwitchController::OnDistributedAudioDeviceChange(const std
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     if (audioDeviceManager != nullptr) {
         if (devRole == static_cast<int32_t>(DistributedRole::SINK)) {
-            if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
+            auto audioSysMgr = AudioStandard::AudioSystemManager::GetInstance();
+            if (audioSysMgr == nullptr) {
+                TELEPHONY_LOGE("audio system manager is null");
+                return;
+            }
+            if (audioSysMgr->IsDeviceActive(
                 AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO)) { // deactive bt if switch from bt to sink
-                AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
+                audioSysMgr->SetDeviceActive(
                     AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO, false);
             }
             std::string address = GetDevAddress(devId, devName);
@@ -113,7 +127,10 @@ void DistributedSourceSwitchController::OnRemoveSystemAbility()
     isAudioOnSink_ = false;
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     if (hfpListener_ != nullptr) {
-        Bluetooth::HandsFreeAudioGateway::GetProfile()->DeregisterObserver(hfpListener_);
+        auto profile = Bluetooth::HandsFreeAudioGateway::GetProfile();
+        if (profile != nullptr) {
+            profile->DeregisterObserver(hfpListener_);
+        }
         hfpListener_ = nullptr;
     }
 #endif
@@ -162,14 +179,22 @@ std::string DistributedSourceSwitchController::GetDevAddress(const std::string &
 void DcCallSourceHfpListener::OnHfpStackChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t action)
 {
     TELEPHONY_LOGI("source hfp stack changed, action[%{public}d]", action);
+    auto distributedMgr = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    if (distributedMgr == nullptr) {
+        return;
+    }
     if (IsNeedSwitchToSource(device, action)) {
-        (void)DelayedSingleton<DistributedCommunicationManager>::GetInstance()->SwitchToSourceDevice();
+        (void)distributedMgr->SwitchToSourceDevice();
     }
 }
 
 bool DcCallSourceHfpListener::IsNeedSwitchToSource(const Bluetooth::BluetoothRemoteDevice &device, int32_t action)
 {
-    if (!DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink()) {
+    auto distributedMgr = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    if (distributedMgr == nullptr) {
+        return false;
+    }
+    if (!distributedMgr->IsAudioOnSink()) {
         return false;
     }
     int32_t cod = DEFAULT_HFP_FLAG_VALUE;

@@ -24,7 +24,6 @@
 #include "i_voip_call_manager_service.h"
 #include "if_system_ability_manager.h"
 #include "refbase.h"
-#include "rwlock.h"
 #include "singleton.h"
 #include "system_ability_status_change_stub.h"
 
@@ -60,7 +59,7 @@ private:
 #endif
     void BuildDisconnectedCallInfo(CallReportInfo &callReportInfo, const VoipCallReportInfo &voipInfo);
     int32_t systemAbilityId_ = TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID;
-    sptr<ICallStatusCallback> voipCallCallbackPtr_;
+    sptr<ICallStatusCallback> voipCallCallbackPtr_{nullptr};
     sptr<IVoipCallManagerService> voipCallManagerInterfacePtr_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     bool connectCallManagerState_ = false;

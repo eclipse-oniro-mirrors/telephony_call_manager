@@ -53,6 +53,8 @@ private:
     bool IsHostAnswerTransferCall(const CallDetailInfo &info);
     void DisconnectTransferCall(const CallDetailInfo &info);
 #endif
+    void ReportIncomingCallsDropChrEvents(
+        const CallDetailsInfo &info, bool isDevProvisioned, bool isOobeComplete);
 
 private:
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_;

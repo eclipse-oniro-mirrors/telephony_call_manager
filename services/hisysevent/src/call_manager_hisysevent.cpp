@@ -40,7 +40,6 @@ static constexpr const char *CALL_HANGUP_FAILED_EVENT = "CALL_HANGUP_FAILED";
 static constexpr const char *INCOMING_CALL_EVENT = "INCOMING_CALL";
 static constexpr const char *CALL_STATE_CHANGED_EVENT = "CALL_STATE";
 static constexpr const char *CALL_INCOMING_NUM_IDENTITY_EVENT = "CALL_INCOMING_NUM_IDENTITY";
-static constexpr const char *EMC_RESCUE_STATE_INFO_EVENT = "EMC_RESCUE_STATE_INFO";
 
 // KEY
 static constexpr const char *MODULE_NAME_KEY = "MODULE";
@@ -55,11 +54,9 @@ static constexpr const char *ERROR_MSG_KEY = "ERROR_MSG";
 static constexpr const char *MARK_TYPE_KEY = "MARK_TYPE";
 static constexpr const char *IS_BLOCK = "IS_BLOCK";
 static constexpr const char *BLOCK_REASON = "BLOCK_REASON";
-static constexpr const char *DATASTATE_KEY = "DATASTATE";
 
 // VALUE
 static constexpr const char *CALL_MANAGER_MODULE = "CALL_MANAGER";
-static constexpr const char *IN_CELLULAR_MODE = "0";
 static const int32_t CS_CALL_TYPE = 0;
 static const int32_t IMS_CALL_TYPE = 1;
 static const int32_t SATELLITE_CALL_TYPE = 5;

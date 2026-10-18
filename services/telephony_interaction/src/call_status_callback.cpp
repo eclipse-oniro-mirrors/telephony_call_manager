@@ -19,6 +19,7 @@
 #include "call_manager_config.h"
 #include "call_ability_report_proxy.h"
 #include "call_manager_errors.h"
+#include "call_state_report_proxy.h"
 #include "call_manager_hisysevent.h"
 #include "call_dialog.h"
 #include "cpp/task_ext.h"
@@ -357,6 +358,12 @@ int32_t CallStatusCallback::UpdateSetTransferResult(const int32_t result)
     AppExecFwk::PacMap resultInfo;
     resultInfo.PutIntValue("result", result);
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
+}
+
+int32_t CallStatusCallback::UpdateCallTransferStatus(int32_t slotId, bool enabled)
+{
+    TELEPHONY_LOGI("UpdateCallTransferStatus slotId=%{public}d, enabled=%{public}d", slotId, enabled);
+    return DelayedSingleton<CallStateReportProxy>::GetInstance()->ReportCallTransferStatusToRegistry(slotId, enabled);
 }
 
 int32_t CallStatusCallback::UpdateGetCallClipResult(const ClipResponse &clipResponse)

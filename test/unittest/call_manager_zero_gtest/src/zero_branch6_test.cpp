@@ -62,6 +62,7 @@
 #include "voip_call.h"
 #include "call_manager_proxy.h"
 #include "call_manager_service.h"
+#include "i_call_manager_service_mock.h"
 #include "accesstoken_kit.h"
 #include "token_setproc.h"
 #include "nativetoken_kit.h"
@@ -93,8 +94,6 @@ constexpr const char *TEST_STR = "123";
 constexpr const char *LONG_STR =
     "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
     "111111111";
-constexpr const char *DEVICE_PROVISIONED_URI =
-    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 } // namespace
 
 class DemoHandler : public AppExecFwk::EventHandler {
@@ -321,6 +320,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     info.state = TelCallState::CALL_STATUS_DISCONNECTED;
     callStatusManager->HandleCallReportInfo(info);
 }
+
 /**
  * @tc.number   Telephony_CallStatusManager_008
  * @tc.name     test error branch
@@ -328,8 +328,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
  */
  HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_008, TestSize.Level0)
 {
-    Uri uri(DEVICE_PROVISIONED_URI);
-    sptr<OOBEStatusObserver> oobeStatusObserver_(new (std::nothrow) OOBEStatusObserver());
     auto reportCallInfo = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
     reportCallInfo->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
     CallDetailInfo info;
@@ -338,29 +336,13 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     info.index = 1;
     info.state = TelCallState::CALL_STATUS_INCOMING;
     info.callType = CallType::TYPE_BLUETOOTH;
-    ASSERT_TRUE(oobeStatusObserver_ != nullptr);
-    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    callStatusManager->RegisterObserver();
-    ASSERT_EQ(helper->RegisterToDataShare(uri, oobeStatusObserver_), true);
-    oobeStatusObserver_->OnChange();
-    callStatusManager->deviceProvisioned_ = -1;
-    callStatusManager->UpdateDevProvisioned();
-    EXPECT_EQ(helper->Update(uri, "device_provisioned", "0"), 0);
-    oobeStatusObserver_->OnChange();
     callStatusManager->deviceProvisioned_ = -1;
     callStatusManager->GetDevProvisioned();
-    EXPECT_EQ(helper->UnRegisterToDataShare(uri, oobeStatusObserver_), true);
-
     callStatusManager->deviceProvisioned_ = 0;
-    DialParaInfo dialParaInfo;
-    sptr<CallBase> call = new IMSCall(dialParaInfo);
-    EXPECT_TRUE(callStatusManager->ShouldRejectIncomingCall(call));
-    reportCallInfo->UpdateCallReportInfo(info);
-    callStatusManager->RegisterObserver();
-    callStatusManager->oobeStatusObserver_ = nullptr;
+    EXPECT_EQ(reportCallInfo->UpdateCallReportInfo(info), TELEPHONY_SUCCESS);
 }
-
+ 
 /**
  * @tc.number   Telephony_CallStatusManager_009
  * @tc.name     test error branch
@@ -383,6 +365,31 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
     callStatusManager->SetVideoCallState(callObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED);
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     EXPECT_NE(audioDeviceManager->GetCurrentAudioDevice(), AudioDeviceType::DEVICE_SPEAKER);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusManager_010
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_010, TestSize.Level0)
+{
+    auto reportCallInfo = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+    reportCallInfo->callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
+    CallDetailsInfo info;
+    info.slotId = 0;
+    CallDetailInfo detailInfo;
+    std::string number = "123456789";
+    memcpy_s(&detailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    detailInfo.index = 1;
+    detailInfo.state = TelCallState::CALL_STATUS_INCOMING;
+    detailInfo.callType = CallType::TYPE_IMS;
+    info.callVec.push_back(detailInfo);
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    callStatusManager->userSetupComplete_ = -1;
+    callStatusManager->GetDevUserSetupCompleteValue();
+    callStatusManager->userSetupComplete_ = 0;
+    EXPECT_EQ(reportCallInfo->UpdateCallsReportInfo(info), TELEPHONY_SUCCESS);
 }
 
 #ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
@@ -804,6 +811,31 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallRequestEventHandlerHelper_001, TestSize.
 }
 
 /**
+ * @tc.number   Telephony_DistributedCallManager_ValidProxy
+ * @tc.name     test IsSelectVirtualModem with valid proxy
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_ValidProxy, TestSize.Level0)
+{
+    DistributedCallManager manager;
+    AudioDevice device;
+    std::string deviceId = "{ \"devId\": \"101\" }";
+    EXPECT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
+    // No online device -> false
+    manager.onlineDCallDevices_.clear();
+    EXPECT_FALSE(manager.IsSelectVirtualModem());
+    // Has online device, dcallProxy_ is null -> false
+    manager.onlineDCallDevices_["101"] = device;
+    manager.dcallProxy_ = nullptr;
+    EXPECT_FALSE(manager.IsSelectVirtualModem());
+    // Has online device, dcallProxy_ is valid -> calls dcallProxy_->IsSelectVirtualModem
+    manager.dcallProxy_ = std::make_shared<DistributedCallProxy>();
+    EXPECT_FALSE(manager.IsSelectVirtualModem());
+    manager.onlineDCallDevices_.clear();
+    manager.dcallProxy_ = nullptr;
+}
+
+/**
  * @tc.number   Telephony_DistributedCallManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -894,6 +926,13 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_002, TestSize.Level0)
     ASSERT_TRUE(manager.IsDistributedCarDeviceOnline());
     manager.onlineDCallDevices_.clear();
     ASSERT_FALSE(manager.IsDistributedCarDeviceOnline());
+    // IsSelectVirtualModem: no online dcall device
+    EXPECT_FALSE(manager.IsSelectVirtualModem());
+    // IsSelectVirtualModem: has online device but dcallProxy_ is null
+    manager.onlineDCallDevices_["101"] = device;
+    manager.dcallProxy_ = nullptr;
+    EXPECT_FALSE(manager.IsSelectVirtualModem());
+    manager.onlineDCallDevices_.clear();
     CallObjectManager::callObjectPtrList_.clear();
     ASSERT_FALSE(manager.isCeliaCall());
     call->callType_ = CallType::TYPE_IMS;
@@ -949,29 +988,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_003, TestSize.Level0)
 }
 
 /**
- * @tc.number   Telephony_DistributedCallManager_004
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_004, TestSize.Level0)
-{
-    Bluetooth::BluetoothRemoteDevice device;
-    int32_t action = 1; // unwear bt headset
-    DCallHfpListener listener;
-    listener.OnHfpStackChanged(device, action); // not bt head set
-
-    DistributedCallManager manager;
-    manager.dcallHfpListener_ = nullptr;
-    EXPECT_EQ(manager.AddDCallDevice(TEST_STR), TELEPHONY_ERR_FAIL);
-    manager.OnDCallDeviceOffline(TEST_STR);
-    manager.dcallHfpListener_ = std::make_shared<DCallHfpListener>();
-    EXPECT_EQ(manager.AddDCallDevice(TEST_STR), TELEPHONY_ERR_FAIL);
-    manager.OnDCallDeviceOffline(TEST_STR);
-}
-#endif
-
-/**
  * @tc.number   Telephony_DistributedCallProxy_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1025,7 +1041,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_BluetoothCallManager_001, TestSize.Level0)
     int32_t numActive = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
     int32_t numHeld = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_HOLDING);
     int32_t callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
-    std::string number = CallObjectManager::GetCallNumber(TelCallState::CALL_STATUS_HOLDING);
+    std::string number = CallObjectManager::GetPhoneNumber(TelCallState::CALL_STATUS_HOLDING);
     BluetoothCallManager bluetoothCallManager;
     ASSERT_EQ(bluetoothCallManager.SendBtCallState(numActive, numHeld, callState, number), TELEPHONY_SUCCESS);
     ASSERT_EQ(bluetoothCallManager.SendCallDetailsChange(1, 1), TELEPHONY_SUCCESS);
@@ -1380,6 +1396,46 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_003, TestSize.Level0)
     data.WriteUInt8Vector(userProfile);
     data.RewindRead(0);
     ASSERT_EQ(callStatusCallback->OnUpdateCallReportInfo(data, reply), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   ZeroBranch5Test_CallManagerProxy_RejectCallWithType_Normal
+ * @tc.name     CallManagerProxy_RejectCallWithType_Normal
+ * @tc.desc     When IPC call succeeds with CALL_REJECT_NORMAL, return TELEPHONY_SUCCESS
+ */
+HWTEST_F(ZeroBranch5Test, CallManagerProxy_RejectCallWithType_Normal, Function | MediumTest | Level1)
+{
+    auto proxy = DelayedSingleton<CallManagerProxy>::GetInstance();
+    EXPECT_NE(proxy, nullptr);
+    auto originalService = proxy->callManagerServicePtr_;
+    sptr<MockICallManagerService> mockService = new MockICallManagerService();
+    EXPECT_NE(mockService, nullptr);
+    EXPECT_CALL(*mockService, RejectCall(RejectType::CALL_REJECT_NORMAL))
+        .WillOnce(testing::Return(TELEPHONY_SUCCESS));
+    proxy->callManagerServicePtr_ = mockService;
+    int32_t result = proxy->RejectCall(RejectType::CALL_REJECT_NORMAL);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+    proxy->callManagerServicePtr_ = originalService;
+}
+
+/**
+ * @tc.number   ZeroBranch5Test_CallManagerProxy_RejectCallWithType_IpcFail
+ * @tc.name     CallManagerProxy_RejectCallWithType_IpcFail
+ * @tc.desc     When IPC call fails, error code is returned directly without retry
+ */
+HWTEST_F(ZeroBranch5Test, CallManagerProxy_RejectCallWithType_IpcFail, Function | MediumTest | Level1)
+{
+    auto proxy = DelayedSingleton<CallManagerProxy>::GetInstance();
+    EXPECT_NE(proxy, nullptr);
+    auto originalService = proxy->callManagerServicePtr_;
+    sptr<MockICallManagerService> mockService = new MockICallManagerService();
+    EXPECT_NE(mockService, nullptr);
+    EXPECT_CALL(*mockService, RejectCall(RejectType::CALL_REJECT_NORMAL))
+        .WillOnce(testing::Return(TELEPHONY_ERR_PERMISSION_ERR));
+    proxy->callManagerServicePtr_ = mockService;
+    int32_t result = proxy->RejectCall(RejectType::CALL_REJECT_NORMAL);
+    EXPECT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    proxy->callManagerServicePtr_ = originalService;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -108,6 +108,8 @@ void DistributedCommunicationManager::OnDeviceOnline(const std::string &devId, c
     if (devObserver_ == nullptr) {
         return;
     }
+    std::shared_ptr<DistributedDataController> dataController;
+    std::shared_ptr<DistributedDeviceSwitchController> devSwitchController;
     {
         std::lock_guard<ffrt::mutex> lock(mutex_);
         status_ = DistributedStatus::CONNECT;
@@ -130,9 +132,15 @@ void DistributedCommunicationManager::OnDeviceOnline(const std::string &devId, c
                 devSwitchController_ = std::make_shared<DistributedSourceSwitchController>();
             }
         }
+        dataController = dataController_;
+        devSwitchController = devSwitchController_;
     }
-    devObserver_->RegisterDevStatusCallback(dataController_);
-    devObserver_->RegisterDevStatusCallback(devSwitchController_);
+    if (dataController != nullptr) {
+        devObserver_->RegisterDevStatusCallback(dataController);
+    }
+    if (devSwitchController != nullptr) {
+        devObserver_->RegisterDevStatusCallback(devSwitchController);
+    }
     devObserver_->OnDeviceOnline(devId, devName, deviceType);
     TELEPHONY_LOGI("distributed device online");
 }
@@ -144,8 +152,19 @@ void DistributedCommunicationManager::OnDeviceOffline(const std::string &devId, 
         return;
     }
     devObserver_->OnDeviceOffline(devId, devName, deviceType);
-    devObserver_->UnRegisterDevStatusCallback(dataController_);
-    devObserver_->UnRegisterDevStatusCallback(devSwitchController_);
+    std::shared_ptr<DistributedDataController> dataController;
+    std::shared_ptr<DistributedDeviceSwitchController> devSwitchController;
+    {
+        std::lock_guard<ffrt::mutex> lock(mutex_);
+        dataController = dataController_;
+        devSwitchController = devSwitchController_;
+    }
+    if (dataController != nullptr) {
+        devObserver_->UnRegisterDevStatusCallback(dataController);
+    }
+    if (devSwitchController != nullptr) {
+        devObserver_->UnRegisterDevStatusCallback(devSwitchController);
+    }
 
     std::lock_guard<ffrt::mutex> lock(mutex_);
     auto iter = std::find(peerDevices_.begin(), peerDevices_.end(), devId);
@@ -345,7 +364,9 @@ std::string DistributedCommunicationManager::ParseDevIdFromAudioDevice(const Aud
     if (devIdJson != nullptr) {
         if (cJSON_IsString(devIdJson)) {
             char *value = cJSON_GetStringValue(devIdJson);
-            devId = value;
+            if (value != nullptr) {
+                devId = value;
+            }
         }
     }
     cJSON_Delete(root);

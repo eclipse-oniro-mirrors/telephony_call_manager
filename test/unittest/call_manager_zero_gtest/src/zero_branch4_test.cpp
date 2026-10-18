@@ -774,6 +774,18 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_002, TestSize.Level0)
     ASSERT_GT(callManagerClient->SetCallPolicyInfo(false, dialingList, false, incomingList), TELEPHONY_ERROR);
 }
 
+/**
+ * @tc.number   Telephony_CallManagerClient_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_004, TestSize.Level0)
+{
+    std::shared_ptr<CallManagerClient> callManagerClient = std::make_shared<CallManagerClient>();
+    callManagerClient->UnInit();
+    EXPECT_EQ(callManagerClient->RejectCall(RejectType::CALL_REJECT_NORMAL), TELEPHONY_ERR_UNINIT);
+}
+
 #ifdef SUPPORT_RTT_CALL
 /**
  * @tc.number   Telephony_CallManagerClient_003
@@ -923,77 +935,13 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_003, TestSize.Level0)
     DialParaInfo dialInfo;
     int32_t appIndex = 0;
     sptr<CallBase> call1 = new VoIPCall(dialInfo);
-<<<<<<< HEAD
-    ASSERT_EQ(CallObjectManager::AddOneCallObject(call1), TELEPHONY_SUCCESS);
-=======
     EXPECT_EQ(CallObjectManager::AddOneCallObject(call1), TELEPHONY_SUCCESS);
->>>>>>> origin/master
     sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call1.GetRefPtr());
     callManagerHisysevent->WriteVoipCallStatisticalEvent("123", 100, "statisticalField");
     callManagerHisysevent->WriteVoipCallStatisticalEvent(call1->GetCallID(), "statisticalField");
     std::string bundleName = voipCall->GetVoipBundleName();
     callManagerHisysevent->GetAppIndexByBundleName(bundleName, voipCall->GetVoipUid(), appIndex);
-<<<<<<< HEAD
-    std::string callId = "test_call_null";
-    nlohmann::json nullJson = nullptr;
-    callManagerHisysevent->voipProcedureCallInfo_[callId] = nullJson;
-    callManagerHisysevent->RecordVoipProcedure(callId, VoipProcedureEvent::PUSH_REPORT_INCOMING_CALL, 1);
-    callId = "test_call_procedures_null";
-    nlohmann::json scenarioJson;
-    scenarioJson["Procedures"] = nullptr;
-    callManagerHisysevent->voipProcedureCallInfo_[callId] = scenarioJson;
-    callManagerHisysevent->RecordVoipProcedure(callId, VoipProcedureEvent::PUSH_REPORT_INCOMING_CALL, 100);
-    callManagerHisysevent->RecordVoipProcedure(-1, VoipProcedureEvent::PUSH_REPORT_INCOMING_CALL, 100);
-    callId = "test_call_null_value";
-    scenarioJson = nlohmann::json::value_t::null;
-    callManagerHisysevent->voipProcedureCallInfo_[callId] = scenarioJson;
-    nlohmann::json outJson;
-    callManagerHisysevent->GetVoipProcedureCallInfo(callId, outJson);
-    std::string procedureJsonStr = "procedureJsonStr";
-    callManagerHisysevent->ReportCallProcedureEvents(callId, procedureJsonStr);
-    procedureJsonStr = R"({"Procedures" : {"P" : [{"T" : 1000}], "cnt":1}, )"
-    R"("CallAttribute" : {"bundleName" : "test.app", "voipCallType" : 1,"
-        "isConferenceCall" : false, "direction" : 0, "appIndex" : 0}})";
-    callManagerHisysevent->ReportCallProcedureEvents(callId, procedureJsonStr);
-    callManagerHisysevent->ClearVoipProcedureCallInfo(callId);
-}
-
-/**
- * @tc.number   Telephony_CallManagerHisysevent_004
- * @tc.name     test normal branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_004, TestSize.Level0)
-{
-    std::shared_ptr<CallManagerHisysevent> callManagerHisysevent = std::make_shared<CallManagerHisysevent>();
-
-    std::string callId = "1";
-    std::string procedureJsonStr = "str";
-    nlohmann::json procedures = {{"1", {"str", {{"Procedures", {"P", "[1,2,3,4,5]"}}, {"P", "[1,2,3,4,5]"}}}}};
-    callManagerHisysevent->voipProcedureCallInfo_["1"] = procedures;
-    callManagerHisysevent->ReportCallProcedureEvents(callId, procedureJsonStr);
-
-    procedureJsonStr = R"({"Procedures": {"P": 2}})";
-    callManagerHisysevent->ReportCallProcedureEvents(callId, procedureJsonStr);
-
-    procedureJsonStr = R"({"Procedures": {"P": [1,2,3]}})";
-    callManagerHisysevent->ReportCallProcedureEvents(callId, procedureJsonStr);
-
-    callManagerHisysevent->ReportCallDropChrEvent(-100, 123);
-    DialParaInfo dialParaInfo;
-    sptr<CallBase> call = new IMSCall(dialParaInfo);
-    call->callId_ = 100;
-    CallObjectManager::callObjectPtrList_.push_back(call);
-    callManagerHisysevent->ReportCallDropChrEvent(100, 123);
-    EXPECT_TRUE(call->IsApCauseReported());
-
-    CallObjectManager::callObjectPtrList_.pop_back();
-    MessageParcel parcel;
-    EXPECT_FALSE(callManagerHisysevent->ReportEventToChrAsync("TestDtModule", parcel));
-=======
-    callManagerHisysevent->WriteVoipCallFaultEvent("123", 123, 233);
     EXPECT_NE(appIndex, -1);
->>>>>>> origin/master
 }
 /**
  * @tc.number   Telephony_OTTCall_001

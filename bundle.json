@@ -44,6 +44,7 @@
                 "ability_runtime",
                 "access_token",
                 "api_metrics",
+                "accessibility",
                 "bluetooth",
                 "c_utils",
                 "cellular_data",
@@ -83,7 +84,6 @@
                 "device_manager",
                 "openssl",
                 "libphonenumber",
-                "screenlock_mgr",
                 "runtime_core",
                 "taihe_ffi_gen",
                 "window_manager"

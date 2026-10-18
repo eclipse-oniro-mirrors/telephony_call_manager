@@ -200,7 +200,28 @@ public:
      */
     int32_t NotifyVoIPAudioStreamStart(int32_t uid) override;
 
+    /**
+     * @brief answer the current voip call selected by the SA (reverse control, no callId)
+     *
+     * @param videoState[in], the video state of the answer (VideoStateType::TYPE_VOICE or TYPE_VIDEO)
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t AnswerCall(int32_t videoState) override;
+    /**
+     * @brief reject the current incoming voip call selected by the SA (reverse control, no callId)
+     *
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t RejectCall() override;
+    /**
+     * @brief hang up the current voip call selected by the SA (reverse control, no callId)
+     *
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t HangUpCall() override;
+
 private:
+    int32_t SendControlRequest(int32_t msgId, int32_t videoState = -1);
     bool WriteDataParcel(MessageParcel &dataParcel, AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile);
     __attribute__((noinline)) int32_t SendRequest(const std::string &callId, int32_t msgId, MessageParcel &in,
         MessageParcel &out, MessageOption &option);

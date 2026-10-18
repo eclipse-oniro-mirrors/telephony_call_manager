@@ -28,7 +28,6 @@
 #include "call_control_manager.h"
 #include "ims_call.h"
 #include "voip_call.h"
-#include "incoming_flash_reminder.h"
 #include "nativetoken_kit.h"
 #include "nearlink_call_client.h"
 #include "telephony_errors.h"
@@ -662,26 +661,6 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioProxy_002, TestSize.Level0)
     dcallManager->dCallDeviceSwitchedOn_.store(temp); // recovery
     descs.clear();
     EXPECT_FALSE(std::make_shared<AudioPreferDeviceChangeCallback>()->IsDistributedDeviceSelected(descs));
-}
-
-/**
- * @tc.number   Telephony_IncomingFlashReminder_001
- * @tc.name     test IncomingFlashReminder
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch10Test, Telephony_IncomingFlashReminder_001, TestSize.Level1)
-{
-    DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ = nullptr;
-    DelayedSingleton<CallControlManager>::GetInstance()->StartFlashRemind();
-    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
-    auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
-    DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ =
-        std::make_shared<IncomingFlashReminder>(runner, nullptr);
-    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
-    DelayedSingleton<CallControlManager>::GetInstance()->StartFlashRemind();
-    DelayedSingleton<CallControlManager>::GetInstance()->StopFlashRemind();
-    DelayedSingleton<CallControlManager>::GetInstance()->ClearFlashReminder();
-    EXPECT_EQ(DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_, nullptr);
 }
 
 /**

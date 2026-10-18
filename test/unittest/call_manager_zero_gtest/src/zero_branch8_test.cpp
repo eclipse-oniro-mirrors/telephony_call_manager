@@ -84,7 +84,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBroadcastSubscriber_001, TestSize.Level0
     subscriber.ConnectCallUiSuperPrivacyModeBroadcast(eventData);
     subscriber.UpdateBluetoothDeviceName(eventData);
     subscriber.UpdateNearlinkDeviceName(eventData);
-    subscriber.ConnectCallUiUserSwitchedBroadcast(eventData);
+    subscriber.HandleUserSwicth(eventData);
     ASSERT_NE(sizeof(eventData), 0);
 }
 
@@ -310,6 +310,22 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallWiredHeadSet_002, Function | MediumTest 
     CallObjectManager::DeleteOneCallObject(activeCall);
     EXPECT_NE(activeCall, nullptr);
     EXPECT_EQ(ringingCall->answerType_, CallAnswerType::CALL_ANSWER_REJECT);
+}
+
+/**
+ * @tc.number   Telephony_CallBase_RejectType_001
+ * @tc.name     test reject type missed flag and answer type
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallBase_RejectType_001, Function | MediumTest | Level1)
+{
+    DialParaInfo info;
+    sptr<CallBase> rejectCall = new IMSCall(info);
+    EXPECT_EQ(rejectCall->RejectCallBase(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(rejectCall->GetAnswerType(), CallAnswerType::CALL_ANSWER_REJECT);
+    rejectCall->SetRejectType(RejectType::CALL_REJECT_MISSED_CALL);
+    EXPECT_EQ(rejectCall->RejectCallBase(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(rejectCall->GetAnswerType(), CallAnswerType::CALL_ANSWER_MISSED);
 }
 
 static bool g_receiveUnknownEvent = false;

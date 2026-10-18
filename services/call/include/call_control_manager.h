@@ -74,7 +74,6 @@ public:
     ~WearStatusObserver() = default;
     void OnChange() override;
 };
-class IncomingFlashReminder;
 class CallControlManager : public CallPolicy, public std::enable_shared_from_this<CallControlManager> {
     DECLARE_DELAYED_SINGLETON(CallControlManager)
 
@@ -84,7 +83,8 @@ public:
     int32_t DialCall(std::u16string &number, AppExecFwk::PacMap &extras);
     int32_t AnswerCall(int32_t callId, int32_t videoState, bool isRTT = false);
     int32_t HandlerAnswerCall(int32_t callId, int32_t videoState, bool isRTT = false);
-    int32_t RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage);
+    int32_t RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage,
+        RejectType rejectType = RejectType::CALL_REJECT_NORMAL);
     int32_t HangUpCall(int32_t callId);
     int32_t GetCallState();
     int32_t HoldCall(int32_t callId);
@@ -181,8 +181,7 @@ public:
     void StartFlashRemind();
     void SetRegMmiCodeCallbackState(bool isReg);
     void StopFlashRemind();
-    void ClearFlashReminder();
-    bool SetRemoteControlEnable(bool isRemoteControlEnable);
+    bool SetRemoteControlEnable(bool IsRemoteControlEnable);
 #ifdef NOT_SUPPORT_MULTICALL
     bool HangUpOtherCall(int32_t answerCallId);
     void HangUpOtherCallByAnswerCallID(int32_t answerCallId, bool autoAnswerState = false);
@@ -309,11 +308,9 @@ private:
     sptr<WearStatusObserver> wearStatusObserver_ = nullptr;
     int32_t wearStatus_ = WEAR_STATUS_INVALID;
     ffrt::mutex wearStatusMutex_;
-    ffrt::mutex reminderMutex_;
     ffrt::mutex ringToneMutex_;
     ffrt::task_handle pendingHangupHandle_ = nullptr;
     ffrt::mutex pendingHangupHandleMutex_;
-    std::shared_ptr<IncomingFlashReminder> incomingFlashReminder_ {nullptr};
 #ifdef CALL_MANAGER_THERMAL_PROTECTION
     std::atomic<int32_t> thermalLevel_ = -1;
 #endif

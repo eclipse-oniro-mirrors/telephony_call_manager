@@ -113,6 +113,7 @@ public:
     MOCK_METHOD2(SetCallAudioMode, int32_t(int32_t mode, int32_t scenarios));
     MOCK_METHOD0(AnswerCall, int32_t());
     MOCK_METHOD0(RejectCall, int32_t());
+    MOCK_METHOD1(RejectCall, int32_t(RejectType rejectType));
     MOCK_METHOD0(HangUpCall, int32_t());
     MOCK_METHOD2(GetCallTransferInfo, int32_t(const std::string number, CallTransferType type));
     MOCK_METHOD2(GetCallTransferInfoByNumber, int32_t(const std::string number, CallTransferType type));

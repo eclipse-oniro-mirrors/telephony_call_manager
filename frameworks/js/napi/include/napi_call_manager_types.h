@@ -69,7 +69,6 @@ struct DialAsyncContext : AsyncContext {
     int32_t videoState = 0;
     int32_t dialScene = 0;
     int32_t dialType = 0;
-    bool isRTT = false;
     AAFwk::WantParams extraParams;
 };
 

@@ -42,7 +42,7 @@ static constexpr const char *OBSERVER_OFF_JS_PERMISSION_ERROR_STRING =
     "BusinessError 201: Permission denied. An attempt was made to Off forbidden by permission: "
     "ohos.permission.SET_TELEPHONY_STATE.";
 int32_t NapiCallManager::registerStatus_ = TELEPHONY_ERROR;
-const std::unordered_set<std::string> HIGH_PRIO_OPERATION = {"DialCall", "AnswerCall", "RejectCall", "HangUpCall"};
+
 constexpr int32_t INVALID_ACCOUNT_ID = -1;
 constexpr int32_t MAX_ACCOUNT_ID = 1;
 
@@ -5443,9 +5443,7 @@ napi_value NapiCallManager::HandleAsyncWork(napi_env env, AsyncContext *context,
     napi_value resourceName = nullptr;
     napi_create_string_utf8(env, workName.data(), NAPI_AUTO_LENGTH, &resourceName);
     napi_create_async_work(env, resource, resourceName, execute, complete, (void *)context, &context->work);
-    bool isHighPrio = HIGH_PRIO_OPERATION.count(workName) > 0;
-    napi_queue_async_work_with_qos(env, context->work,
-        isHighPrio ? napi_qos_user_interactive : napi_qos_default);
+    napi_queue_async_work_with_qos(env, context->work, napi_qos_default);
     return result;
 }
 

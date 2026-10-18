@@ -1658,6 +1658,22 @@ int32_t CallManagerServiceProxy::RejectCall()
     return replyParcel.ReadInt32();
 }
 
+int32_t CallManagerServiceProxy::RejectCall(RejectType rejectType)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(static_cast<int32_t>(rejectType));
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_REJECT_CALL_WITH_TYPE, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
 int32_t CallManagerServiceProxy::HangUpCall()
 {
     MessageParcel dataParcel;

@@ -25,17 +25,20 @@ constexpr size_t SINGLE_CARRIER_CALL_COUNT = 1;
 void DistributedDataSourceController::OnDeviceOnline(const std::string &devId, const std::string &devName,
     AudioDeviceType devType)
 {
-    if (session_ != nullptr) {
-        return;
-    }
-    auto transMgr = DelayedSingleton<TransmissionManager>::GetInstance();
-    if (transMgr == nullptr) {
-        TELEPHONY_LOGE("get transmission manager fail");
-        return;
-    }
-    session_ = transMgr->CreateServerSession(shared_from_this());
-    if (session_ != nullptr) {
-        session_->Create(SESSION_NAME, QOS_MIN_BW);
+    {
+        std::lock_guard<ffrt::mutex> lock(sessionMutex_);
+        if (session_ != nullptr) {
+            return;
+        }
+        auto transMgr = DelayedSingleton<TransmissionManager>::GetInstance();
+        if (transMgr == nullptr) {
+            TELEPHONY_LOGE("get transmission manager fail");
+            return;
+        }
+        session_ = transMgr->CreateServerSession(shared_from_this());
+        if (session_ != nullptr) {
+            session_->Create(SESSION_NAME, QOS_MIN_BW);
+        }
     }
 
     // save current call info
@@ -56,6 +59,7 @@ void DistributedDataSourceController::OnDeviceOnline(const std::string &devId, c
 void DistributedDataSourceController::OnDeviceOffline(const std::string &devId, const std::string &devName,
     AudioDeviceType devType)
 {
+    std::lock_guard<ffrt::mutex> lock(sessionMutex_);
     if (session_ != nullptr) {
         session_->Destroy();
         session_.reset();
@@ -149,6 +153,10 @@ void DistributedDataSourceController::HandleDataQueryMsg(const cJSON *msg)
     if (!GetInt32Value(msg, DISTRIBUTED_ITEM_TYPE, type)) {
         return;
     }
+    if (type < 0 || type >= static_cast<int32_t>(DistributedDataType::MAX)) {
+        TELEPHONY_LOGE("invalid item type %{public}d", type);
+        return;
+    }
     std::string num = "";
     if (!GetStringValue(msg, DISTRIBUTED_ITEM_NUM, num)) {
         return;
@@ -206,7 +214,12 @@ std::string DistributedDataSourceController::CreateDataRspMsg(DistributedMsgType
 
 void DistributedDataSourceController::SendLocalDataRsp()
 {
-    if (session_ == nullptr || !session_->IsReady()) {
+    std::shared_ptr<SessionAdapter> session;
+    {
+        std::lock_guard<ffrt::mutex> lock(sessionMutex_);
+        session = session_;
+    }
+    if (session == nullptr || !session->IsReady()) {
         TELEPHONY_LOGI("session not ready");
         return;
     }
@@ -238,7 +251,7 @@ void DistributedDataSourceController::SendLocalDataRsp()
             if (data.empty()) {
                 continue;
             }
-            session_->SendMsg(data.c_str(), static_cast<uint32_t>(data.length()));
+            session->SendMsg(data.c_str(), static_cast<uint32_t>(data.length()));
             queryIter->second &= ~(DISTRIBUTED_DATA_TYPE_OFFSET_BASE << type);
         }
     }
@@ -293,12 +306,18 @@ void DistributedDataSourceController::HandleCurrentDataQueryMsg(const cJSON *msg
         TELEPHONY_LOGE("not find distributed call");
         return;
     }
-    bool isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
+    if (audioProxy == nullptr) {
+        TELEPHONY_LOGE("audio proxy is null");
+        return;
+    }
+    bool isMuted = audioProxy->IsMicrophoneMute();
     TELEPHONY_LOGI("HandleCurrentDataQueryMsg isMuted[%{public}d]", isMuted);
     auto data = CreateCurrentDataRspMsg(num, isMuted, static_cast<int32_t>(call->GetCallDirection()));
     if (data.empty()) {
         return;
     }
+    std::lock_guard<ffrt::mutex> lock(sessionMutex_);
     if (session_ != nullptr) {
         session_->SendMsg(data.c_str(), static_cast<uint32_t>(data.length()));
     }

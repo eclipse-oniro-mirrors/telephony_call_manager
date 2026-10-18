@@ -916,6 +916,15 @@ public:
     int32_t RejectCall() override;
 
     /**
+     * RejectCall
+     *
+     * @brief Reject a phone call by reject type
+     * @param rejectType[in], the reject type
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t RejectCall(RejectType rejectType) override;
+
+    /**
      * HangUpCall
      *
      * @brief Hang up the phone by call manager

@@ -20,7 +20,9 @@
 #include "rwlock.h"
 #include "singleton.h"
 
+#include "call_manager_inner_type.h"
 #include "call_state_listener_base.h"
+#include "voip_call_state_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -35,9 +37,13 @@ public:
     int32_t ReportCallStateForCallId(
         int32_t slotId, int32_t callState, std::u16string incomingNumber);
     void UpdateCallStateForVoIPOrRestart();
+    int32_t ReportCallTransferStatusToRegistry(int32_t slotId, bool enabled);
 private:
     TelCallState GetVoipCallState();
     void SendVoipCallStateChanged(int32_t uid, TelCallState state);
+    void ReportVoIPCallStateToRegistry(sptr<CallBase> &callObjectPtr, TelCallState nextState);
+    VoIPCallType ConvertToVoipCallType(const CallAttributeInfo &attrInfo);
+    VoIPCallState ConvertToVoipCallState(TelCallState nextState);
 
 private:
     TelCallState currentCallState_ = TelCallState::CALL_STATUS_UNKNOWN;

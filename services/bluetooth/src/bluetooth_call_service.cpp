@@ -183,35 +183,35 @@ std::vector<int32_t> BluetoothCallService::getCallInfoNum(int32_t &callState, st
     int32_t numDisconnecting = GetCallCountForRemoteControl(TelCallState::CALL_STATUS_DISCONNECTING);
     if (numHeld > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
-        number = GetCallNumber(TelCallState::CALL_STATUS_HOLDING);
+        number = GetPhoneNumber(TelCallState::CALL_STATUS_HOLDING);
     }
     if (numActive > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
-        number = GetCallNumber(TelCallState::CALL_STATUS_ACTIVE);
+        number = GetPhoneNumber(TelCallState::CALL_STATUS_ACTIVE);
     }
     if (numDial > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_DIALING);
-        number = GetCallNumber(TelCallState::CALL_STATUS_DIALING);
+        number = GetPhoneNumber(TelCallState::CALL_STATUS_DIALING);
     }
     if (numAlert > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_ALERTING);
-        number = GetCallNumber(TelCallState::CALL_STATUS_ALERTING);
+        number = GetPhoneNumber(TelCallState::CALL_STATUS_ALERTING);
     }
     if (numIncoming > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_INCOMING);
-        number = GetCallNumber(TelCallState::CALL_STATUS_INCOMING);
+        number =GetPhoneNumber(TelCallState::CALL_STATUS_INCOMING);
     }
     if (numWait > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_INCOMING);
-        number = GetCallNumber(TelCallState::CALL_STATUS_WAITING);
+        number = GetPhoneNumber(TelCallState::CALL_STATUS_WAITING);
     }
     if (numDisconnected > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
-        number = GetCallNumber(TelCallState::CALL_STATUS_DISCONNECTED);
+        number = GetPhoneNumber(TelCallState::CALL_STATUS_DISCONNECTED);
     }
     if (numDisconnecting > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_DISCONNECTED);
-        number = GetCallNumber(TelCallState::CALL_STATUS_DISCONNECTING);
+        number = GetPhoneNumber(TelCallState::CALL_STATUS_DISCONNECTING);
     }
     return {numActive, numHeld};
 }

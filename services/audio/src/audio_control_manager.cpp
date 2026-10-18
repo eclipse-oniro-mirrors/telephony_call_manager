@@ -1488,7 +1488,7 @@ void AudioControlManager::PlayCallEndedTone()
         HandleNotNormalRingerMode();
         return;
     }
-    std::lock_guard<std::recursive_mutex> lock(toneStateLock_);
+    std::unique_lock<ffrt::recursive_mutex> lock(toneStateLock_);
     if (toneState_ == ToneState::TONEING) {
         StopCallTone();
     }
@@ -1512,8 +1512,8 @@ void AudioControlManager::PlayCallEndedTone()
         }
         std::lock_guard<ffrt::recursive_mutex> lock(audioControlPtr->toneStateLock_);
         std::this_thread::sleep_for(std::chrono::milliseconds(CALL_ENDED_PLAY_TIME));
-        toneState_ = ToneState::TONEING;
-        if (StopCallTone() != TELEPHONY_SUCCESS) {
+        audioControlPtr->toneState_ = ToneState::TONEING;
+        if (audioControlPtr->StopCallTone() != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("stop call ended tone failed");
             return;
         }
@@ -1523,7 +1523,7 @@ void AudioControlManager::PlayCallEndedTone()
 void AudioControlManager::HandleNotNormalRingerMode()
 {
     TELEPHONY_LOGE("ringer mode is not normal");
-    std::lock_guard<std::recursive_mutex> lock(toneStateLock_);
+    std::lock_guard<ffrt::recursive_mutex> lock(toneStateLock_);
     if (toneState_ == ToneState::TONEING) {
         StopCallTone();
         TELEPHONY_LOGI("ringer mode is not normal, stop call tone!");
@@ -1591,7 +1591,7 @@ void AudioControlManager::SetSoundState(SoundState state)
 
 void AudioControlManager::SetToneState(ToneState state)
 {
-    std::lock_guard<std::recursive_mutex> lock(toneStateLock_);
+    std::lock_guard<ffrt::recursive_mutex> lock(toneStateLock_);
     toneState_ = state;
 }
 
@@ -1630,7 +1630,7 @@ bool AudioControlManager::IsAudioActivated() const
 
 int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
 {
-    std::lock_guard<std::recursive_mutex> lock(toneStateLock_);
+    std::lock_guard<ffrt::recursive_mutex> lock(toneStateLock_);
     if (toneState_ == ToneState::TONEING) {
         TELEPHONY_LOGE("callTone is already playing");
         return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
@@ -1653,7 +1653,7 @@ int32_t AudioControlManager::StopCallTone()
 {
     TELEPHONY_LOGI("stop call tone enter");
     {
-        std::lock_guard<std::recursive_mutex> lock(toneStateLock_);
+        std::lock_guard<ffrt::recursive_mutex> lock(toneStateLock_);
         if (toneState_ == ToneState::STOPPED) {
             TELEPHONY_LOGI("tone is already stopped");
             return TELEPHONY_SUCCESS;
@@ -1680,7 +1680,7 @@ int32_t AudioControlManager::StopCallTone()
 
 bool AudioControlManager::IsTonePlaying()
 {
-    std::lock_guard<std::recursive_mutex> lock(toneStateLock_);
+    std::lock_guard<ffrt::recursive_mutex> lock(toneStateLock_);
     return toneState_ == ToneState::TONEING;
 }
 

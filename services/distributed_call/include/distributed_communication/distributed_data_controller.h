@@ -17,6 +17,7 @@
 #define TELEPHONY_DISTRIBUTED_COMMUNICATION_DATA_CONTROLLER_H
 
 #include "cJSON.h"
+#include "ffrt.h"
 #include "call_base.h"
 #include "i_distributed_device_state_callback.h"
 #include "session_adapter.h"
@@ -77,6 +78,7 @@ protected:
 
 protected:
     std::shared_ptr<SessionAdapter> session_{nullptr};
+    ffrt::mutex sessionMutex_{};
 
 private:
     std::string CreateMuteMsg(DistributedMsgType msgType, bool isMute);

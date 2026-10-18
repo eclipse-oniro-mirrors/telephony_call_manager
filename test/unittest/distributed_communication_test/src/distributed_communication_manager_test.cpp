@@ -137,6 +137,154 @@ HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_DeviceOnline_0
 }
 
 /**
+ * @tc.number   Telephony_DcManager_DeviceOnline_NoControllers
+ * @tc.name     test dc device online with null controllers
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_DeviceOnline_NoControllers, Level1)
+{
+    int32_t devRole = 0; // sink
+    std::string devId = "UnitTestDeviceId_002";
+    std::string devName = "UnitTestDeviceName";
+    AudioDeviceType deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    ASSERT_NO_THROW(dcManager->Init());
+    dcManager->dataController_ = nullptr;
+    dcManager->devSwitchController_ = nullptr;
+    ASSERT_NO_THROW(dcManager->OnDeviceOnline(devId, devName, deviceType, devRole));
+    EXPECT_TRUE(dcManager->IsConnected());
+    EXPECT_TRUE(dcManager->dataController_ != nullptr);
+    EXPECT_TRUE(dcManager->devSwitchController_ != nullptr);
+}
+
+/**
+ * @tc.number   Telephony_DcManager_DeviceOnline_WithControllers
+ * @tc.name     test dc device online with existing controllers
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_DeviceOnline_WithControllers, Level1)
+{
+    int32_t devRole = 0; // sink
+    std::string devId = "UnitTestDeviceId_003";
+    std::string devName = "UnitTestDeviceName";
+    AudioDeviceType deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    ASSERT_NO_THROW(dcManager->Init());
+    // Pre-set controlles to non-null to exercise local copy branch
+    dcManager->dataController_ = std::make_shared<DistributedDataSinkController>();
+    dcManager->devSwitchController_ = std::make_shared<DistributedSinkSwitchController>();
+    ASSERT_NO_THROW(dcManager->OnDeviceOnline(devId, devName, deviceType, devRole));
+    EXPECT_TRUE(dcManager->IsConnected());
+    EXPECT_TRUE(dcManager->dataController_ != nullptr);
+    EXPECT_TRUE(dcManager->devSwitchController_ != nullptr);
+    dcManager->peerDevices_.clear();
+    dcManager->dataController_ = nullptr;
+    dcManager->devSwitchController_ = nullptr;
+}
+
+/**
+ * @tc.number   Telephony_DcManager_DeviceOffline_NoControllers
+ * @tc.name     test dc device offline with null controllers
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_DeviceOffline_NoControllers, Level1)
+{
+    int32_t devRole = 0;
+    std::string devId = "UnitTestDeviceId_002";
+    std::string devName = "UnitTestDeviceName";
+    AudioDeviceType deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    ASSERT_NO_THROW(dcManager->Init());
+    dcManager->dataController_ = nullptr;
+    dcManager->devSwitchController_ = nullptr;
+    ASSERT_NO_THROW(dcManager->OnDeviceOffline(devId, devName, deviceType, devRole));
+    EXPECT_TRUE(dcManager->dataController_ == nullptr);
+    EXPECT_TRUE(dcManager->devSwitchController_ == nullptr);
+}
+
+/**
+ * @tc.number   Telephony_DcManager_DeviceOffline_WithControllers
+ * @tc.name     test dc device offline with null controllers
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_DeviceOffline_WithControllers, Level1)
+{
+    int32_t devRole = 0;
+    std::string devId = "UnitTestDeviceId_003";
+    std::string devName = "UnitTestDeviceName";
+    AudioDeviceType deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    ASSERT_NO_THROW(dcManager->Init());
+    // Online first to create controllers
+    ASSERT_NO_THROW(dcManager->OnDeviceOnline(devId, devName, deviceType, devRole));
+    EXPECT_TRUE(dcManager->IsConnected());
+    EXPECT_TRUE(dcManager->dataController_ != nullptr);
+    EXPECT_TRUE(dcManager->devSwitchController_ != nullptr);
+    // Offline with controllers non-null (local copy unregister branch)
+    ASSERT_NO_THROW(dcManager->OnDeviceOffline(devId, devName, deviceType, devRole));
+    EXPECT_FALSE(dcManager->IsConnected());
+    EXPECT_TRUE(dcManager->dataController_ == nullptr);
+    EXPECT_TRUE(dcManager->devSwitchController_ == nullptr);
+}
+
+/**
+ * @tc.number   Telephony_DcManager_DcManager_OnRemoveSystemAbility
+ * @tc.name     test dc manager on remove system ability
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_DcManager_OnRemoveSystemAbility, Level1)
+{
+    int32_t devRole = 0;
+    std::string devId = "UnitTestDeviceId_004";
+    std::string devName = "UnitTestDeviceName";
+    AudioDeviceType deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    ASSERT_NO_THROW(dcManager->Init());
+    ASSERT_NO_THROW(dcManager->OnDeviceOnline(devId, devName, deviceType, devRole));
+    EXPECT_TRUE(dcManager->IsConnected());
+    // OnRemoveSystemAbility clears everything
+    ASSERT_NO_THROW(dcManager->OnRemoveSystemAbility());
+    EXPECT_FALSE(dcManager->IsConnected());
+    EXPECT_TRUE(dcManager->dataController_ == nullptr);
+    EXPECT_TRUE(dcManager->devSwitchController_ == nullptr);
+    EXPECT_TRUE(dcManager->peerDevices_.empty());
+}
+
+
+/**
+ * @tc.number   Telephony_DcManager_ParseDevIdFromAudioDevice
+ * @tc.name     test parse dev id from audio device
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_ParseDevIdFromAudioDevice, Level1)
+{
+    AudioDevice device;
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    // empty address
+    EXPECT_EQ(dcManager->ParseDevIdFromAudioDevice(device), "");
+
+    // invalid json string
+    std::string deviceId = "not Json string";
+    EXPECT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
+    EXPECT_EQ(dcManager->ParseDevIdFromAudioDevice(device), "");
+
+    // valid devId
+    deviceId = "{ \"devId\": \"dev_001\" }";
+    EXPECT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
+    EXPECT_EQ(dcManager->ParseDevIdFromAudioDevice(device), "dev_001");
+
+    // devId is not string type
+    deviceId = "{ \"devId\": 123 }";
+    EXPECT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
+    EXPECT_EQ(dcManager->ParseDevIdFromAudioDevice(device), "");
+
+    // json without devId field
+    deviceId = "{ \"other\": \"value\" }";
+    EXPECT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
+    EXPECT_EQ(dcManager->ParseDevIdFromAudioDevice(device), "");
+}
+
+/**
  * @tc.number   Telephony_DcManager_DeviceOffline_001
  * @tc.name     test dc device offline
  * @tc.desc     Function test
@@ -237,5 +385,144 @@ HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_CallStateUpdat
     ASSERT_NO_THROW(dcManager->dataController_ = std::make_shared<DistributedDataSourceController>());
     EXPECT_NO_THROW(dcManager->CallStateUpdated(callObjectPtr, priorState, nextState));
 }
+
+/**
+ * @tc.number   Telephony_DcManager_IsAudioOnSink
+ * @tc.name     test IsAudioOnSink with null and valid devSwitchController
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_IsAudioOnSink, Function | Level1)
+{
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    dcManager->devSwitchController_ = nullptr;
+    EXPECT_FALSE(dcManager->IsAudioOnSink());
+    dcManager->devSwitchController_ = std::make_shared<DistributedSinkSwitchController>();
+    EXPECT_FALSE(dcManager->IsAudioOnSink());
+    dcManager->devSwitchController_->isAudioOnSink_ = true;
+    EXPECT_TRUE(dcManager->IsAudioOnSink());
+    dcManager->devSwitchController_->isAudioOnSink_ = false;
+    dcManager->devSwitchController_ = nullptr;
+}
+
+/**
+ * @tc.number   Telephony_DcManager_IsDistributedDevAudioDevice
+ * @tc.name     test IsDistributedDevAudioDevice with AudioDevice overload
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_IsDistributedDevAudioDevice, Function | Level1)
+{
+    AudioDevice device;
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    EXPECT_FALSE(dcManager->IsDistributedDev(device));
+    std::string deviceId = "{ \"devId\": \"dev_002\" }";
+    ASSERT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
+    EXPECT_FALSE(dcManager->IsDistributedDev(device));
+    dcManager->peerDevices_.push_back("dev_002");
+    EXPECT_TRUE(dcManager->IsDistributedDev(device));
+    dcManager->peerDevices_.clear();
+}
+
+/**
+ * @tc.number   Telephony_DcManager_CallStateUpdated_Disconnected
+ * @tc.name     test CallStateUpdated_Disconnected with CALL_STATUS_DISCONNECTED state
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_CallStateUpdated_Disconnected, Function | Level1)
+{
+    DialParaInfo mDialParaInfo;
+    sptr<CallBase> callObjectPtr = new CSCall(mDialParaInfo);
+    TelCallState priorState = TelCallState::CALL_STATUS_ACTIVE;
+    TelCallState nextState = TelCallState::CALL_STATUS_DISCONNECTED;
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    dcManager->dataController_ = nullptr;
+    EXPECT_NO_THROW(dcManager->CallStateUpdated(callObjectPtr, priorState, nextState));
+    dcManager->dataController_ = std::make_shared<DistributedDataSinkController>();
+    EXPECT_NO_THROW(dcManager->CallStateUpdated(callObjectPtr, priorState, nextState));
+    dcManager->dataController_ = nullptr;
+}
+
+/**
+ * @tc.number   Telephony_DcManager_DeviceOnline_SourceRole
+ * @tc.name     test device online with source role and existing controller
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_DeviceOnline_SourceRole, Function | Level1)
+{
+    int32_t devRole = 1; // source
+    std::string devId = "UnitTestDeviceId_src";
+    std::string devName = "UnitTestDeviceName";
+    AudioDeviceType deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PAD;
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    ASSERT_NO_THROW(dcManager->Init());
+    dcManager->dataController_ = nullptr;
+    dcManager->devSwitchController_ = nullptr;
+    ASSERT_NO_THROW(dcManager->OnDeviceOnline(devId, devName, deviceType, devRole));
+    EXPECT_FALSE(dcManager->IsSinkRole());
+    EXPECT_TRUE(dcManager->IsConnected());
+    EXPECT_TRUE(dcManager->dataController_ != nullptr);
+    EXPECT_TRUE(dcManager->devSwitchController_ != nullptr);
+    // Online again with existing controllers
+    ASSERT_NO_THROW(dcManager->OnDeviceOnline(devId, devName, deviceType, devRole));
+    // Clean up
+    ASSERT_NO_THROW(dcManager->OnDeviceOffline(devId, devName, deviceType, devRole));
+    dcManager->peerDevices_.clear();
+    dcManager->dataController_ = nullptr;
+    dcManager->devSwitchController_ = nullptr;
+}
+
+/**
+ * @tc.number   Telephony_DcManager_DeviceOffline_DevObserverNull
+ * @tc.name     test device offline with null devObserver
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_DeviceOffline_DevObserverNull, Function | Level1)
+{
+    int32_t devRole = 0;
+    std::string devId = "UnitTestDeviceId_off";
+    std::string devName = "UnitTestDeviceName";
+    AudioDeviceType deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    dcManager->devObserver_ = nullptr;
+    ASSERT_NO_THROW(dcManager->OnDeviceOffline(devId, devName, deviceType, devRole));
+    EXPECT_FALSE(dcManager->IsConnected());
+}
+
+/**
+ * @tc.number   Telephony_DcManager_NewCallCreated_NonCSType
+ * @tc.name     test NewCallCreated witn non IMS/CS call type
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_NewCallCreated_NonCSType, Function | Level1)
+{
+    DialParaInfo mDialParaInfo;
+    sptr<CallBase> csCall = new CSCall(mDialParaInfo);
+    csCall->SetCallType(CallType::TYPE_OTT);
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    ASSERT_NO_THROW(dcManager->NewCallCreated(csCall));
+}
+
+/**
+ * @tc.number   Telephony_DcManager_DeInitExtWrapper
+ * @tc.name     test DeInitExtWrapper with null handler
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_DeInitExtWrapper, Function | Level1)
+{
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    ASSERT_NO_THROW(dcManager->DeInitExtWrapper());
+}
+
+/**
+ * @tc.number   Telephony_DcManager_SwitchToSourceDevice_Null
+ * @tc.name     test SwitchToSourceDevice with null devSwitchController
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_SwitchToSourceDevice_Null, Function | Level1)
+{
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    dcManager->devSwitchController_ = nullptr;
+    EXPECT_FALSE(dcManager->SwitchToSourceDevice());
+}
+
 } // namespace Telephony
 } // namespace OHOS

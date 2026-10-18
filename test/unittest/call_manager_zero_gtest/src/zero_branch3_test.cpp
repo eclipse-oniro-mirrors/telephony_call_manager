@@ -79,7 +79,6 @@
 #include "bluetooth_call.h"
 #include "call_records_handler.h"
 #include "datashare_helper.h"
-#include "incoming_flash_reminder.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1368,6 +1367,62 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_013, Function | MediumTes
 }
 
 /**
+ * @tc.number   Telephony_CallControlManager_014
+ * @tc.name     test CallControlManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_014, Function | MediumTest | Level1)
+{
+    CallObjectManager::callObjectPtrList_.clear();
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    if (callControlManager->CallRequestHandlerPtr_ == nullptr) {
+        callControlManager->CallRequestHandlerPtr_ = std::make_unique<CallRequestHandler>();
+        callControlManager->CallRequestHandlerPtr_->callRequestProcessPtr_ = nullptr;
+    }
+    DialParaInfo dialParaInfo;
+    sptr<CallBase> callObjectPtr = new CSCall(dialParaInfo);
+    callObjectPtr->SetCallId(VALID_CALLID);
+    callObjectPtr->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_ALERTING);
+    CallObjectManager::AddOneCallObject(callObjectPtr);
+    std::u16string textMessage = u"";
+    EXPECT_EQ(callControlManager->RejectCall(VALID_CALLID, false, textMessage, RejectType::CALL_REJECT_NORMAL),
+        CALL_ERR_ILLEGAL_CALL_OPERATION);
+    EXPECT_EQ(callControlManager->RejectCall(VALID_CALLID, false, textMessage, RejectType::CALL_REJECT_MISSED_CALL),
+        CALL_ERR_ILLEGAL_CALL_OPERATION);
+    CallObjectManager::DeleteOneCallObject(callObjectPtr);
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
+ * @tc.number   Telephony_CallControlManager_015
+ * @tc.name     test CallControlManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_015, Function | MediumTest | Level1)
+{
+    CallObjectManager::callObjectPtrList_.clear();
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    if (callControlManager->CallRequestHandlerPtr_ == nullptr) {
+        callControlManager->CallRequestHandlerPtr_ = std::make_unique<CallRequestHandler>();
+        callControlManager->CallRequestHandlerPtr_->callRequestProcessPtr_ = nullptr;
+    }
+    DialParaInfo dialParaInfo;
+    sptr<CallBase> callObjectPtr = new CSCall(dialParaInfo);
+    callObjectPtr->SetCallId(VALID_CALLID);
+    callObjectPtr->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    CallObjectManager::AddOneCallObject(callObjectPtr);
+    std::u16string textMessage = u"";
+    EXPECT_EQ(callControlManager->RejectCall(VALID_CALLID, false, textMessage, RejectType::CALL_REJECT_MISSED_CALL),
+        TELEPHONY_SUCCESS);
+    CallObjectManager::DeleteOneCallObject(callObjectPtr);
+    CallObjectManager::callObjectPtrList_.clear();
+    callControlManager->StartFlashRemind();
+    callControlManager->StopFlashRemind();
+}
+
+/**
  * @tc.number   Telephony_CallStatusManager_016
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -2062,25 +2117,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_019, TestSize.Level0)
     ASSERT_TRUE(audioControl->IsScoTemporarilyDisabled());
     CallObjectManager::callObjectPtrList_.clear();
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
-}
-
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_ActiveHandle_StopTorch, TestSize.Level0)
-{
-    CallObjectManager::callObjectPtrList_.clear();
-    CallObjectManager::voipCallObjectList_.clear();
-    auto runner = AppExecFwk::EventRunner::Create("handler_incoming_flash_reminder");
-    bool stopped = false;
-    auto task = [&stopped]() {
-        stopped = true;
-    };
-    DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ =
-        std::make_shared<IncomingFlashReminder>(runner, task);
-    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    CallDetailInfo info;
-    EXPECT_EQ(callStatusManager->ActiveHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    sleep(1);
-    EXPECT_EQ(stopped, true);
-    DelayedSingleton<CallControlManager>::GetInstance()->incomingFlashReminder_ = nullptr;
 }
 
 /**

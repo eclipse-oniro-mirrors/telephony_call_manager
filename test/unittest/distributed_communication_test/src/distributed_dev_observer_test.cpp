@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include "telephony_errors.h"
+#include "distributed_communication_manager.h"
 #include "distributed_device_observer.h"
 #include "distributed_sink_switch_controller.h"
 #include "distributed_source_switch_controller.h"
@@ -136,6 +137,112 @@ HWTEST_F(DistributedDevObserverTest, Telephony_DcDeviceObserver_DeviceOnlineOffl
 
     ret = deviceCallback->OnDistributedDeviceOffline(devId, devName, devType, devRole);
     ASSERT_TRUE(ret == TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_DcDeviceObserver_RegisterDevCallback
+ * @tc.name     test register dev callback with mutex
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedDevObserverTest, Telephony_DcDeviceObserver_RegisterDevCallback, Function | Level1)
+{
+    auto deviceObserver = std::make_shared<DistributedDeviceObserver>();
+    // RegisterDevCallback: deviceListener_ is null -> create via mutex_
+    ASSERT_NO_THROW(deviceObserver->RegisterDevCallback());
+    // RegisterDevCallback again: deviceListener_ already set
+    ASSERT_NO_THROW(deviceObserver->RegisterDevCallback());
+    // UnRegisterDevCallback: deviceListener_ not null -> reset via mutex_
+    ASSERT_NO_THROW(deviceObserver->UnRegisterDevCallback());
+    // UnRegisterDevCallback again: deviceListener_ already null
+    ASSERT_NO_THROW(deviceObserver->UnRegisterDevCallback());
+}
+
+/**
+ * @tc.number   Telephony_DcDeviceObserver_RegisterDevStatusCallback
+ * @tc.name     test register dev status callback with mutex
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedDevObserverTest, Telephony_DcDeviceObserver_RegisterDevStatusCallback, Function | Level1)
+{
+    auto deviceObserver = std::make_shared<DistributedDeviceObserver>();
+    std::shared_ptr<IDistributedDeviceStateCallback> callback = nullptr;
+    // RegisterDevStatusCallback with null callback
+    ASSERT_NO_THROW(deviceObserver->RegisterDevStatusCallback(callback));
+    // RegisterDevStatusCallback with valid callback
+    callback = std::make_shared<DistributedSourceSwitchController>();
+    ASSERT_NO_THROW(deviceObserver->RegisterDevStatusCallback(callback));
+    // RegisterDevStatusCallback duplicate
+    ASSERT_NO_THROW(deviceObserver->RegisterDevStatusCallback(callback));
+    // UnRegisterDevStatusCallback
+    ASSERT_NO_THROW(deviceObserver->UnRegisterDevStatusCallback(callback));
+    // UnRegisterDevStatusCallback again (not in list)
+    ASSERT_NO_THROW(deviceObserver->UnRegisterDevStatusCallback(callback));
+}
+
+/**
+ * @tc.number   Telephony_DcDeviceObserver_OnlineOfflineWithCallbacks
+ * @tc.name     test device online/offline with registered callbacks
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedDevObserverTest, Telephony_DcDeviceObserver_OnlineOfflineWithCallbacks, Function | Level1)
+{
+    std::string devId = "UnitTestDeviceId";
+    std::string devName = "UnitTestDeviceName";
+    AudioDeviceType deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+    auto deviceObserver = std::make_shared<DistributedDeviceObserver>();
+    std::shared_ptr<IDistributedDeviceStateCallback> callback = std::make_shared<DistributedSourceSwitchController>();
+    ASSERT_NO_THROW(deviceObserver->RegisterDevStatusCallback(callback));
+    // OnDeviceOnline with callbacks
+    ASSERT_NO_THROW(deviceObserver->OnDeviceOnline(devId, devName, deviceType));
+    // OnDistributedAudioDeviceChange with callbacks
+    ASSERT_NO_THROW(deviceObserver->OnDistributedAudioDeviceChange(devId, devName,
+        deviceType, static_cast<int32_t>(DistributedRole::SINK)));
+    // OnDeviceOffline with callbacks
+    ASSERT_NO_THROW(deviceObserver->OnDeviceOffline(devId, devName, deviceType));
+    // OnRemoveSystemAbility with callbacks
+    ASSERT_NO_THROW(deviceObserver->OnRemoveSystemAbility());
+}
+
+/**
+ * @tc.number   Telephony_DcDeviceObserver_DeviceChangeUnknown
+ * @tc.name     test distributed audio device change with unknown type
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedDevObserverTest, Telephony_DcDeviceObserver_DeviceChangeUnknown, Function | MediumTest | Level1)
+{
+    std::string devId = "UnitTestDeviceId";
+    std::string devName = "UnitTestDeviceName";
+    int32_t devType = -1; // unknown type
+    int32_t devRole = 0;
+    auto deviceCallback = std::make_shared<DistributedDeviceCallback>();
+    // OnDistributedAudioDeviceChange with unknown device type -> return ERROR
+    int32_t ret = deviceCallback->OnDistributedAudioDeviceChange(devId, devName, devType, devRole);
+    EXPECT_TRUE(ret == TELEPHONY_ERROR);
+    // OnDistributedAudioDeviceChange with valid device type
+    devType = 1; // pad
+    ret = deviceCallback->OnDistributedAudioDeviceChange(devId, devName, devType, devRole);
+    EXPECT_TRUE(ret == TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_DcDeviceObserver_DeviceIdLenExceed
+ * @tc.name     test distributed device online with device id length exceed
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedDevObserverTest, Telephony_DcDeviceObserver_DeviceIdLenExceed, Function | MediumTest | Level1)
+{
+    std::string longDevId(100, 'a'); // exceed MAX_DEVICE_ID_LEN (70)
+    std::string devName = "UnitTestDeviceName";
+    int32_t devType = 0;
+    int32_t devRole = 0;
+    auto deviceCallback = std::make_shared<DistributedDeviceCallback>();
+    // device id length exceeds limit -> return ERROR
+    int32_t ret = deviceCallback->OnDistributedDeviceOnline(longDevId, devName, devType, devRole);
+    EXPECT_TRUE(ret == TELEPHONY_ERROR);
+    // device name length exceeds limit
+    std::string longDevName(100, 'b');
+    ret = deviceCallback->OnDistributedDeviceOnline(devName, longDevName, devType, devRole);
+    EXPECT_TRUE(ret == TELEPHONY_ERROR);
 }
 
 } // namespace Telephony

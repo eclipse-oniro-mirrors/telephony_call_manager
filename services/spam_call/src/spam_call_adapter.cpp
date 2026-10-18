@@ -75,7 +75,7 @@ SpamCallAdapter::~SpamCallAdapter()
 }
 
 bool SpamCallAdapter::DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId,
-    IWatchTelephonyNode *watchTelephonyNode)
+    IWatchTelephonyNode *watchTelephonyNode, int32_t callType)
 {
     TELEPHONY_LOGW("DetectSpamCall start");
     phoneNumber_ = phoneNumber;
@@ -89,7 +89,7 @@ bool SpamCallAdapter::DetectSpamCall(const std::string &phoneNumber, const int32
     result_ = "";
     isQueryComplete_ = false;
     lock.unlock();
-    SubmitCallerStatusQuery(phoneNumber, watchTelephonyNode);
+    SubmitCallerStatusQuery(phoneNumber, watchTelephonyNode, callType);
     std::unique_lock<ffrt::mutex> lockForWait(spamMutex_);
     if (!spamCv_.wait_for(lockForWait, std::chrono::milliseconds(WAIT_TIME_FIVE_SECOND),
         [this]() { return isQueryComplete_; })) {
@@ -207,15 +207,16 @@ uint64_t SpamCallAdapter::GetCurrentTimeMs()
     return std::chrono::duration_cast<std::chrono::milliseconds>(timeNow.time_since_epoch()).count();
 }
 
-void SpamCallAdapter::SubmitCallerStatusQuery(const std::string &phoneNumber, IWatchTelephonyNode *watchTelephonyNode)
+void SpamCallAdapter::SubmitCallerStatusQuery(const std::string &phoneNumber,
+    IWatchTelephonyNode *watchTelephonyNode, int32_t callType)
 {
     auto weak = weak_from_this();
-    ffrt::submit_h([weak, phoneNumber, watchTelephonyNode] {
+    ffrt::submit_h([weak, phoneNumber, watchTelephonyNode, callType] {
         auto strong = weak.lock();
         if (strong == nullptr) {
             return;
         }
-        std::string dispositionJson = "";
+        std::string dispositionJson = "{\"callType\":" + std::to_string(callType) + "}";
         // watchTelephonyNode already check nullptr
         int32_t res = watchTelephonyNode->GetCallerStatus(phoneNumber, dispositionJson);
         TELEPHONY_LOGI("query result[%{public}d]", res);

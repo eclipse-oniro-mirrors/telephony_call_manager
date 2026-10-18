@@ -73,7 +73,7 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_002, Function | MediumTest | Le
     std::shared_ptr<SpamCallAdapter> spamCallAdapter_ = std::make_shared<SpamCallAdapter>();
     const std::string phoneNumber = "12345678900";
     const int32_t slotId = -1;
-    ASSERT_FALSE(spamCallAdapter_->DetectSpamCall(phoneNumber, slotId));
+    ASSERT_FALSE(spamCallAdapter_->DetectSpamCall(phoneNumber, slotId, nullptr, 1)); // 1: TYPE_IMS
 }
 
 /**
