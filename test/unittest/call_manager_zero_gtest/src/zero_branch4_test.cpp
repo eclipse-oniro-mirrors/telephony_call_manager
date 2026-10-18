@@ -923,12 +923,17 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_003, TestSize.Level0)
     DialParaInfo dialInfo;
     int32_t appIndex = 0;
     sptr<CallBase> call1 = new VoIPCall(dialInfo);
+<<<<<<< HEAD
     ASSERT_EQ(CallObjectManager::AddOneCallObject(call1), TELEPHONY_SUCCESS);
+=======
+    EXPECT_EQ(CallObjectManager::AddOneCallObject(call1), TELEPHONY_SUCCESS);
+>>>>>>> origin/master
     sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call1.GetRefPtr());
     callManagerHisysevent->WriteVoipCallStatisticalEvent("123", 100, "statisticalField");
     callManagerHisysevent->WriteVoipCallStatisticalEvent(call1->GetCallID(), "statisticalField");
     std::string bundleName = voipCall->GetVoipBundleName();
     callManagerHisysevent->GetAppIndexByBundleName(bundleName, voipCall->GetVoipUid(), appIndex);
+<<<<<<< HEAD
     std::string callId = "test_call_null";
     nlohmann::json nullJson = nullptr;
     callManagerHisysevent->voipProcedureCallInfo_[callId] = nullJson;
@@ -985,6 +990,10 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_004, TestSize.Level0)
     CallObjectManager::callObjectPtrList_.pop_back();
     MessageParcel parcel;
     EXPECT_FALSE(callManagerHisysevent->ReportEventToChrAsync("TestDtModule", parcel));
+=======
+    callManagerHisysevent->WriteVoipCallFaultEvent("123", 123, 233);
+    EXPECT_NE(appIndex, -1);
+>>>>>>> origin/master
 }
 /**
  * @tc.number   Telephony_OTTCall_001
