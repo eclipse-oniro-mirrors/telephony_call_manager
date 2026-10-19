@@ -862,4 +862,44 @@ HWTEST_F(ZeroBranch10Test, CallManagerServiceStub_SetCallAudioMode_ValidTest, Te
     data.WriteInt32(scenarios);
     EXPECT_NE(serviceStub->OnSetCallAudioMode(data, reply), ret);
 }
+
+/**
+ * @tc.number   Telephony_SetTelCallState_RollbackGuard_001
+ * @tc.name     test SetTelCallState rollback guard after disconnecting
+ * @tc.desc     State machine must not rollback from DISCONNECTING/DISCONNECTED to non-terminal states,
+ *              to avoid contradictory NotifyCallStateUpdated (e.g. 3->7 followed by 0->6)
+ */
+HWTEST_F(ZeroBranch10Test, Telephony_SetTelCallState_RollbackGuard_001, Function | MediumTest | Level1)
+{
+    DialParaInfo info;
+    sptr<CallBase> call = new IMSCall(info);
+    EXPECT_NE(call, nullptr);
+    EXPECT_EQ(call->SetTelCallState(TelCallState::CALL_STATUS_DIALING), TELEPHONY_SUCCESS);
+    EXPECT_EQ(call->SetTelCallState(TelCallState::CALL_STATUS_ALERTING), TELEPHONY_SUCCESS);
+    EXPECT_EQ(call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTING), TELEPHONY_SUCCESS);
+    EXPECT_EQ(call->SetTelCallState(TelCallState::CALL_STATUS_ALERTING), CALL_ERR_NOT_NEW_STATE);
+    EXPECT_EQ(call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE), CALL_ERR_NOT_NEW_STATE);
+    EXPECT_EQ(call->GetTelCallState(), TelCallState::CALL_STATUS_DISCONNECTING);
+    EXPECT_EQ(call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED), TELEPHONY_SUCCESS);
+    EXPECT_EQ(call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE), CALL_ERR_NOT_NEW_STATE);
+    EXPECT_EQ(call->GetTelCallState(), TelCallState::CALL_STATUS_DISCONNECTED);
+}
+
+/**
+ * @tc.number   Telephony_SetTelCallState_DuplicateState_001
+ * @tc.name     test SetTelCallState keep disconnecting state on duplicate setting
+ * @tc.desc     When a concurrent flow repeats DISCONNECTING, the stored state must remain
+ *              consistent so later DISCONNECTED notification carries priorState=DISCONNECTING
+ */
+HWTEST_F(ZeroBranch10Test, Telephony_SetTelCallState_DuplicateState_001, Function | MediumTest | Level1)
+{
+    DialParaInfo info;
+    sptr<CallBase> call = new IMSCall(info);
+    EXPECT_NE(call, nullptr);
+    EXPECT_EQ(call->SetTelCallState(TelCallState::CALL_STATUS_DIALING), TELEPHONY_SUCCESS);
+    EXPECT_EQ(call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTING), TELEPHONY_SUCCESS);
+    EXPECT_EQ(call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTING), CALL_ERR_NOT_NEW_STATE);
+    EXPECT_EQ(call->GetTelCallState(), TelCallState::CALL_STATUS_DISCONNECTING);
+    EXPECT_EQ(call->GetCallRunningState(), CallRunningState::CALL_RUNNING_STATE_ENDING);
+}
 }

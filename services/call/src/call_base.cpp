@@ -260,6 +260,14 @@ int32_t CallBase::SetTelCallState(TelCallState nextState)
         TELEPHONY_LOGI("Call state duplication %{public}d", nextState);
         return CALL_ERR_NOT_NEW_STATE;
     }
+    if (callRunningState_ != CallRunningState::CALL_RUNNING_STATE_CREATE &&
+        (callState_ == TelCallState::CALL_STATUS_DISCONNECTING ||
+        callState_ == TelCallState::CALL_STATUS_DISCONNECTED) && nextState != TelCallState::CALL_STATUS_DISCONNECTED &&
+        nextState != TelCallState::CALL_STATUS_IDLE && nextState != TelCallState::CALL_STATUS_UNKNOWN) {
+        TELEPHONY_LOGE("Call state rollback not allowed, from:%{public}d to:%{public}d",
+            static_cast<int32_t>(callState_), static_cast<int32_t>(nextState));
+        return CALL_ERR_NOT_NEW_STATE;
+    }
     callState_ = nextState;
     switch (nextState) {
         case TelCallState::CALL_STATUS_DIALING:

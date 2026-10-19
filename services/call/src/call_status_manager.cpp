@@ -1805,6 +1805,9 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
         TELEPHONY_LOGE("SetTelCallState failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (ret == CALL_ERR_NOT_NEW_STATE && call->GetTelCallState() != nextState) {
+        return CALL_ERR_NOT_NEW_STATE;
+    }
     if (nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
         time_t createTime = call->GetCallCreateTime();
         AAFwk::WantParams params = call->GetExtraParams();
