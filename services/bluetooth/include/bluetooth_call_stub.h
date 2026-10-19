@@ -55,6 +55,7 @@ private:
 #ifdef SUPPORT_HEARING_AID
     int32_t OnResetBtHearingAidDeviceList(MessageParcel &data, MessageParcel &reply);
 #endif
+    int32_t OnGetVoipCallState(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothCallFunc> memberFuncMap_;
 };
 } // namespace Telephony

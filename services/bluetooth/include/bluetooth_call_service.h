@@ -61,6 +61,16 @@ public:
     int32_t GetCallState() override;
 
     /**
+     * GetVoipCallState
+     *
+     * @brief Obtain the current voip call state from callObjectPtrList_
+     * @return Returns TelCallState value as int32_t in priority order:
+     *         incoming, active, answered, dialing, disconnecting, disconnected.
+     *         Returns CALL_STATUS_UNKNOWN if no voip call exists.
+     */
+    int32_t GetVoipCallState() override;
+
+    /**
      * HoldCall
      *
      * @brief Park a phone call

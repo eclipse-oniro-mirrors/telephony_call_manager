@@ -243,6 +243,31 @@ void BluetoothCallService::GetVoipCallState(int32_t &numActive, int32_t &callSta
     TELEPHONY_LOGI("GetVoipCallState finish,callState:%{public}d, numActive:%{public}d", callState, numActive);
 }
 
+int32_t BluetoothCallService::GetVoipCallState()
+{
+    TELEPHONY_LOGI("BluetoothCallService::GetVoipCallState start");
+    if (IsCallExist(CallType::TYPE_VOIP, TelCallState::CALL_STATUS_INCOMING)) {
+        return static_cast<int32_t>(TelCallState::CALL_STATUS_INCOMING);
+    }
+    if (IsCallExist(CallType::TYPE_VOIP, TelCallState::CALL_STATUS_ACTIVE)) {
+        return static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE);
+    }
+    if (IsCallExist(CallType::TYPE_VOIP, TelCallState::CALL_STATUS_ANSWERED)) {
+        return static_cast<int32_t>(TelCallState::CALL_STATUS_ANSWERED);
+    }
+    if (IsCallExist(CallType::TYPE_VOIP, TelCallState::CALL_STATUS_DIALING)) {
+        return static_cast<int32_t>(TelCallState::CALL_STATUS_DIALING);
+    }
+    if (IsCallExist(CallType::TYPE_VOIP, TelCallState::CALL_STATUS_DISCONNECTING)) {
+        return static_cast<int32_t>(TelCallState::CALL_STATUS_DISCONNECTING);
+    }
+    if (IsCallExist(CallType::TYPE_VOIP, TelCallState::CALL_STATUS_DISCONNECTED)) {
+        return static_cast<int32_t>(TelCallState::CALL_STATUS_DISCONNECTED);
+    }
+    TELEPHONY_LOGI("BluetoothCallService::GetVoipCallState no voip call exists");
+    return static_cast<int32_t>(TelCallState::CALL_STATUS_UNKNOWN);
+}
+
 int32_t BluetoothCallService::HoldCall()
 {
     if (!TelephonyPermission::CheckPermission(Permission::ANSWER_CALL)) {

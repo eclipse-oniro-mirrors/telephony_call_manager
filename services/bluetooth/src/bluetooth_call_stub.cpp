@@ -66,6 +66,8 @@ BluetoothCallStub::BluetoothCallStub()
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_RESET_BT_HEARINGAID_AUDIO_DEVICE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnResetBtHearingAidDeviceList(data, reply); };
 #endif
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_GET_VOIP_CALL_STATE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoipCallState(data, reply); };
 }
 
 BluetoothCallStub::~BluetoothCallStub()
@@ -289,5 +291,16 @@ int32_t BluetoothCallStub::OnResetBtHearingAidDeviceList(MessageParcel &data, Me
     return result;
 }
 #endif
+
+int32_t BluetoothCallStub::OnGetVoipCallState(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = GetVoipCallState();
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS
