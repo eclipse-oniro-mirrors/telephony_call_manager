@@ -407,14 +407,14 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-    if (call == nullptr) {
-        TELEPHONY_LOGE("call is nullptr");
-        CallManagerHisysevent::WriteHangUpFaultEvent(
-            INVALID_PARAMETER, callId, TELEPHONY_ERR_LOCAL_PTR_NULL, "Reject call is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
     if (callId == INVALID_CALLID) {
+        sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+        if (call == nullptr) {
+            TELEPHONY_LOGE("call is nullptr");
+            CallManagerHisysevent::WriteHangUpFaultEvent(
+                INVALID_PARAMETER, callId, TELEPHONY_ERR_LOCAL_PTR_NULL, "Reject call is nullptr");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
         callId = call->GetCallID();
     }
 
@@ -435,10 +435,13 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
         return ret;
     }
     if (rejectType == RejectType::CALL_REJECT_MISSED_CALL) {
-        TELEPHONY_LOGI("reject call and mark it as missed call");
-        call->SetRejectType(rejectType);
-        if (missedCallNotification_ != nullptr) {
-            missedCallNotification_->PublishMissedCallEvent(call);
+        sptr<CallBase> call = GetOneCallObject(callId);
+        if (call != nullptr) {
+            TELEPHONY_LOGI("reject call and mark it as missed call");
+            call->SetRejectType(rejectType);
+            if (missedCallNotification_ != nullptr) {
+                missedCallNotification_->PublishMissedCallEvent(call);
+            }
         }
     }
     CallManagerHisysevent::WriteVoipCallStatisticalEvent(callId, "MtBannerReject");

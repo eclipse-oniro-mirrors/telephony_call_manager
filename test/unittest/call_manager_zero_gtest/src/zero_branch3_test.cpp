@@ -1388,8 +1388,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_014, Function | MediumTes
     std::u16string textMessage = u"";
     EXPECT_EQ(callControlManager->RejectCall(VALID_CALLID, false, textMessage, RejectType::CALL_REJECT_NORMAL),
         CALL_ERR_ILLEGAL_CALL_OPERATION);
-    EXPECT_EQ(callControlManager->RejectCall(VALID_CALLID, false, textMessage, RejectType::CALL_REJECT_MISSED_CALL),
-        CALL_ERR_ILLEGAL_CALL_OPERATION);
     CallObjectManager::DeleteOneCallObject(callObjectPtr);
     CallObjectManager::callObjectPtrList_.clear();
 }
@@ -1420,6 +1418,34 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_015, Function | MediumTes
     CallObjectManager::callObjectPtrList_.clear();
     callControlManager->StartFlashRemind();
     callControlManager->StopFlashRemind();
+}
+
+/**
+ * @tc.number   Telephony_CallControlManager_016
+ * @tc.name     test CallControlManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_016, Function | MediumTest | Level1)
+{
+    CallObjectManager::callObjectPtrList_.clear();
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    callControlManager->CallRequestHandlerPtr_ = std::make_unique<CallRequestHandler>();
+    callControlManager->CallRequestHandlerPtr_->Init();
+    DialParaInfo dialParaInfo;
+    sptr<CallBase> callObjectPtr = new CSCall(dialParaInfo);
+    callObjectPtr->SetCallId(VALID_CALLID);
+    callObjectPtr->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    CallObjectManager::AddOneCallObject(callObjectPtr);
+    EXPECT_EQ(callControlManager->RejectCall(VALID_CALLID, false, u"", RejectType::CALL_REJECT_MISSED_CALL),
+        TELEPHONY_SUCCESS);
+    EXPECT_EQ(callObjectPtr->rejectType_, RejectType::CALL_REJECT_MISSED_CALL);
+    callObjectPtr->rejectType_ = RejectType::CALL_REJECT_NORMAL;
+    callObjectPtr->SetCallId(VALID_CALLID + 1);
+    EXPECT_EQ(callControlManager->RejectCall(INVALID_CALLID, false, u"", RejectType::CALL_REJECT_MISSED_CALL),
+        TELEPHONY_SUCCESS);
+    CallObjectManager::DeleteOneCallObject(callObjectPtr);
+    CallObjectManager::callObjectPtrList_.clear();
 }
 
 /**
