@@ -446,7 +446,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_IncomingCallWakeup_002, TestSize.Level1)
     incomingCallWakeup.NewCallCreated(callObjectPtr);
     ASSERT_TRUE(CallManagerUtils::IsWearableDevice());
     ASSERT_FALSE(CallStatusManager::IsFocusModeOpen());
-
 }
 
 /**
