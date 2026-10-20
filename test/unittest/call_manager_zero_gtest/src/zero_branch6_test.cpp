@@ -432,6 +432,24 @@ HWTEST_F(ZeroBranch5Test, Telephony_IncomingCallWakeup_001, TestSize.Level1)
 }
 
 /**
+ * @tc.number   Telephony_IncomingCallWakeup_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch5Test, Telephony_IncomingCallWakeup_002, TestSize.Level1)
+{
+    IncomingCallWakeup incomingCallWakeup;
+    DialParaInfo info;
+    sptr<CallBase> callObjectPtr = new VoIPCall(info);
+    callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    system::SetParameter("const.product.devicetype", "wearable");
+    incomingCallWakeup.NewCallCreated(callObjectPtr);
+    ASSERT_TRUE(CallManagerUtils::IsWearableDevice());
+    ASSERT_FALSE(CallStatusManager::IsFocusModeOpen());
+
+}
+
+/**
  * @tc.number   Telephony_CallStateReportProxy_001
  * @tc.name     test error branch
  * @tc.desc     Function test

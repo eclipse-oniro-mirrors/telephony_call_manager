@@ -73,6 +73,7 @@ public:
     static void UpdateDevProvisioned();
     static void UpdateUserSetupCompleteValue();
     static void ResetUserSetupCompleteValue();
+    static bool IsFocusModeOpen();
 #ifdef SUPPORT_RTT_CALL
     void HandleRttEventInfo(const ImsRTTEventType &eventType);
 #endif
@@ -151,7 +152,6 @@ private:
     int32_t HandleRingOnceCall(sptr<CallBase> &call);
     void CarrierAndVoipConflictProcess(int32_t callId);
     void SetVideoCallState(sptr<CallBase> &call, TelCallState nextState);
-    bool IsFocusModeOpen();
     bool IsRejectCall(sptr<CallBase> &call, const CallDetailInfo &info, bool &block);
     bool PublishIncomingCallBlockInfo(const sptr<CallBase> &callObjectPtr, bool block);
     void CreateAndSaveNewCall(const CallDetailInfo &info, CallDirection direction);
