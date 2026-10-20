@@ -78,6 +78,7 @@
 #include "wired_headset.h"
 #include "call_status_policy.h"
 #include "audio_device_manager.h"
+#include "call_manager_utils.h"
 
 namespace OHOS {
 namespace Telephony {
