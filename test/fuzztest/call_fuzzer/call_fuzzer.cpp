@@ -621,7 +621,7 @@ void BluetoothCallConnectionFunc(FuzzedDataProvider& provider)
     bluetoothConnection->SetHfpConnected(provider.ConsumeBool());
     bluetoothConnection->GetSupportBtCall();
     bluetoothConnection->SetBtCallScoConnected(provider.ConsumeBool());
-    bluetoothConnection->HfpDisConnectedEndBtCall();
+    bluetoothConnection->HfpDisConnectedEndBtCall(false);
     size_t length = provider.ConsumeIntegral<uint8_t>() / DATA_COUNT;
     std::string hfpPhoneNumber = provider.ConsumeRandomLengthString(length);
     std::string hfpContactName = provider.ConsumeRandomLengthString(length);
