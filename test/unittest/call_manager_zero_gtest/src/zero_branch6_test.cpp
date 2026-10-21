@@ -78,6 +78,7 @@
 #include "wired_headset.h"
 #include "call_status_policy.h"
 #include "audio_device_manager.h"
+#include "call_manager_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -429,6 +430,23 @@ HWTEST_F(ZeroBranch5Test, Telephony_IncomingCallWakeup_001, TestSize.Level1)
     sptr<CallBase> callObjectPtr = nullptr;
     incomingCallWakeup->NewCallCreated(callObjectPtr);
     EXPECT_TRUE(incomingCallWakeup != nullptr);
+}
+
+/**
+ * @tc.number   Telephony_IncomingCallWakeup_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch5Test, Telephony_IncomingCallWakeup_002, TestSize.Level1)
+{
+    IncomingCallWakeup incomingCallWakeup;
+    DialParaInfo info;
+    sptr<CallBase> callObjectPtr = new VoIPCall(info);
+    callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    system::SetParameter("const.product.devicetype", "wearable");
+    incomingCallWakeup.NewCallCreated(callObjectPtr);
+    ASSERT_TRUE(CallManagerUtils::IsWearableDevice());
+    ASSERT_FALSE(CallStatusManager::IsFocusModeOpen());
 }
 
 /**

@@ -22,6 +22,8 @@
 #include "system_ability.h"
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
+#include "call_manager_utils.h"
+#include "call_status_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -84,6 +86,9 @@ void IncomingCallWakeup::WakeupDevice(sptr<CallBase> &callObjectPtr)
     }
     // if call type is voip, set the screen on
     if (callObjectPtr != nullptr && callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
+        if (CallManagerUtils::IsWearableDevice() && CallStatusManager::IsFocusModeOpen()) {
+            return;
+        }
         PowerMgr::PowerMgrClient::GetInstance().WakeupDevice(
             PowerMgr::WakeupDeviceType::WAKEUP_DEVICE_APPLICATION, wakeupReason_);
     }
