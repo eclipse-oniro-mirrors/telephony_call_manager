@@ -60,6 +60,7 @@ private:
     int32_t OnObserverOnCallDetailsChange(MessageParcel &data, MessageParcel &reply);
     int32_t OnDialCall(MessageParcel &data, MessageParcel &reply);
     int32_t OnMakeCall(MessageParcel &data, MessageParcel &reply);
+    int32_t OnMakeDirectCall(MessageParcel &data, MessageParcel &reply);
     int32_t OnMakeCallWithToken(MessageParcel &data, MessageParcel &reply);
     int32_t OnAcceptCall(MessageParcel &data, MessageParcel &reply);
     int32_t OnRejectCall(MessageParcel &data, MessageParcel &reply);

@@ -25,6 +25,7 @@ static constexpr const char *PLACE_CALL = "ohos.permission.PLACE_CALL";
 static constexpr const char *ANSWER_CALL = "ohos.permission.ANSWER_CALL";
 static constexpr const char *SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
 static constexpr const char *GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
+static constexpr const char *OHOS_PERMISSION_DIRECT_CALL = "ohos.permission.DIRECT_CALL";
 
 static std::unordered_map<int32_t, const char *> eventNameMap_ = {
     { CALL_MANAGER_DIAL_CALL, "dial" },
@@ -58,6 +59,7 @@ static std::unordered_map<int32_t, const char *> eventNameMap_ = {
     { CALL_MANAGER_QUERY_CAMERA_CAPABILITIES, "queryCameraCapabilities" },
     { CALL_MANAGER_CANCEL_CALL_UPGRADE, "cancelCallUpgrade" },
     { CALL_MANAGER_SEND_USSD_RESPONSE, "sendUssdResponse" },
+    { CALL_MANAGER_DIRECT_CALL, "makeDirectCall" },
 };
 
 static std::unordered_map<int32_t, const char *> eventPermissionMap_ = {
@@ -91,6 +93,7 @@ static std::unordered_map<int32_t, const char *> eventPermissionMap_ = {
     { CALL_MANAGER_QUERY_CAMERA_CAPABILITIES, GET_TELEPHONY_STATE },
     { CALL_MANAGER_CANCEL_CALL_UPGRADE, PLACE_CALL },
     { CALL_MANAGER_SEND_USSD_RESPONSE, SET_TELEPHONY_STATE },
+    { CALL_MANAGER_DIRECT_CALL, OHOS_PERMISSION_DIRECT_CALL },
 };
 
 std::string NapiCallManagerUtils::GetEventName(int32_t eventId)

@@ -79,6 +79,14 @@ public:
     int32_t MakeCall(std::string number);
 
     /**
+     * @brief Make a direct phone call
+     *
+     * @param number[in],  call param.
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t MakeDirectCall(std::string number);
+
+    /**
      * @brief Make a phone call with options, generate a token for the call
      *
      * @param number[in], phone number to call

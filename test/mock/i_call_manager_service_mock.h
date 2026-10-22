@@ -28,6 +28,7 @@ public:
     MOCK_METHOD0(ObserverOnCallDetailsChange, int32_t());
     MOCK_METHOD2(DialCall, int32_t(std::u16string number, AppExecFwk::PacMap &extras));
     MOCK_METHOD1(MakeCall, int32_t(std::string number));
+    MOCK_METHOD1(MakeDirectCall, int32_t(std::string number));
     MOCK_METHOD3(AnswerCall, int32_t(int32_t callId, int32_t videoState, bool isRTT));
     MOCK_METHOD3(RejectCall, int32_t(int32_t callId, bool rejectWithMessage, std::u16string textMessage));
     MOCK_METHOD1(HangUpCall, int32_t(int32_t callId));

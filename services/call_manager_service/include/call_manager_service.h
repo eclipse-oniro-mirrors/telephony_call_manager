@@ -33,6 +33,7 @@
 #include "system_ability_definition.h"
 #include "bluetooth_call_state.h"
 #include "challenge_token_manager.h"
+#include "dialog_ability_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -127,6 +128,15 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t MakeCall(std::string number) override;
+
+    /**
+     * MakeDirectCall
+     *
+     * @brief Make a direct phone call
+     * @param number[in], call param.
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t MakeDirectCall(std::string number) override;
 
     /**
      * @brief Make a phone call with options, generate a token for the call
@@ -965,6 +975,8 @@ private:
     int32_t HandleVoIPCallEvent(int32_t callId, std::string &eventName);
     void BtCallWaitSlotId(AppExecFwk::PacMap &dialInfo, const std::u16string &number);
     int32_t HandleDialCall(std::u16string number, AppExecFwk::PacMap &extras);
+    int32_t DialCallCore(std::u16string number, AppExecFwk::PacMap &extras);
+    int32_t StartContactsDialog(std::string number);
     bool CheckSetTelephonyStatePermission();
     bool CheckCallerIsSystemApp();
 
@@ -992,6 +1004,7 @@ private:
     int64_t bindTime_ = 0L;
     int32_t spendTime_ = 0;
     sptr<ICallStatusCallback> bluetoothCallCallbackPtr_ = nullptr;
+    sptr<DialogAbilityConnection> dialogAbilityConnection_ = nullptr;
     std::shared_ptr<BluetoothCallState> bluetoothCallObserver_ = nullptr;
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_ = nullptr;
     ffrt::mutex callTransferLock_;
