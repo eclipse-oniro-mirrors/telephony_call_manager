@@ -53,7 +53,7 @@ public:
     void HfpDisConnectedEndBtCall(bool isSystemAbilityRemoved);
     void SetHfpContactName(const std::string &hfpPhoneNumber, const std::string &hfpContactName);
     void HandleBtConnectionStateChange(const Bluetooth::BluetoothRemoteDevice &device,
-        int32_t state, int32_t cause);
+        int32_t state);
     std::string GetHfpContactName(const std::string &hfpPhoneNumber);
 
 #ifdef CALL_MANAGER_CALL_TRANSFER
