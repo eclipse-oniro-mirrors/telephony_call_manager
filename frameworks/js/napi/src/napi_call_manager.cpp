@@ -4228,6 +4228,8 @@ void NapiCallManager::NativeMakeDirectCall(napi_env env, void *data)
         DelayedSingleton<CallManagerClient>::GetInstance()->MakeDirectCall(phoneNumber);
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = TELEPHONY_SUCCESS;
+    } else if (asyncContext->errorCode == TELEPHONY_ERR_NO_SIM_CARD) {
+        asyncContext->errorCode = TELEPHONY_ERR_NETWORK_NOT_IN_SERVICE;
     }
 }
 
