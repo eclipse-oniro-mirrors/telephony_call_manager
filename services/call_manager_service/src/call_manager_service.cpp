@@ -395,7 +395,7 @@ int32_t CallManagerService::MakeDirectCall(std::string number)
         TELEPHONY_LOGI("dial directly");
         int32_t accountId = iccAccountInfoList.size() == 1 ? iccAccountInfoList[0].slotIndex : defaultVoiceSlotId;
         AppExecFwk::PacMap extras;
-        extras.PutIntValue(SLOT_ID, GetInternalSlotId(accountId));
+        extras.PutIntValue(SLOT_ID, accountId);
         ret = DialCallCore(Str8ToStr16(number), extras);
         return ret;
     }
