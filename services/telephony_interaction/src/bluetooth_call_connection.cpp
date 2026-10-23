@@ -265,14 +265,22 @@ void BluetoothCallConnection::HfpDisConnectedEndBtCall(bool isSystemAbilityRemov
 void BluetoothCallConnection::SetBtCallScoDisconnPhoneIndex(const std::string &macAddress)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    std::string realAddr;
-    int32_t ret = Bluetooth::BluetoothHost::GetDefaultHost().GetRealAddress(macAddress, realAddr);
-    TELEPHONY_LOGI("GetRealAddress, ret=%{public}d, realAddr size=%{public}lu", ret, realAddr.length());
-    if (macAddress == macAddress_ || realAddr == macAddress_) {
+    std::string realAddr = GetRealAddr(macAddress);
+    if (realAddr == macAddress_) {
         btCallScoDisconnPhoneIndex_ = 0;
-    } else if (macAddress == secondaryPhoneMacAddress_ || realAddr == secondaryPhoneMacAddress_) {
+    } else if (realAddr == secondaryPhoneMacAddress_) {
         btCallScoDisconnPhoneIndex_ = 1;
     }
+}
+
+std::string BluetoothCallConnection::GetRealAddr(const std::string &macAddress)
+{
+    std::string realAddr;
+    Bluetooth::BluetoothHost::GetDefaultHost().GetRealAddress(macAddress, realAddr);
+    if (realAddr.empty()) {
+        realAddr = macAddress;
+    }
+    return realAddr;
 }
 
 void BluetoothCallConnection::SetHfpContactName(const std::string &hfpPhoneNumber, const std::string &hfpContactName)
