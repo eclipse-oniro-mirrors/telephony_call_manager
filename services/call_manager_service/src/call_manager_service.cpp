@@ -389,53 +389,56 @@ int32_t CallManagerService::MakeDirectCall(std::string number)
     bool isTstsModeEnabled = (ret == TELEPHONY_SUCCESS && iccAccountInfoList.size() == 3);
     bool isBackupSlotIdValid = false;
     if (isTstsModeEnabled) {
-        auto datashareHelper = SettingsDataShareHelper::GetInstance();
-        if (datashareHelper == nullptr) {
-            TELEPHONY_LOGE("datashareHelper is nullptr!");
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
-        std::string backupVoiceSlotId {"-1"};
-        OHOS::Uri uri(
-            "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=backup_voice_slot_id");
-        datashareHelper->Query(uri, "backup_voice_slot_id", backupVoiceSlotId);
-        int32_t backupSlotId = std::stoi(backupVoiceSlotId);
-        isBackupSlotIdValid = DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(backupSlotId);
+        isBackupSlotIdValid = IsBackupSlotIdValid();
     }
     if (!isMultiSim || (isDefaultVoiceSlotIdValid && !isBackupSlotIdValid)) {
         TELEPHONY_LOGI("dial directly");
         int32_t accountId = iccAccountInfoList.size() == 1 ? iccAccountInfoList[0].slotIndex : defaultVoiceSlotId;
         AppExecFwk::PacMap extras;
-        extras.PutIntValue(SLOT_ID, accountId);
+        extras.PutIntValue(SLOT_ID, GetInternalSlotId(accountId));
         ret = DialCallCore(Str8ToStr16(number), extras);
-        if (ret == TELEPHONY_ERR_NO_SIM_CARD) {
-            return TELEPHONY_ERR_NETWORK_NOT_IN_SERVICE;
-        }
         return ret;
     }
     return StartContactsDialog(number);
 }
- 
+
+bool CallManagerService::IsBackupSlotIdValid()
+{
+    auto datashareHelper = SettingsDataShareHelper::GetInstance();
+    if (datashareHelper == nullptr) {
+        TELEPHONY_LOGE("datashareHelper is nullptr!");
+        return false;
+    } else {
+        std::string backupVoiceSlotId {"-1"};
+        OHOS::Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/"
+                        "SETTINGSDATA?Proxy=true&key=backup_voice_slot_id");
+        datashareHelper->Query(uri, "backup_voice_slot_id", backupVoiceSlotId);
+        int32_t backupSlotId = static_cast<int32_t>(std::strtol(backupVoiceSlotId.c_str(), nullptr, 10));
+        return DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(backupSlotId);
+    }
+}
+
 int32_t CallManagerService::StartContactsDialog(std::string number)
 {
-    int32_t uid = IPCSkeleton::GetCallingUid();
-    std::string bundleName = "";
-    TelephonyPermission::GetBundleNameByUid(uid, bundleName);
-    TELEPHONY_LOGI("no default dial card");
-    std::string identity = IPCSkeleton::ResetCallingIdentity();
-    dialogAbilityConnection_ = sptr<DialogAbilityConnection>::MakeSptr();
-    int32_t ret = dialogAbilityConnection_->OpenSystemDialog("com.ohos.contacts", "DirectDialogExtensionAbility",
-        number, bundleName);
-    IPCSkeleton::SetCallingIdentity(identity);
     bool isAirplaneModeOn = false;
     std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
     if (callDataPtr == nullptr) {
         TELEPHONY_LOGE("callDataPtr is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t err = callDataPtr->GetAirplaneMode(isAirplaneModeOn);
-    if (err == TELEPHONY_SUCCESS && isAirplaneModeOn) {
+    int32_t ret = callDataPtr->GetAirplaneMode(isAirplaneModeOn);
+    if (ret == TELEPHONY_SUCCESS && isAirplaneModeOn) {
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_IN_AIRPLANE_MODE");
         return TELEPHONY_ERR_AIRPLANE_MODE_ON;
     }
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    std::string bundleName = "";
+    TelephonyPermission::GetBundleNameByUid(uid, bundleName);
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    dialogAbilityConnection_ = sptr<DialogAbilityConnection>::MakeSptr();
+    ret = dialogAbilityConnection_->OpenSystemDialog("com.ohos.contacts", "DirectDialogExtensionAbility",
+        number, bundleName);
+    IPCSkeleton::SetCallingIdentity(identity);
     return ret;
 }
 
