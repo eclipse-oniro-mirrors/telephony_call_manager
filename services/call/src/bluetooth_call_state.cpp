@@ -33,7 +33,7 @@ void BluetoothCallState::OnConnectionStateChanged(const Bluetooth::BluetoothRemo
         TELEPHONY_LOGI("BluetoothCallConnection is nullptr");
         return;
     }
-    btConn->HandleBtConnectionStateChange(device, state, cause);
+    btConn->HandleBtConnectionStateChange(device, state);
 }
 
 void BluetoothCallState::OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state)
