@@ -103,6 +103,7 @@ private:
 private:
     void SetBtCallScoDisconnPhoneIndex(const std::string &macAddress);
     std::string GetBtScoMacAddress(const sptr<CallBase> &call);
+    std::string GetRealAddr(const std::string &macAddress);
 };
 } // namespace Telephony
 } // namespace OHOS
