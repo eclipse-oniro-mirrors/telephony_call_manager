@@ -979,6 +979,7 @@ private:
     int32_t StartContactsDialog(std::string number);
     bool CheckSetTelephonyStatePermission();
     bool CheckCallerIsSystemApp();
+    bool IsBackupSlotIdValid();
 
 private:
     enum ServiceRunningState {
