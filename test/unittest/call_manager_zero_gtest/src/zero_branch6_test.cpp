@@ -1059,7 +1059,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_BluetoothCallManager_001, TestSize.Level0)
     int32_t numActive = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
     int32_t numHeld = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_HOLDING);
     int32_t callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
-    std::string number = CallObjectManager::GetCallNumber(TelCallState::CALL_STATUS_HOLDING);
+    std::string number = CallObjectManager::GetPhoneNumber(TelCallState::CALL_STATUS_HOLDING);
     BluetoothCallManager bluetoothCallManager;
     ASSERT_EQ(bluetoothCallManager.SendBtCallState(numActive, numHeld, callState, number), TELEPHONY_SUCCESS);
     ASSERT_EQ(bluetoothCallManager.SendCallDetailsChange(1, 1), TELEPHONY_SUCCESS);

@@ -20,6 +20,9 @@
 #include "call_manager_proxy.h"
 #include "parameter.h"
 #include "telephony_errors.h"
+#ifdef API_METRICS_SUPPORT
+#include "histogram_plugin_macros.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -411,6 +414,9 @@ int32_t CallManagerClient::IsRinging(bool &enabled)
 
 bool CallManagerClient::HasCall(const bool isInCludeVoipCall)
 {
+#ifdef API_METRICS_SUPPORT
+    HISTOGRAM_BOOLEAN("TelephonyKit.APIcall.hasCallSync", true);
+#endif
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->HasCall(isInCludeVoipCall);
     } else {

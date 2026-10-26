@@ -26,7 +26,7 @@ CallAbilityCallback::~CallAbilityCallback() {}
 
 int32_t CallAbilityCallback::SetProcessCallback(std::unique_ptr<CallManagerCallback> callback)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callback == nullptr) {
         callbackPtr_ = nullptr;
         return TELEPHONY_SUCCESS;
@@ -37,7 +37,7 @@ int32_t CallAbilityCallback::SetProcessCallback(std::unique_ptr<CallManagerCallb
 
 int32_t CallAbilityCallback::OnCallDetailsChange(const CallAttributeInfo &info)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnCallDetailsChange(info);
     }
@@ -46,7 +46,7 @@ int32_t CallAbilityCallback::OnCallDetailsChange(const CallAttributeInfo &info)
 
 int32_t CallAbilityCallback::OnMeeTimeDetailsChange(const CallAttributeInfo &info)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnMeeTimeDetailsChange(info);
     }
@@ -55,7 +55,7 @@ int32_t CallAbilityCallback::OnMeeTimeDetailsChange(const CallAttributeInfo &inf
 
 int32_t CallAbilityCallback::OnCallEventChange(const CallEventInfo &info)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnCallEventChange(info);
     }
@@ -64,7 +64,7 @@ int32_t CallAbilityCallback::OnCallEventChange(const CallEventInfo &info)
 
 int32_t CallAbilityCallback::OnCallDisconnectedCause(const DisconnectedDetails &details)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnCallDisconnectedCause(details);
     }
@@ -73,7 +73,7 @@ int32_t CallAbilityCallback::OnCallDisconnectedCause(const DisconnectedDetails &
 
 int32_t CallAbilityCallback::OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnReportAsyncResults(reportId, resultInfo);
     }
@@ -82,7 +82,7 @@ int32_t CallAbilityCallback::OnReportAsyncResults(CallResultReportId reportId, A
 
 int32_t CallAbilityCallback::OnReportMmiCodeResult(const MmiCodeInfo &info)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnReportMmiCodeResult(info);
     }
@@ -91,7 +91,7 @@ int32_t CallAbilityCallback::OnReportMmiCodeResult(const MmiCodeInfo &info)
 
 int32_t CallAbilityCallback::OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnOttCallRequest(requestId, info);
     }
@@ -100,7 +100,7 @@ int32_t CallAbilityCallback::OnOttCallRequest(OttCallRequestId requestId, AppExe
 
 int32_t CallAbilityCallback::OnReportAudioDeviceChange(const AudioDeviceInfo &info)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnReportAudioDeviceChange(info);
     }
@@ -109,7 +109,7 @@ int32_t CallAbilityCallback::OnReportAudioDeviceChange(const AudioDeviceInfo &in
 
 int32_t CallAbilityCallback::OnReportPostDialDelay(const std::string &str)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnReportPostDialDelay(str);
     }
@@ -118,7 +118,7 @@ int32_t CallAbilityCallback::OnReportPostDialDelay(const std::string &str)
 
 int32_t CallAbilityCallback::OnReportImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnUpdateImsCallModeChange(imsCallModeInfo);
     }
@@ -127,7 +127,7 @@ int32_t CallAbilityCallback::OnReportImsCallModeChange(const CallMediaModeInfo &
 
 int32_t CallAbilityCallback::OnReportCallSessionEventChange(const CallSessionEvent &callSessionEventOptions)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnCallSessionEventChange(callSessionEventOptions);
     }
@@ -136,7 +136,7 @@ int32_t CallAbilityCallback::OnReportCallSessionEventChange(const CallSessionEve
 
 int32_t CallAbilityCallback::OnReportPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnPeerDimensionsChange(peerDimensionsDetail);
     }
@@ -145,7 +145,7 @@ int32_t CallAbilityCallback::OnReportPeerDimensionsChange(const PeerDimensionsDe
 
 int32_t CallAbilityCallback::OnReportCallDataUsageChange(const int64_t dataUsage)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnCallDataUsageChange(dataUsage);
     }
@@ -154,7 +154,7 @@ int32_t CallAbilityCallback::OnReportCallDataUsageChange(const int64_t dataUsage
 
 int32_t CallAbilityCallback::OnReportCameraCapabilities(const CameraCapabilities &cameraCapabilities)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnUpdateCameraCapabilities(cameraCapabilities);
     }
@@ -164,7 +164,7 @@ int32_t CallAbilityCallback::OnReportCameraCapabilities(const CameraCapabilities
 int32_t CallAbilityCallback::OnPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState,
     const std::string &number)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnPhoneStateChange(numActive, numHeld, callState, number);
     }
@@ -174,7 +174,7 @@ int32_t CallAbilityCallback::OnPhoneStateChange(int32_t numActive, int32_t numHe
 #ifdef SUPPORT_RTT_CALL
 int32_t CallAbilityCallback::OnReportRttCallEvtChanged(const RttEvent &info)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnReportRttCallEvtChanged(info);
     }
@@ -183,7 +183,7 @@ int32_t CallAbilityCallback::OnReportRttCallEvtChanged(const RttEvent &info)
 
 int32_t CallAbilityCallback::OnReportRttCallError(const RttError &info)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnReportRttCallError(info);
     }
@@ -192,7 +192,7 @@ int32_t CallAbilityCallback::OnReportRttCallError(const RttError &info)
 
 int32_t CallAbilityCallback::OnReportRttCallMessage(AppExecFwk::PacMap &msgResult)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
         return callbackPtr_->OnReportRttCallMessage(msgResult);
     }

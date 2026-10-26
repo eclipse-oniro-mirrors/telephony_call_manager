@@ -64,7 +64,7 @@ void CallManagerProxy::Init(int32_t systemAbilityId)
         TELEPHONY_LOGW("you have already initialized");
         return;
     }
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::unique_lock<ffrt::mutex> lock(mutex_);
     systemAbilityId_ = systemAbilityId;
 #ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
     if (!IsServiceStart()) {

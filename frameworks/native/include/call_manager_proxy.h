@@ -194,12 +194,12 @@ private:
 
 private:
     int32_t systemAbilityId_;
-    ffrt::shared_mutex clientLock_;
+    ffrt::shared_mutex clientLock_{};
     bool registerStatus_;
     bool initStatus_;
     sptr<ICallManagerService> callManagerServicePtr_ = nullptr;
     sptr<CallAbilityCallback> callAbilityCallbackPtr_ = nullptr;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
 #ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
     std::unique_ptr<CallManagerCallback> callBack_ = nullptr;

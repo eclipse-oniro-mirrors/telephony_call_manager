@@ -32,6 +32,7 @@ public:
     void SetSatcommTempLevel(int32_t level);
     int32_t IsAllowedSatelliteDialCall();
     int32_t IsSatelliteSwitchEnable();
+    SatCallType GetCurSatelliteType();
     SatCommTempLevel GetSatcommTempLevel();
     void HandleSatelliteCallStateUpdate(sptr<CallBase> &call, TelCallState priorState, TelCallState nextState);
     bool IsShowDialog();

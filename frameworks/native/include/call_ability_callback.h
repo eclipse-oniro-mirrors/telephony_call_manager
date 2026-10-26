@@ -18,7 +18,7 @@
 
 #include <memory>
 #include <mutex>
-
+#include "ffrt.h"
 #include "ipc_types.h"
 
 #include "call_ability_callback_stub.h"
@@ -55,7 +55,7 @@ public:
 
 private:
     std::unique_ptr<CallManagerCallback> callbackPtr_;
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

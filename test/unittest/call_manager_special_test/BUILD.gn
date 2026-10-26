@@ -153,6 +153,12 @@ ohos_unittest("tel_call_manager_special0_test") {
       global_parts_info.multimedia_camera_framework) {
     external_deps += [ "camera_framework:camera_framework" ]
   }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.customization_config_policy) &&
+      global_parts_info.customization_config_policy) {
+    external_deps += [ "config_policy:configpolicy_util" ]
+  }
 }
 
 ohos_unittest("tel_call_manager_special1_test") {
@@ -293,6 +299,12 @@ ohos_unittest("tel_call_manager_special1_test") {
       defined(global_parts_info.multimedia_camera_framework) &&
       global_parts_info.multimedia_camera_framework) {
     external_deps += [ "camera_framework:camera_framework" ]
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.customization_config_policy) &&
+      global_parts_info.customization_config_policy) {
+    external_deps += [ "config_policy:configpolicy_util" ]
   }
 }
 
@@ -435,6 +447,12 @@ ohos_unittest("tel_call_manager_special2_test") {
       global_parts_info.multimedia_camera_framework) {
     external_deps += [ "camera_framework:camera_framework" ]
   }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.customization_config_policy) &&
+      global_parts_info.customization_config_policy) {
+    external_deps += [ "config_policy:configpolicy_util" ]
+  }
 }
 
 ohos_unittest("tel_call_manager_special3_test") {
@@ -576,5 +594,11 @@ ohos_unittest("tel_call_manager_special3_test") {
       defined(global_parts_info.multimedia_camera_framework) &&
       global_parts_info.multimedia_camera_framework) {
     external_deps += [ "camera_framework:camera_framework" ]
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.customization_config_policy) &&
+      global_parts_info.customization_config_policy) {
+    external_deps += [ "config_policy:configpolicy_util" ]
   }
 }

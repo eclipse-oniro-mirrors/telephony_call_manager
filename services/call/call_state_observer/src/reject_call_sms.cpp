@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Telephony {
-
 RejectCallSms::RejectCallSms() {}
 
 void RejectCallSms::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content)

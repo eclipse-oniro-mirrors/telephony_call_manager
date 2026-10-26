@@ -513,6 +513,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("CreateNewCall failed!");
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
+    SetSatelliteCallType(call);
     if (IsFromTheSameNumberAtTheSameTime(call)) {
         ModifyEsimType();
     }
@@ -759,7 +760,7 @@ int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
     
-    call->SetNonVirtualCall(!DelayedSingleton<AudioDeviceManager>::GetInstance()->GetVirtualCall());
+    call->SetRemoteControl(DelayedSingleton<AudioControlManager>::GetInstance()->GetRemoteControlEnable());
     call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
 #ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
     std::shared_ptr<SpamCallAdapter> spamCallAdapterPtr = std::make_shared<SpamCallAdapter>();
@@ -800,7 +801,7 @@ int32_t CallStatusManager::OutgoingVoipCallHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("CreateVoipCall failed!");
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
-    call->SetNonVirtualCall(!DelayedSingleton<AudioDeviceManager>::GetInstance()->GetVirtualCall());
+        call->SetRemoteControl(DelayedSingleton<AudioControlManager>::GetInstance()->GetRemoteControlEnable());
     AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
@@ -850,11 +851,11 @@ int32_t CallStatusManager::DisconnectingVoipCallHandle(const CallDetailInfo &inf
     if (call == nullptr) {
         return TELEPHONY_ERROR;
     }
-    if (GetVoipCallNum(true) == 1) {
-        bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(true);
-        TELEPHONY_LOGE("SetVirtualCall res:%{public}d", res);
+    if (GetVoipCallCountForRemoteControl() == 1) {
+        bool res = DelayedSingleton<AudioControlManager>::GetInstance()->SetRemoteControlEnable(false);
+        TELEPHONY_LOGE("SetRemoteControlEnable res:%{public}d", res);
     }
-    call->SetNonVirtualCall(false);
+    call->SetRemoteControl(false);
     return UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
 }
 
@@ -1462,11 +1463,11 @@ int32_t CallStatusManager::DisconnectedVoipCallHandle(const CallDetailInfo &info
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
     }
-    if (GetVoipCallNum(true) == 1) {
-        bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(true);
-        TELEPHONY_LOGE("SetVirtualCall res:%{public}d", res);
+    if (GetVoipCallCountForRemoteControl() == 1) {
+        bool res = DelayedSingleton<AudioControlManager>::GetInstance()->SetRemoteControlEnable(false);
+        TELEPHONY_LOGE("SetRemoteControlEnable res:%{public}d", res);
     }
-    call->SetNonVirtualCall(false);
+    call->SetRemoteControl(false);
     DeleteOneCallObject(call->GetCallID());
     TELEPHONY_LOGI("handle disconnected voip call state success");
     return ret;
@@ -1531,6 +1532,21 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     StopCallMotionRecognition(TelCallState::CALL_STATUS_DISCONNECTED);
     callControlManager->StopFlashRemind();
     return TELEPHONY_SUCCESS;
+}
+
+void CallStatusManager::SetSatelliteCallType(sptr<CallBase> &call)
+{
+    if (call == nullptr) {
+        TELEPHONY_LOGE("SetSatelliteCallType failed!");
+        return;
+    }
+    SatCallType satelliteCallType = DelayedSingleton<SatelliteCallControl>::GetInstance()->GetCurSatelliteType();
+    if (satelliteCallType == SatCallType::SAT_CALL_TYPE_OFF) {
+        return;
+    }
+    AAFwk::WantParams params = call->GetExtraParams();
+    params.SetParam("SatelliteCallType", AAFwk::Integer::Box(static_cast<int32_t>(satelliteCallType)));
+    call->SetExtraParams(params);
 }
 
 void CallStatusManager::StopCallMotionRecognition(TelCallState nextState)
@@ -1825,6 +1841,9 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
         return CALL_ERR_PHONE_CALLSTATE_NOTIFY_FAILED;
     }
     SetVideoCallState(call, nextState);
+    if (GetVoipCallCountForRemoteControl() > 0) {
+        DelayedSingleton<BluetoothCallService>::GetInstance()->GetCallState();
+    }
     return TELEPHONY_SUCCESS;
 }
 

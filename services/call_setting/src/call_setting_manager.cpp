@@ -107,7 +107,8 @@ int32_t CallSettingManager::SetCallRestrictionPassword(
     return cellularCallConnectionPtr_->SetCallRestrictionPassword(slotId, fac, oldPassword, newPassword);
 }
 
-int32_t CallSettingManager::GetCallTransferInfo(int32_t slotId, CallTransferType type)
+int32_t CallSettingManager::GetCallTransferInfo(int32_t slotId, CallTransferType type,
+    bool isIncludeCallForwardingNumber)
 {
     int32_t ret = GetCallTransferInfoPolicy(slotId, type);
     if (ret != TELEPHONY_SUCCESS) {
@@ -117,7 +118,7 @@ int32_t CallSettingManager::GetCallTransferInfo(int32_t slotId, CallTransferType
     if (!IsCellularCallConnectionValid()) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return cellularCallConnectionPtr_->GetCallTransferInfo(type, slotId);
+    return cellularCallConnectionPtr_->GetCallTransferInfo(type, slotId, isIncludeCallForwardingNumber);
 }
 
 int32_t CallSettingManager::SetCallTransferInfo(int32_t slotId, CallTransferInfo &info)

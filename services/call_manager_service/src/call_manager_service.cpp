@@ -844,7 +844,7 @@ int32_t CallManagerService::GetCallTransferInfo(int32_t slotId, CallTransferType
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->GetCallTransferInfo(slotId, type);
+        return callControlManagerPtr_->GetCallTransferInfo(slotId, type, true);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -2098,7 +2098,7 @@ int32_t CallManagerService::GetCallTransferInfo(const std::string number, CallTr
     }
     lastGetCallTransferInfoTimes_[key] = now;
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->GetCallTransferInfo(slotId, type);
+        return callControlManagerPtr_->GetCallTransferInfo(slotId, type, false);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

@@ -192,6 +192,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.name = object.GetStringParam("name");
         info.namePresentation = object.GetIntParam("namePresentation", 0);
         info.antiFraudState = object.GetIntParam("antiFraudState", 0);
+        info.satelliteCallType = object.GetIntParam("SatelliteCallType", 0);
         info.phoneOrWatch = phoneOrWatch_;
         info.imsDomain = imsDomain_;
         info.isCustomAccessibility = isCustomAccessibility_;
@@ -851,16 +852,16 @@ void CallBase::SetAntiFraudState(int32_t antiFraudState)
     antiFraudState_ = antiFraudState;
 }
 
-bool CallBase::isNonVirtualCall()
+bool CallBase::IsRemoteControlEnable()
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    return isNonVirtualCall_;
+    return isRemoteControlEnable_;
 }
 
-void CallBase::SetNonVirtualCall(bool isNonVirtualCall)
+void CallBase::SetRemoteControl(bool isRemoteControlEnable)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    isNonVirtualCall_ = isNonVirtualCall;
+    isRemoteControlEnable_ = isRemoteControlEnable;
 }
 
 void CallBase::SetApCauseReported(bool isReported)

@@ -106,6 +106,32 @@ int32_t SatelliteCallControl::IsSatelliteSwitchEnable()
     return TELEPHONY_ERROR;
 }
 
+SatCallType SatelliteCallControl::GetCurSatelliteType()
+{
+    if (IsSatelliteSwitchEnable() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGI("satellite is off status");
+        return SatCallType::SAT_CALL_TYPE_OFF;
+    }
+    auto datashareHelper = SettingsDataShareHelper::GetInstance();
+    OHOS::Uri satelliteTypeUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
+    std::string cur_satellite_type{ "0" };
+    int32_t err = datashareHelper->Query(satelliteTypeUri, SettingsDataShareHelper::QUERY_SATELLITE_MODE_TIANTONG_KEY,
+        cur_satellite_type);
+    int32_t satelliteOn = std::atoi(cur_satellite_type.c_str());
+    if (err == TELEPHONY_SUCCESS && satelliteOn) {
+        TELEPHONY_LOGI("satellite current type is tts");
+        return SatCallType::SAT_CALL_TYPE_TTS;
+    }
+    err = datashareHelper->Query(satelliteTypeUri, SettingsDataShareHelper::QUERY_SATELLITE_MODE_HYACINTH_KEY,
+        cur_satellite_type);
+    satelliteOn = std::atoi(cur_satellite_type.c_str());
+    if (err == TELEPHONY_SUCCESS && satelliteOn) {
+        TELEPHONY_LOGI("satellite current type is fxz");
+        return SatCallType::SAT_CALL_TYPE_FXZ;
+    }
+    return SatCallType::SAT_CALL_TYPE_OFF;
+}
+
 SatCommTempLevel SatelliteCallControl::GetSatcommTempLevel()
 {
     return SatCommTempLevel_;
