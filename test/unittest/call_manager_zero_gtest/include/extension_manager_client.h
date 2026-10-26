@@ -29,18 +29,12 @@ public:
     virtual ~ExtensionManagerClient() = default;
 
     static ExtensionManagerClient &GetInstance();
-
     int32_t ConnectServiceExtensionAbility(const Want &want, const sptr<IRemoteObject> &connect, int32_t userId);
-
     int32_t ConnectServiceExtensionAbility(const Want &want, const sptr<IRemoteObject> &connect,
         const sptr<IRemoteObject> &callerToken, int32_t userId);
-
     int32_t DisconnectAbility(const sptr<IRemoteObject> &connect);
-
     void SetConnectResult(int32_t result);
-
     sptr<IRemoteObject> GetConnectObject();
-
     void Reset();
 
 private:
