@@ -22,9 +22,11 @@ namespace OHOS {
 namespace Telephony {
 class CallSettingAbilityConnection : public AAFwk::AbilityConnectionStub {
 public:
-    CallSettingAbilityConnection(const std::string &commandStr)
+    CallSettingAbilityConnection(const std::string &commandStr,
+        const std::function<void(bool status)> setAbilityConnectDoneCallback = nullptr)
     {
         commandStr_ = commandStr;
+        setAbilityConnectDoneCallback_ = setAbilityConnectDoneCallback;
     }
 
     virtual ~CallSettingAbilityConnection() = default;
@@ -35,6 +37,7 @@ public:
 
 private:
     std::string commandStr_;
+    std::function<void(bool status)> setAbilityConnectDoneCallback_;
 };
 } // namespace Telephony
 } // namespace OHOS

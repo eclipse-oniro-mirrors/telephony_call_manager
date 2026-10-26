@@ -24,6 +24,7 @@
 #include "call_ability_connect_callback.h"
 #include "call_broadcast_subscriber.h"
 #include "call_connect_ability.h"
+#include "call_dialog.h"
 #include "call_incoming_filter_manager.h"
 #include "call_object_manager.h"
 #include "call_request_event_handler_helper.h"
@@ -32,6 +33,7 @@
 #include "call_wired_headset.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "extension_manager_client.h"
 #include "fold_status_manager.h"
 #include "gtest/gtest.h"
 #include "ims_call.h"
@@ -1034,6 +1036,176 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBase_SetMicDisabled_IsMicDisabled, Funct
     call->SetMicDisabled(false);
     EXPECT_EQ(call->IsMicDisabled(), false);
     CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
+ * @tc.number   CallSettingAbilityConnection_OnAbilityConnectDone_WithCallback_001
+ * @tc.name     test OnAbilityConnectDone with registered callback
+ * @tc.desc     Callback should be notified with true when the remote object is valid
+ */
+HWTEST_F(ZeroBranch7Test, CallSettingAbilityConnection_OnAbilityConnectDone_WithCallback_001, TestSize.Level0)
+{
+    bool callbackStatus = false;
+    bool callbackInvoked = false;
+    auto callback = [&callbackStatus, &callbackInvoked](bool status) {
+        callbackStatus = status;
+        callbackInvoked = true;
+    };
+    CallSettingAbilityConnection connection("command", callback);
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = new MockRemoteObject();
+    connection.OnAbilityConnectDone(element, remoteObject, 0);
+    EXPECT_TRUE(callbackInvoked);
+    EXPECT_TRUE(callbackStatus);
+}
+
+/**
+ * @tc.number   CallSettingAbilityConnection_OnAbilityConnectDone_NullRemote_001
+ * @tc.name     test OnAbilityConnectDone with null remote object
+ * @tc.desc     Callback should not be notified when the remote object is null
+ */
+HWTEST_F(ZeroBranch7Test, CallSettingAbilityConnection_OnAbilityConnectDone_NullRemote_001, TestSize.Level0)
+{
+    bool callbackInvoked = false;
+    auto callback = [&callbackInvoked](bool) {
+        callbackInvoked = true;
+    };
+    CallSettingAbilityConnection connection("command", callback);
+    AppExecFwk::ElementName element;
+    connection.OnAbilityConnectDone(element, nullptr, 0);
+    EXPECT_FALSE(callbackInvoked);
+}
+
+/**
+ * @tc.number   CallSettingAbilityConnection_OnAbilityConnectDone_WithoutCallback_001
+ * @tc.name     test OnAbilityConnectDone without callback
+ * @tc.desc     Should handle a valid remote object when no callback is registered
+ */
+HWTEST_F(ZeroBranch7Test, CallSettingAbilityConnection_OnAbilityConnectDone_WithoutCallback_001, TestSize.Level0)
+{
+    CallSettingAbilityConnection connection("command");
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = new MockRemoteObject();
+    connection.OnAbilityConnectDone(element, remoteObject, 0);
+    EXPECT_NE(remoteObject, nullptr);
+}
+
+/**
+ * @tc.number   CallSettingAbilityConnection_OnAbilityDisconnectDone_WithCallback_001
+ * @tc.name     test OnAbilityDisconnectDone with registered callback
+ * @tc.desc     Callback should be notified with false when the ability disconnects
+ */
+HWTEST_F(ZeroBranch7Test, CallSettingAbilityConnection_OnAbilityDisconnectDone_WithCallback_001, TestSize.Level0)
+{
+    bool callbackStatus = true;
+    bool callbackInvoked = false;
+    auto callback = [&callbackStatus, &callbackInvoked](bool status) {
+        callbackStatus = status;
+        callbackInvoked = true;
+    };
+    CallSettingAbilityConnection connection("command", callback);
+    AppExecFwk::ElementName element;
+    connection.OnAbilityDisconnectDone(element, 0);
+    EXPECT_TRUE(callbackInvoked);
+    EXPECT_FALSE(callbackStatus);
+}
+
+/**
+ * @tc.number   CallSettingAbilityConnection_OnAbilityDisconnectDone_WithoutCallback_001
+ * @tc.name     test OnAbilityDisconnectDone without callback
+ * @tc.desc     Should handle the disconnect event when no callback is registered
+ */
+HWTEST_F(ZeroBranch7Test, CallSettingAbilityConnection_OnAbilityDisconnectDone_WithoutCallback_001, TestSize.Level0)
+{
+    CallSettingAbilityConnection connection("command");
+    AppExecFwk::ElementName element;
+    connection.OnAbilityDisconnectDone(element, 0);
+    SUCCEED();
+}
+
+/**
+ * @tc.number   CallDialog_DialogProcessMMICodeExtension_ConnectDoneCallback_001
+ * @tc.name     test DialogProcessMMICodeExtension callback state
+ * @tc.desc     Callback should update the MMI ability connection state on connect and disconnect
+ */
+HWTEST_F(ZeroBranch7Test, CallDialog_DialogProcessMMICodeExtension_ConnectDoneCallback_001, TestSize.Level0)
+{
+    CallDialog::isAbilityConnectDoneforMMI_ = false;
+    auto &client = AAFwk::ExtensionManagerClient::GetInstance();
+    client.Reset();
+    client.SetConnectResult(0);
+    auto callDialog = std::make_shared<CallDialog>();
+    ASSERT_NE(callDialog, nullptr);
+    callDialog->DialogProcessMMICodeExtension();
+    sptr<IRemoteObject> connectObject = client.GetConnectObject();
+    ASSERT_NE(connectObject, nullptr);
+    sptr<CallSettingAbilityConnection> connection =
+        static_cast<CallSettingAbilityConnection *>(connectObject.GetRefPtr());
+    ASSERT_NE(connection, nullptr);
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = new MockRemoteObject();
+    connection->OnAbilityConnectDone(element, remoteObject, 0);
+    EXPECT_TRUE(callDialog->IsAbilityConnectDoneforMMI());
+    connection->OnAbilityDisconnectDone(element, 0);
+    EXPECT_FALSE(callDialog->IsAbilityConnectDoneforMMI());
+    client.Reset();
+}
+
+/**
+ * @tc.number   CallDialog_DialogProcessMMICodeExtension_ExpiredWeakPtr_001
+ * @tc.name     test DialogProcessMMICodeExtension after dialog destroyed
+ * @tc.desc     Callback should be ignored safely when the weak pointer has expired
+ */
+HWTEST_F(ZeroBranch7Test, CallDialog_DialogProcessMMICodeExtension_ExpiredWeakPtr_001, TestSize.Level0)
+{
+    CallDialog::isAbilityConnectDoneforMMI_ = false;
+    auto &client = AAFwk::ExtensionManagerClient::GetInstance();
+    client.Reset();
+    client.SetConnectResult(0);
+    auto callDialog = std::make_shared<CallDialog>();
+    ASSERT_NE(callDialog, nullptr);
+    callDialog->DialogProcessMMICodeExtension();
+    sptr<IRemoteObject> connectObject = client.GetConnectObject();
+    ASSERT_NE(connectObject, nullptr);
+    sptr<CallSettingAbilityConnection> connection =
+        static_cast<CallSettingAbilityConnection *>(connectObject.GetRefPtr());
+    ASSERT_NE(connection, nullptr);
+    callDialog.reset();
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = new MockRemoteObject();
+    connection->OnAbilityConnectDone(element, remoteObject, 0);
+    EXPECT_FALSE(CallDialog::isAbilityConnectDoneforMMI_);
+    client.Reset();
+}
+
+/**
+ * @tc.number   CallStatusCallback_SendMmiCodeResult_Cache_001
+ * @tc.name     test SendMmiCodeResult when MMI ability is not connected
+ * @tc.desc     Result should be cached while the dialog ability is connecting
+ */
+HWTEST_F(ZeroBranch7Test, CallStatusCallback_SendMmiCodeResult_Cache_001, TestSize.Level0)
+{
+    CallDialog::isAbilityConnectDoneforMMI_ = false;
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    ASSERT_NE(callStatusCallback, nullptr);
+    MmiCodeInfo mmiCodeInfo;
+    EXPECT_EQ(callStatusCallback->SendMmiCodeResult(mmiCodeInfo), TELEPHONY_SUCCESS);
+    CallDialog::isAbilityConnectDoneforMMI_ = false;
+}
+
+/**
+ * @tc.number   CallStatusCallback_SendMmiCodeResult_Report_001
+ * @tc.name     test SendMmiCodeResult when MMI ability is connected
+ * @tc.desc     Result should be reported asynchronously once the dialog ability is connected
+ */
+HWTEST_F(ZeroBranch7Test, CallStatusCallback_SendMmiCodeResult_Report_001, TestSize.Level0)
+{
+    CallDialog::isAbilityConnectDoneforMMI_ = true;
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    ASSERT_NE(callStatusCallback, nullptr);
+    MmiCodeInfo mmiCodeInfo;
+    EXPECT_EQ(callStatusCallback->SendMmiCodeResult(mmiCodeInfo), TELEPHONY_SUCCESS);
+    CallDialog::isAbilityConnectDoneforMMI_ = false;
 }
 } // namespace Telephony
 } // namespace OHOS
