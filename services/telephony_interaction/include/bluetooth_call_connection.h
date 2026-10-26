@@ -77,6 +77,10 @@ public:
 #endif
 
 private:
+    void SetBtCallScoDisconnPhoneIndex(const std::string &macAddress);
+    std::string GetBtScoMacAddress(const sptr<CallBase> &call);
+    std::string GetRealAddr(const std::string &macAddress);
+
     std::string macAddress_;
     std::string secondaryPhoneMacAddress_;
     std::atomic<int32_t> btCallScoDisconnPhoneIndex_ = 0;
@@ -85,10 +89,6 @@ private:
     std::string hfpPhoneNumber_;
     std::string hfpContactName_;
     ffrt::mutex mutex_;
-
-    void SetBtCallScoDisconnPhoneIndex(const std::string &macAddress);
-    std::string GetBtScoMacAddress(const sptr<CallBase> &call);
-    std::string GetRealAddr(const std::string &macAddress);
 
 #ifdef CALL_MANAGER_CALL_TRANSFER
     void GetTransferCallInfo(const sptr<BluetoothCall> call, TransferCallInfo &transferCallInfo);
