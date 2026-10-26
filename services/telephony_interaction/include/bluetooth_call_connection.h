@@ -86,6 +86,10 @@ private:
     std::string hfpContactName_;
     ffrt::mutex mutex_;
 
+    void SetBtCallScoDisconnPhoneIndex(const std::string &macAddress);
+    std::string GetBtScoMacAddress(const sptr<CallBase> &call);
+    std::string GetRealAddr(const std::string &macAddress);
+
 #ifdef CALL_MANAGER_CALL_TRANSFER
     void GetTransferCallInfo(const sptr<BluetoothCall> call, TransferCallInfo &transferCallInfo);
 
@@ -99,11 +103,6 @@ private:
     ffrt::task_handle hfpWaitContactHandle_ = nullptr;
     ffrt::task_handle ancsCacheTimeoutHandle_ = nullptr;
 #endif
-
-private:
-    void SetBtCallScoDisconnPhoneIndex(const std::string &macAddress);
-    std::string GetBtScoMacAddress(const sptr<CallBase> &call);
-    std::string GetRealAddr(const std::string &macAddress);
 };
 } // namespace Telephony
 } // namespace OHOS
