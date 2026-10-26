@@ -21,11 +21,14 @@
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
 #include "os_account_manager.h"
+#ifdef CONFIG_POLICY_ENABLE
+#include "config_policy_utils.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
 
-constexpr const char PATH[] = "/system/etc/telephony/call_manager_config.json";
+constexpr const char PATH[] = "etc/telephony/call_manager_config.json";
 constexpr const char ITEM_HANG_UP_CELLULAR_CALL_BEFORE_ANSWER_LIST[] = "HangUpCellularCallBeforeAnswer";
 constexpr const char ITEM_CONVERT_USERNAME_TO_PHONE_NUM_LIST[] = "ConvertUsernameToPhoneNum";
 constexpr int MAX_BYTE_LEN = 10 * 1024;
@@ -95,8 +98,30 @@ bool CallManagerConfig::ShouldConvertUsernameToPhoneNum(int32_t uid)
 
 int32_t CallManagerConfig::ParserConfigJson()
 {
+#ifdef CONFIG_POLICY_ENABLE
+    CfgFiles *cfgFiles = GetCfgFiles(PATH);
+    if (cfgFiles == nullptr) {
+        TELEPHONY_LOGW("CallManagerConfig: Not found call_manager_config.josn!");
+        return TELEPHONY_ERR_READ_DATA_FAIL;
+    }
+
+    int32_t ret = TELEPHONY_ERR_READ_DATA_FAIL;
+    for (int32_t i = MAX_CFG_POLICY_DIRS_CNT - 1; i >= 0; i--) {
+        if (cfgFiles->paths[i] && *(cfgFiles->paths[i]) != '\0') {
+            ret = ParserConfigJsonFromFile(cfgFiles->paths[i]);
+        }
+    }
+    FreeCfgFiles(cfgFiles);
+    return ret;
+#else
+    return TELEPHONY_ERR_READ_DATA_FAIL;
+#endif
+}
+
+int32_t CallManagerConfig::ParserConfigJsonFromFile(const std::string &path)
+{
     std::unique_ptr<char[]> content;
-    int32_t ret = LoaderJsonFile(content, PATH);
+    int32_t ret = LoaderJsonFile(content, path);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("CallManagerConfig: load fail");
         return ret;

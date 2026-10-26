@@ -42,6 +42,7 @@ static constexpr const char *OBSERVER_OFF_JS_PERMISSION_ERROR_STRING =
     "BusinessError 201: Permission denied. An attempt was made to Off forbidden by permission: "
     "ohos.permission.SET_TELEPHONY_STATE.";
 int32_t NapiCallManager::registerStatus_ = TELEPHONY_ERROR;
+
 constexpr int32_t INVALID_ACCOUNT_ID = -1;
 constexpr int32_t MAX_ACCOUNT_ID = 1;
 
@@ -5687,21 +5688,24 @@ void NapiCallManager::NativeGetCallTransferByNumber(napi_env env, void *data)
     asyncContext->errorCode = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterGetTransferCallback(
         infoListener, asyncContext->type);
     if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("RegisterGetTransferCallback failed!");
+        TELEPHONY_LOGE("NativeGetCallTransferByNumber RegisterGetTransferCallback failed!");
         return;
     }
     CallTransferType type = static_cast<CallTransferType>(asyncContext->type);
     std::string number(asyncContext->number, asyncContext->numberLen);
     auto callManagerClient = DelayedSingleton<CallManagerClient>::GetInstance();
     if (callManagerClient == nullptr) {
-        TELEPHONY_LOGE("callManagerClient is nullptr!");
+        asyncContext->eventId = CALL_MANAGER_GET_CALL_TRANSFER_STATE_BY_NUMBER;
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterGetTransferCallback();
+        TELEPHONY_LOGE("NativeGetCallTransferByNumber callManagerClient is nullptr!");
+        NapiUtil::ThrowParameterError(env);
         return;
     }
     asyncContext->errorCode = callManagerClient->GetCallTransferInfo(number, type);
     if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
-        asyncContext->eventId = CALL_MANAGER_GET_CALL_TRANSFER;
+        asyncContext->eventId = CALL_MANAGER_GET_CALL_TRANSFER_STATE_BY_NUMBER;
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterGetTransferCallback();
-        TELEPHONY_LOGE("GetCallTransferInfo failed!");
+        TELEPHONY_LOGE("NativeGetCallTransferByNumber GetCallTransferInfo failed!");
         return;
     }
     asyncContext->resolved = TELEPHONY_SUCCESS;

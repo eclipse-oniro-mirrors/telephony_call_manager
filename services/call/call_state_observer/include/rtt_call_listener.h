@@ -17,7 +17,6 @@
 #define TELEPHONY_RTT_CALL_LISTENER_H
 
 #include <cstdint>
-
 #include "call_state_listener_base.h"
 #include "ims_call.h"
 

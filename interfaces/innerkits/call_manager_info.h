@@ -307,6 +307,10 @@ struct CallAttributeInfo {
      */
     CallType callType = CallType::TYPE_ERR_CALL;
     /**
+     * Indicates the satellite call type, includes tts, fxz.
+     */
+    int32_t satelliteCallType = 0;
+    /**
      * Indicates the call index.
      */
     int32_t callId = 0;
@@ -477,6 +481,10 @@ struct CallRecordInfo {
      */
     CallType callType = CallType::TYPE_ERR_CALL;
     /**
+     * Indicates the satellite call type, includes tts, fxz.
+     */
+    int32_t satelliteCallType = 0;
+    /**
      * Indicates the type of video state. {@link VideoStateType}
      */
     VideoStateType videoState = VideoStateType::TYPE_VOICE;
@@ -595,6 +603,7 @@ struct CallRecordInfo {
         std::copy(std::begin(temp.numberLocation), std::end(temp.numberLocation),
             std::begin(numberLocation));
         callType = temp.callType;
+        satelliteCallType = temp.satelliteCallType;
         callBeginTime = temp.callBeginTime;
         callCreateTime = temp.callCreateTime;
         callEndTime = temp.callEndTime;

@@ -35,6 +35,7 @@ public:
 private:
     static void Init();
     static int32_t ParserConfigJson();
+    static int32_t ParserConfigJsonFromFile(const std::string &path);
     static int32_t LoaderJsonFile(std::unique_ptr<char[]> &content, const std::string &path);
     static std::string ParseString(const cJSON *value);
     static void ParseFeatureList(

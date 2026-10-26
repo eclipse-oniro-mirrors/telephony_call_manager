@@ -34,8 +34,10 @@ public:
     static const std::string QUERY_MOTION_CLOSE_TO_EAR_KEY;
     static const std::string QUERY_MOTION_FLIP_MUTE_KEY;
     static const std::string QUERY_MOTION_PICKUP_REDUCE_KEY;
+    static const std::string QUERY_SATELLITE_MODE_TIANTONG_KEY;
+    static const std::string QUERY_SATELLITE_MODE_HYACINTH_KEY;
 
-    ErrCode Query(Uri& uri, const std::string& key, std::string& value);
+    ErrCode Query(Uri& uri, const std::string& key, std::string& values);
     int32_t Insert(Uri &uri, const std::string &key, const std::string &value);
     int32_t Update(Uri &uri, const std::string &key, const std::string &value);
     bool RegisterToDataShare(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer);

@@ -464,8 +464,8 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallSettingManager_001, TestSize.Level0)
     EXPECT_EQ(callSettingManager->SetCallRestrictionPassword(SIM1_SLOTID, fac, oldPassword, newPassword),
         TELEPHONY_ERR_LOCAL_PTR_NULL);
     CallTransferType type = CallTransferType::TRANSFER_TYPE_UNCONDITIONAL;
-    EXPECT_EQ(callSettingManager->GetCallTransferInfo(INVALID_SLOTID, type), CALL_ERR_INVALID_SLOT_ID);
-    EXPECT_EQ(callSettingManager->GetCallTransferInfo(SIM1_SLOTID, type), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(callSettingManager->GetCallTransferInfo(INVALID_SLOTID, type, true), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(callSettingManager->GetCallTransferInfo(SIM1_SLOTID, type, true), TELEPHONY_ERR_LOCAL_PTR_NULL);
     CallTransferInfo callTransferInfo = {
         .transferNum = "",
         .settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE,

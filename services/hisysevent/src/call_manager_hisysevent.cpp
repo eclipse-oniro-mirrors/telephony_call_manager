@@ -82,7 +82,6 @@ void CallManagerHisysevent::WriteIncomingCallBehaviorEvent(const int32_t slotId,
         type = static_cast<int32_t>(IncomingCallType::IMS_VIDEO_INCOMING);
     } else if ((callType == CS_CALL_TYPE || callType == SATELLITE_CALL_TYPE) && callMode == VOICE_TYPE) {
         type = static_cast<int32_t>(IncomingCallType::CS_VOICE_INCOMING);
-    } else {
         TELEPHONY_LOGE("WriteIncomingCallBehaviorEvent call incomming arges is out of range!");
         return;
     }

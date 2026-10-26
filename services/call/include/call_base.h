@@ -167,8 +167,8 @@ public:
     void SetAntiFraudState(int32_t antifraudState);
     void SetApCauseReported(bool isReported);
     bool IsApCauseReported();
-    bool isNonVirtualCall();
-    void SetNonVirtualCall(bool isNonVirtualCall);
+    bool IsRemoteControlEnable();
+    void SetRemoteControl(bool isRemoteControlEnable);
 
 #ifdef CALL_MANAGER_CALL_TRANSFER
     virtual bool IsTransferCall() {return false;}
@@ -233,7 +233,7 @@ private:
     int32_t newCallUseBox_ = 0;
     int32_t btCallSlotId_{BT_CALL_INVALID_SLOT};
     int32_t antiFraudState_ = 0;
-    bool isNonVirtualCall_{false};
+    bool isRemoteControlEnable_{false};
     int32_t imsDomain_ = 0;
     bool isMicDisabled_;
     bool isApCauseReported_{false};

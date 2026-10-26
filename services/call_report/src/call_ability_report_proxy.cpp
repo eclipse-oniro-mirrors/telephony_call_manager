@@ -27,10 +27,16 @@
 #include "system_ability.h"
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
+#include "want.h"
+#include "common_event.h"
+#include "common_event_manager.h"
+#include "telephony_permission.h"
 #include "call_object_manager.h"
 #ifdef SUPPORT_DSOFTBUS
 #include "interoperable_communication_manager.h"
 #endif
+
+#include "call_manager_hisysevent.h"
 
 namespace OHOS {
 namespace Telephony {

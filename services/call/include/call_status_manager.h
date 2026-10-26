@@ -170,6 +170,8 @@ private:
     int32_t HandleCallReportInfoEx(const CallDetailInfo &info);
     void ClearPendingState(sptr<CallBase> &call);
     void RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason, const std::string &message);
+    void AcquireDisconnectedLock(const sptr<CallBase> &call);
+    void SetSatelliteCallType(sptr<CallBase> &call);
     bool AutoAnswerVideoCallForNotDsda(const sptr<CallBase> disconnectedCall, int32_t activeCallNum);
 #ifdef CALL_MANAGER_WATCH_CALL_BLOCKING
     bool HandleWatchCallDisposition(std::shared_ptr<SpamCallAdapter> &spamCallAdapterPtr, const sptr<CallBase> &call);

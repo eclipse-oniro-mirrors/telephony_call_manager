@@ -95,9 +95,7 @@ int32_t CallWiredHeadSet::RegistKeyEvent(int32_t keyCode, bool isFinalKeyDown, c
 {
     std::set<int32_t> preKeys;
     std::shared_ptr<MMI::KeyOption> keyOption = InitOption(preKeys, keyCode, isFinalKeyDown, 0);
-    if (keyCode == MMI::KeyEvent::KEYCODE_HEADSETHOOK) {
-        keyOption->SetPriority(MMI::SubscribePriority::PRIORITY_100);
-    }
+    keyOption->SetPriority(MMI::SubscribePriority::PRIORITY_100);
     int32_t subscribeId = MMI::InputManager::GetInstance()->SubscribeKeyEvent(keyOption, callback);
     TELEPHONY_LOGI("keyCode: %{public}d, subscribeId: %{public}d", keyCode, subscribeId);
     return subscribeId;

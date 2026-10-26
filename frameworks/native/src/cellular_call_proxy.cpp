@@ -620,7 +620,8 @@ int32_t CellularCallProxy::CanSetCallTransferTime(int32_t slotId, bool &result)
     return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
 }
 
-int32_t CellularCallProxy::GetCallTransferInfo(int32_t slotId, CallTransferType type)
+int32_t CellularCallProxy::GetCallTransferInfo(int32_t slotId, CallTransferType type,
+    bool isIncludeCallForwardingNumber)
 {
     MessageOption option;
     MessageParcel in;
@@ -631,6 +632,9 @@ int32_t CellularCallProxy::GetCallTransferInfo(int32_t slotId, CallTransferType 
         return result;
     }
     if (!in.WriteInt32((int32_t)type)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteBool(isIncludeCallForwardingNumber)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     int32_t error = SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::GET_CALL_TRANSFER), in, out, option);

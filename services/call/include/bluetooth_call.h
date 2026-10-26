@@ -79,7 +79,7 @@ private:
     std::string remoteName_ = "";
     std::string transferCallContactName_ = "";
     std::atomic<bool> isTransferCall_ = false;
-    std::atomic<bool> isTransferCallAllow_ = true;
+    std::atomic<bool> isTransferCallAllow_ = false;
     ffrt::mutex contactNameMutex_;
     std::atomic<bool> isBluetoothHeadsetWarned_ = false;
 #endif

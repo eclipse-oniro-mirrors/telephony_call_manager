@@ -222,7 +222,7 @@ public:
      * @param slotId[in] the slot id
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type) = 0;
+    virtual int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type, bool isIncludeCallForwardingNumber) = 0;
 
     /**
      * @brief Set Call Waiting

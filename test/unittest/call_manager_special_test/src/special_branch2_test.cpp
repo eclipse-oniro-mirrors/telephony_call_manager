@@ -224,7 +224,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_001, TestSize.Leve
 
     bool result;
     cellularCallConnection->CanSetCallTransferTime(0, result);
-    cellularCallConnection->GetCallTransferInfo(CallTransferType::TRANSFER_TYPE_BUSY, 0);
+    cellularCallConnection->GetCallTransferInfo(CallTransferType::TRANSFER_TYPE_BUSY, 0, true);
     cellularCallConnection->GetVideoCallWaiting(0, result);
     cellularCallConnection->SetCallPreferenceMode(0, 0);
 

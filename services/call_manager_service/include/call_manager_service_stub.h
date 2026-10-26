@@ -137,7 +137,6 @@ private:
     int32_t OnRegisterBluetoothCallManagerCallbackPtr(MessageParcel &data, MessageParcel &reply);
     int32_t OnSendUssdResponse(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetCallPolicyInfo(MessageParcel &data, MessageParcel &reply);
-    int32_t OnWriteVoipCallFaultEvent(MessageParcel &data, MessageParcel &reply);
     int32_t OnEndCall(MessageParcel &data, MessageParcel &reply);
     int32_t OnHasDistributedCommunicationCapability(MessageParcel &data, MessageParcel &reply);
     int32_t OnNotifyVoIPAudioStreamStart(MessageParcel &data, MessageParcel &reply);

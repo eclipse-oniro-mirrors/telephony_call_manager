@@ -428,13 +428,14 @@ int CellularCallConnection::CanSetCallTransferTime(int32_t slotId, bool &result)
     return cellularCallInterfacePtr_->CanSetCallTransferTime(slotId, result);
 }
 
-int CellularCallConnection::GetCallTransferInfo(CallTransferType type, int32_t slotId)
+int CellularCallConnection::GetCallTransferInfo(CallTransferType type, int32_t slotId,
+    bool isIncludeCallForwardingNumber)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return cellularCallInterfacePtr_->GetCallTransferInfo(slotId, type);
+    return cellularCallInterfacePtr_->GetCallTransferInfo(slotId, type, isIncludeCallForwardingNumber);
 }
 
 int CellularCallConnection::SetCallWaiting(bool activate, int32_t slotId)

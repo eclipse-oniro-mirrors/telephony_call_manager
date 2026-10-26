@@ -22,6 +22,7 @@
 #include "audio_scene_processor.h"
 #include "call_state_listener_base.h"
 #include "ffrt.h"
+#include <condition_variable>
 #include "ring.h"
 #include "singleton.h"
 #include "sound.h"
@@ -97,6 +98,8 @@ public:
     bool StopForNoRing();
     bool NeedPlayVideoRing(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr);
     bool IsSystemVideoRing(sptr<CallBase> &callObjectPtr);
+    static bool SetRemoteControlEnable(bool isRemoteControlEnable);
+    static bool GetRemoteControlEnable();
 #ifdef CALL_MANAGER_SOS_NO_RINGBACK_TONE
     bool IsSosNoRingbackToneEnable();
 #endif
@@ -160,7 +163,8 @@ private:
     std::unique_ptr<Tone> tone_;
     std::unique_ptr<Sound> sound_;
     ffrt::mutex mutex_;
-    std::recursive_mutex toneStateLock_;
+    ffrt::recursive_mutex toneStateLock_;
+    std::condition_variable_any toneStateCv_;
     sptr<CallBase> frontCall_ = nullptr;
     std::atomic<bool> isSetAudioDeviceByUser_ = false;
     bool isScoTemporarilyDisabled_ = false;
