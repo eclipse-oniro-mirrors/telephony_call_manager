@@ -940,4 +940,56 @@ HWTEST_F(ZeroBranch9Test, Telephony_UpdateDeviceType_CrsWithVideoCall, TestSize.
     ASSERT_NO_THROW(audioControl->UpdateDeviceType(call));
     CallObjectManager::DeleteOneCallObject(call);
 }
+
+/**
+ * @tc.number   ZeroBranch9Test_AudioDeviceManager_UpdateDeviceTypeForBtCall_IncomingState
+ * @tc.name     AudioDeviceManager_UpdateDeviceTypeForBtCall_IncomingState
+ * @tc.desc     When call is INCOMING state
+ */
+HWTEST_F(ZeroBranch9Test, AudioDeviceManager_UpdateDeviceTypeForBtCall_IncomingState, Function | MediumTest | Level1)
+{
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    EXPECT_NE(audioDeviceManager, nullptr);
+    DialParaInfo info;
+    info.callType = CallType::TYPE_BLUETOOTH;
+    std::string macAddr = "00:11:22:33:44:55";
+    BluetoothCall *btCall = new BluetoothCall(info, macAddr, 0);
+    sptr<CallBase> call = btCall;
+    EXPECT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(false);
+    btCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    auto btConn = DelayedSingleton<BluetoothCallConnection>::GetInstance();
+    EXPECT_NE(btConn, nullptr);
+    std::string mac;
+    btConn->SetBtCallScoConnected(true, mac);
+    std::vector<AudioDevice> transferCallIgnoreDeviceList = {};
+    audioDeviceManager->UpdateDeviceTypeForBtCall(call, transferCallIgnoreDeviceList);
+    EXPECT_EQ(audioDeviceManager->info_.currentAudioDevice.deviceType, AudioDeviceType::DEVICE_SPEAKER);
+    btConn->SetBtCallScoConnected(false, mac);
+}
+ 
+/**
+ * @tc.number   ZeroBranch9Test_AudioDeviceManager_UpdateDeviceTypeForBtCall_VoipWearable
+ * @tc.name     AudioDeviceManager_UpdateDeviceTypeForBtCall_VoipWearable
+ * @tc.desc     When call type is TYPE_VOIP on WearableDevice
+ */
+HWTEST_F(ZeroBranch9Test, AudioDeviceManager_UpdateDeviceTypeForBtCall_VoipWearable, Function | MediumTest | Level1)
+{
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    EXPECT_NE(audioDeviceManager, nullptr);
+    DialParaInfo info;
+    info.callType = CallType::TYPE_VOIP;
+    VoIPCall *voipCall = new VoIPCall(info);
+    sptr<CallBase> call = voipCall;
+    EXPECT_NE(voipCall, nullptr);
+    voipCall->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    auto btConn = DelayedSingleton<BluetoothCallConnection>::GetInstance();
+    EXPECT_NE(btConn, nullptr);
+    std::string mac;
+    btConn->SetBtCallScoConnected(true, mac);
+    std::vector<AudioDevice> transferCallIgnoreDeviceList = {};
+    audioDeviceManager->UpdateDeviceTypeForBtCall(call, transferCallIgnoreDeviceList);
+    EXPECT_EQ(audioDeviceManager->info_.currentAudioDevice.deviceType, AudioDeviceType::DEVICE_SPEAKER);
+    btConn->SetBtCallScoConnected(false, mac);
+}
 }
