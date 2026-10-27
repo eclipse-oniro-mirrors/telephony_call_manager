@@ -68,6 +68,7 @@ napi_value NapiCallManager::DeclareCallBasisInterface(napi_env env, napi_value e
         DECLARE_NAPI_WRITABLE_FUNCTION("dial", Dial),
         DECLARE_NAPI_WRITABLE_FUNCTION("dialCall", DialCall),
         DECLARE_NAPI_WRITABLE_FUNCTION("makeCall", MakeCall),
+        DECLARE_NAPI_WRITABLE_FUNCTION("makeDirectCall", MakeDirectCall),
         DECLARE_NAPI_WRITABLE_FUNCTION("makeCallWithToken", MakeCallWithToken),
         DECLARE_NAPI_WRITABLE_FUNCTION("answer", AnswerCall),
         DECLARE_NAPI_WRITABLE_FUNCTION("reject", RejectCall),
@@ -1240,6 +1241,24 @@ napi_value NapiCallManager::MakeCall(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     return HandleAsyncWork(env, asyncContext.release(), "MakeCall", NativeMakeCall, NativeVoidCallBackWithErrorCode);
+}
+
+napi_value NapiCallManager::MakeDirectCall(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
+    if (!MatchOneStringParameter(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::MakeDirectCall MatchOneStringParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<AsyncContext>();
+    napi_get_value_string_utf8(
+        env, argv[ARRAY_INDEX_FIRST], asyncContext->number, PHONE_NUMBER_MAXIMUM_LIMIT, &(asyncContext->numberLen));
+    if (argc == TWO_VALUE_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    return HandleAsyncWork(
+        env, asyncContext.release(), "MakeDirectCall", NativeMakeDirectCall, NativeVoidCallBackWithErrorCode);
 }
 
 napi_value NapiCallManager::MakeCallWithToken(napi_env env, napi_callback_info info)
@@ -4193,6 +4212,25 @@ void NapiCallManager::NativeMakeCall(napi_env env, void *data)
         DelayedSingleton<CallManagerClient>::GetInstance()->MakeCall(phoneNumber);
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
+}
+
+void NapiCallManager::NativeMakeDirectCall(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeMakeDirectCall data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (AsyncContext *)data;
+    asyncContext->eventId = CALL_MANAGER_DIRECT_CALL;
+    std::string phoneNumber(asyncContext->number, asyncContext->numberLen);
+    asyncContext->errorCode =
+        DelayedSingleton<CallManagerClient>::GetInstance()->MakeDirectCall(phoneNumber);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    } else if (asyncContext->errorCode == TELEPHONY_ERR_NO_SIM_CARD) {
+        asyncContext->errorCode = TELEPHONY_ERR_NETWORK_NOT_IN_SERVICE;
     }
 }
 

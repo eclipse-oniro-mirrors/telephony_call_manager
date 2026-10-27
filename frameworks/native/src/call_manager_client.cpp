@@ -109,6 +109,16 @@ int32_t CallManagerClient::MakeCall(std::string number)
     }
 }
 
+int32_t CallManagerClient::MakeDirectCall(std::string number)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->MakeDirectCall(number);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t CallManagerClient::MakeCallWithToken(std::string number, AppExecFwk::PacMap &options, std::string &token)
 {
     if (g_callManagerProxy != nullptr) {

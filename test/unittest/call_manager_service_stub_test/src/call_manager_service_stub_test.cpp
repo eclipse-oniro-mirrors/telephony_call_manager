@@ -68,6 +68,10 @@ public:
     {
         return TELEPHONY_SUCCESS;
     }
+    int32_t MakeDirectCall(std::string number) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
     int32_t AnswerCall(int32_t callId, int32_t videoState, bool isRTT) override
     {
         return TELEPHONY_SUCCESS;
@@ -578,6 +582,44 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnMakeCall_0200, Tes
     data.WriteString(shortNumber);
 
     int32_t result = stub->OnMakeCall(data, reply);
+    EXPECT_EQ(result, TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnMakeDirectCall_0100, TestSize.Level1)
+{
+    sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
+    MessageParcel data;
+    MessageParcel reply;
+ 
+    data.WriteString("");
+ 
+    int32_t result = stub->OnMakeDirectCall(data, reply);
+    EXPECT_EQ(result, CALL_ERR_NUMBER_OUT_OF_RANGE);
+}
+ 
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnMakeDirectCall_0200, TestSize.Level1)
+{
+    sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
+    MessageParcel data;
+    MessageParcel reply;
+ 
+    std::string longNumber(ACCOUNT_NUMBER_MAX_LENGTH + 1, '1');
+    data.WriteString(longNumber);
+ 
+    int32_t result = stub->OnMakeDirectCall(data, reply);
+    EXPECT_EQ(result, CALL_ERR_NUMBER_OUT_OF_RANGE);
+}
+ 
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnMakeDirectCall_0300, TestSize.Level1)
+{
+    sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
+    MessageParcel data;
+    MessageParcel reply;
+ 
+    std::string shortNumber("10086");
+    data.WriteString(shortNumber);
+ 
+    int32_t result = stub->OnMakeDirectCall(data, reply);
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
 }
 

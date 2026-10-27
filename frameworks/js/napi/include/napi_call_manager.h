@@ -75,6 +75,7 @@ public:
     static napi_value Dial(napi_env env, napi_callback_info info);
     static napi_value DialCall(napi_env env, napi_callback_info info);
     static napi_value MakeCall(napi_env env, napi_callback_info info);
+    static napi_value MakeDirectCall(napi_env env, napi_callback_info info);
     static napi_value MakeCallWithToken(napi_env env, napi_callback_info info);
     static napi_value AnswerCall(napi_env env, napi_callback_info info);
     static napi_value AnswerVideoCall(napi_env env, napi_callback_info info);
@@ -183,6 +184,7 @@ private:
     static void NativeDial(napi_env env, void *data);
     static void NativeDialCall(napi_env env, void *data);
     static void NativeMakeCall(napi_env env, void *data);
+    static void NativeMakeDirectCall(napi_env env, void *data);
     static void NativeMakeCallWithToken(napi_env env, void *data);
     static void NativeMakeCallWithTokenCallBack(napi_env env, napi_status status, void *data);
     static void NativeAnswerCall(napi_env env, void *data);

@@ -124,6 +124,7 @@ async function startAbility(args, context) {
 export default {
     makeCall: makeCallFunc,
     makeCallWithToken: call.makeCallWithToken,
+    makeDirectCall: call.makeDirectCall,
     dialCall: call.dialCall,
     muteRinger: call.muteRinger,
     answerCall: call.answerCall,

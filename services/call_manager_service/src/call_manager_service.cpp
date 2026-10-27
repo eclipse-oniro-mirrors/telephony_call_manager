@@ -20,6 +20,8 @@
 #include "audio_proxy.h"
 #include "bluetooth_call_service.h"
 #include "call_ability_report_proxy.h"
+#include "call_data_base_helper.h"
+#include "call_dialog.h"
 #include "call_manager_dump_helper.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
@@ -38,6 +40,7 @@
 #include "distributed_call_manager.h"
 #include "call_earthquake_alarm_subscriber.h"
 #include "want_params_wrapper.h"
+#include "settings_datashare_helper.h"
 #include "string_wrapper.h"
 #include "bluetooth_call_connection.h"
 #ifdef SUPPORT_DSOFTBUS
@@ -67,6 +70,7 @@ static constexpr const char *OHOS_PERMISSION_READ_CALL_LOG = "ohos.permission.RE
 static constexpr const char *OHOS_PERMISSION_WRITE_CALL_LOG = "ohos.permission.WRITE_CALL_LOG";
 static constexpr const char *OHOS_PERMISSION_MANAGE_CALL_FOR_DEVICES = "ohos.permission.MANAGE_CALL_FOR_DEVICES";
 static constexpr const char *OHOS_PERMISSION_GET_CALL_TRANSFER_INFO = "ohos.permission.GET_CALL_TRANSFER_INFO";
+static constexpr const char *OHOS_PERMISSION_DIRECT_CALL = "ohos.permission.DIRECT_CALL";
 static constexpr const char *OHOS_PERMISSION_SEND_MESSAGES = "ohos.permission.SEND_MESSAGES";
 static constexpr const char *SLOT_ID = "accountId";
 static constexpr const char *CALL_TYPE = "callType";
@@ -308,6 +312,22 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
     }
     DelayedSingleton<CallManagerHisysevent>::GetInstance()->SetDialStartTime();
     StartAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue(SLOT_ID), extras.GetIntValue(CALL_TYPE),
+            extras.GetIntValue(VIDEO_STATE), TELEPHONY_ERR_PERMISSION_ERR, OHOS_PERMISSION_PLACE_CALL);
+        FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    int32_t ret = DialCallCore(number, extras);
+    if (ret != TELEPHONY_SUCCESS) {
+        FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
+    }
+    return ret;
+}
+ 
+int32_t CallManagerService::DialCallCore(std::u16string number, AppExecFwk::PacMap &extras)
+{
     int32_t uid = IPCSkeleton::GetCallingUid();
     std::string bundleName = "";
     TelephonyPermission::GetBundleNameByUid(uid, bundleName);
@@ -315,13 +335,6 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
     challengeTokenMgr_.FillExtrasFromChallengeToken(Str16ToStr8(number), extras);
     if (extras.GetBooleanValue("btSlotIdUnknown", false)) {
         BtCallWaitSlotId(extras, number);
-    }
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
-        TELEPHONY_LOGE("Permission denied!");
-        CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue(SLOT_ID), extras.GetIntValue(CALL_TYPE),
-            extras.GetIntValue(VIDEO_STATE), TELEPHONY_ERR_PERMISSION_ERR, OHOS_PERMISSION_PLACE_CALL);
-        FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
-        return TELEPHONY_ERR_PERMISSION_ERR;
     }
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_CUST
     if (TELEPHONY_CUST_WRAPPER.isChangeDialNumberToTwEmc_ != nullptr &&
@@ -342,14 +355,91 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
             DelayedSingleton<CallManagerHisysevent>::GetInstance()->GetErrorDescription(ret, errordesc);
             CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue(SLOT_ID), extras.GetIntValue(CALL_TYPE),
                 extras.GetIntValue(VIDEO_STATE), ret, errordesc);
-            FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
         }
         return ret;
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+}
+
+int32_t CallManagerService::MakeDirectCall(std::string number)
+{
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_DIRECT_CALL)) {
+        TELEPHONY_LOGI("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+#ifdef SUPPORT_DSOFTBUS
+    auto dcMgrInstance = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    if (dcMgrInstance != nullptr && dcMgrInstance->IsSinkRole() && dcMgrInstance->IsConnected()) {
+        return TELEPHONY_ERR_FAIL;
+    }
+#endif
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    int32_t ret = PrivacyKit::AddPermissionUsedRecord(callerToken, OHOS_PERMISSION_DIRECT_CALL, 1, 0);
+    if (ret != 0) {
+        TELEPHONY_LOGE("AddPermissionUsedRecord failed for granted permission!");
+    }
+    std::vector<IccAccountInfo> iccAccountInfoList;
+    ret = CoreServiceClient::GetInstance().GetActiveSimAccountInfoList(iccAccountInfoList);
+    bool isMultiSim = (ret == TELEPHONY_SUCCESS && iccAccountInfoList.size() >= 2);
+    int32_t defaultVoiceSlotId = CoreServiceClient::GetInstance().GetDefaultVoiceSlotId();
+    bool isDefaultVoiceSlotIdValid =
+        DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(defaultVoiceSlotId);
+    bool isTstsModeEnabled = (ret == TELEPHONY_SUCCESS && iccAccountInfoList.size() == 3);
+    bool isBackupSlotIdValid = false;
+    if (isTstsModeEnabled) {
+        isBackupSlotIdValid = IsBackupSlotIdValid();
+    }
+    if (!isMultiSim || (isDefaultVoiceSlotIdValid && !isBackupSlotIdValid)) {
+        TELEPHONY_LOGI("dial directly");
+        int32_t accountId = iccAccountInfoList.size() == 1 ? iccAccountInfoList[0].slotIndex : defaultVoiceSlotId;
+        AppExecFwk::PacMap extras;
+        extras.PutIntValue(SLOT_ID, accountId);
+        ret = DialCallCore(Str8ToStr16(number), extras);
+        return ret;
+    }
+    return StartContactsDialog(number);
+}
+
+bool CallManagerService::IsBackupSlotIdValid()
+{
+    auto datashareHelper = SettingsDataShareHelper::GetInstance();
+    if (datashareHelper == nullptr) {
+        TELEPHONY_LOGE("datashareHelper is nullptr!");
+        return false;
+    } else {
+        std::string backupVoiceSlotId {"-1"};
+        OHOS::Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/"
+                        "SETTINGSDATA?Proxy=true&key=backup_voice_slot_id");
+        datashareHelper->Query(uri, "backup_voice_slot_id", backupVoiceSlotId);
+        int32_t backupSlotId = static_cast<int32_t>(std::strtol(backupVoiceSlotId.c_str(), nullptr, 10));
+        return DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(backupSlotId);
+    }
+}
+
+int32_t CallManagerService::StartContactsDialog(std::string number)
+{
+    bool isAirplaneModeOn = false;
+    std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
+    if (callDataPtr == nullptr) {
+        TELEPHONY_LOGE("callDataPtr is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret = callDataPtr->GetAirplaneMode(isAirplaneModeOn);
+    if (ret == TELEPHONY_SUCCESS && isAirplaneModeOn) {
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_IN_AIRPLANE_MODE");
+        return TELEPHONY_ERR_AIRPLANE_MODE_ON;
+    }
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    std::string bundleName = "";
+    TelephonyPermission::GetBundleNameByUid(uid, bundleName);
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    dialogAbilityConnection_ = sptr<DialogAbilityConnection>::MakeSptr();
+    ret = dialogAbilityConnection_->OpenSystemDialog("com.ohos.contacts", "DirectDialogExtensionAbility",
+        number, bundleName);
+    IPCSkeleton::SetCallingIdentity(identity);
+    return ret;
 }
 
 void CallManagerService::BtCallWaitSlotId(AppExecFwk::PacMap &dialInfo, const std::u16string &number)
