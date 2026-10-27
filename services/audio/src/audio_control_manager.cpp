@@ -445,18 +445,18 @@ bool AudioControlManager::PreHandleAnswerdState(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
     auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
-    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
-    if (audioDeviceManager == nullptr || callStateProcessor == nullptr) {
+    if (callStateProcessor == nullptr) {
         return false;
     }
+    bool isIncomingToAnswer = (nextState == TelCallState::CALL_STATUS_ANSWERED &&
+        priorState == TelCallState::CALL_STATUS_INCOMING);
     auto callId = callObjectPtr->GetCallID();
     if (!callObjectPtr->GetAnsweredByPhone()) {
-        if (nextState == TelCallState::CALL_STATUS_ANSWERED && priorState == TelCallState::CALL_STATUS_INCOMING) {
+        if (isIncomingToAnswer) {
             TELEPHONY_LOGI("user answered, mute ringer instead of release renderer");
             callStateProcessor->DeleteCall(callId, priorState);
             callObjectPtr->SetIsAnsweredByPhone(true);
             MuteRinger();
-            audioDeviceManager->SetAudioDeviceByAudioMode(false, true);
             return true;
         }
     }
@@ -470,9 +470,15 @@ bool AudioControlManager::PreHandleAnswerdState(
 
     if (callObjectPtr->GetAnsweredByPhone()) {
         if (isMtCallActived || (nextState == TelCallState::CALL_STATUS_INCOMING && nextState == priorState) ||
-            (nextState == TelCallState::CALL_STATUS_ANSWERED && priorState == TelCallState::CALL_STATUS_INCOMING)) {
+            isIncomingToAnswer) {
             callStateProcessor->DeleteCall(callId, priorState);
-            TELEPHONY_LOGI("not need into audio state machine");
+            if (isIncomingToAnswer && soundState_ == SoundState::STOPPED) {
+                // PlaySoundTone may not have started when the first "Answered" state is received,
+                // need to retry executing PlaySoundTone here.
+                ProcessAudioWhenCallActive(callObjectPtr);
+            } else {
+                TELEPHONY_LOGI("No need into audio state machine");
+            }
             return false;
         }
 
@@ -671,6 +677,7 @@ void AudioControlManager::ProcessSoundtone(sptr<CallBase> &callObjectPtr)
         minMulityCall = MIN_DC_MULITY_ACTIVE_CALL_COUNT;
     }
     if (((CallObjectManager::GetCurrentCallNum() - ringCallCount) >= minMulityCall)) {
+        TELEPHONY_LOGI("No call needs to process soundtone");
         return;
     }
 
