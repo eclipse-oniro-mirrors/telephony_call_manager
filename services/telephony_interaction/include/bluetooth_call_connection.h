@@ -50,8 +50,10 @@ public:
     bool GetSupportBtCall();
     void SetBtCallScoConnected(bool isBtCallScoConnected);
     bool GetBtCallScoConnected();
-    void HfpDisConnectedEndBtCall();
+    void HfpDisConnectedEndBtCall(bool isSystemAbilityRemoved);
     void SetHfpContactName(const std::string &hfpPhoneNumber, const std::string &hfpContactName);
+    void HandleBtConnectionStateChange(const Bluetooth::BluetoothRemoteDevice &device,
+        int32_t state);
     std::string GetHfpContactName(const std::string &hfpPhoneNumber);
 
 #ifdef CALL_MANAGER_CALL_TRANSFER
@@ -75,8 +77,13 @@ public:
 #endif
 
 private:
+    void SetBtCallScoDisconnPhoneIndex(const std::string &macAddress);
+    std::string GetBtScoMacAddress(const sptr<CallBase> &call);
+    std::string GetRealAddr(const std::string &macAddress);
+
     std::string macAddress_;
     std::string secondaryPhoneMacAddress_;
+    std::atomic<int32_t> btCallScoDisconnPhoneIndex_ = 0;
     bool isHfpConnected_ = false;
     bool isBtCallScoConnected_ = false;
     std::string hfpPhoneNumber_;

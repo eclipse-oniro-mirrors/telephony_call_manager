@@ -283,7 +283,7 @@ void SystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const
         TELEPHONY_LOGE("removed SA is not bluetooth service, ignored.");
         return;
     }
-    DelayedSingleton<BluetoothCallConnection>::GetInstance()->HfpDisConnectedEndBtCall();
+    DelayedSingleton<BluetoothCallConnection>::GetInstance()->HfpDisConnectedEndBtCall(true);
     DelayedSingleton<BluetoothConnection>::GetInstance()->ResetBtConnection();
     std::shared_ptr<AudioDeviceManager> audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     audioDeviceManager->ResetBtAudioDevicesList();

@@ -27,18 +27,13 @@ BluetoothCallState::~BluetoothCallState() {}
 void BluetoothCallState::OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device,
     int32_t state, int32_t cause)
 {
-    switch (state) {
-        case (int32_t)Bluetooth::BTConnectState::CONNECTED:
-            DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpConnected(true);
-            break;
-        case (int32_t)Bluetooth::BTConnectState::DISCONNECTED:
-            DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpContactName("", "");
-            DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpConnected(false);
-            DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetBtCallScoConnected(false);
-            break;
-        default:
-            break;
+    TELEPHONY_LOGI("BluetoothCallState OnConnectionStateChanged, state = %{public}d", state);
+    auto btConn = DelayedSingleton<BluetoothCallConnection>::GetInstance();
+    if (btConn == nullptr) {
+        TELEPHONY_LOGI("BluetoothCallConnection is nullptr");
+        return;
     }
+    btConn->HandleBtConnectionStateChange(device, state);
 }
 
 void BluetoothCallState::OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state)

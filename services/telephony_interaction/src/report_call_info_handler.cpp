@@ -205,6 +205,7 @@ void ReportCallInfoHandler::DisconnectBtCallWhenPhoneAnswered(const CallDetailIn
             detailInfo.index = info.index;
             detailInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
             detailInfo.phoneIndex = info.phoneIndex;
+            btCall->SetAnswerType(CallAnswerType::CALL_ANSWERED_ELSEWHER);
             (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, info.phoneNum, kMaxNumberLen);
             (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen  + 1, 0, kMaxBundleNameLen + 1);
             int32_t ret = UpdateCallReportInfo(detailInfo);

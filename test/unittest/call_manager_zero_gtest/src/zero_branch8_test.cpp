@@ -225,6 +225,33 @@ HWTEST_F(ZeroBranch7Test, Telephony_BluetoothCallConnection_001, TestSize.Level0
     blueToothConnectionPtr->GetMacAddress(1);
 }
 
+HWTEST_F(ZeroBranch7Test, Telephony_BluetoothCallConnection_002, TestSize.Level0)
+{
+    auto blueToothConnectionPtr = DelayedSingleton<BluetoothCallConnection>::GetInstance();
+    if (blueToothConnectionPtr == nullptr) {
+        return;
+    }
+    EXPECT_TRUE(blueToothConnectionPtr != nullptr);
+    std::list<sptr<BluetoothCall>> allCallList;
+    DialParaInfo info;
+    std::string macAddr1 = "abc";
+    std::string macAddr2 = "00:11:22:33:44:55";
+    sptr<BluetoothCall> btCall1 = new BluetoothCall(info, macAddr1, 0);
+    sptr<BluetoothCall> btCall2 = new BluetoothCall(info, macAddr2, 1);
+    allCallList.push_back(btCall1);
+    allCallList.push_back(btCall2);
+    blueToothConnectionPtr->SetMacAddress(1, "00:11:22:33:44:55");
+    blueToothConnectionPtr->SetBtCallScoDisconnPhoneIndex("00:11:22:33:44:55");
+    blueToothConnectionPtr->SetMacAddress(0, "00:11:22:33:44:66");
+    blueToothConnectionPtr->SetBtCallScoDisconnPhoneIndex("00:11:22:33:44:66");
+    blueToothConnectionPtr->HfpDisConnectedEndBtCall(false);
+    sptr<CallBase> callObjectPtr = nullptr;
+    blueToothConnectionPtr->GetBtScoMacAddress(callObjectPtr);
+    sptr<CallBase> call = new IMSCall(info);
+    blueToothConnectionPtr->GetBtScoMacAddress(call);
+    blueToothConnectionPtr->GetBtScoMacAddress(btCall1);
+}
+
 /**
  * @tc.number   Telephony_CallWiredHeadSet_001
  * @tc.name     test key mute press

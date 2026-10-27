@@ -105,8 +105,10 @@ int32_t BluetoothCallConnection::ConnectBtSco()
 {
     TELEPHONY_LOGI("connectBtSco event");
     Bluetooth::HandsFreeUnit *profile = Bluetooth::HandsFreeUnit::GetProfile();
+    sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    std::string macAddress = GetBtScoMacAddress(call);
     if (profile != nullptr) {
-        Bluetooth::BluetoothRemoteDevice device(macAddress_, 1);
+        Bluetooth::BluetoothRemoteDevice device(macAddress, 1);
         bool isOK = profile->ConnectSco(device);
         if (!isOK) {
             TELEPHONY_LOGE("connectBtSco failed!");
@@ -123,8 +125,10 @@ int32_t BluetoothCallConnection::DisConnectBtSco()
 {
     TELEPHONY_LOGI("disconnectBtSco event");
     Bluetooth::HandsFreeUnit *profile = Bluetooth::HandsFreeUnit::GetProfile();
+    sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    std::string macAddress = GetBtScoMacAddress(call);
     if (profile != nullptr) {
-        Bluetooth::BluetoothRemoteDevice device(macAddress_, 1);
+        Bluetooth::BluetoothRemoteDevice device(macAddress, 1);
         bool isOK = profile->DisconnectSco(device);
         if (!isOK) {
             TELEPHONY_LOGE("disconnectBtSco failed!");
@@ -135,6 +139,17 @@ int32_t BluetoothCallConnection::DisConnectBtSco()
         TELEPHONY_LOGE("profile is nullptr");
     }
     return TELEPHONY_ERR_FAIL;
+}
+
+std::string BluetoothCallConnection::GetBtScoMacAddress(const sptr<CallBase> &call)
+{
+    int32_t phoneIndex = 0;
+    if (call != nullptr && call->GetCallType() == CallType::TYPE_BLUETOOTH) {
+        sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+        phoneIndex = btCall->GetPhoneIndex();
+    }
+    TELEPHONY_LOGI("BluetoothCallConnection::GetBtScoMacAddress phoneIndex=%{public}d", phoneIndex);
+    return GetMacAddress(phoneIndex);
 }
 
 bool BluetoothCallConnection::GetBtScoIsConnected()
@@ -160,7 +175,7 @@ void BluetoothCallConnection::SetHfpConnected(bool isHfpConnected)
     isHfpConnected_ = isHfpConnected;
     TELEPHONY_LOGI("Set hfpCconnectd=%{public}d", isHfpConnected_);
     if (!isHfpConnected_) {
-        HfpDisConnectedEndBtCall();
+        HfpDisConnectedEndBtCall(false);
 #ifdef CALL_MANAGER_CALL_TRANSFER
         CancelHfpWaitContactTask();
 #endif
@@ -195,7 +210,27 @@ bool BluetoothCallConnection::GetBtCallScoConnected()
     return isBtCallScoConnected_;
 }
 
-void BluetoothCallConnection::HfpDisConnectedEndBtCall()
+void BluetoothCallConnection::HandleBtConnectionStateChange(const Bluetooth::BluetoothRemoteDevice &device,
+    int32_t state)
+{
+    std::string macAddress = device.GetDeviceAddr();
+    switch (state) {
+        case static_cast<int>(Bluetooth::BTConnectState::CONNECTED):
+            SetHfpConnected(true);
+            break;
+        case static_cast<int>(Bluetooth::BTConnectState::DISCONNECTED):
+            /* no need break, need run through to default */
+            SetBtCallScoDisconnPhoneIndex(macAddress);
+            SetHfpContactName("", "");
+            SetHfpConnected(false);
+            SetBtCallScoConnected(false);
+            break;
+        default:
+            break;
+    }
+}
+
+void BluetoothCallConnection::HfpDisConnectedEndBtCall(bool isSystemAbilityRemoved)
 {
     TELEPHONY_LOGI("hfp disconnected, hangup all bt call.");
     std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
@@ -205,12 +240,16 @@ void BluetoothCallConnection::HfpDisConnectedEndBtCall()
         }
         CallAttributeInfo info;
         (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
-        call->GetCallAttributeBaseInfo(info);
+        call->GetCallAttributeInfo(info);
         CallDetailInfo detailInfo;
+        if (info.phoneIndex != btCallScoDisconnPhoneIndex_ && !isSystemAbilityRemoved) {
+            continue;
+        }
         detailInfo.callType = info.callType;
         detailInfo.accountId = info.accountId;
         detailInfo.index = call->GetCallIndex();
         detailInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
+        detailInfo.phoneIndex = info.phoneIndex;
         (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, info.accountNumber, kMaxNumberLen);
         (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen  + 1, 0, kMaxBundleNameLen + 1);
         int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(detailInfo);
@@ -221,6 +260,27 @@ void BluetoothCallConnection::HfpDisConnectedEndBtCall()
                 detailInfo.state, detailInfo.index);
         }
     }
+}
+
+void BluetoothCallConnection::SetBtCallScoDisconnPhoneIndex(const std::string &macAddress)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    std::string realAddr = GetRealAddr(macAddress);
+    if (realAddr == macAddress_) {
+        btCallScoDisconnPhoneIndex_ = 0;
+    } else if (realAddr == secondaryPhoneMacAddress_) {
+        btCallScoDisconnPhoneIndex_ = 1;
+    }
+}
+
+std::string BluetoothCallConnection::GetRealAddr(const std::string &macAddress)
+{
+    std::string realAddr;
+    Bluetooth::BluetoothHost::GetDefaultHost().GetRealAddress(macAddress, realAddr);
+    if (realAddr.empty()) {
+        realAddr = macAddress;
+    }
+    return realAddr;
 }
 
 void BluetoothCallConnection::SetHfpContactName(const std::string &hfpPhoneNumber, const std::string &hfpContactName)
