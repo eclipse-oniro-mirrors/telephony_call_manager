@@ -1856,5 +1856,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallStatusManager_GetAntiFraudDetectType_01
         OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_SPEECH_SYNTHESIS |
         OHOS::AntiFraudService::ANTIFRAUD_DETECT_TYPE_XOIP_TRANSFER);
 }
+
+HWTEST_F(CallManagerGtest, Telephony_CallStatusManager_UpdateAntiFraudState_0300, TestSize.Level0)
 } // namespace Telephony
 } // namespace OHOS
