@@ -247,17 +247,13 @@ int32_t CallStatusCallback::SendUssdResult(const int32_t result)
 
 int32_t CallStatusCallback::SendMmiCodeResult(const MmiCodeInfo &info)
 {
-    auto callDialog = DelayedSingleton<CallDialog>::GetInstance();
-    if (callDialog == nullptr) {
-        TELEPHONY_LOGE("callDialog is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
     auto callAbilityReportProxy = DelayedSingleton<CallAbilityReportProxy>::GetInstance();
     if (callAbilityReportProxy == nullptr) {
         TELEPHONY_LOGE("callAbilityReportProxy is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (!callDialog->IsAbilityConnectDoneforMMI()) {
+    auto callDialog = DelayedSingleton<CallDialog>::GetInstance();
+    if (callDialog != nullptr && !callDialog->IsAbilityConnectDoneForMmi()) {
         callDialog->DialogProcessMMICodeExtension();
         callAbilityReportProxy->CacheMmiCodeInfo(info);
         return TELEPHONY_SUCCESS;
