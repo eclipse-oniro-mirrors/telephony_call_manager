@@ -31,7 +31,7 @@ namespace Telephony {
 constexpr int32_t DEFAULT_USER_ID = -1;
 const int32_t SCB_SYS_DIALOG_ZORDER_UNDER_LOCK = 1;
 const int32_t SOURCE_SCREENLOCKED = 2;
-std::atomic<bool> CallDialog::isAbilityConnectDoneforMMI_{false};
+std::atomic<bool> CallDialog::isAbilityConnectDoneForMmi_{false};
 
 bool CallDialog::DialogConnectExtension(const std::string &dialogReason)
 {
@@ -79,11 +79,11 @@ bool CallDialog::DialogConnectExtensionAbility(const AAFwk::Want &want, const st
 }
 
 bool CallDialog::CallSettingDialogConnectExtensionAbility(const AAFwk::Want &want,
-    const std::string commandStr, const std::function<void(bool status)> setAbilityConnectDoneCallback)
+    const std::string commandStr, const std::function<void(bool status)> abilityConnectDoneCallback)
 {
     TELEPHONY_LOGI("CallSettingDialogConnectExtensionAbility start");
     sptr<CallSettingAbilityConnection> callSettingConnection = sptr<CallSettingAbilityConnection> (new (std::nothrow)
-        CallSettingAbilityConnection(commandStr, setAbilityConnectDoneCallback));
+        CallSettingAbilityConnection(commandStr, abilityConnectDoneCallback));
     if (callSettingConnection == nullptr) {
         TELEPHONY_LOGE("connection is nullptr");
         return false;
@@ -259,22 +259,19 @@ void CallDialog::DialogProcessMMICodeExtension()
     std::string bundleName = "com.ohos.sceneboard";
     std::string abilityName = "com.ohos.sceneboard.systemdialog";
     want.SetElementName(bundleName, abilityName);
-    std::weak_ptr<CallDialog> weakPtr = shared_from_this();
-    std::function<void(bool)> setAbilityConnectDoneCallback = [weakPtr] (bool isAbilityConnectDoneforMMI) {
-        auto ptr = weakPtr.lock();
-        if (ptr != nullptr) {
-            ptr->isAbilityConnectDoneforMMI_ = isAbilityConnectDoneforMMI;
-        }
+    isAbilityConnectDoneForMmi_ = false;
+    std::function<void(bool)> abilityConnectDoneCallback = [](bool isAbilityConnectDoneForMmi) {
+        isAbilityConnectDoneForMmi_ = isAbilityConnectDoneForMmi;
     };
-    bool connectResult = CallSettingDialogConnectExtensionAbility(want, commandStr, setAbilityConnectDoneCallback);
+    bool connectResult = CallSettingDialogConnectExtensionAbility(want, commandStr, abilityConnectDoneCallback);
     if (!connectResult) {
         TELEPHONY_LOGE("CallSettingDialogConnectExtensionAbility failed!");
     }
 }
 
-bool CallDialog::IsAbilityConnectDoneforMMI()
+bool CallDialog::IsAbilityConnectDoneForMmi()
 {
-    return isAbilityConnectDoneforMMI_;
+    return isAbilityConnectDoneForMmi_;
 }
 
 std::string CallDialog::BuildProcessMMICodeCommand()
