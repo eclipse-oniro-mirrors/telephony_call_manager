@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace Telephony {
-class CallDialog : public std::enable_shared_from_this<CallDialog> {
+class CallDialog {
 public:
     bool DialogConnectExtension(const std::string &dialogReason);
     bool DialogConnectExtension(const std::string &dialogReason, int32_t slotId);
@@ -32,14 +32,14 @@ public:
     int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo);
     bool DialogConnectAnswerPrivacyModeExtension(const std::string &dialogReason,
         int32_t &callId, int32_t &videoState, bool isVideo);
-    bool IsAbilityConnectDoneforMMI();
+    bool IsAbilityConnectDoneForMmi();
     void DialogCallingPrivacyModeExtension(Rosen::FoldStatus foldStatus);
     void DialogProcessMMICodeExtension();
 
 private:
     bool DialogConnectExtensionAbility(const AAFwk::Want &want, const std::string commandStr);
     bool CallSettingDialogConnectExtensionAbility(const AAFwk::Want &want, const std::string commandStr,
-        const std::function<void(bool status)> setAbilityConnectDoneCallback = nullptr);
+        const std::function<void(bool status)> abilityConnectDoneCallback = nullptr);
     std::string BuildStartPrivacyModeCommand(const std::string &dialogReason, std::u16string &number,
 	    int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo);
     std::string BuildStartAnswerPrivacyModeCommand(const std::string &dialogReason,
@@ -48,7 +48,7 @@ private:
     std::string BuildCallingPrivacyModeCommand(int32_t &videoState);
     std::string BuildProcessMMICodeCommand();
 
-    static std::atomic<bool> isAbilityConnectDoneforMMI_;
+    static std::atomic<bool> isAbilityConnectDoneForMmi_;
 };
 } // namespace Telephony
 } // namespace OHOS
