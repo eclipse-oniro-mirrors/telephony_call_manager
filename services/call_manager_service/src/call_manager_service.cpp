@@ -366,7 +366,7 @@ int32_t CallManagerService::DialCallCore(std::u16string number, AppExecFwk::PacM
 int32_t CallManagerService::MakeDirectCall(std::string number)
 {
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_DIRECT_CALL)) {
-        TELEPHONY_LOGI("Permission denied!");
+        TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
 #ifdef SUPPORT_DSOFTBUS
@@ -375,6 +375,13 @@ int32_t CallManagerService::MakeDirectCall(std::string number)
         return TELEPHONY_ERR_FAIL;
     }
 #endif
+    std::string newPhoneNum =
+        DelayedSingleton<CallNumberUtils>::GetInstance()->RemoveSeparatorsPhoneNumber(number);
+    bool isMMiCode = DelayedSingleton<CellularCallConnection>::GetInstance()->IsMmiCode(0, newPhoneNum);
+    if (isMMiCode) {
+        TELEPHONY_LOGE("Mmi code not support");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     int32_t ret = PrivacyKit::AddPermissionUsedRecord(callerToken, OHOS_PERMISSION_DIRECT_CALL, 1, 0);
     if (ret != 0) {
