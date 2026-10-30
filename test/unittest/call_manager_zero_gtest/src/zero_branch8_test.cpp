@@ -1130,7 +1130,7 @@ HWTEST_F(ZeroBranch7Test, CallSettingAbilityConnection_OnAbilityDisconnectDone_W
  */
 HWTEST_F(ZeroBranch7Test, CallDialog_DialogProcessMMICodeExtension_ConnectDoneCallback_001, TestSize.Level0)
 {
-    CallDialog::isAbilityConnectDoneforMMI_ = false;
+    CallDialog::isAbilityConnectDoneForMmi_ = false;
     auto &client = AAFwk::ExtensionManagerClient::GetInstance();
     client.Reset();
     client.SetConnectResult(0);
@@ -1158,7 +1158,7 @@ HWTEST_F(ZeroBranch7Test, CallDialog_DialogProcessMMICodeExtension_ConnectDoneCa
  */
 HWTEST_F(ZeroBranch7Test, CallDialog_DialogProcessMMICodeExtension_ExpiredWeakPtr_001, TestSize.Level0)
 {
-    CallDialog::isAbilityConnectDoneforMMI_ = false;
+    CallDialog::isAbilityConnectDoneForMmi_ = false;
     auto &client = AAFwk::ExtensionManagerClient::GetInstance();
     client.Reset();
     client.SetConnectResult(0);
@@ -1174,7 +1174,7 @@ HWTEST_F(ZeroBranch7Test, CallDialog_DialogProcessMMICodeExtension_ExpiredWeakPt
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject();
     connection->OnAbilityConnectDone(element, remoteObject, 0);
-    EXPECT_FALSE(CallDialog::isAbilityConnectDoneforMMI_);
+    EXPECT_FALSE(CallDialog::isAbilityConnectDoneForMmi_);
     client.Reset();
 }
 
@@ -1185,12 +1185,12 @@ HWTEST_F(ZeroBranch7Test, CallDialog_DialogProcessMMICodeExtension_ExpiredWeakPt
  */
 HWTEST_F(ZeroBranch7Test, CallStatusCallback_SendMmiCodeResult_Cache_001, TestSize.Level0)
 {
-    CallDialog::isAbilityConnectDoneforMMI_ = false;
+    CallDialog::isAbilityConnectDoneForMmi_ = false;
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     ASSERT_NE(callStatusCallback, nullptr);
     MmiCodeInfo mmiCodeInfo;
     EXPECT_EQ(callStatusCallback->SendMmiCodeResult(mmiCodeInfo), TELEPHONY_SUCCESS);
-    CallDialog::isAbilityConnectDoneforMMI_ = false;
+    CallDialog::isAbilityConnectDoneForMmi_ = false;
 }
 
 /**
@@ -1200,12 +1200,12 @@ HWTEST_F(ZeroBranch7Test, CallStatusCallback_SendMmiCodeResult_Cache_001, TestSi
  */
 HWTEST_F(ZeroBranch7Test, CallStatusCallback_SendMmiCodeResult_Report_001, TestSize.Level0)
 {
-    CallDialog::isAbilityConnectDoneforMMI_ = true;
+    CallDialog::isAbilityConnectDoneForMmi_ = true;
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     ASSERT_NE(callStatusCallback, nullptr);
     MmiCodeInfo mmiCodeInfo;
     EXPECT_EQ(callStatusCallback->SendMmiCodeResult(mmiCodeInfo), TELEPHONY_SUCCESS);
-    CallDialog::isAbilityConnectDoneforMMI_ = false;
+    CallDialog::isAbilityConnectDoneForMmi_ = false;
 }
 } // namespace Telephony
 } // namespace OHOS
