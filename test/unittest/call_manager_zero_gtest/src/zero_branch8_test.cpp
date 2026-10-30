@@ -1145,9 +1145,9 @@ HWTEST_F(ZeroBranch7Test, CallDialog_DialogProcessMMICodeExtension_ConnectDoneCa
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = new MockRemoteObject();
     connection->OnAbilityConnectDone(element, remoteObject, 0);
-    EXPECT_TRUE(callDialog->IsAbilityConnectDoneforMMI());
+    EXPECT_TRUE(callDialog->IsAbilityConnectDoneForMmi());
     connection->OnAbilityDisconnectDone(element, 0);
-    EXPECT_FALSE(callDialog->IsAbilityConnectDoneforMMI());
+    EXPECT_FALSE(callDialog->IsAbilityConnectDoneForMmi());
     client.Reset();
 }
 
