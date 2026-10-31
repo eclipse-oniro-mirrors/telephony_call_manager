@@ -16,6 +16,7 @@
 #ifndef TELEPHONY_AUDIO_DEVICE_MANAGER_H
 #define TELEPHONY_AUDIO_DEVICE_MANAGER_H
 
+#include <atomic>
 #include <map>
 
 #include "audio_base.h"
@@ -118,7 +119,7 @@ private:
 #endif
     ffrt::mutex mutex_;
     ffrt::mutex infoMutex_;
-    AudioDeviceType audioDeviceType_;
+    std::atomic<AudioDeviceType> audioDeviceType_{AudioDeviceType::DEVICE_UNKNOWN};
     static bool isBtScoDevEnable_;
     static bool isDCallDevEnable_;
     bool isWiredHeadsetDevEnable_ = false;
@@ -131,7 +132,7 @@ private:
     static bool isWiredHeadsetConnected_;
     static bool isBtScoConnected_;
     static bool isDCallDevConnected_;
-    bool isAudioActivated_;
+    std::atomic<bool> isAudioActivated_{false};
     AudioDeviceInfo info_;
     CallAudioMode callAudioMode_;
     ffrt::mutex audioModeMutex_;
