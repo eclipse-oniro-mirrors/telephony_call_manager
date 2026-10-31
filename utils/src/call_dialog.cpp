@@ -31,7 +31,6 @@ namespace Telephony {
 constexpr int32_t DEFAULT_USER_ID = -1;
 const int32_t SCB_SYS_DIALOG_ZORDER_UNDER_LOCK = 1;
 const int32_t SOURCE_SCREENLOCKED = 2;
-std::atomic<bool> CallDialog::isAbilityConnectDoneForMmi_{false};
 
 bool CallDialog::DialogConnectExtension(const std::string &dialogReason)
 {
@@ -259,9 +258,13 @@ void CallDialog::DialogProcessMMICodeExtension()
     std::string bundleName = "com.ohos.sceneboard";
     std::string abilityName = "com.ohos.sceneboard.systemdialog";
     want.SetElementName(bundleName, abilityName);
-    isAbilityConnectDoneForMmi_ = false;
-    std::function<void(bool)> abilityConnectDoneCallback = [](bool isAbilityConnectDoneForMmi) {
-        isAbilityConnectDoneForMmi_ = isAbilityConnectDoneForMmi;
+    isAbilityConnectDoneForMmi_.store(false);
+    std::weak_ptr<CallDialog> weakPtr = weak_from_this();
+    std::function<void(bool)> abilityConnectDoneCallback = [weakPtr](bool isAbilityConnectDoneForMmi) {
+        auto dialogSharedPtr = weakPtr.lock();
+        if (dialogSharedPtr != nullptr) {
+            dialogSharedPtr->isAbilityConnectDoneForMmi_.store(isAbilityConnectDoneForMmi);
+        }
     };
     bool connectResult = CallSettingDialogConnectExtensionAbility(want, commandStr, abilityConnectDoneCallback);
     if (!connectResult) {
@@ -271,7 +274,7 @@ void CallDialog::DialogProcessMMICodeExtension()
 
 bool CallDialog::IsAbilityConnectDoneForMmi()
 {
-    return isAbilityConnectDoneForMmi_;
+    return isAbilityConnectDoneForMmi_.load();
 }
 
 std::string CallDialog::BuildProcessMMICodeCommand()
