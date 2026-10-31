@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace Telephony {
-class CallDialog {
+class CallDialog : public std::enable_shared_from_this<CallDialog> {
 public:
     bool DialogConnectExtension(const std::string &dialogReason);
     bool DialogConnectExtension(const std::string &dialogReason, int32_t slotId);
@@ -48,7 +48,7 @@ private:
     std::string BuildCallingPrivacyModeCommand(int32_t &videoState);
     std::string BuildProcessMMICodeCommand();
 
-    static std::atomic<bool> isAbilityConnectDoneForMmi_;
+    std::atomic<bool> isAbilityConnectDoneForMmi_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
