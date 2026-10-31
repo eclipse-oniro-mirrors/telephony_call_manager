@@ -151,7 +151,7 @@ void AudioDeviceManager::UpdateNearlinkDeviceName(const std::string &macAddress,
 bool AudioDeviceManager::UpdateDeviceName(const std::string &macAddress, const std::string &deviceName,
     AudioDeviceType deviceType)
 {
-    std::lock_guard<ffrt::mutex> lock(infoMutex_);
+    std::unique_lock<ffrt::mutex> lock(infoMutex_);
     for (auto &device : info_.audioDeviceList) {
         if (device.address == macAddress && (device.deviceType == deviceType)) {
             if (deviceName.length() > kMaxDeviceNameLen) {
@@ -167,6 +167,7 @@ bool AudioDeviceManager::UpdateDeviceName(const std::string &macAddress, const s
                 return false;
             }
             TELEPHONY_LOGI("UpdateDeviceName for type %d", static_cast<int>(deviceType));
+            lock.unlock();
             ReportAudioDeviceInfo();
             return true;
         }
@@ -197,7 +198,7 @@ bool AudioDeviceManager::IsBluetoothHeadsetConnect()
 void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType,
     const std::string &deviceName)
 {
-    std::lock_guard<ffrt::mutex> lock(infoMutex_);
+    std::unique_lock<ffrt::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
         if (it->address == address && it->deviceType == deviceType) {
@@ -243,13 +244,14 @@ void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDev
     if (IsDistributedAudioDeviceType(deviceType)) {
         SetDeviceAvailable(deviceType, true);
     }
+    lock.unlock();
     ReportAudioDeviceInfo();
     TELEPHONY_LOGI("AddAudioDeviceList success, deviceType=%{public}d", deviceType);
 }
 
 void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType)
 {
-    std::lock_guard<ffrt::mutex> lock(infoMutex_);
+    std::unique_lock<ffrt::mutex> lock(infoMutex_);
     bool needAddEarpiece = true;
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
@@ -290,6 +292,7 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
         liveCall->GetCallType() == CallType::TYPE_SATELLITE)) {
         DelayedSingleton<AudioControlManager>::GetInstance()->UpdateDeviceType();
     }
+    lock.unlock();
     ReportAudioDeviceInfo();
     TELEPHONY_LOGI("RemoveAudioDeviceList success");
 }
@@ -360,10 +363,11 @@ void AudioDeviceManager::ResetNearlinkAudioDevicesList()
             ++it;
         }
     }
+    lock.unlock();
     if (hadNearlinkActived) {
         ReportAudioDeviceInfo();
     }
-    lock.unlock();
+
     if (audioDeviceType_ == AudioDeviceType::DEVICE_NEARLINK) {
         TELEPHONY_LOGI("Nearlink SA removed, init audio device");
         ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
@@ -384,10 +388,11 @@ void AudioDeviceManager::ResetBtHearingAidDeviceList()
             ++it;
         }
     }
+    lock.unlock();
     if (hadBtHearingAidActived) {
         ReportAudioDeviceInfo();
     }
-    lock.unlock();
+
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_HEARING_AID) {
         TELEPHONY_LOGI("Bluetooth SA removed, init audio device");
         ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
@@ -757,6 +762,7 @@ int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
         TELEPHONY_LOGE("call is nullptr.");
         return TELEPHONY_ERR_ARGUMENT_NULL;
     }
+    std::lock_guard<ffrt::mutex> lock(infoMutex_);
     info_.callId = call->GetCallID();
     CallType currentCallType = call->GetCallType();
     if (currentCallType == CallType::TYPE_VOIP || currentCallType == CallType::TYPE_BLUETOOTH) {
