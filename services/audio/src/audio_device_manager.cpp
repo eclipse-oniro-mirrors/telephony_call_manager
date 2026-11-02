@@ -287,12 +287,12 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
     if (needAddEarpiece && deviceType == AudioDeviceType::DEVICE_WIRED_HEADSET && !wiredHeadsetExist) {
         AddEarpiece();
     }
+    lock.unlock();
     sptr<CallBase> liveCall = CallObjectManager::GetAudioLiveCall();
     if (liveCall != nullptr && (liveCall->GetVideoStateType() == VideoStateType::TYPE_VIDEO ||
         liveCall->GetCallType() == CallType::TYPE_SATELLITE)) {
         DelayedSingleton<AudioControlManager>::GetInstance()->UpdateDeviceType();
     }
-    lock.unlock();
     ReportAudioDeviceInfo();
     TELEPHONY_LOGI("RemoveAudioDeviceList success");
 }
@@ -313,7 +313,7 @@ void AudioDeviceManager::AddEarpiece()
 
 void AudioDeviceManager::ResetBtAudioDevicesList()
 {
-    std::lock_guard<ffrt::mutex> lock(infoMutex_);
+    std::unique_lock<ffrt::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     bool hadBtActived = false;
     while (it != info_.audioDeviceList.end()) {
@@ -326,6 +326,7 @@ void AudioDeviceManager::ResetBtAudioDevicesList()
     }
     SetDeviceAvailable(AudioDeviceType::DEVICE_BLUETOOTH_SCO, false);
     if (hadBtActived) {
+        lock.unlock();
         ReportAudioDeviceInfo();
     }
     TELEPHONY_LOGI("ResetBtAudioDevicesList success");
@@ -630,6 +631,7 @@ void AudioDeviceManager::OnActivedCallDisconnected()
 
 int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
 {
+    std::unique_lock<ffrt::mutex> lock(infoMutex_);
     if (audioDeviceType_ == AudioDeviceType::DEVICE_UNKNOWN) {
         audioDeviceType_ = DelayedSingleton<AudioControlManager>::GetInstance()->GetInitAudioDeviceType();
     }
@@ -654,7 +656,12 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
         UpdateBtHearingAidDevice(address, deviceName);
     }
 #endif
-    return CopyDeviceData(address, deviceName);
+    int32_t ret = CopyDeviceData(address, deviceName);
+    lock.unlock();
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    }
+    return ReportAudioDeviceInfo();
 }
 
 int32_t AudioDeviceManager::CopyDeviceData(const std::string &address, const std::string &deviceName)
@@ -684,7 +691,7 @@ int32_t AudioDeviceManager::CopyDeviceData(const std::string &address, const std
         TELEPHONY_LOGE("memcpy_s deviceName fail");
         return TELEPHONY_ERR_MEMCPY_FAIL;
     }
-    return ReportAudioDeviceInfo();
+    return TELEPHONY_SUCCESS;
 }
 
 void AudioDeviceManager::UpdateBtDevice(std::string &address, std::string &deviceName)
