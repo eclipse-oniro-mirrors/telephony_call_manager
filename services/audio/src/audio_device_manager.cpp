@@ -195,7 +195,7 @@ bool AudioDeviceManager::IsBluetoothHeadsetConnect()
 }
 #endif
 
-bool AudioDeviceManager::CreateAudioDevice(const std::string &address, AudioDeviceType deviceType,
+bool AudioDeviceManager::BuildAudioDevice(const std::string &address, AudioDeviceType deviceType,
     const std::string &deviceName, AudioDevice &audioDevice)
 {
     if (memset_s(&audioDevice, sizeof(AudioDevice), 0, sizeof(AudioDevice)) != EOK) {
@@ -240,7 +240,7 @@ void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDev
         }
     }
     AudioDevice audioDevice;
-    if (!CreateAudioDevice(address, deviceType, deviceName, audioDevice)) {
+    if (!BuildAudioDevice(address, deviceType, deviceName, audioDevice)) {
         return;
     }
     info_.audioDeviceList.push_back(audioDevice);
@@ -667,10 +667,10 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
         UpdateBtHearingAidDevice(address, deviceName);
     }
 #endif
-    return CopyDeviceData(address, deviceName);
+    return SyncAudioDeviceInfo(address, deviceName);
 }
 
-int32_t AudioDeviceManager::CopyDeviceData(const std::string &address, const std::string &deviceName)
+int32_t AudioDeviceManager::SyncAudioDeviceInfo(const std::string &address, const std::string &deviceName)
 {
     if (address.length() > kMaxAddressLen) {
         TELEPHONY_LOGE("address is not too long");
