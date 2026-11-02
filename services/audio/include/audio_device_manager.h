@@ -63,7 +63,7 @@ public:
     void ResetBtHearingAidDeviceList();
 #endif
     int32_t ReportAudioDeviceChange(const AudioDevice &device);
-    int32_t CopyDeviceData(const std::string &address, const std::string &deviceName);
+    int32_t SyncAudioDeviceInfo(const std::string &address, const std::string &deviceName);
     bool CheckAndSwitchDistributedAudioDevice();
     int32_t ReportAudioDeviceInfo();
     int32_t ReportAudioDeviceInfo(sptr<CallBase> call);
@@ -110,7 +110,7 @@ private:
 #ifdef SUPPORT_HEARING_AID
     void UpdateBtHearingAidDevice(std::string &address, std::string &deviceName);
 #endif
-    bool CreateAudioDevice(const std::string &address, AudioDeviceType deviceType,
+    bool BuildAudioDevice(const std::string &address, AudioDeviceType deviceType,
         const std::string &deviceName, AudioDevice &audioDevice);
     bool UpdateDeviceName(const std::string &macAddress, const std::string &deviceName, AudioDeviceType deviceType);
     void UpdateDeviceTypeForBtCall(sptr<CallBase> call, std::vector<AudioDevice> &transferCallIgnoreDeviceList);
