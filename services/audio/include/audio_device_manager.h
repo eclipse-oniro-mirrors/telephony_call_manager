@@ -110,6 +110,8 @@ private:
 #ifdef SUPPORT_HEARING_AID
     void UpdateBtHearingAidDevice(std::string &address, std::string &deviceName);
 #endif
+    bool CreateAudioDevice(const std::string &address, AudioDeviceType deviceType,
+        const std::string &deviceName, AudioDevice &audioDevice);
     bool UpdateDeviceName(const std::string &macAddress, const std::string &deviceName, AudioDeviceType deviceType);
     void UpdateDeviceTypeForBtCall(sptr<CallBase> call, std::vector<AudioDevice> &transferCallIgnoreDeviceList);
 
