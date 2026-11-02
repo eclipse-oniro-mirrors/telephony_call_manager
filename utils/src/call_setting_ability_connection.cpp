@@ -31,6 +31,9 @@ void CallSettingAbilityConnection::OnAbilityConnectDone(const AppExecFwk::Elemen
         TELEPHONY_LOGE("remote object is nullptr");
         return;
     }
+    if (abilityConnectDoneCallback_ != nullptr) {
+        abilityConnectDoneCallback_(true);
+    }
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -49,9 +52,8 @@ void CallSettingAbilityConnection::OnAbilityConnectDone(const AppExecFwk::Elemen
 void CallSettingAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element,
     int32_t resultCode)
 {
-    auto callAbilityReportProxy = DelayedSingleton<CallAbilityReportProxy>::GetInstance();
-    if (callAbilityReportProxy != nullptr) {
-        callAbilityReportProxy->SetRegMmiCodeCallbackState(false);
+    if (abilityConnectDoneCallback_ != nullptr) {
+        abilityConnectDoneCallback_(false);
     }
     TELEPHONY_LOGI("OnAbilityDisconnectDone, resultCode = %{public}d", resultCode);
 }

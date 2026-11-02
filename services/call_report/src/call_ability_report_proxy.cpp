@@ -307,7 +307,6 @@ void CallAbilityReportProxy::SetRegMmiCodeCallbackState(bool isReg)
 {
     std::unique_lock<ffrt::mutex> lock(mutex_);
     if (isReg) {
-        isMmiCodeCallbackRegistered_ = true;
         if (cacheInfo_ != nullptr) {
             auto info = std::move(*cacheInfo_);
             cacheInfo_ = nullptr;
@@ -315,15 +314,8 @@ void CallAbilityReportProxy::SetRegMmiCodeCallbackState(bool isReg)
             ReportMmiCodeResult(info);
         }
     } else {
-        isMmiCodeCallbackRegistered_ = false;
         cacheInfo_ = nullptr;
     }
-}
- 
-bool CallAbilityReportProxy::IsMmiCodeCallbackRegistered()
-{
-    std::unique_lock<ffrt::mutex> lock(mutex_);
-    return isMmiCodeCallbackRegistered_;
 }
 
 int32_t CallAbilityReportProxy::ReportMmiCodeResult(const MmiCodeInfo &info)

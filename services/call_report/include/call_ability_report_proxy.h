@@ -55,7 +55,6 @@ public:
     int32_t ReportPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
     void CacheMmiCodeInfo(const MmiCodeInfo &info);
     void SetRegMmiCodeCallbackState(bool isReg);
-    bool IsMmiCodeCallbackRegistered();
 #ifdef SUPPORT_RTT_CALL
     int32_t ReportRttCallEvtChanged(const RttEvent &info);
     int32_t ReportRttCallError(const RttError &info);
@@ -72,7 +71,6 @@ private:
     sptr<ApplicationStateObserver> appStateObserver;
     sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
     ffrt::mutex mutex_;
-    bool isMmiCodeCallbackRegistered_ = false;
     std::shared_ptr<MmiCodeInfo> cacheInfo_ = nullptr;
 };
 } // namespace Telephony

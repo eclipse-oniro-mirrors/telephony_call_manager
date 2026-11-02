@@ -78,11 +78,11 @@ bool CallDialog::DialogConnectExtensionAbility(const AAFwk::Want &want, const st
 }
 
 bool CallDialog::CallSettingDialogConnectExtensionAbility(const AAFwk::Want &want,
-    const std::string commandStr)
+    const std::string commandStr, const std::function<void(bool status)> abilityConnectDoneCallback)
 {
     TELEPHONY_LOGI("CallSettingDialogConnectExtensionAbility start");
     sptr<CallSettingAbilityConnection> callSettingConnection = sptr<CallSettingAbilityConnection> (new (std::nothrow)
-        CallSettingAbilityConnection(commandStr));
+        CallSettingAbilityConnection(commandStr, abilityConnectDoneCallback));
     if (callSettingConnection == nullptr) {
         TELEPHONY_LOGE("connection is nullptr");
         return false;
@@ -258,10 +258,23 @@ void CallDialog::DialogProcessMMICodeExtension()
     std::string bundleName = "com.ohos.sceneboard";
     std::string abilityName = "com.ohos.sceneboard.systemdialog";
     want.SetElementName(bundleName, abilityName);
-    bool connectResult = CallSettingDialogConnectExtensionAbility(want, commandStr);
+    isAbilityConnectDoneForMmi_.store(false);
+    std::weak_ptr<CallDialog> weakPtr = weak_from_this();
+    std::function<void(bool)> abilityConnectDoneCallback = [weakPtr](bool isAbilityConnectDoneForMmi) {
+        auto dialogSharedPtr = weakPtr.lock();
+        if (dialogSharedPtr != nullptr) {
+            dialogSharedPtr->isAbilityConnectDoneForMmi_.store(isAbilityConnectDoneForMmi);
+        }
+    };
+    bool connectResult = CallSettingDialogConnectExtensionAbility(want, commandStr, abilityConnectDoneCallback);
     if (!connectResult) {
         TELEPHONY_LOGE("CallSettingDialogConnectExtensionAbility failed!");
     }
+}
+
+bool CallDialog::IsAbilityConnectDoneForMmi()
+{
+    return isAbilityConnectDoneForMmi_.load();
 }
 
 std::string CallDialog::BuildProcessMMICodeCommand()
