@@ -16,6 +16,7 @@
 #ifndef TELEPHONY_AUDIO_DEVICE_MANAGER_H
 #define TELEPHONY_AUDIO_DEVICE_MANAGER_H
 
+#include <atomic>
 #include <map>
 
 #include "audio_base.h"
@@ -62,7 +63,7 @@ public:
     void ResetBtHearingAidDeviceList();
 #endif
     int32_t ReportAudioDeviceChange(const AudioDevice &device);
-    int32_t CopyDeviceData(const std::string &address, const std::string &deviceName);
+    int32_t SyncAudioDeviceInfo(const std::string &address, const std::string &deviceName);
     bool CheckAndSwitchDistributedAudioDevice();
     int32_t ReportAudioDeviceInfo();
     int32_t ReportAudioDeviceInfo(sptr<CallBase> call);
@@ -109,6 +110,8 @@ private:
 #ifdef SUPPORT_HEARING_AID
     void UpdateBtHearingAidDevice(std::string &address, std::string &deviceName);
 #endif
+    bool BuildAudioDevice(const std::string &address, AudioDeviceType deviceType,
+        const std::string &deviceName, AudioDevice &audioDevice);
     bool UpdateDeviceName(const std::string &macAddress, const std::string &deviceName, AudioDeviceType deviceType);
     void UpdateDeviceTypeForBtCall(sptr<CallBase> call, std::vector<AudioDevice> &transferCallIgnoreDeviceList);
 
@@ -118,7 +121,7 @@ private:
 #endif
     ffrt::mutex mutex_;
     ffrt::mutex infoMutex_;
-    AudioDeviceType audioDeviceType_;
+    std::atomic<AudioDeviceType> audioDeviceType_{AudioDeviceType::DEVICE_UNKNOWN};
     static bool isBtScoDevEnable_;
     static bool isDCallDevEnable_;
     bool isWiredHeadsetDevEnable_ = false;
@@ -131,7 +134,7 @@ private:
     static bool isWiredHeadsetConnected_;
     static bool isBtScoConnected_;
     static bool isDCallDevConnected_;
-    bool isAudioActivated_;
+    std::atomic<bool> isAudioActivated_{false};
     AudioDeviceInfo info_;
     CallAudioMode callAudioMode_;
     ffrt::mutex audioModeMutex_;
