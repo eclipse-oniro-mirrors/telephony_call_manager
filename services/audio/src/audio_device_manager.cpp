@@ -195,6 +195,33 @@ bool AudioDeviceManager::IsBluetoothHeadsetConnect()
 }
 #endif
 
+bool AudioDeviceManager::CreateAudioDevice(const std::string &address, AudioDeviceType deviceType,
+    const std::string &deviceName, AudioDevice &audioDevice)
+{
+    if (memset_s(&audioDevice, sizeof(AudioDevice), 0, sizeof(AudioDevice)) != EOK) {
+        TELEPHONY_LOGE("memset_s fail");
+        return false;
+    }
+    audioDevice.deviceType = deviceType;
+    if (address.length() > kMaxAddressLen) {
+        TELEPHONY_LOGE("address is too long");
+        return false;
+    }
+    if (memcpy_s(audioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s address fail");
+        return false;
+    }
+    if (deviceName.length() > kMaxDeviceNameLen) {
+        TELEPHONY_LOGE("deviceName is too long");
+        return false;
+    }
+    if (memcpy_s(audioDevice.deviceName, kMaxDeviceNameLen, deviceName.c_str(), deviceName.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s deviceName fail");
+        return false;
+    }
+    return true;
+}
+
 void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType,
     const std::string &deviceName)
 {
@@ -213,25 +240,7 @@ void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDev
         }
     }
     AudioDevice audioDevice;
-    if (memset_s(&audioDevice, sizeof(AudioDevice), 0, sizeof(AudioDevice)) != EOK) {
-        TELEPHONY_LOGE("memset_s fail");
-        return;
-    }
-    audioDevice.deviceType = deviceType;
-    if (address.length() > kMaxAddressLen) {
-        TELEPHONY_LOGE("address is too long");
-        return;
-    }
-    if (memcpy_s(audioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
-        TELEPHONY_LOGE("memcpy_s address fail");
-        return;
-    }
-    if (deviceName.length() > kMaxDeviceNameLen) {
-        TELEPHONY_LOGE("deviceName is too long");
-        return;
-    }
-    if (memcpy_s(audioDevice.deviceName, kMaxDeviceNameLen, deviceName.c_str(), deviceName.length()) != EOK) {
-        TELEPHONY_LOGE("memcpy_s deviceName fail");
+    if (!CreateAudioDevice(address, deviceType, deviceName, audioDevice)) {
         return;
     }
     info_.audioDeviceList.push_back(audioDevice);
