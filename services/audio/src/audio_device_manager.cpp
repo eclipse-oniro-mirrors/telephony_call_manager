@@ -640,11 +640,13 @@ void AudioDeviceManager::OnActivedCallDisconnected()
 
 int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
 {
-    std::unique_lock<ffrt::mutex> lock(infoMutex_);
     if (audioDeviceType_ == AudioDeviceType::DEVICE_UNKNOWN) {
         audioDeviceType_ = DelayedSingleton<AudioControlManager>::GetInstance()->GetInitAudioDeviceType();
     }
-    info_.currentAudioDevice.deviceType = audioDeviceType_;
+    {
+        std::lock_guard<ffrt::mutex> lock(infoMutex_);
+        info_.currentAudioDevice.deviceType = audioDeviceType_;
+    }
     std::string address = device.address;
     std::string deviceName = device.deviceName;
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
@@ -665,12 +667,7 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
         UpdateBtHearingAidDevice(address, deviceName);
     }
 #endif
-    int32_t ret = CopyDeviceData(address, deviceName);
-    lock.unlock();
-    if (ret != TELEPHONY_SUCCESS) {
-        return ret;
-    }
-    return ReportAudioDeviceInfo();
+    return CopyDeviceData(address, deviceName);
 }
 
 int32_t AudioDeviceManager::CopyDeviceData(const std::string &address, const std::string &deviceName)
@@ -679,6 +676,7 @@ int32_t AudioDeviceManager::CopyDeviceData(const std::string &address, const std
         TELEPHONY_LOGE("address is not too long");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
+    std::unique_lock<ffrt::mutex> lock(infoMutex_);
     if (memset_s(info_.currentAudioDevice.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK) {
         TELEPHONY_LOGE("failed to memset_s currentAudioDevice.address");
         return TELEPHONY_ERR_MEMSET_FAIL;
@@ -700,7 +698,8 @@ int32_t AudioDeviceManager::CopyDeviceData(const std::string &address, const std
         TELEPHONY_LOGE("memcpy_s deviceName fail");
         return TELEPHONY_ERR_MEMCPY_FAIL;
     }
-    return TELEPHONY_SUCCESS;
+    lock.unlock();
+    return ReportAudioDeviceInfo();
 }
 
 void AudioDeviceManager::UpdateBtDevice(std::string &address, std::string &deviceName)
