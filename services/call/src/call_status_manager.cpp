@@ -1261,7 +1261,7 @@ void CallStatusManager::UpdateAntiFraudState(sptr<CallBase> &call, int32_t antiF
         } else if (antiFraudResultExt.isXoipFraud) {
             antiFraudMarkDetail = std::string(ANTIFRAUD_MARK_XOIP_TRANSFER);
         } else if (antiFraudResultExt.isSpeechSynthesisFraud) {
-            antiFraudMarkDetail = std::string(ANTIFRAUD_MARK_XOIP_TRANSFER);
+            antiFraudMarkDetail = std::string(ANTIFRAUD_MARK_SPEECH_SYNTHESIS);
         }
     }
     call->SetExtraParams(extraParams);
