@@ -78,6 +78,9 @@ const std::string ADVSECMODE_STATE = "ohos.boot.advsecmode.state";
 const std::string ANTIFRAUD_FEATURE = "const.telephony.antifraud.supported";
 const std::string PRIMARY_CONTACT = "primary_contact";
 constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
+constexpr const char *ANTIFRAUD_MARK_VOICE_SEMANTIC = "antifraud_mark_voice_semantic";
+constexpr const char *ANTIFRAUD_MARK_XOIP_TRANSFER = "antifraud_mark_xoip_transfer";
+constexpr const char *ANTIFRAUD_MARK_SPEECH_SYNTHESIS = "antifraud_mark_speech_synthesis";
 std::atomic<int32_t> CallStatusManager::deviceProvisioned_ = DEVICE_PROVISION_UNDEF;
 std::atomic<int32_t> CallStatusManager::userSetupComplete_ = DEVICE_PROVISION_UNDEF;
 
@@ -1240,6 +1243,7 @@ void CallStatusManager::UpdateAntiFraudState(sptr<CallBase> &call, int32_t antiF
     AAFwk::WantParams extraParams = call->GetExtraParams();
     extraParams.SetParam("antiFraudState", AAFwk::Integer::Box(antiFraudState));
     TELEPHONY_LOGI("Report AntiFraudState: %{public}d", antiFraudState);
+    std::string antiFraudMarkDetail;
     if (antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK)) {
         extraParams.SetParam("antiFraudResultVoiceText", AAFwk::Integer::Box(
             int(antiFraudResultExt.isVoiceSemanticFraud)));
@@ -1252,8 +1256,23 @@ void CallStatusManager::UpdateAntiFraudState(sptr<CallBase> &call, int32_t antiF
             "Xoip: %{public}d. Report Confidence of Voice Synthesis Result: %{public}d",
             antiFraudResultExt.isVoiceSemanticFraud, antiFraudResultExt.isSpeechSynthesisFraud,
             antiFraudResultExt.isXoipFraud, speechSynthesisPercentProb);
+        if (antiFraudResultExt.isVoiceSemanticFraud) {
+            antiFraudMarkDetail = std::string(ANTIFRAUD_MARK_VOICE_SEMANTIC);
+        } else if (antiFraudResultExt.isXoipFraud) {
+            antiFraudMarkDetail = std::string(ANTIFRAUD_MARK_XOIP_TRANSFER);
+        } else if (antiFraudResultExt.isSpeechSynthesisFraud) {
+            antiFraudMarkDetail = std::string(ANTIFRAUD_MARK_SPEECH_SYNTHESIS);
+        }
     }
     call->SetExtraParams(extraParams);
+    NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
+    if (!antiFraudMarkDetail.empty() && numberMarkInfo.markDetails[0] == '\0') {
+        if (strcpy_s(numberMarkInfo.markDetails, sizeof(numberMarkInfo.markDetails),
+            antiFraudMarkDetail.c_str()) == EOK) {
+            TELEPHONY_LOGI("SetAntiFraudMarkDetail %{public}s succ", antiFraudMarkDetail.c_str());
+            call->SetNumberMarkInfo(numberMarkInfo);
+        }
+    }
 }
 
 bool CallStatusManager::IsContactPhoneNum(const std::string &phoneNum)
