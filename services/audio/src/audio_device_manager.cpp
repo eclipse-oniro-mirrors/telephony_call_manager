@@ -811,8 +811,11 @@ int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
 void AudioDeviceManager::UpdateDeviceTypeForBtCall(sptr<CallBase> call,
     std::vector<AudioDevice> &transferCallIgnoreDeviceList)
 {
+    /* for WearableDevice, VoIP call path is bluetooth --> sceneboard --> CallServiceKit --> CallManager,
+    so audio device need changed by BT-SCO connect status */
     CallType currentCallType = call->GetCallType();
-    if (currentCallType != CallType::TYPE_BLUETOOTH) {
+    if ((currentCallType != CallType::TYPE_BLUETOOTH) &&
+        !(currentCallType == CallType::TYPE_VOIP && CallManagerUtils::IsWearableDevice())) {
         return;
     }
 
@@ -826,7 +829,8 @@ void AudioDeviceManager::UpdateDeviceTypeForBtCall(sptr<CallBase> call,
     TelCallState currentTelCallState = call->GetTelCallState();
     if (currentTelCallState != TelCallState::CALL_STATUS_ACTIVE &&
         currentTelCallState != TelCallState::CALL_STATUS_DIALING &&
-        currentTelCallState != TelCallState::CALL_STATUS_ALERTING) {
+        currentTelCallState != TelCallState::CALL_STATUS_ALERTING &&
+        currentTelCallState != TelCallState::CALL_STATUS_INCOMING) {
         return;
     }
 
