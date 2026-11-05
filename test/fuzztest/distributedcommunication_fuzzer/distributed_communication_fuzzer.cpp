@@ -15,6 +15,7 @@
 
 #include "distributed_communication_fuzzer.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include "addcalltoken_fuzzer.h"
@@ -31,8 +32,9 @@ void TestCommonController(const std::shared_ptr<DistributedDataController> &cont
     int32_t intValue = provider.ConsumeIntegral<int32_t>();
     AudioDeviceType audioDevType = static_cast<AudioDeviceType>(
         provider.ConsumeIntegral<int32_t>() % static_cast<uint32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_PC));
-    const char *charValue = provider.ConsumeRandomLengthString().c_str();
-    uint32_t uintValue = provider.ConsumeIntegral<uint32_t>();
+    std::string charStringValue = provider.ConsumeRandomLengthString().c_str();
+    const char *charValue = charStringValue.c_str();
+    uint32_t uintValue = std::min(provider.ConsumeIntegral<uint32_t>(), static_cast<uint32_t>(charStringValue.size()));
     DialParaInfo dialParaInfo;
     sptr<OHOS::Telephony::CallBase> call = new IMSCall(dialParaInfo);
     DistributedDataType distributedDataType = static_cast<DistributedDataType>(
