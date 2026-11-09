@@ -1339,6 +1339,11 @@ int32_t CallManagerServiceProxy::GetVoIPCallInfo(int32_t &callId, int32_t &state
     return replyParcel.ReadInt32();
 }
 
+int32_t CallManagerServiceProxy::GetVoipCallState()
+{
+    return SendRequest(INTERFACE_GET_VOIP_CALL_STATE_FROM_LIST);
+}
+
 sptr<IRemoteObject> CallManagerServiceProxy::GetProxyObjectPtr(CallManagerProxyType proxyType)
 {
     MessageParcel dataParcel;
