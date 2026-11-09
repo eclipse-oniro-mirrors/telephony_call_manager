@@ -1436,6 +1436,16 @@ int32_t CallManagerServiceStub::OnGetVoIPCallInfo(MessageParcel &data, MessagePa
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallManagerServiceStub::OnGetVoipCallState(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = GetVoipCallState();
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("GetVoipCallState fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerServiceStub::OnGetProxyObjectPtr(MessageParcel &data, MessageParcel &reply)
 {
     CallManagerProxyType proxyType = static_cast<CallManagerProxyType>(data.ReadInt32());
