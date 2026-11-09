@@ -261,6 +261,8 @@ void CallManagerServiceStub::InitImsServiceRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoIPCallInfo(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_INFO)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoIPCallInfo(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_STATE_FROM_LIST)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoipCallState(data, reply); };
 #ifdef SUPPORT_RTT_CALL
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_RTT_CAPABILITY_SETTING)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetRttCapability(data, reply); };
