@@ -126,6 +126,7 @@ private:
     int32_t OnGetVoIPCallState(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetVoIPCallInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetVoIPCallInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetVoipCallState(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetProxyObjectPtr(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetRegMmiCodeCallbackState(MessageParcel &data, MessageParcel &reply);
     int32_t OnReportAudioDeviceInfo(MessageParcel &data, MessageParcel &reply);
