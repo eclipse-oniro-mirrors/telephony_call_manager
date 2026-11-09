@@ -31,6 +31,7 @@
 #include "transfer_control_mock.h"
 #include "i_call_manager_service_mock.h"
 #include "call_manager_proxy.h"
+#include "call_manager_service_proxy.h"
 
 using namespace OHOS::Bluetooth;
 namespace OHOS {
@@ -297,6 +298,7 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, TestSize.Level0
     ASSERT_EQ(client->RemoveMissedIncomingCallNotification(), TELEPHONY_ERR_UNINIT);
     ASSERT_EQ(client->SetVoIPCallState(value), TELEPHONY_ERR_UNINIT);
     ASSERT_EQ(client->GetVoIPCallState(value), TELEPHONY_ERR_UNINIT);
+    ASSERT_EQ(client->GetVoipCallState(), TELEPHONY_ERR_UNINIT);
     ASSERT_EQ(client->ReportAudioDeviceInfo(), TELEPHONY_ERR_UNINIT);
     ASSERT_EQ(client->RequestCameraCapabilities(g_newCallId), TELEPHONY_ERR_UNINIT);
 }
@@ -1098,6 +1100,63 @@ HWTEST_F(ClientErrorBranchTest, CallManagerClient_UnRegisterTransferController_S
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
     proxy->callManagerServicePtr_ = originalService;
     proxy->isTransferCbRegistered_.store(false);
+}
+
+/**
+ * @tc.number: CallManagerClient_GetVoipCallState_Success
+ * @tc.name: Test GetVoipCallState delegates to proxy when service ptr valid
+ * @tc.desc: Verify CallManagerProxy::GetVoipCallState forwards to service
+ */
+HWTEST_F(ClientErrorBranchTest, CallManagerClient_GetVoipCallState_Success, TestSize.Level1)
+{
+    auto proxy = DelayedSingleton<CallManagerProxy>::GetInstance();
+    EXPECT_NE(proxy, nullptr);
+    auto originalService = proxy->callManagerServicePtr_;
+    sptr<MockICallManagerService> mockService = new MockICallManagerService();
+    EXPECT_NE(mockService, nullptr);
+    EXPECT_CALL(*mockService, GetVoipCallState())
+        .WillOnce(testing::Return(static_cast<int32_t>(CallStateToApp::CALL_STATE_OFFHOOK)));
+    proxy->callManagerServicePtr_ = mockService;
+ 
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    client->isInit_.store(false);
+    client->Init(0);
+    int32_t result = client->GetVoipCallState();
+    EXPECT_EQ(result, static_cast<int32_t>(CallStateToApp::CALL_STATE_OFFHOOK));
+    proxy->callManagerServicePtr_ = originalService;
+}
+ 
+/**
+ * @tc.number: CallManagerClient_GetVoipCallState_NullService
+ * @tc.name: Test GetVoipCallState when proxy service ptr is null
+ * @tc.desc: Verify CallManagerProxy::GetVoipCallState returns LOCAL_PTR_NULL when service ptr null
+ */
+HWTEST_F(ClientErrorBranchTest, CallManagerClient_GetVoipCallState_NullService, TestSize.Level1)
+{
+    auto proxy = DelayedSingleton<CallManagerProxy>::GetInstance();
+    EXPECT_NE(proxy, nullptr);
+    auto originalService = proxy->callManagerServicePtr_;
+    proxy->callManagerServicePtr_ = nullptr;
+ 
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    client->isInit_.store(false);
+    client->Init(0);
+    int32_t result = client->GetVoipCallState();
+    EXPECT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    proxy->callManagerServicePtr_ = originalService;
+}
+ 
+/**
+ * @tc.number: CallManagerServiceProxy_GetVoipCallState_Fail
+ * @tc.name: Test CallManagerServiceProxy::GetVoipCallState SendRequest fail branch
+ * @tc.desc: Verify service_proxy GetVoipCallState returns error when SendRequest fails
+ */
+HWTEST_F(ClientErrorBranchTest, CallManagerServiceProxy_GetVoipCallState_Fail, TestSize.Level1)
+{
+    sptr<IRemoteObject> impl;
+    CallManagerServiceProxy proxy(impl);
+    // impl 为空 -> SendRequest 失败 -> 返回 TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL
+    EXPECT_EQ(proxy.GetVoipCallState(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 } // namespace Telephony
 } // namespace OHOS
