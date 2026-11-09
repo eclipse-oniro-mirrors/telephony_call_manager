@@ -1548,6 +1548,20 @@ int32_t CallManagerProxy::GetVoIPCallState(int32_t &state)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallManagerProxy::GetVoipCallState()
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::shared_lock<ffrt::shared_mutex> lock(clientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return callManagerServicePtr_->GetVoipCallState();
+}
+
 int32_t CallManagerProxy::SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
