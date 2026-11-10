@@ -438,6 +438,10 @@ function MakeCallSync2(context: @sts_type("Context") Opaque, phoneNumber: String
 @gen_promise("makeCallWithToken")
 function MakeCallWithTokenSync(phoneNumber: String, options: Optional<MakeCallOptions>): String;
 
+@gen_async("makeDirectCall")
+@gen_promise("makeDirectCall")
+function MakeDirectCallSync(phoneNumber: String): void;
+
 function HasVoiceCapability(): bool;
 
 @gen_async("formatPhoneNumber")
