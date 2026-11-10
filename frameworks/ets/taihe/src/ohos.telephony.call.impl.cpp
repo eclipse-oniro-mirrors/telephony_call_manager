@@ -110,6 +110,21 @@ void MakeCallSync2(uintptr_t context, ::taihe::string_view phoneNumber)
     return token;
 }
 
+void MakeDirectCallSync(::taihe::string_view phoneNumber)
+{
+    CallManagerClientInitializer init;
+    std::string number(phoneNumber);
+    int32_t errorCode = OHOS::DelayedSingleton<CallManagerClient>::GetInstance()->MakeDirectCall(number);
+    if (errorCode == TELEPHONY_ERR_NO_SIM_CARD) {
+        errorCode = TELEPHONY_ERR_NETWORK_NOT_IN_SERVICE;
+    }
+    if (errorCode != TELEPHONY_ERR_SUCCESS) {
+        TELEPHONY_LOGE("MakeDirectCall return error");
+        ConvertErrorForBusinessError(errorCode);
+    }
+    return;
+}
+
 bool HasVoiceCapability()
 {
     CallManagerClientInitializer init;
