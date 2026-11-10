@@ -54,6 +54,7 @@ public:
     void TearDown() {}
 };
 
+using Security::AccessToken::AccessTokenID;
 using namespace Security::AccessToken;
  
 // 按 apl/permission/进程名构造 native token 并设为当前线程 token
@@ -88,11 +89,55 @@ inline void SetSystemAppTokenNoGet()
     SetNativeToken("system_basic", perms, 1, "CallManagerServiceStubTestNoGet");
 }
  
-// 非 system app
-inline void SetNormalAppToken()
-{
-    SetNativeToken("normal", nullptr, 0, "CallManagerServiceStubTestNormal");
-}
+// 非系统应用 Hap token: isSystemApp=false 是 Hap 策略显式字段, native aplStr 不足以表达
+inline HapInfoParams testInfoParamsNonSystem = {
+    .bundleName = "CallManagerServiceStubTest",
+    .userID = 1,
+    .instIndex = 0,
+    .appIDDesc = "test",
+    .isSystemApp = false,
+};
+inline PermissionDef testPermCheckVoiceCallDef = {
+    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
+    .bundleName = "CallManagerServiceStubTest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call manager",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+inline PermissionStateFull testPermissionCheckVoiceCall = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
+    .resDeviceID = { "local" },
+};
+inline HapPolicyParams testPolicyParamsNonSystem = {
+    .apl = APL_SYSTEM_BASIC,
+    .domain = "test.domain",
+    .permList = { testPermCheckVoiceCallDef },
+    .permStateList = { testPermissionCheckVoiceCall },
+};
+class NonSystemAppToken {
+public:
+    NonSystemAppToken()
+    {
+        currentID_ = GetSelfTokenID();
+        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testInfoParamsNonSystem, testPolicyParamsNonSystem);
+        accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
+        SetSelfTokenID(tokenIdEx.tokenIDEx);
+    }
+    ~NonSystemAppToken()
+    {
+        AccessTokenKit::DeleteToken(accessID_);
+        SetSelfTokenID(currentID_);
+    }
+private:
+    AccessTokenID currentID_ = 0;
+    AccessTokenID accessID_ = 0;
+};
 
 class CallManagerServiceStubMock : public CallManagerServiceStub {
 public:
@@ -2012,7 +2057,7 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerProxy_GetVoipCallState_Forward, 
  */
 HWTEST_F(CallManagerServiceStubTest, CallManagerService_GetVoipCallState_NonSystemApp, TestSize.Level1)
 {
-    SetNormalAppToken();
+    NonSystemAppToken token;
     // 自检: 必须确实是非 system app, 否则无法覆盖系统应用拒绝分支
     ASSERT_FALSE(TelephonyPermission::CheckCallerIsSystemApp()) << "token 未生效: 应为非 system app 身份";
     std::shared_ptr<CallManagerService> service = std::make_shared<CallManagerService>();
