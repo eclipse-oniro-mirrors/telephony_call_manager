@@ -34,6 +34,7 @@
 #include "number_identity_service.h"
 #include "call_setting_ability_connection.h"
 #include "audio_player.h"
+#include "ims_call.h"
 
 using namespace OHOS::Bluetooth;
 namespace OHOS {
