@@ -1511,6 +1511,7 @@ void OffCameraCapabilitiesChange(
 TH_EXPORT_CPP_API_MakeCallSync(MakeCallSync);
 TH_EXPORT_CPP_API_MakeCallSync2(MakeCallSync2);
 TH_EXPORT_CPP_API_MakeCallWithTokenSync(MakeCallWithTokenSync);
+TH_EXPORT_CPP_API_MakeDirectCallSync(MakeDirectCallSync);
 TH_EXPORT_CPP_API_HasVoiceCapability(HasVoiceCapability);
 TH_EXPORT_CPP_API_FormatPhoneNumberSync(FormatPhoneNumberSync);
 TH_EXPORT_CPP_API_FormatPhoneNumberSync2(FormatPhoneNumberSync2);
