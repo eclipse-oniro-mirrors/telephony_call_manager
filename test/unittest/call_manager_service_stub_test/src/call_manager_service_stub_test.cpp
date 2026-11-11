@@ -1863,7 +1863,7 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetVoipCallState_0
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
     EXPECT_EQ(reply.ReadInt32(), static_cast<int32_t>(CallStateToApp::CALL_STATE_IDLE));
 }
- 
+
 /**
  * @tc.name: CallManagerServiceStub_OnGetVoipCallState_0200
  * @tc.desc: OnRemoteRequest 按接口码分派到 OnGetVoipCallState
@@ -1878,12 +1878,12 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetVoipCallState_0
     MessageOption option;
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     int32_t code = static_cast<int32_t>(
-        CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_STATE_FROM_LIST);
+        CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_STATE);
     int32_t result = stub->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
     EXPECT_EQ(reply.ReadInt32(), static_cast<int32_t>(CallStateToApp::CALL_STATE_IDLE));
 }
- 
+
 /**
  * @tc.name: CallManagerServiceStub_OnGetVoipCallState_control_idle
  * @tc.desc: 双列表均为空, HasVoipCallExist()=false -> IDLE(0)
@@ -1899,7 +1899,7 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetVoipCallState_c
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
     EXPECT_EQ(reply.ReadInt32(), static_cast<int32_t>(CallStateToApp::CALL_STATE_IDLE));
 }
- 
+
 /**
  * @tc.name: CallManagerServiceStub_OnGetVoipCallState_control_main_offhook
  * @tc.desc: 主列表有非来电 VoIP, HasVoipCallExist()=true 且内层全 false -> OFFHOOK(2)
@@ -1924,7 +1924,7 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetVoipCallState_c
     EXPECT_EQ(reply.ReadInt32(), static_cast<int32_t>(CallStateToApp::CALL_STATE_OFFHOOK));
     CallObjectManager::callObjectPtrList_.clear();
 }
- 
+
 /**
  * @tc.name: CallManagerServiceStub_OnGetVoipCallState_control_main_ringing
  * @tc.desc: 主列表有 INCOMING VoIP, IsCallExist(TYPE_VOIP,INCOMING)=true -> RINGING(1)
@@ -1949,38 +1949,39 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetVoipCallState_c
     EXPECT_EQ(reply.ReadInt32(), static_cast<int32_t>(CallStateToApp::CALL_STATE_RINGING));
     CallObjectManager::callObjectPtrList_.clear();
 }
- 
+
 /**
- * @tc.name: CallManagerServiceStub_OnGetVoipCallState_control_voiplist_ringing
- * @tc.desc: 主列表有非来电 VoIP(外层 true) + 独立列表有 INCOMING -> IsVoipCallExist(INCOMING)=true -> RINGING
+ * @tc.name: CallManagerServiceStub_OnGetVoipCallState_control_mainlist_ringing
+ * @tc.desc: 主列表同时有 ACTIVE 和 INCOMING VoIP -> IsCallExist(TYPE_VOIP, INCOMING)=true -> RINGING
  */
-HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetVoipCallState_control_voiplist_ringing,
+HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetVoipCallState_control_mainlist_ringing,
     TestSize.Level1)
 {
     CallObjectManager::ClearVoipList();
     CallObjectManager::callObjectPtrList_.clear();
-    DialParaInfo info;
-    info.dialType = DialType::DIAL_BLUETOOTH_TYPE;
-    info.callId = 202;
-    sptr<CallBase> voipCall = nullptr;
-    voipCall = new IMSCall(info);
-    voipCall->SetCallType(CallType::TYPE_VOIP);
-    voipCall->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
-    CallObjectManager::callObjectPtrList_.push_back(voipCall);
-    CallAttributeInfo callAttrInfo;
-    callAttrInfo.callId = 300;
-    callAttrInfo.callState = TelCallState::CALL_STATUS_INCOMING;
-    EXPECT_EQ(CallObjectManager::AddOneVoipCallObject(callAttrInfo), TELEPHONY_SUCCESS);
+    DialParaInfo activeInfo;
+    activeInfo.dialType = DialType::DIAL_BLUETOOTH_TYPE;
+    activeInfo.callId = 202;
+    sptr<CallBase> activeCall = new IMSCall(activeInfo);
+    activeCall->SetCallType(CallType::TYPE_VOIP);
+    activeCall->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    CallObjectManager::callObjectPtrList_.push_back(activeCall);
+    DialParaInfo incomingInfo;
+    incomingInfo.dialType = DialType::DIAL_BLUETOOTH_TYPE;
+    incomingInfo.callId = 203;
+    sptr<CallBase> incomingCall = new IMSCall(incomingInfo);
+    incomingCall->SetCallType(CallType::TYPE_VOIP);
+    incomingCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    CallObjectManager::callObjectPtrList_.push_back(incomingCall);
     sptr<CallManagerServiceStubMock> stub = new CallManagerServiceStubMock();
     MessageParcel data;
     MessageParcel reply;
     int32_t result = stub->OnGetVoipCallState(data, reply);
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
     EXPECT_EQ(reply.ReadInt32(), static_cast<int32_t>(CallStateToApp::CALL_STATE_RINGING));
-    CallObjectManager::ClearVoipList();
     CallObjectManager::callObjectPtrList_.clear();
 }
- 
+
 /**
  * @tc.name: CallManagerServiceProxy_GetVoipCallState_NullImpl
  * @tc.desc: CallManagerServiceProxy 以 null impl 构造时 SendRequest 失败
@@ -1991,7 +1992,7 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceProxy_GetVoipCallState_Nu
     CallManagerServiceProxy proxy(impl);
     EXPECT_EQ(proxy.GetVoipCallState(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
- 
+
 /**
  * @tc.name: CallManagerClient_GetVoipCallState_Uninit
  * @tc.desc: CallManagerClient 未 Init 时 g_callManagerProxy 为空, 返回 TELEPHONY_ERR_UNINIT
@@ -2001,7 +2002,7 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerClient_GetVoipCallState_Uninit, 
     std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
     EXPECT_EQ(client->GetVoipCallState(), TELEPHONY_ERR_UNINIT);
 }
- 
+
 /**
  * @tc.name: CallManagerProxy_GetVoipCallState_ReconnectFail
  * @tc.desc: CallManagerProxy 未连接时 ReConnectService 失败, 返回错误码
@@ -2010,14 +2011,12 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerProxy_GetVoipCallState_Reconnect
 {
     auto proxy = DelayedSingleton<CallManagerProxy>::GetInstance();
     ASSERT_NE(proxy, nullptr);
-    // 显式置空, 不依赖用例执行顺序
+    // 显式置空, 不依赖用例执行顺序, 覆盖 ReConnectService 失败分支
     proxy->callManagerServicePtr_ = nullptr;
     int32_t result = proxy->GetVoipCallState();
-    EXPECT_NE(result, static_cast<int32_t>(CallStateToApp::CALL_STATE_IDLE));
-    EXPECT_NE(result, static_cast<int32_t>(CallStateToApp::CALL_STATE_RINGING));
-    EXPECT_NE(result, static_cast<int32_t>(CallStateToApp::CALL_STATE_OFFHOOK));
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
- 
+
 /**
  * @tc.name: CallManagerClient_GetVoipCallState_Init
  * @tc.desc: CallManagerClient Init 后 g_callManagerProxy 非空, 走 if 分支转发到代理层
@@ -2034,7 +2033,7 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerClient_GetVoipCallState_Init, Te
         proxy->callManagerServicePtr_ = nullptr;
     }
 }
- 
+
 /**
  * @tc.name: CallManagerProxy_GetVoipCallState_Forward
  * @tc.desc: callManagerServicePtr_ 非空时 ReConnectService 直接成功, 走转发分支
@@ -2044,13 +2043,16 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerProxy_GetVoipCallState_Forward, 
     auto proxy = DelayedSingleton<CallManagerProxy>::GetInstance();
     ASSERT_NE(proxy, nullptr);
     sptr<IRemoteObject> impl;
-    auto temp = proxy->callManagerServicePtr_;
+    // 显式置为"已连接"状态, 不依赖前序用例遗留的指针
     proxy->callManagerServicePtr_ = new CallManagerServiceProxy(impl);
+    // 自检: 指针非空时 ReConnectService 必须成功, 才能覆盖成功分支
+    ASSERT_EQ(proxy->ReConnectService(), TELEPHONY_SUCCESS) << "ReConnectService did not take success branch";
     int32_t result = proxy->GetVoipCallState();
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-    proxy->callManagerServicePtr_ = temp;
+    // 还原为未连接状态, 避免污染后续用例
+    proxy->callManagerServicePtr_ = nullptr;
 }
- 
+
 /**
  * @tc.name: CallManagerService_GetVoipCallState_NonSystemApp
  * @tc.desc: 非系统应用身份 -> CheckCallerIsSystemApp() 拒绝 -> ILLEGAL_USE_OF_SYSTEM_API
@@ -2059,11 +2061,11 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerService_GetVoipCallState_NonSyst
 {
     NonSystemAppToken token;
     // 自检: 必须确实是非 system app, 否则无法覆盖系统应用拒绝分支
-    ASSERT_FALSE(TelephonyPermission::CheckCallerIsSystemApp()) << "token 未生效: 应为非 system app 身份";
+    ASSERT_FALSE(TelephonyPermission::CheckCallerIsSystemApp()) << "token not effective: expected non system app";
     std::shared_ptr<CallManagerService> service = std::make_shared<CallManagerService>();
     EXPECT_EQ(service->GetVoipCallState(), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
- 
+
 /**
  * @tc.name: CallManagerService_GetVoipCallState_NoGetPermission
  * @tc.desc: 有 system app 身份但无 GET_TELEPHONY_STATE 权限 -> PERMISSION_ERR
@@ -2072,13 +2074,13 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerService_GetVoipCallState_NoGetPe
 {
     SetSystemAppTokenNoGet();
     // 自检: 必须是 system app 但确实没有 GET_TELEPHONY_STATE 权限
-    ASSERT_TRUE(TelephonyPermission::CheckCallerIsSystemApp()) << "token 未生效: 应为 system app 身份";
+    ASSERT_TRUE(TelephonyPermission::CheckCallerIsSystemApp()) << "token not effective: expected system app";
     ASSERT_FALSE(TelephonyPermission::CheckPermission("ohos.permission.GET_TELEPHONY_STATE"))
-        << "token 未生效: GET_TELEPHONY_STATE 不应被授予";
+        << "token not effective: GET_TELEPHONY_STATE should not be granted";
     std::shared_ptr<CallManagerService> service = std::make_shared<CallManagerService>();
     EXPECT_EQ(service->GetVoipCallState(), TELEPHONY_ERR_PERMISSION_ERR);
 }
- 
+
 /**
  * @tc.name: CallManagerService_GetVoipCallState_SystemApp_NullControl
  * @tc.desc: 有 system app 身份且有 GET_TELEPHONY_STATE 权限, control 为空 -> LOCAL_PTR_NULL
@@ -2090,7 +2092,7 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerService_GetVoipCallState_SystemA
     int32_t result = service->GetVoipCallState();
     EXPECT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
- 
+
 /**
  * @tc.name: CallManagerService_GetVoipCallState_SystemApp_Forward
  * @tc.desc: 有 system app 身份且有 GET_TELEPHONY_STATE 权限, control 非空 -> 转发
@@ -2099,9 +2101,9 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerService_GetVoipCallState_SystemA
 {
     SetSystemAppTokenWithGet();
     // 自检: 若 token 未生效则该用例会静默走错分支, 覆盖率不可信
-    ASSERT_TRUE(TelephonyPermission::CheckCallerIsSystemApp()) << "token 未生效: 非 system app 身份";
+    ASSERT_TRUE(TelephonyPermission::CheckCallerIsSystemApp()) << "token not effective: expected system app";
     ASSERT_TRUE(TelephonyPermission::CheckPermission("ohos.permission.GET_TELEPHONY_STATE"))
-        << "token 未生效: GET_TELEPHONY_STATE 权限未授予";
+        << "token not effective: GET_TELEPHONY_STATE not granted";
     std::shared_ptr<CallManagerService> service = std::make_shared<CallManagerService>();
     service->callControlManagerPtr_ = std::make_shared<CallControlManager>();
     CallObjectManager::ClearVoipList();
