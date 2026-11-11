@@ -1275,7 +1275,7 @@ int32_t CallManagerServiceProxy::SetVoIPCallState(int32_t state)
     }
     dataParcel.WriteInt32(state);
     MessageParcel replyParcel;
-    int32_t error = SendRequest(INTERFACE_SET_VOIP_CALL_STATE, dataParcel, replyParcel);
+    int32_t error = SendRequest(INTERFACE_SET_MEETIME_CALL_STATE, dataParcel, replyParcel);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("function SetVoIPCallState failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
