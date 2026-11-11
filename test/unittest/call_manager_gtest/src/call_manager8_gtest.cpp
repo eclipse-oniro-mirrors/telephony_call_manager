@@ -913,7 +913,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoipCallState_0100, TestSize
     EXPECT_EQ(callControlManager->GetVoipCallState(),
         static_cast<int32_t>(CallStateToApp::CALL_STATE_IDLE));
 }
- 
+
 /**
  * @tc.number   Telephony_CallManager_GetVoipCallState_0200
  * @tc.name     test GetVoipCallState offhook branch from main list
@@ -936,7 +936,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoipCallState_0200, TestSize
         static_cast<int32_t>(CallStateToApp::CALL_STATE_OFFHOOK));
     CallObjectManager::callObjectPtrList_.clear();
 }
- 
+
 /**
  * @tc.number   Telephony_CallManager_GetVoipCallState_0300
  * @tc.name     test GetVoipCallState ringing branch from main list
@@ -959,56 +959,52 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoipCallState_0300, TestSize
         static_cast<int32_t>(CallStateToApp::CALL_STATE_RINGING));
     CallObjectManager::callObjectPtrList_.clear();
 }
- 
+
 /**
  * @tc.number   Telephony_CallManager_GetVoipCallState_0400
- * @tc.name     test GetVoipCallState voip list only returns idle
- * @tc.desc     Function test: 仅独立 VoIP 列表有 ACTIVE(主列表空) 时外层只查主列表 -> IDLE(0)
+ * @tc.name     test GetVoipCallState empty main list returns idle
+ * @tc.desc     Function test: 主列表为空时返回 CALL_STATE_IDLE(0), 与畅连老列表(voipCallObjectList_)无关
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoipCallState_0400, TestSize.Level0)
 {
     CallObjectManager::ClearVoipList();
     CallObjectManager::callObjectPtrList_.clear();
-    CallAttributeInfo callAttrInfo;
-    callAttrInfo.callId = 100;
-    callAttrInfo.callState = TelCallState::CALL_STATUS_ACTIVE;
-    EXPECT_EQ(CallObjectManager::AddOneVoipCallObject(callAttrInfo), TELEPHONY_SUCCESS);
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
-    // 外层仅判断主列表 HasVoipCallExist(), 独立列表不影响 -> IDLE
+    // GetVoipCallState 仅从主列表(callObjectPtrList_)取状态, 主列表空 -> IDLE
     EXPECT_EQ(callControlManager->GetVoipCallState(),
         static_cast<int32_t>(CallStateToApp::CALL_STATE_IDLE));
-    CallObjectManager::ClearVoipList();
 }
- 
+
 /**
  * @tc.number   Telephony_CallManager_GetVoipCallState_0500
- * @tc.name     test GetVoipCallState ringing from voip list with main voip call
- * @tc.desc     Function test: 主列表有非来电 VoIP + 独立列表有 INCOMING -> RINGING(1)
+ * @tc.name     test GetVoipCallState main list mixed states returns ringing
+ * @tc.desc     Function test: 主列表同时有 ACTIVE 和 INCOMING VoIP 时, 有 INCOMING -> RINGING(1)
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoipCallState_0500, TestSize.Level0)
 {
     CallObjectManager::ClearVoipList();
     CallObjectManager::callObjectPtrList_.clear();
-    DialParaInfo info;
-    info.dialType = DialType::DIAL_BLUETOOTH_TYPE;
-    info.callId = 102;
-    sptr<CallBase> voipCall = nullptr;
-    voipCall = new IMSCall(info);
-    voipCall->SetCallType(CallType::TYPE_VOIP);
-    voipCall->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
-    CallObjectManager::callObjectPtrList_.push_back(voipCall);
-    CallAttributeInfo callAttrInfo;
-    callAttrInfo.callId = 101;
-    callAttrInfo.callState = TelCallState::CALL_STATUS_INCOMING;
-    EXPECT_EQ(CallObjectManager::AddOneVoipCallObject(callAttrInfo), TELEPHONY_SUCCESS);
+    DialParaInfo activeInfo;
+    activeInfo.dialType = DialType::DIAL_BLUETOOTH_TYPE;
+    activeInfo.callId = 102;
+    sptr<CallBase> activeCall = new IMSCall(activeInfo);
+    activeCall->SetCallType(CallType::TYPE_VOIP);
+    activeCall->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    CallObjectManager::callObjectPtrList_.push_back(activeCall);
+    DialParaInfo incomingInfo;
+    incomingInfo.dialType = DialType::DIAL_BLUETOOTH_TYPE;
+    incomingInfo.callId = 103;
+    sptr<CallBase> incomingCall = new IMSCall(incomingInfo);
+    incomingCall->SetCallType(CallType::TYPE_VOIP);
+    incomingCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    CallObjectManager::callObjectPtrList_.push_back(incomingCall);
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
-    // 外层主列表 true, 内层 IsVoipCallExist(INCOMING) true -> RINGING
+    // 主列表两路 VoIP, 其中一路 INCOMING -> RINGING
     EXPECT_EQ(callControlManager->GetVoipCallState(),
         static_cast<int32_t>(CallStateToApp::CALL_STATE_RINGING));
-    CallObjectManager::ClearVoipList();
     CallObjectManager::callObjectPtrList_.clear();
 }
- 
+
 /**
  * @tc.number   Telephony_CallManager_GetVoipCallState_0600
  * @tc.name     test GetVoipCallState via client IPC
@@ -1023,7 +1019,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoipCallState_0600, TestSize
     int32_t state = CallManagerGtest::clientPtr_->GetVoipCallState();
     EXPECT_GE(state, 0);
 }
- 
+
 /**
  * @tc.number   Telephony_CallManager_GetVoipCallState_0700
  * @tc.name     test GetVoipCallState service forward branch
@@ -1037,7 +1033,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoipCallState_0700, TestSize
     // callControlManagerPtr_ 非空时转发, 返回 >=0 的状态值(或 LOCAL_PTR_NULL 若未初始化)
     EXPECT_GE(state, static_cast<int32_t>(CallStateToApp::CALL_STATE_UNKNOWN));
 }
- 
+
 /**
  * @tc.number   Telephony_CallManager_GetVoipCallState_0800
  * @tc.name     test GetVoipCallState service null manager branch
@@ -1050,7 +1046,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoipCallState_0800, TestSize
     service->callControlManagerPtr_ = nullptr;
     EXPECT_EQ(service->GetVoipCallState(), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
- 
+
 /**
  * @tc.number   Telephony_CallManager_GetVoipCallState_0900
  * @tc.name     test GetVoipCallState no permission
