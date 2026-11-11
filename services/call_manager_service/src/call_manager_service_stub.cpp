@@ -253,15 +253,15 @@ void CallManagerServiceStub::InitImsServiceRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoNRState(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VONR_STATE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoNRState(data, reply); };
-    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_VOIP_CALL_STATE)] =
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_MEETIME_CALL_STATE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoIPCallState(data, reply); };
-    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_STATE)] =
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_MEETIME_CALL_STATE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoIPCallState(data, reply); };
-    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_VOIP_CALL_INFO)] =
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_MEETIME_CALL_INFO)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoIPCallInfo(data, reply); };
-    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_INFO)] =
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_MEETIME_CALL_INFO)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoIPCallInfo(data, reply); };
-    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_STATE_FROM_LIST)] =
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_STATE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoipCallState(data, reply); };
 #ifdef SUPPORT_RTT_CALL
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_RTT_CAPABILITY_SETTING)] =
