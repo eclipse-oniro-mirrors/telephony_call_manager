@@ -532,7 +532,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_004, TestSize.Level0
     callManagerService->OnRemoteRequest(static_cast<uint32_t>(
         CallManagerInterfaceCode::INTERFACE_SET_MEETIME_CALL_STATE), data, reply, option);
     callManagerService->OnRemoteRequest(static_cast<uint32_t>(
-        CallManagerInterfaceCode::INTERFACE_GET_MEETIME_CALL_STATE),data, reply, option);
+        CallManagerInterfaceCode::INTERFACE_GET_MEETIME_CALL_STATE), data, reply, option);
     callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_CANCEL_CALL_UPGRADE),
         data, reply, option);
     callManagerService->OnRemoteRequest(static_cast<uint32_t>(
