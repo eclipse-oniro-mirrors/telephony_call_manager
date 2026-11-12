@@ -40,13 +40,9 @@ const uint8_t BLUETOOTH_SET_MAC_ADDRESS = 1;
 const uint8_t BLUETOOTH_GET_MAC_ADDRESS = 2;
 const uint8_t BLUETOOTH_GET_DEVICE_NAME = 3;
 const uint8_t BLUETOOTH_SET_HFP_CONNECTED = 4;
-const uint8_t BLUETOOTH_SET_BT_CALL_SCO_CONNECTED = 5;
 const uint8_t BLUETOOTH_HFP_DISCONNECTED_END_BT_CALL = 6;
 const uint8_t BLUETOOTH_SET_HFP_CONTACT_NAME = 7;
 const uint8_t BLUETOOTH_GET_HFP_CONTACT_NAME = 8;
-const uint8_t BLUETOOTH_SET_HFP_SUBSCRIBER_NUMBER = 9;
-const uint8_t BLUETOOTH_SET_SECONDARY_PHONE_CONTACT_NAME = 10;
-const uint8_t BLUETOOTH_GET_SECONDARY_PHONE_CONTACT_NAME = 11;
 const uint8_t BLUETOOTH_HANDLE_BT_CONNECTION_STATE_CHANGE = 12;
 const uint8_t TARGET_SIZE = 13;
 
@@ -114,19 +110,6 @@ static void DoSetHfpConnected(FuzzedDataProvider &provider)
     connection->SetHfpConnected(isHfpConnected);
 }
 
-static void DoSetBtCallScoConnected(FuzzedDataProvider &provider)
-{
-    auto connection = GetBluetoothCallConnection();
-    if (connection == nullptr) {
-        return;
-    }
-    bool isBtCallScoConnected = provider.ConsumeBool();
-    std::string macAddress = provider.ConsumeRandomLengthString(MAX_MAC_LENGTH);
-    connection->SetMacAddress(0, macAddress);
-    connection->SetBtCallScoConnected(isBtCallScoConnected, macAddress);
-    (void)connection->GetBtCallScoConnected();
-}
-
 static void DoHfpDisConnectedEndBtCall(FuzzedDataProvider &provider)
 {
     auto connection = GetBluetoothCallConnection();
@@ -156,38 +139,6 @@ static void DoGetHfpContactName(FuzzedDataProvider &provider)
     }
     std::string hfpPhoneNumber = provider.ConsumeRandomLengthString(MAX_PHONE_NUMBER_LENGTH);
     (void)connection->GetHfpContactName(hfpPhoneNumber);
-}
-
-static void DoSetHfpSubscriberNumber(FuzzedDataProvider &provider)
-{
-    auto connection = GetBluetoothCallConnection();
-    if (connection == nullptr) {
-        return;
-    }
-    std::string hfpSubscriberNumber = provider.ConsumeRandomLengthString(MAX_PHONE_NUMBER_LENGTH);
-    connection->SetHfpSubscriberNumber(hfpSubscriberNumber);
-    (void)connection->GetHfpSubscriberNumber();
-}
-
-static void DoSetSecondaryPhoneContactName(FuzzedDataProvider &provider)
-{
-    auto connection = GetBluetoothCallConnection();
-    if (connection == nullptr) {
-        return;
-    }
-    std::string phoneNumber = provider.ConsumeRandomLengthString(MAX_PHONE_NUMBER_LENGTH);
-    std::string contactName = provider.ConsumeRandomLengthString(MAX_CONTACT_NAME_LENGTH);
-    connection->SetSecondaryPhoneContactName(phoneNumber, contactName);
-}
-
-static void DoGetSecondaryPhoneContactName(FuzzedDataProvider &provider)
-{
-    auto connection = GetBluetoothCallConnection();
-    if (connection == nullptr) {
-        return;
-    }
-    std::string phoneNumber = provider.ConsumeRandomLengthString(MAX_PHONE_NUMBER_LENGTH);
-    (void)connection->GetSecondaryPhoneContactName(phoneNumber);
 }
 
 static void DoHandleBtConnectionStateChange(FuzzedDataProvider &provider)
@@ -225,9 +176,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         case BLUETOOTH_SET_HFP_CONNECTED:
             DoSetHfpConnected(provider);
             break;
-        case BLUETOOTH_SET_BT_CALL_SCO_CONNECTED:
-            DoSetBtCallScoConnected(provider);
-            break;
         case BLUETOOTH_HFP_DISCONNECTED_END_BT_CALL:
             DoHfpDisConnectedEndBtCall(provider);
             break;
@@ -236,15 +184,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
             break;
         case BLUETOOTH_GET_HFP_CONTACT_NAME:
             DoGetHfpContactName(provider);
-            break;
-        case BLUETOOTH_SET_HFP_SUBSCRIBER_NUMBER:
-            DoSetHfpSubscriberNumber(provider);
-            break;
-        case BLUETOOTH_SET_SECONDARY_PHONE_CONTACT_NAME:
-            DoSetSecondaryPhoneContactName(provider);
-            break;
-        case BLUETOOTH_GET_SECONDARY_PHONE_CONTACT_NAME:
-            DoGetSecondaryPhoneContactName(provider);
             break;
         case BLUETOOTH_HANDLE_BT_CONNECTION_STATE_CHANGE:
             DoHandleBtConnectionStateChange(provider);

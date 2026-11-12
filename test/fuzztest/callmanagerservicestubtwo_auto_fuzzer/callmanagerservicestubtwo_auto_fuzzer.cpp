@@ -43,14 +43,6 @@ static void DoOnIsEmergencyPhoneNumber(FuzzedDataProvider &provider)
     DelayedSingleton<CallManagerService>::GetInstance()->OnIsEmergencyPhoneNumber(messageParcel, reply);
 }
 
-static void DoOnGetHomeLocation(FuzzedDataProvider &provider)
-{
-    std::string number = provider.ConsumeRandomLengthString();
-    MessageParcel messageParcel;
-    messageParcel.WriteString(number);
-    MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnGetHomeLocation(messageParcel, reply);
-}
 
 static void DoOnFormatPhoneNumber(FuzzedDataProvider &provider)
 {
@@ -251,7 +243,6 @@ static void DoOnNotifyTransferCallContact(FuzzedDataProvider &provider)
 using FuzzApiHandler = void (*)(FuzzedDataProvider &);
 constexpr FuzzApiHandler SUPPLEMENT_API_HANDLERS[] = {
     DoOnIsEmergencyPhoneNumber,
-    DoOnGetHomeLocation,
     DoOnFormatPhoneNumber,
     DoOnFormatPhoneNumberToE164,
     DoOnSetCallPolicyInfo,

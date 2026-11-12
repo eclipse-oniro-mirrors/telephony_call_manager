@@ -41,13 +41,7 @@ constexpr size_t MAX_MAC_LENGTH = 64;
 constexpr size_t MAX_PHONE_NUMBER_LENGTH = 256;
 constexpr size_t MAX_CONTACT_NAME_LENGTH = 256;
 
-const uint8_t BLUETOOTH_CACHE_TRANSFER_CALL_INFO = 0;
-const uint8_t BLUETOOTH_CACHE_TRANSFER_CALL_CONTACT_NAME = 1;
-const uint8_t BLUETOOTH_REMOVE_CACHED_TRANSFER_CALL = 2;
-const uint8_t BLUETOOTH_REMOVE_CACHED_TRANSFER_CALL_BY_INDEX = 3;
-const uint8_t BLUETOOTH_GET_CACHED_TRANSFER_CONTACT_NAME = 4;
 const uint8_t BLUETOOTH_CACHE_ANCS_CONTACT_NAME = 5;
-const uint8_t BLUETOOTH_REGISTER_TRANSFER_CONTROLLER = 6;
 const uint8_t BLUETOOTH_NOTIFY_TRANSFER_CALL = 7;
 const uint8_t BLUETOOTH_UPDATE_TRANSFER_CALL = 8;
 const uint8_t BLUETOOTH_START_HFP_WAIT_CONTACT_TASK = 9;
@@ -109,73 +103,6 @@ static sptr<BluetoothCall> CreateBluetoothCall(FuzzedDataProvider &provider)
     return new BluetoothCall(dialPara, macAddress, dialPara.phoneIndex);
 }
 
-static void DoCacheTransferCallInfo(FuzzedDataProvider &provider)
-{
-    auto connection = GetBluetoothCallConnection();
-    if (connection == nullptr) {
-        return;
-    }
-    CallDetailInfo detailInfo;
-    detailInfo.index = provider.ConsumeIntegralInRange<int32_t>(1, CALL_INDEX_MAX);
-    detailInfo.accountId = provider.ConsumeIntegralInRange<int32_t>(0, SLOT_ID_MAX);
-    detailInfo.phoneIndex = provider.ConsumeIntegralInRange<int32_t>(0, 1);
-    detailInfo.state = static_cast<TelCallState>(provider.ConsumeIntegral<uint8_t>());
-    detailInfo.callType = static_cast<CallType>(provider.ConsumeIntegral<uint8_t>());
-    std::string phoneNumber = provider.ConsumeRandomLengthString(MAX_PHONE_NUMBER_LENGTH);
-    size_t copyLen = phoneNumber.length() > static_cast<size_t>(kMaxNumberLen)
-        ? static_cast<size_t>(kMaxNumberLen) : phoneNumber.length();
-    if (memcpy_s(detailInfo.phoneNum, static_cast<size_t>(kMaxNumberLen), phoneNumber.c_str(), copyLen) != EOK) {
-        return;
-    }
-    std::string contactName = provider.ConsumeRandomLengthString(MAX_CONTACT_NAME_LENGTH);
-    connection->CacheTransferCallInfo(detailInfo, contactName);
-    connection->CacheTransferCallInfo(detailInfo, contactName);
-    connection->RestoreCachedTransferCalls();
-    connection->ClearCachedTransferCalls();
-}
-
-static void DoCacheTransferCallContactName(FuzzedDataProvider &provider)
-{
-    auto connection = GetBluetoothCallConnection();
-    if (connection == nullptr) {
-        return;
-    }
-    int32_t index = provider.ConsumeIntegralInRange<int32_t>(1, CALL_INDEX_MAX);
-    std::string contactName = provider.ConsumeRandomLengthString(MAX_CONTACT_NAME_LENGTH);
-    connection->CacheTransferCallContactName(index, contactName);
-}
-
-static void DoRemoveCachedTransferCall(FuzzedDataProvider &provider)
-{
-    auto connection = GetBluetoothCallConnection();
-    if (connection == nullptr) {
-        return;
-    }
-    int32_t index = provider.ConsumeIntegralInRange<int32_t>(1, CALL_INDEX_MAX);
-    std::string phoneNumber = provider.ConsumeRandomLengthString(MAX_PHONE_NUMBER_LENGTH);
-    connection->RemoveCachedTransferCall(index, phoneNumber);
-}
-
-static void DoRemoveCachedTransferCallByIndex(FuzzedDataProvider &provider)
-{
-    auto connection = GetBluetoothCallConnection();
-    if (connection == nullptr) {
-        return;
-    }
-    int32_t index = provider.ConsumeIntegralInRange<int32_t>(1, CALL_INDEX_MAX);
-    connection->RemoveCachedTransferCallByIndex(index);
-}
-
-static void DoGetCachedTransferContactName(FuzzedDataProvider &provider)
-{
-    auto connection = GetBluetoothCallConnection();
-    if (connection == nullptr) {
-        return;
-    }
-    int32_t index = provider.ConsumeIntegralInRange<int32_t>(1, CALL_INDEX_MAX);
-    (void)connection->GetCachedTransferContactName(index);
-}
-
 static void DoCacheAncsContactName(FuzzedDataProvider &provider)
 {
     auto connection = GetBluetoothCallConnection();
@@ -185,23 +112,6 @@ static void DoCacheAncsContactName(FuzzedDataProvider &provider)
     std::string contactName = provider.ConsumeRandomLengthString(MAX_CONTACT_NAME_LENGTH);
     connection->CacheAncsContactName(contactName);
     (void)connection->ConsumeAncsContactName();
-}
-
-static void DoRegisterTransferController(FuzzedDataProvider &provider)
-{
-    auto connection = GetBluetoothCallConnection();
-    if (connection == nullptr) {
-        return;
-    }
-    std::string macAddress = provider.ConsumeRandomLengthString(MAX_MAC_LENGTH);
-    connection->SetMacAddress(0, macAddress);
-    sptr<ITransferControlCallback> callback = new TransferControlCallbackStubImpl();
-    (void)connection->RegisterTransferController(callback, macAddress);
-    bool isBtCallScoConnected = provider.ConsumeBool();
-    connection->SetBtCallScoConnected(isBtCallScoConnected, macAddress);
-    connection->DisconnectScoByTransferControl();
-    connection->ScoDisconnectedEndTransferCall();
-    (void)connection->UnRegisterTransferController();
 }
 
 static void DoNotifyTransferCall(FuzzedDataProvider &provider)
@@ -278,26 +188,8 @@ void DoSomethingInterestingWithTwoAPI(const uint8_t *data, size_t size)
     FuzzedDataProvider provider(data, size);
     uint8_t action = provider.ConsumeIntegralInRange<uint8_t>(0, TARGET_SIZE - 1);
     switch (action) {
-        case BLUETOOTH_CACHE_TRANSFER_CALL_INFO:
-            DoCacheTransferCallInfo(provider);
-            break;
-        case BLUETOOTH_CACHE_TRANSFER_CALL_CONTACT_NAME:
-            DoCacheTransferCallContactName(provider);
-            break;
-        case BLUETOOTH_REMOVE_CACHED_TRANSFER_CALL:
-            DoRemoveCachedTransferCall(provider);
-            break;
-        case BLUETOOTH_REMOVE_CACHED_TRANSFER_CALL_BY_INDEX:
-            DoRemoveCachedTransferCallByIndex(provider);
-            break;
-        case BLUETOOTH_GET_CACHED_TRANSFER_CONTACT_NAME:
-            DoGetCachedTransferContactName(provider);
-            break;
         case BLUETOOTH_CACHE_ANCS_CONTACT_NAME:
             DoCacheAncsContactName(provider);
-            break;
-        case BLUETOOTH_REGISTER_TRANSFER_CONTROLLER:
-            DoRegisterTransferController(provider);
             break;
         case BLUETOOTH_NOTIFY_TRANSFER_CALL:
             DoNotifyTransferCall(provider);

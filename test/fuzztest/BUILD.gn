@@ -32,7 +32,6 @@ group("fuzztest") {
   deps += [ "callnotification_fuzzer:fuzztest" ]
   deps += [ "controlcamera_fuzzer:fuzztest" ]
   deps += [ "dialcall_fuzzer:fuzztest" ]
-  deps += [ "display_fuzzer:fuzztest" ]
   deps += [ "formatphonenumber_fuzzer:fuzztest" ]
   deps += [ "formatphonenumbertoe164_fuzzer:fuzztest" ]
   deps += [ "isemergencyphonenumber_fuzzer:fuzztest" ]
@@ -42,9 +41,6 @@ group("fuzztest") {
   deps += [ "setpausepicture_fuzzer:fuzztest" ]
   deps += [ "startdtmf_fuzzer:fuzztest" ]
   deps += [ "telephonyinteraction_fuzzer:fuzztest" ]
-  if (call_manager_support_xcall) {
-    deps += [ "xcall_fuzzer:fuzztest" ]
-  }
   if (call_manager_feature_support_dsoftbus) {
     deps += [ "distributedcommunication_fuzzer:fuzztest" ]
   }

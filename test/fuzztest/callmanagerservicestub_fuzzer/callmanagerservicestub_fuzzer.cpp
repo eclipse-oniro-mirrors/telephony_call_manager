@@ -61,47 +61,47 @@ void OnUnRegisterVoipCallManagerCallback(FuzzedDataProvider& provider)
     DelayedSingleton<CallManagerService>::GetInstance()->OnUnRegisterVoipCallManagerCallback(messageParcel, reply);
 }
 
-int32_t GetProxyObjectPtr(FuzzedDataProvider& provider)
+void GetProxyObjectPtr(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
+        return;
     }
     int32_t type = provider.ConsumeIntegral<int32_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(type);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetProxyObjectPtr(messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnGetProxyObjectPtr(messageParcel, reply);
 }
 
-int32_t SetVoIPCallState(FuzzedDataProvider& provider)
+void SetVoIPCallState(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
+        return;
     }
     int32_t state = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(state);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetVoIPCallState(messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetVoIPCallState(messageParcel, reply);
 }
 
-int32_t ReportAudioDeviceInfo(FuzzedDataProvider& provider)
+void ReportAudioDeviceInfo(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
+        return;
     }
     MessageParcel messageParcel;
     std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
-    return  DelayedSingleton<CallManagerService>::GetInstance()->OnReportAudioDeviceInfo(messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnReportAudioDeviceInfo(messageParcel, reply);
 }
 
-int32_t PostDialProceed(FuzzedDataProvider& provider)
+void PostDialProceed(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
+        return;
     }
     MessageParcel messageParcel;
     MessageParcel reply;
@@ -109,26 +109,26 @@ int32_t PostDialProceed(FuzzedDataProvider& provider)
     int32_t activate = provider.ConsumeIntegral<int32_t>() % ACTIVE_NUM;
     messageParcel.WriteInt32(callId);
     messageParcel.WriteBool(activate);
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnPostDialProceed(messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnPostDialProceed(messageParcel, reply);
 }
 
-int32_t GetVoIPCallState(FuzzedDataProvider& provider)
+void GetVoIPCallState(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
+        return;
     }
     MessageParcel messageParcel;
     std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetVoIPCallState(messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnGetVoIPCallState(messageParcel, reply);
 }
 
-int32_t CanSetCallTransferTime(FuzzedDataProvider& provider)
+void CanSetCallTransferTime(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
+        return;
     }
 
     int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
@@ -137,13 +137,13 @@ int32_t CanSetCallTransferTime(FuzzedDataProvider& provider)
     messageParcel.WriteInt32(slotId);
     messageParcel.WriteBool(activate);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnCanSetCallTransferTime(messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnCanSetCallTransferTime(messageParcel, reply);
 }
 
-int32_t ObserverOnCallDetailsChange(FuzzedDataProvider& provider)
+void ObserverOnCallDetailsChange(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
+        return;
     }
 
     MessageParcel messageParcel;
@@ -151,13 +151,13 @@ int32_t ObserverOnCallDetailsChange(FuzzedDataProvider& provider)
     messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
     messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnObserverOnCallDetailsChange(messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnObserverOnCallDetailsChange(messageParcel, reply);
 }
 
-int32_t SetVoNRState(FuzzedDataProvider& provider)
+void SetVoNRState(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
+        return;
     }
     int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     int32_t state = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
@@ -165,25 +165,25 @@ int32_t SetVoNRState(FuzzedDataProvider& provider)
     messageParcel.WriteInt32(slotId);
     messageParcel.WriteInt32(state);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetVoNRState(messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetVoNRState(messageParcel, reply);
 }
 
-int32_t KickOutFromConference(FuzzedDataProvider& provider)
+void KickOutFromConference(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
+        return;
     }
     int32_t callId = provider.ConsumeIntegral<int32_t>();
     MessageParcel messageParcel;
     messageParcel.WriteInt32(callId);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnKickOutFromConference(messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnKickOutFromConference(messageParcel, reply);
 }
 
-int32_t SetCallRestrictionPassword(FuzzedDataProvider& provider)
+void SetCallRestrictionPassword(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
+        return;
     }
     int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     int32_t fac = provider.ConsumeIntegral<int32_t>();
@@ -198,7 +198,7 @@ int32_t SetCallRestrictionPassword(FuzzedDataProvider& provider)
     messageParcel.WriteInt32(fac);
     messageParcel.WriteBuffer(passwordBuf.c_str(), passwordBuf.size());
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallRestrictionPassword(messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallRestrictionPassword(messageParcel, reply);
 }
 
 void DoFuzzCallManagerService(FuzzedDataProvider& provider)
@@ -220,10 +220,10 @@ void DoFuzzCallManagerService(FuzzedDataProvider& provider)
     callManagerService->OnRemoteRequest(code, messageParcel, replyParcel, option);
 }
 
-int32_t RegisterBluetoothCallManagerCallbackPtr(FuzzedDataProvider& provider)
+void RegisterBluetoothCallManagerCallbackPtr(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
+        return;
     }
     int32_t phoneIndex = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     std::string macAddress = provider.ConsumeRandomLengthString();
@@ -231,62 +231,39 @@ int32_t RegisterBluetoothCallManagerCallbackPtr(FuzzedDataProvider& provider)
     messageParcel.WriteInt32(phoneIndex);
     messageParcel.WriteString(macAddress);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterBluetoothCallManagerCallbackPtr(
+    DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterBluetoothCallManagerCallbackPtr(
         messageParcel, reply);
 }
 
-void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
+using FuzzApiHandler = void (*)(FuzzedDataProvider&);
+constexpr FuzzApiHandler STUB_API_HANDLERS[] = {
+    OnRegisterVoipCallManagerCallback,
+    CanSetCallTransferTime,
+    ObserverOnCallDetailsChange,
+    SetVoNRState,
+    KickOutFromConference,
+    SetCallRestrictionPassword,
+    GetVoIPCallState,
+    SetVoIPCallState,
+    GetProxyObjectPtr,
+    ReportAudioDeviceInfo,
+    PostDialProceed,
+    OnUnRegisterVoipCallManagerCallback,
+    DoFuzzCallManagerService,
+    RegisterBluetoothCallManagerCallbackPtr,
+};
+constexpr uint32_t STUB_API_TARGET_COUNT =
+    sizeof(STUB_API_HANDLERS) / sizeof(STUB_API_HANDLERS[0]);
+
+void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return;
     }
 
     FuzzedDataProvider provider(data, size);
-    uint32_t choice = provider.ConsumeIntegralInRange<uint32_t>(0, 13);
-    switch (choice) {
-        case 0:
-            OnRegisterVoipCallManagerCallback(provider);
-            break;
-        case 1:
-            CanSetCallTransferTime(provider);
-            break;
-        case 2:
-            ObserverOnCallDetailsChange(provider);
-            break;
-        case 3:
-            SetVoNRState(provider);
-            break;
-        case 4:
-            KickOutFromConference(provider);
-            break;
-        case 5:
-            SetCallRestrictionPassword(provider);
-            break;
-        case 6:
-            GetVoIPCallState(provider);
-            break;
-        case 7:
-            SetVoIPCallState(provider);
-            break;
-        case 8:
-            GetProxyObjectPtr(provider);
-            break;
-        case 9:
-            ReportAudioDeviceInfo(provider);
-            break;
-        case 10:
-            PostDialProceed(provider);
-            break;
-        case 11:
-            OnUnRegisterVoipCallManagerCallback(provider);
-            break;
-        case 12:
-            DoFuzzCallManagerService(provider);
-            break;
-        default:
-            RegisterBluetoothCallManagerCallbackPtr(provider);
-            break;
-    }
+    uint32_t targetIndex = provider.ConsumeIntegralInRange<uint32_t>(0, STUB_API_TARGET_COUNT - 1);
+    STUB_API_HANDLERS[targetIndex](provider);
 }
 } // namespace OHOS
 
