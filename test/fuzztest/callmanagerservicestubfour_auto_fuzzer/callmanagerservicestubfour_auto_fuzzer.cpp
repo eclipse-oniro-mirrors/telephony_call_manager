@@ -31,7 +31,6 @@ constexpr int32_t FEATURE_TYPE_NUM = 8;
 constexpr int32_t IMS_CALL_MODE_NUM = 8;
 constexpr int32_t OTT_EVENT_ID_NUM = 2;
 constexpr int32_t OTT_DETAILS_NUM = 8;
-constexpr uint32_t IMS_API_TARGET_COUNT = 16;
 
 static void DoOnSetCallPreferenceMode(FuzzedDataProvider &provider)
 {
@@ -239,6 +238,30 @@ static void DoOnUpdateImsRttCallMode(FuzzedDataProvider &provider)
 }
 #endif
 
+using FuzzApiHandler = void (*)(FuzzedDataProvider &);
+constexpr FuzzApiHandler IMS_API_HANDLERS[] = {
+    DoOnSetCallPreferenceMode,
+    DoOnGetImsConfig,
+    DoOnSetImsConfig,
+    DoOnGetImsFeatureValue,
+    DoOnSetImsFeatureValue,
+    DoOnEnableVoLte,
+    DoOnDisableVoLte,
+    DoOnIsVoLteEnabled,
+    DoOnGetVoNRState,
+    DoOnUpdateCallMediaMode,
+    DoOnSetVoIPCallInfo,
+    DoOnReportOttCallDetailsInfo,
+    DoOnReportOttCallEventInfo,
+#ifdef SUPPORT_RTT_CALL
+    DoOnSendRttMessage,
+    DoOnSetRttCapability,
+    DoOnUpdateImsRttCallMode,
+#endif
+};
+constexpr uint32_t IMS_API_TARGET_COUNT =
+    sizeof(IMS_API_HANDLERS) / sizeof(IMS_API_HANDLERS[0]);
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -248,65 +271,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
     FuzzedDataProvider provider(data, size);
-#ifdef SUPPORT_RTT_CALL
-    uint32_t switchValue = provider.ConsumeIntegralInRange<uint32_t>(0, IMS_API_TARGET_COUNT - 1);
-#else
-    uint32_t switchValue = provider.ConsumeIntegralInRange<uint32_t>(0, IMS_API_TARGET_COUNT - 4);
-#endif
-    switch (switchValue) {
-        case 0:
-            DoOnSetCallPreferenceMode(provider);
-            break;
-        case 1:
-            DoOnGetImsConfig(provider);
-            break;
-        case 2:
-            DoOnSetImsConfig(provider);
-            break;
-        case 3:
-            DoOnGetImsFeatureValue(provider);
-            break;
-        case 4:
-            DoOnSetImsFeatureValue(provider);
-            break;
-        case 5:
-            DoOnEnableVoLte(provider);
-            break;
-        case 6:
-            DoOnDisableVoLte(provider);
-            break;
-        case 7:
-            DoOnIsVoLteEnabled(provider);
-            break;
-        case 8:
-            DoOnGetVoNRState(provider);
-            break;
-        case 9:
-            DoOnUpdateCallMediaMode(provider);
-            break;
-        case 10:
-            DoOnSetVoIPCallInfo(provider);
-            break;
-        case 11:
-            DoOnReportOttCallDetailsInfo(provider);
-            break;
-        case 12:
-            DoOnReportOttCallEventInfo(provider);
-            break;
-#ifdef SUPPORT_RTT_CALL
-        case 13:
-            DoOnSendRttMessage(provider);
-            break;
-        case 14:
-            DoOnSetRttCapability(provider);
-            break;
-        case 15:
-            DoOnUpdateImsRttCallMode(provider);
-            break;
-#endif
-        default:
-            break;
-    }
+    uint32_t targetIndex = provider.ConsumeIntegralInRange<uint32_t>(0, IMS_API_TARGET_COUNT - 1);
+    IMS_API_HANDLERS[targetIndex](provider);
 }
 } // namespace OHOS
 

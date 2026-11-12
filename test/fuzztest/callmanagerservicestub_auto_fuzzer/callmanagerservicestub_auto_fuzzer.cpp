@@ -32,7 +32,6 @@ constexpr int32_t DIAL_SCENE_NUM = 3;
 constexpr int32_t DIAL_TYPE_NUM = 3;
 constexpr int32_t CALL_TYPE_NUM = 5;
 constexpr int32_t REJECT_TYPE_NUM = 4;
-constexpr uint32_t BASIC_API_TARGET_COUNT = 18;
 
 static void DoOnRegisterCallBack(FuzzedDataProvider &provider)
 {
@@ -237,6 +236,30 @@ static void DoOnInputDialerSpecialCode(FuzzedDataProvider &provider)
     DelayedSingleton<CallManagerService>::GetInstance()->OnInputDialerSpecialCode(messageParcel, reply);
 }
 
+using FuzzApiHandler = void (*)(FuzzedDataProvider &);
+constexpr FuzzApiHandler BASIC_API_HANDLERS[] = {
+    DoOnRegisterCallBack,
+    DoOnDialCall,
+    DoOnMakeCall,
+    DoOnMakeDirectCall,
+    DoOnMakeCallWithToken,
+    DoOnAcceptCall,
+    DoOnRejectCall,
+    DoOnHangUpCall,
+    DoOnHoldCall,
+    DoOnUnHoldCall,
+    DoOnSwitchCall,
+    DoOnRejectCallWithType,
+    DoOnHasCall,
+    DoOnSendCallUiEvent,
+    DoOnPreloadCallUi,
+    DoOnNotifyVoIPAudioStreamStart,
+    DoOnSetCallAudioMode,
+    DoOnInputDialerSpecialCode,
+};
+constexpr uint32_t BASIC_API_TARGET_COUNT =
+    sizeof(BASIC_API_HANDLERS) / sizeof(BASIC_API_HANDLERS[0]);
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -246,65 +269,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
     FuzzedDataProvider provider(data, size);
-    uint32_t switchValue = provider.ConsumeIntegralInRange<uint32_t>(0, BASIC_API_TARGET_COUNT - 1);
-    switch (switchValue) {
-        case 0:
-            DoOnRegisterCallBack(provider);
-            break;
-        case 1:
-            DoOnDialCall(provider);
-            break;
-        case 2:
-            DoOnMakeCall(provider);
-            break;
-        case 3:
-            DoOnMakeDirectCall(provider);
-            break;
-        case 4:
-            DoOnMakeCallWithToken(provider);
-            break;
-        case 5:
-            DoOnAcceptCall(provider);
-            break;
-        case 6:
-            DoOnRejectCall(provider);
-            break;
-        case 7:
-            DoOnHangUpCall(provider);
-            break;
-        case 8:
-            DoOnHoldCall(provider);
-            break;
-        case 9:
-            DoOnUnHoldCall(provider);
-            break;
-        case 10:
-            DoOnSwitchCall(provider);
-            break;
-        case 11:
-            DoOnRejectCallWithType(provider);
-            break;
-        case 12:
-            DoOnHasCall(provider);
-            break;
-        case 13:
-            DoOnSendCallUiEvent(provider);
-            break;
-        case 14:
-            DoOnPreloadCallUi(provider);
-            break;
-        case 15:
-            DoOnNotifyVoIPAudioStreamStart(provider);
-            break;
-        case 16:
-            DoOnSetCallAudioMode(provider);
-            break;
-        case 17:
-            DoOnInputDialerSpecialCode(provider);
-            break;
-        default:
-            break;
-    }
+    uint32_t targetIndex = provider.ConsumeIntegralInRange<uint32_t>(0, BASIC_API_TARGET_COUNT - 1);
+    BASIC_API_HANDLERS[targetIndex](provider);
 }
 } // namespace OHOS
 

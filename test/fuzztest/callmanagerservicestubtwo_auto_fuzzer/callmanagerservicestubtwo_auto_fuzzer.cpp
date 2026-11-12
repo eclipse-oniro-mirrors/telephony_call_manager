@@ -31,7 +31,6 @@ constexpr int32_t RESTRICTION_TYPE_NUM = 16;
 constexpr int32_t RESTRICTION_MODE_NUM = 2;
 constexpr int32_t TRANSFER_TYPE_NUM = 8;
 constexpr int32_t TRANSFER_SETTING_NUM = 8;
-constexpr uint32_t SUPPLEMENT_API_TARGET_COUNT = 17;
 
 static void DoOnIsEmergencyPhoneNumber(FuzzedDataProvider &provider)
 {
@@ -249,6 +248,31 @@ static void DoOnNotifyTransferCallContact(FuzzedDataProvider &provider)
 }
 #endif
 
+using FuzzApiHandler = void (*)(FuzzedDataProvider &);
+constexpr FuzzApiHandler SUPPLEMENT_API_HANDLERS[] = {
+    DoOnIsEmergencyPhoneNumber,
+    DoOnGetHomeLocation,
+    DoOnFormatPhoneNumber,
+    DoOnFormatPhoneNumberToE164,
+    DoOnSetCallPolicyInfo,
+    DoOnGetCallWaiting,
+    DoOnSetCallWaiting,
+    DoOnGetCallRestriction,
+    DoOnSetCallRestriction,
+    DoOnGetTransferNumber,
+    DoOnSetTransferNumber,
+    DoOnCloseUnFinishedUssd,
+    DoOnSendUssdResponse,
+    DoOnGetTransferNumberByNumber,
+    DoOnCheckCallRecordingPermission,
+    DoOnSetRegMmiCodeCallbackState,
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    DoOnNotifyTransferCallContact,
+#endif
+};
+constexpr uint32_t SUPPLEMENT_API_TARGET_COUNT =
+    sizeof(SUPPLEMENT_API_HANDLERS) / sizeof(SUPPLEMENT_API_HANDLERS[0]);
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -258,68 +282,9 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
     FuzzedDataProvider provider(data, size);
-#ifdef CALL_MANAGER_CALL_TRANSFER
-    uint32_t switchValue = provider.ConsumeIntegralInRange<uint32_t>(0, SUPPLEMENT_API_TARGET_COUNT - 1);
-#else
-    uint32_t switchValue = provider.ConsumeIntegralInRange<uint32_t>(0, SUPPLEMENT_API_TARGET_COUNT - 2);
-#endif
-    switch (switchValue) {
-        case 0:
-            DoOnIsEmergencyPhoneNumber(provider);
-            break;
-        case 1:
-            DoOnGetHomeLocation(provider);
-            break;
-        case 2:
-            DoOnFormatPhoneNumber(provider);
-            break;
-        case 3:
-            DoOnFormatPhoneNumberToE164(provider);
-            break;
-        case 4:
-            DoOnSetCallPolicyInfo(provider);
-            break;
-        case 5:
-            DoOnGetCallWaiting(provider);
-            break;
-        case 6:
-            DoOnSetCallWaiting(provider);
-            break;
-        case 7:
-            DoOnGetCallRestriction(provider);
-            break;
-        case 8:
-            DoOnSetCallRestriction(provider);
-            break;
-        case 9:
-            DoOnGetTransferNumber(provider);
-            break;
-        case 10:
-            DoOnSetTransferNumber(provider);
-            break;
-        case 11:
-            DoOnCloseUnFinishedUssd(provider);
-            break;
-        case 12:
-            DoOnSendUssdResponse(provider);
-            break;
-        case 13:
-            DoOnGetTransferNumberByNumber(provider);
-            break;
-        case 14:
-            DoOnCheckCallRecordingPermission(provider);
-            break;
-        case 15:
-            DoOnSetRegMmiCodeCallbackState(provider);
-            break;
-#ifdef CALL_MANAGER_CALL_TRANSFER
-        case 16:
-            DoOnNotifyTransferCallContact(provider);
-            break;
-#endif
-        default:
-            break;
-    }
+    uint32_t targetIndex =
+        provider.ConsumeIntegralInRange<uint32_t>(0, SUPPLEMENT_API_TARGET_COUNT - 1);
+    SUPPLEMENT_API_HANDLERS[targetIndex](provider);
 }
 } // namespace OHOS
 

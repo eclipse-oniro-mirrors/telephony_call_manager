@@ -28,7 +28,6 @@ using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t AUDIO_DEVICE_NUM = 8;
 constexpr int32_t CONFERENCE_LIST_NUM = 3;
-constexpr uint32_t MULTIMEDIA_API_TARGET_COUNT = 18;
 
 static void DoOnCombineConference(FuzzedDataProvider &provider)
 {
@@ -238,6 +237,30 @@ static void DoOnRequestCameraCapabilities(FuzzedDataProvider &provider)
     DelayedSingleton<CallManagerService>::GetInstance()->OnRequestCameraCapabilities(messageParcel, reply);
 }
 
+using FuzzApiHandler = void (*)(FuzzedDataProvider &);
+constexpr FuzzApiHandler MULTIMEDIA_API_HANDLERS[] = {
+    DoOnCombineConference,
+    DoOnSeparateConference,
+    DoOnJoinConference,
+    DoOnGetMainCallId,
+    DoOnGetSubCallIdList,
+    DoOnGetCallIdListForConference,
+    DoOnStartDtmf,
+    DoOnStopDtmf,
+    DoOnSetMute,
+    DoOnSetAudioDevice,
+    DoOnControlCamera,
+    DoOnSetPreviewWindow,
+    DoOnSetDisplayWindow,
+    DoOnSetCameraZoom,
+    DoOnSetPausePicture,
+    DoOnSetDeviceDirection,
+    DoOnCancelCallUpgrade,
+    DoOnRequestCameraCapabilities,
+};
+constexpr uint32_t MULTIMEDIA_API_TARGET_COUNT =
+    sizeof(MULTIMEDIA_API_HANDLERS) / sizeof(MULTIMEDIA_API_HANDLERS[0]);
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -247,65 +270,9 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
     FuzzedDataProvider provider(data, size);
-    uint32_t switchValue = provider.ConsumeIntegralInRange<uint32_t>(0, MULTIMEDIA_API_TARGET_COUNT - 1);
-    switch (switchValue) {
-        case 0:
-            DoOnCombineConference(provider);
-            break;
-        case 1:
-            DoOnSeparateConference(provider);
-            break;
-        case 2:
-            DoOnJoinConference(provider);
-            break;
-        case 3:
-            DoOnGetMainCallId(provider);
-            break;
-        case 4:
-            DoOnGetSubCallIdList(provider);
-            break;
-        case 5:
-            DoOnGetCallIdListForConference(provider);
-            break;
-        case 6:
-            DoOnStartDtmf(provider);
-            break;
-        case 7:
-            DoOnStopDtmf(provider);
-            break;
-        case 8:
-            DoOnSetMute(provider);
-            break;
-        case 9:
-            DoOnSetAudioDevice(provider);
-            break;
-        case 10:
-            DoOnControlCamera(provider);
-            break;
-        case 11:
-            DoOnSetPreviewWindow(provider);
-            break;
-        case 12:
-            DoOnSetDisplayWindow(provider);
-            break;
-        case 13:
-            DoOnSetCameraZoom(provider);
-            break;
-        case 14:
-            DoOnSetPausePicture(provider);
-            break;
-        case 15:
-            DoOnSetDeviceDirection(provider);
-            break;
-        case 16:
-            DoOnCancelCallUpgrade(provider);
-            break;
-        case 17:
-            DoOnRequestCameraCapabilities(provider);
-            break;
-        default:
-            break;
-    }
+    uint32_t targetIndex =
+        provider.ConsumeIntegralInRange<uint32_t>(0, MULTIMEDIA_API_TARGET_COUNT - 1);
+    MULTIMEDIA_API_HANDLERS[targetIndex](provider);
 }
 } // namespace OHOS
 
