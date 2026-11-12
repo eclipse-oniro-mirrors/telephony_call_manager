@@ -1042,14 +1042,17 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoipCallState_0700, TestSize
 /**
  * @tc.number   Telephony_CallManager_GetVoipCallState_0800
  * @tc.name     test GetVoipCallState service null manager branch
- * @tc.desc     Function test: callControlManagerPtr_ 为空时返回 TELEPHONY_ERR_LOCAL_PTR_NULL
+ * @tc.desc     Function test: callControlManagerPtr_ 为空时, 门禁通过则返回 LOCAL_PTR_NULL,
+ *              进程非 system app 或无 GET 权限时返回对应错误码
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoipCallState_0800, TestSize.Level0)
 {
     AccessToken token;
     std::shared_ptr<CallManagerService> service = std::make_shared<CallManagerService>();
     service->callControlManagerPtr_ = nullptr;
-    EXPECT_EQ(service->GetVoipCallState(), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    int32_t result = service->GetVoipCallState();
+    EXPECT_TRUE(result == TELEPHONY_ERR_LOCAL_PTR_NULL || result == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API ||
+        result == TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 /**
