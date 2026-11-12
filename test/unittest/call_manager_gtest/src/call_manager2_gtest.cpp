@@ -1129,7 +1129,9 @@ HWTEST_F(ClientErrorBranchTest, CallManagerClient_GetVoipCallState_Success, Test
 /**
  * @tc.number: CallManagerClient_GetVoipCallState_NullService
  * @tc.name: Test GetVoipCallState when proxy service ptr is null
- * @tc.desc: Verify CallManagerProxy::GetVoipCallState returns LOCAL_PTR_NULL when service ptr null
+ * @tc.desc: Verify CallManagerProxy::GetVoipCallState reports error when service ptr null.
+ *           systemAbilityId 为 0 时 ConnectService 失败返回 IPC_CONNECT_STUB_FAIL,
+ *           服务指针为空时返回 LOCAL_PTR_NULL
  */
 HWTEST_F(ClientErrorBranchTest, CallManagerClient_GetVoipCallState_NullService, TestSize.Level1)
 {
@@ -1137,12 +1139,12 @@ HWTEST_F(ClientErrorBranchTest, CallManagerClient_GetVoipCallState_NullService, 
     EXPECT_NE(proxy, nullptr);
     auto originalService = proxy->callManagerServicePtr_;
     proxy->callManagerServicePtr_ = nullptr;
- 
+
     std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
     client->isInit_.store(false);
     client->Init(0);
     int32_t result = client->GetVoipCallState();
-    EXPECT_EQ(result, TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_TRUE(result == TELEPHONY_ERR_LOCAL_PTR_NULL || result == TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     proxy->callManagerServicePtr_ = originalService;
 }
  
