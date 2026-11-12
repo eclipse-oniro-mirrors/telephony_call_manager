@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,262 +13,318 @@
  * limitations under the License.
  */
 
-#include "callmanagerservicestub_fuzzer.h"
+#include "callmanagerservicestubtwo_auto_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
+#include <securec.h>
 #include <fuzzer/FuzzedDataProvider.h>
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "call_manager_service_stub.h"
-#include "call_ability_callback.h"
-#include "surface_utils.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 2;
-constexpr int32_t ACTIVE_NUM = 2;
-constexpr int32_t VEDIO_STATE_NUM = 2;
-constexpr int32_t DIAL_SCENE_NUM = 3;
-constexpr int32_t DIAL_TYPE_NUM = 3;
-constexpr int32_t CALL_TYPE_NUM = 3;
-constexpr int32_t CALL_ID_NUM = 10;
-constexpr int32_t AUDIO_DEVICE_NUM = 6;
+constexpr int32_t POLICY_LIST_NUM = 3;
+constexpr int32_t RESTRICTION_TYPE_NUM = 16;
+constexpr int32_t RESTRICTION_MODE_NUM = 2;
+constexpr int32_t TRANSFER_TYPE_NUM = 8;
+constexpr int32_t TRANSFER_SETTING_NUM = 8;
+constexpr uint32_t SUPPLEMENT_API_TARGET_COUNT = 17;
 
-void OnRegisterVoipCallManagerCallback(FuzzedDataProvider& provider)
+static void DoOnIsEmergencyPhoneNumber(FuzzedDataProvider &provider)
 {
-    if (!IsServiceInited()) {
-        return;
-    }
+    std::string number = provider.ConsumeRandomLengthString();
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
     MessageParcel messageParcel;
-    std::unique_ptr<CallAbilityCallback> callbackWrap = std::make_unique<CallAbilityCallback>();
-    if (callbackWrap == nullptr) {
-        return;
-    }
-    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
-    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
-    messageParcel.RewindRead(0);
+    messageParcel.WriteString16(Str8ToStr16(number));
+    messageParcel.WriteInt32(slotId);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterVoipCallManagerCallback(messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnIsEmergencyPhoneNumber(messageParcel, reply);
 }
 
-void OnUnRegisterVoipCallManagerCallback(FuzzedDataProvider& provider)
+static void DoOnGetHomeLocation(FuzzedDataProvider &provider)
 {
-    if (!IsServiceInited()) {
-        return;
-    }
+    std::string number = provider.ConsumeRandomLengthString();
     MessageParcel messageParcel;
-    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
-    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
-    messageParcel.RewindRead(0);
+    messageParcel.WriteString(number);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnUnRegisterVoipCallManagerCallback(messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnGetHomeLocation(messageParcel, reply);
 }
 
-int32_t GetProxyObjectPtr(FuzzedDataProvider& provider)
+static void DoOnFormatPhoneNumber(FuzzedDataProvider &provider)
 {
-    if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
-    }
-    int32_t type = provider.ConsumeIntegral<int32_t>();
+    std::string number = provider.ConsumeRandomLengthString();
+    std::string countryCode = provider.ConsumeRandomLengthString();
     MessageParcel messageParcel;
+    messageParcel.WriteString16(Str8ToStr16(number));
+    messageParcel.WriteString16(Str8ToStr16(countryCode));
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnFormatPhoneNumber(messageParcel, reply);
+}
+
+static void DoOnFormatPhoneNumberToE164(FuzzedDataProvider &provider)
+{
+    std::string number = provider.ConsumeRandomLengthString();
+    std::string countryCode = provider.ConsumeRandomLengthString();
+    MessageParcel messageParcel;
+    messageParcel.WriteString16(Str8ToStr16(number));
+    messageParcel.WriteString16(Str8ToStr16(countryCode));
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnFormatPhoneNumberToE164(messageParcel, reply);
+}
+
+static void DoOnSetCallPolicyInfo(FuzzedDataProvider &provider)
+{
+    bool isDialingTrustlist = provider.ConsumeBool();
+    std::vector<std::string> dialingList;
+    for (int32_t i = 0; i < POLICY_LIST_NUM; i++) {
+        dialingList.push_back(provider.ConsumeRandomLengthString());
+    }
+    bool isIncomingTrustlist = provider.ConsumeBool();
+    std::vector<std::string> incomingList;
+    for (int32_t i = 0; i < POLICY_LIST_NUM; i++) {
+        incomingList.push_back(provider.ConsumeRandomLengthString());
+    }
+    MessageParcel messageParcel;
+    messageParcel.WriteBool(isDialingTrustlist);
+    messageParcel.WriteStringVector(dialingList);
+    messageParcel.WriteBool(isIncomingTrustlist);
+    messageParcel.WriteStringVector(incomingList);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallPolicyInfo(messageParcel, reply);
+}
+
+static void DoOnGetCallWaiting(FuzzedDataProvider &provider)
+{
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallWaiting(messageParcel, reply);
+}
+
+static void DoOnSetCallWaiting(FuzzedDataProvider &provider)
+{
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    bool activate = provider.ConsumeBool();
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteBool(activate);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallWaiting(messageParcel, reply);
+}
+
+static void DoOnGetCallRestriction(FuzzedDataProvider &provider)
+{
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t type = provider.ConsumeIntegral<int32_t>() % RESTRICTION_TYPE_NUM;
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
     messageParcel.WriteInt32(type);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetProxyObjectPtr(messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallRestriction(messageParcel, reply);
 }
 
-int32_t SetVoIPCallState(FuzzedDataProvider& provider)
+static void DoOnSetCallRestriction(FuzzedDataProvider &provider)
 {
-    if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
-    }
-    int32_t state = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
-    MessageParcel messageParcel;
-    messageParcel.WriteInt32(state);
-    MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetVoIPCallState(messageParcel, reply);
-}
-
-int32_t ReportAudioDeviceInfo(FuzzedDataProvider& provider)
-{
-    if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
-    }
-    MessageParcel messageParcel;
-    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
-    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
-    messageParcel.RewindRead(0);
-    MessageParcel reply;
-    return  DelayedSingleton<CallManagerService>::GetInstance()->OnReportAudioDeviceInfo(messageParcel, reply);
-}
-
-int32_t PostDialProceed(FuzzedDataProvider& provider)
-{
-    if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
-    }
-    MessageParcel messageParcel;
-    MessageParcel reply;
-    int32_t callId = provider.ConsumeIntegral<int32_t>() % CALL_ID_NUM;
-    int32_t activate = provider.ConsumeIntegral<int32_t>() % ACTIVE_NUM;
-    messageParcel.WriteInt32(callId);
-    messageParcel.WriteBool(activate);
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnPostDialProceed(messageParcel, reply);
-}
-
-int32_t GetVoIPCallState(FuzzedDataProvider& provider)
-{
-    if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
-    }
-    MessageParcel messageParcel;
-    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
-    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
-    messageParcel.RewindRead(0);
-    MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetVoIPCallState(messageParcel, reply);
-}
-
-int32_t CanSetCallTransferTime(FuzzedDataProvider& provider)
-{
-    if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
-    }
-
     int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
-    MessageParcel messageParcel;
-    CallTransferInfo info;
-    std::string msg = provider.ConsumeRandomLengthString();
-    (void)memcpy_s(info.transferNum, kMaxNumberLen, msg.c_str(), msg.length());
-    info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
-    info.type = CallTransferType::TRANSFER_TYPE_BUSY;
-    int32_t activate = provider.ConsumeIntegral<int32_t>() % ACTIVE_NUM;
-    messageParcel.WriteInt32(slotId);
-    messageParcel.WriteBool(activate);
-    messageParcel.WriteRawData((const void *)&info, sizeof(CallTransferInfo));
-    messageParcel.RewindRead(0);
-    MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnCanSetCallTransferTime(messageParcel, reply);
-}
-
-int32_t ObserverOnCallDetailsChange(FuzzedDataProvider& provider)
-{
-    if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
-    }
-
-    MessageParcel messageParcel;
-    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
-    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
-    messageParcel.RewindRead(0);
-    MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnObserverOnCallDetailsChange(messageParcel, reply);
-}
-
-int32_t SetVoNRState(FuzzedDataProvider& provider)
-{
-    if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
-    }
-    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
-    int32_t state = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
-    MessageParcel messageParcel;
-    messageParcel.WriteInt32(slotId);
-    messageParcel.WriteInt32(state);
-    MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetVoNRState(messageParcel, reply);
-}
-
-int32_t KickOutFromConference(FuzzedDataProvider& provider)
-{
-    if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
-    }
-    int32_t callId = provider.ConsumeIntegral<int32_t>();
-    MessageParcel messageParcel;
-    messageParcel.WriteInt32(callId);
-    MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnKickOutFromConference(messageParcel, reply);
-}
-
-int32_t SetCallRestrictionPassword(FuzzedDataProvider& provider)
-{
-    if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
-    }
-    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
-    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
-    MessageParcel messageParcel;
-    messageParcel.WriteInt32(slotId);
-    messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>());
-    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
-    messageParcel.RewindRead(0);
-    MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallRestrictionPassword(messageParcel, reply);
-}
-
-void DoFuzzCallManagerService(FuzzedDataProvider& provider)
-{
-    auto callManagerService = DelayedSingleton<CallManagerService>::GetInstance();
-    callManagerService->OnStart();
-    uint32_t code = provider.ConsumeIntegralInRange<uint32_t>(0, 72);
-    if (provider.remaining_bytes() == 0) {
+    std::string password = provider.ConsumeRandomLengthString();
+    CallRestrictionInfo info;
+    if (memset_s(&info, sizeof(CallRestrictionInfo), 0, sizeof(CallRestrictionInfo)) != EOK) {
         return;
     }
-    std::u16string service_token = u"OHOS.Telephony.ICallManagerService";
-    MessageOption option;
+    size_t pwdLen = password.length() > static_cast<size_t>(kMaxNumberLen)
+        ? static_cast<size_t>(kMaxNumberLen) : password.length();
+    if (memcpy_s(info.password, kMaxNumberLen + 1, password.c_str(), pwdLen) != EOK) {
+        return;
+    }
+    info.fac = static_cast<CallRestrictionType>(provider.ConsumeIntegral<int32_t>() % RESTRICTION_TYPE_NUM);
+    info.mode = static_cast<CallRestrictionMode>(provider.ConsumeIntegral<int32_t>() % RESTRICTION_MODE_NUM);
     MessageParcel messageParcel;
-    MessageParcel replyParcel;
-    std::vector<uint8_t> subData =
-        provider.ConsumeBytes<uint8_t>(provider.ConsumeIntegralInRange<size_t>(0, provider.remaining_bytes()));
-    messageParcel.WriteInterfaceToken(service_token);
-    messageParcel.WriteBuffer(subData.data(), subData.size());
-    callManagerService->OnRemoteRequest(code, messageParcel, replyParcel, option);
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteRawData((const void *)&info, sizeof(CallRestrictionInfo));
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallRestriction(messageParcel, reply);
 }
 
-int32_t RegisterBluetoothCallManagerCallbackPtr(FuzzedDataProvider& provider)
+static void DoOnGetTransferNumber(FuzzedDataProvider &provider)
 {
-    if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
-    }
-    std::string str = "";
-    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    int32_t type = provider.ConsumeIntegral<int32_t>() % TRANSFER_TYPE_NUM;
     MessageParcel messageParcel;
-    messageParcel.WriteString(str);
-    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
-    messageParcel.RewindRead(0);
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteInt32(type);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterBluetoothCallManagerCallbackPtr(
-        messageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnGetTransferNumber(messageParcel, reply);
 }
+
+static void DoOnSetTransferNumber(FuzzedDataProvider &provider)
+{
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    std::string transferNum = provider.ConsumeRandomLengthString();
+    CallTransferInfo info;
+    if (memset_s(&info, sizeof(CallTransferInfo), 0, sizeof(CallTransferInfo)) != EOK) {
+        return;
+    }
+    size_t numLen = transferNum.length() > static_cast<size_t>(kMaxNumberLen)
+        ? static_cast<size_t>(kMaxNumberLen) : transferNum.length();
+    if (memcpy_s(info.transferNum, kMaxNumberLen + 1, transferNum.c_str(), numLen) != EOK) {
+        return;
+    }
+    info.settingType = static_cast<CallTransferSettingType>(
+        provider.ConsumeIntegral<int32_t>() % TRANSFER_SETTING_NUM);
+    info.type = static_cast<CallTransferType>(provider.ConsumeIntegral<int32_t>() % TRANSFER_TYPE_NUM);
+    info.startHour = provider.ConsumeIntegral<int32_t>();
+    info.startMinute = provider.ConsumeIntegral<int32_t>();
+    info.endHour = provider.ConsumeIntegral<int32_t>();
+    info.endMinute = provider.ConsumeIntegral<int32_t>();
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteRawData((const void *)&info, sizeof(CallTransferInfo));
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetTransferNumber(messageParcel, reply);
+}
+
+static void DoOnCloseUnFinishedUssd(FuzzedDataProvider &provider)
+{
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnCloseUnFinishedUssd(messageParcel, reply);
+}
+
+static void DoOnSendUssdResponse(FuzzedDataProvider &provider)
+{
+    int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    std::string content = provider.ConsumeRandomLengthString();
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteString(content);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSendUssdResponse(messageParcel, reply);
+}
+
+static void DoOnGetTransferNumberByNumber(FuzzedDataProvider &provider)
+{
+    std::string number = provider.ConsumeRandomLengthString();
+    int32_t type = provider.ConsumeIntegral<int32_t>() % TRANSFER_TYPE_NUM;
+    MessageParcel messageParcel;
+    messageParcel.WriteString(number);
+    messageParcel.WriteInt32(type);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnGetTransferNumberByNumber(messageParcel, reply);
+}
+
+static void DoOnCheckCallRecordingPermission(FuzzedDataProvider &provider)
+{
+    std::string phoneNumber = provider.ConsumeRandomLengthString();
+    std::string recordToken = provider.ConsumeRandomLengthString();
+    MessageParcel messageParcel;
+    messageParcel.WriteString(phoneNumber);
+    messageParcel.WriteString(recordToken);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnCheckCallRecordingPermission(messageParcel, reply);
+}
+
+static void DoOnSetRegMmiCodeCallbackState(FuzzedDataProvider &provider)
+{
+    bool isReg = provider.ConsumeBool();
+    MessageParcel messageParcel;
+    messageParcel.WriteBool(isReg);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetRegMmiCodeCallbackState(messageParcel, reply);
+}
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+static void DoOnNotifyTransferCallContact(FuzzedDataProvider &provider)
+{
+    std::string contactName = provider.ConsumeRandomLengthString();
+    MessageParcel messageParcel;
+    messageParcel.WriteString(contactName);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnNotifyTransferCallContact(messageParcel, reply);
+}
+#endif
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return;
     }
-
+    if (!IsServiceInited()) {
+        return;
+    }
     FuzzedDataProvider provider(data, size);
-    OnRegisterVoipCallManagerCallback(provider);
-    CanSetCallTransferTime(provider);
-    ObserverOnCallDetailsChange(provider);
-    SetVoNRState(provider);
-    KickOutFromConference(provider);
-    SetCallRestrictionPassword(provider);
-    GetVoIPCallState(provider);
-    SetVoIPCallState(provider);
-    GetProxyObjectPtr(provider);
-    ReportAudioDeviceInfo(provider);
-    PostDialProceed(provider);
-    OnUnRegisterVoipCallManagerCallback(provider);
-    DoFuzzCallManagerService(provider);
-    RegisterBluetoothCallManagerCallbackPtr(provider);
-    DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    uint32_t switchValue = provider.ConsumeIntegralInRange<uint32_t>(0, SUPPLEMENT_API_TARGET_COUNT - 1);
+#else
+    uint32_t switchValue = provider.ConsumeIntegralInRange<uint32_t>(0, SUPPLEMENT_API_TARGET_COUNT - 2);
+#endif
+    switch (switchValue) {
+        case 0:
+            DoOnIsEmergencyPhoneNumber(provider);
+            break;
+        case 1:
+            DoOnGetHomeLocation(provider);
+            break;
+        case 2:
+            DoOnFormatPhoneNumber(provider);
+            break;
+        case 3:
+            DoOnFormatPhoneNumberToE164(provider);
+            break;
+        case 4:
+            DoOnSetCallPolicyInfo(provider);
+            break;
+        case 5:
+            DoOnGetCallWaiting(provider);
+            break;
+        case 6:
+            DoOnSetCallWaiting(provider);
+            break;
+        case 7:
+            DoOnGetCallRestriction(provider);
+            break;
+        case 8:
+            DoOnSetCallRestriction(provider);
+            break;
+        case 9:
+            DoOnGetTransferNumber(provider);
+            break;
+        case 10:
+            DoOnSetTransferNumber(provider);
+            break;
+        case 11:
+            DoOnCloseUnFinishedUssd(provider);
+            break;
+        case 12:
+            DoOnSendUssdResponse(provider);
+            break;
+        case 13:
+            DoOnGetTransferNumberByNumber(provider);
+            break;
+        case 14:
+            DoOnCheckCallRecordingPermission(provider);
+            break;
+        case 15:
+            DoOnSetRegMmiCodeCallbackState(provider);
+            break;
+#ifdef CALL_MANAGER_CALL_TRANSFER
+        case 16:
+            DoOnNotifyTransferCallContact(provider);
+            break;
+#endif
+        default:
+            break;
+    }
 }
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;
     /* Run your code on data */

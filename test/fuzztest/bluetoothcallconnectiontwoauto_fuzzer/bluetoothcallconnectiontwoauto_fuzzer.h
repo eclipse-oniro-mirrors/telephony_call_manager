@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,9 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef AUDIODEVICE_FUZZER_H
-#define AUDIODEVICE_FUZZER_H
+#ifndef BLUETOOTH_CALL_CONNECTION_TWO_AUTO_FUZZER_H
+#define BLUETOOTH_CALL_CONNECTION_TWO_AUTO_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "audiodevice_fuzzer"
+#include <cstddef>
+#include <cstdint>
 
-#endif // AUDIODEVICE_FUZZER_H
+#include "bluetooth_call_connection.h"
+#include "common_type.h"
+
+namespace OHOS {
+namespace Telephony {
+void DoSomethingInterestingWithTwoAPI(const uint8_t *data, size_t size);
+} // namespace Telephony
+} // namespace OHOS
+#endif // BLUETOOTH_CALL_CONNECTION_TWO_AUTO_FUZZER_H

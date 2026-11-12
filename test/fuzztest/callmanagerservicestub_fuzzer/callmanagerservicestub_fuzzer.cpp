@@ -28,12 +28,8 @@ using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t ACTIVE_NUM = 2;
-constexpr int32_t VEDIO_STATE_NUM = 2;
-constexpr int32_t DIAL_SCENE_NUM = 3;
-constexpr int32_t DIAL_TYPE_NUM = 3;
-constexpr int32_t CALL_TYPE_NUM = 3;
 constexpr int32_t CALL_ID_NUM = 10;
-constexpr int32_t AUDIO_DEVICE_NUM = 6;
+constexpr int32_t WAIT_TIME = 2;
 
 void OnRegisterVoipCallManagerCallback(FuzzedDataProvider& provider)
 {
@@ -136,17 +132,10 @@ int32_t CanSetCallTransferTime(FuzzedDataProvider& provider)
     }
 
     int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    bool activate = provider.ConsumeBool();
     MessageParcel messageParcel;
-    CallTransferInfo info;
-    std::string msg = provider.ConsumeRandomLengthString();
-    (void)memcpy_s(info.transferNum, kMaxNumberLen, msg.c_str(), msg.length());
-    info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
-    info.type = CallTransferType::TRANSFER_TYPE_BUSY;
-    int32_t activate = provider.ConsumeIntegral<int32_t>() % ACTIVE_NUM;
     messageParcel.WriteInt32(slotId);
     messageParcel.WriteBool(activate);
-    messageParcel.WriteRawData((const void *)&info, sizeof(CallTransferInfo));
-    messageParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnCanSetCallTransferTime(messageParcel, reply);
 }
@@ -197,12 +186,17 @@ int32_t SetCallRestrictionPassword(FuzzedDataProvider& provider)
         return TELEPHONY_ERROR;
     }
     int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
-    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    int32_t fac = provider.ConsumeIntegral<int32_t>();
+    std::string oldPassword = provider.ConsumeRandomLengthString(kMaxNumberLen);
+    std::string newPassword = provider.ConsumeRandomLengthString(kMaxNumberLen);
+    std::string passwordBuf = oldPassword;
+    passwordBuf.push_back('\0');
+    passwordBuf += newPassword;
+    passwordBuf.push_back('\0');
     MessageParcel messageParcel;
     messageParcel.WriteInt32(slotId);
-    messageParcel.WriteInt32(provider.ConsumeIntegral<int32_t>());
-    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
-    messageParcel.RewindRead(0);
+    messageParcel.WriteInt32(fac);
+    messageParcel.WriteBuffer(passwordBuf.c_str(), passwordBuf.size());
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallRestrictionPassword(messageParcel, reply);
 }
@@ -211,7 +205,7 @@ void DoFuzzCallManagerService(FuzzedDataProvider& provider)
 {
     auto callManagerService = DelayedSingleton<CallManagerService>::GetInstance();
     callManagerService->OnStart();
-    uint32_t code = provider.ConsumeIntegralInRange<uint32_t>(0, 72);
+    uint32_t code = provider.ConsumeIntegralInRange<uint32_t>(0, 99);
     if (provider.remaining_bytes() == 0) {
         return;
     }
@@ -231,12 +225,11 @@ int32_t RegisterBluetoothCallManagerCallbackPtr(FuzzedDataProvider& provider)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    std::string str = "";
-    std::vector<uint8_t> testData = provider.ConsumeRemainingBytes<uint8_t>();
+    int32_t phoneIndex = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
+    std::string macAddress = provider.ConsumeRandomLengthString();
     MessageParcel messageParcel;
-    messageParcel.WriteString(str);
-    messageParcel.WriteBuffer(static_cast<void*>(testData.data()), testData.size());
-    messageParcel.RewindRead(0);
+    messageParcel.WriteInt32(phoneIndex);
+    messageParcel.WriteString(macAddress);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterBluetoothCallManagerCallbackPtr(
         messageParcel, reply);
@@ -249,21 +242,51 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     FuzzedDataProvider provider(data, size);
-    OnRegisterVoipCallManagerCallback(provider);
-    CanSetCallTransferTime(provider);
-    ObserverOnCallDetailsChange(provider);
-    SetVoNRState(provider);
-    KickOutFromConference(provider);
-    SetCallRestrictionPassword(provider);
-    GetVoIPCallState(provider);
-    SetVoIPCallState(provider);
-    GetProxyObjectPtr(provider);
-    ReportAudioDeviceInfo(provider);
-    PostDialProceed(provider);
-    OnUnRegisterVoipCallManagerCallback(provider);
-    DoFuzzCallManagerService(provider);
-    RegisterBluetoothCallManagerCallbackPtr(provider);
-    DelayedSingleton<CallManagerService>::GetInstance()->OnStop();
+    uint32_t choice = provider.ConsumeIntegralInRange<uint32_t>(0, 13);
+    switch (choice) {
+        case 0:
+            OnRegisterVoipCallManagerCallback(provider);
+            break;
+        case 1:
+            CanSetCallTransferTime(provider);
+            break;
+        case 2:
+            ObserverOnCallDetailsChange(provider);
+            break;
+        case 3:
+            SetVoNRState(provider);
+            break;
+        case 4:
+            KickOutFromConference(provider);
+            break;
+        case 5:
+            SetCallRestrictionPassword(provider);
+            break;
+        case 6:
+            GetVoIPCallState(provider);
+            break;
+        case 7:
+            SetVoIPCallState(provider);
+            break;
+        case 8:
+            GetProxyObjectPtr(provider);
+            break;
+        case 9:
+            ReportAudioDeviceInfo(provider);
+            break;
+        case 10:
+            PostDialProceed(provider);
+            break;
+        case 11:
+            OnUnRegisterVoipCallManagerCallback(provider);
+            break;
+        case 12:
+            DoFuzzCallManagerService(provider);
+            break;
+        default:
+            RegisterBluetoothCallManagerCallbackPtr(provider);
+            break;
+    }
 }
 } // namespace OHOS
 

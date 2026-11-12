@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,182 +13,247 @@
  * limitations under the License.
  */
 
-#include "audiodevice_fuzzer.h"
+#include "bluetoothcallconnectionauto_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
-#define private public
+#include <memory>
+#include <string>
+
 #include "addcalltoken_fuzzer.h"
-#include "audio_control_manager.h"
-#include "cs_call.h"
+#include "bluetooth_hfp_hf.h"
+#include "singleton.h"
+#include "telephony_errors.h"
 #include "fuzzer/FuzzedDataProvider.h"
 
-using namespace OHOS::Telephony;
 namespace OHOS {
-constexpr int32_t BOOL_NUM = 2;
-constexpr int32_t CALL_TYPE_NUM = 4;
-constexpr int32_t RING_STATE_NUM = 2;
-constexpr int32_t DIAL_TYPE = 3;
-constexpr int32_t VIDIO_TYPE_NUM = 2;
-constexpr int32_t TEL_CALL_STATE_NUM = 9;
-constexpr int32_t AUDIO_DEVICE_NUM = 6;
-constexpr int32_t AUDIO_EVENT = 30;
-constexpr int32_t AUDIO_SCENE_NUM = 4;
-constexpr int32_t AUDIO_VOLUME_TYPE_NUM = 13;
-constexpr int32_t WAIT_TIME = 2;
+namespace Telephony {
+constexpr int32_t PHONE_INDEX_MIN = -2;
+constexpr int32_t PHONE_INDEX_MAX = 3;
+constexpr int32_t SLOT_ID_MAX = 2;
+constexpr size_t MAX_MAC_LENGTH = 64;
+constexpr size_t MAX_PHONE_NUMBER_LENGTH = 256;
+constexpr size_t MAX_CONTACT_NAME_LENGTH = 256;
 
-void AudioControlManagerFunc(FuzzedDataProvider& provider)
+const uint8_t BLUETOOTH_CALL_DIAL = 0;
+const uint8_t BLUETOOTH_SET_MAC_ADDRESS = 1;
+const uint8_t BLUETOOTH_GET_MAC_ADDRESS = 2;
+const uint8_t BLUETOOTH_GET_DEVICE_NAME = 3;
+const uint8_t BLUETOOTH_SET_HFP_CONNECTED = 4;
+const uint8_t BLUETOOTH_SET_BT_CALL_SCO_CONNECTED = 5;
+const uint8_t BLUETOOTH_HFP_DISCONNECTED_END_BT_CALL = 6;
+const uint8_t BLUETOOTH_SET_HFP_CONTACT_NAME = 7;
+const uint8_t BLUETOOTH_GET_HFP_CONTACT_NAME = 8;
+const uint8_t BLUETOOTH_SET_HFP_SUBSCRIBER_NUMBER = 9;
+const uint8_t BLUETOOTH_SET_SECONDARY_PHONE_CONTACT_NAME = 10;
+const uint8_t BLUETOOTH_GET_SECONDARY_PHONE_CONTACT_NAME = 11;
+const uint8_t BLUETOOTH_HANDLE_BT_CONNECTION_STATE_CHANGE = 12;
+const uint8_t TARGET_SIZE = 13;
+
+static std::shared_ptr<BluetoothCallConnection> GetBluetoothCallConnection()
 {
-    if (!IsServiceInited()) {
-        return;
-    }
-
-    std::shared_ptr<AudioControlManager> audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
-    DialParaInfo paraInfo;
-    paraInfo.dialType = static_cast<DialType>(
-        provider.ConsumeIntegralInRange<int32_t>(0, DIAL_TYPE));
-    paraInfo.callType = static_cast<CallType>(
-        provider.ConsumeIntegralInRange<int32_t>(0, CALL_TYPE_NUM));
-    paraInfo.videoState = static_cast<VideoStateType>(
-        provider.ConsumeIntegralInRange<int32_t>(0, VIDIO_TYPE_NUM));
-    paraInfo.callState = static_cast<TelCallState>(provider.ConsumeIntegralInRange<int32_t>(0, TEL_CALL_STATE_NUM));
-    sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
-    std::string message = provider.ConsumeRandomLengthString();
-    DisconnectedDetails details;
-    bool isMute = provider.ConsumeBool();
-    RingState ringState = static_cast<RingState>(provider.ConsumeIntegralInRange<int32_t>(0, RING_STATE_NUM));
-    AudioDevice audioDevice = {
-        .deviceType = static_cast<AudioDeviceType>(provider.ConsumeIntegralInRange<int32_t>(0, AUDIO_DEVICE_NUM)),
-        .address = { 0 },
-    };
-
-    audioControlManager->SetAudioDevice(audioDevice);
-    audioControlManager->CallDestroyed(details);
-    audioControlManager->NewCallCreated(callObjectPtr);
-    audioControlManager->IncomingCallActivated(callObjectPtr);
-    audioControlManager->IncomingCallHungUp(callObjectPtr, true, message);
-    audioControlManager->HandleNewActiveCall(callObjectPtr);
-    audioControlManager->StopRingtone();
-    audioControlManager->GetInitAudioDeviceType();
-    audioControlManager->SetMute(isMute);
-    audioControlManager->MuteRinger();
-    audioControlManager->GetCallList();
-    audioControlManager->GetCurrentActiveCall();
-    audioControlManager->IsEmergencyCallExists();
-    audioControlManager->GetAudioInterruptState();
-    audioControlManager->SetVolumeAudible();
-    audioControlManager->SetRingState(ringState);
-    audioControlManager->SetLocalRingbackNeeded(isMute);
-    audioControlManager->IsAudioActivated();
-    audioControlManager->StopCallTone();
-    audioControlManager->IsCurrentRinging();
-    audioControlManager->StopRingback();
-    audioControlManager->StopWaitingTone();
+    return DelayedSingleton<BluetoothCallConnection>::GetInstance();
 }
 
-void AudioDeviceManagerFunc(FuzzedDataProvider& provider)
+static void DoDial(FuzzedDataProvider &provider)
 {
-    if (!IsServiceInited()) {
+    auto connection = GetBluetoothCallConnection();
+    if (connection == nullptr) {
         return;
     }
-
-    std::shared_ptr<AudioDeviceManager> audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
-    AudioDeviceType deviceType = static_cast<AudioDeviceType>(
-        provider.ConsumeIntegralInRange<int32_t>(0, AUDIO_DEVICE_NUM));
-    AudioEvent event = static_cast<AudioEvent>(provider.ConsumeIntegralInRange<int32_t>(0, AUDIO_EVENT));
-
-    audioDeviceManager->Init();
-    audioDeviceManager->InitAudioDevice();
-    audioDeviceManager->ProcessEvent(event);
-    audioDeviceManager->SwitchDevice(deviceType);
-    audioDeviceManager->EnableBtSco();
-    audioDeviceManager->EnableWiredHeadset(false);
-    audioDeviceManager->EnableSpeaker(false);
-    audioDeviceManager->EnableEarpiece(false);
-    audioDeviceManager->DisableAll();
-    audioDeviceManager->IsBtScoDevEnable();
-    audioDeviceManager->IsSpeakerDevEnable();
-    audioDeviceManager->IsEarpieceDevEnable();
-    audioDeviceManager->IsWiredHeadsetDevEnable();
-    audioDeviceManager->GetCurrentAudioDevice();
-    audioDeviceManager->IsEarpieceAvailable();
-    audioDeviceManager->IsSpeakerAvailable();
-    audioDeviceManager->IsBtScoConnected();
-    audioDeviceManager->IsBtActived();
-    audioDeviceManager->IsWiredHeadsetConnected();
-    audioDeviceManager->SetCurrentAudioDevice(deviceType);
+    int32_t phoneIndex = provider.ConsumeIntegralInRange<int32_t>(PHONE_INDEX_MIN, PHONE_INDEX_MAX);
+    std::string macAddress = provider.ConsumeRandomLengthString(MAX_MAC_LENGTH);
+    connection->SetMacAddress(phoneIndex, macAddress);
+    DialParaInfo dialPara;
+    dialPara.phoneIndex = phoneIndex;
+    dialPara.accountId = provider.ConsumeIntegralInRange<int32_t>(0, SLOT_ID_MAX);
+    dialPara.number = provider.ConsumeRandomLengthString(MAX_PHONE_NUMBER_LENGTH);
+    (void)connection->ConnectBtSco();
+    (void)connection->Dial(dialPara);
+    (void)connection->DisConnectBtSco();
 }
 
-void AudioProxyFunc(FuzzedDataProvider& provider)
+static void DoSetMacAddress(FuzzedDataProvider &provider)
 {
-    if (!IsServiceInited()) {
+    auto connection = GetBluetoothCallConnection();
+    if (connection == nullptr) {
         return;
     }
-
-    std::shared_ptr<AudioProxy> audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
-    std::shared_ptr<AudioControlManager> audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
-    AudioStandard::AudioScene audioScene = static_cast<AudioStandard::AudioScene>(
-        provider.ConsumeIntegralInRange<int32_t>(0, AUDIO_SCENE_NUM));
-    AudioStandard::AudioVolumeType audioVolumeType = static_cast<AudioStandard::AudioVolumeType>(
-        provider.ConsumeIntegralInRange<int32_t>(0, AUDIO_VOLUME_TYPE_NUM));
-    int32_t volume = provider.ConsumeIntegral<int32_t>();
-    int32_t callId = provider.ConsumeIntegral<int32_t>();
-    bool isMute = provider.ConsumeBool();
-
-    audioControlManager->GetCallBase(callId);
-    audioProxy->SetVolumeAudible();
-    audioProxy->IsMicrophoneMute();
-    audioProxy->SetMicrophoneMute(isMute);
-    audioProxy->SetEarpieceDevActive();
-    audioProxy->SetSpeakerDevActive(true);
-    audioProxy->SetBluetoothDevActive();
-    audioProxy->SetWiredHeadsetDevActive();
-    audioProxy->GetRingerMode();
-    audioProxy->GetVolume(audioVolumeType);
-    audioProxy->SetVolume(audioVolumeType, volume);
-    audioProxy->SetVolumeWithDevice(audioVolumeType, volume,
-        AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER);
-    audioProxy->SetMaxVolume(audioVolumeType);
-    audioProxy->IsStreamMute(audioVolumeType);
-    audioProxy->GetMaxVolume(audioVolumeType);
-    audioProxy->GetMinVolume(audioVolumeType);
-    audioProxy->SetAudioDeviceChangeCallback();
+    int32_t phoneIndex = provider.ConsumeIntegralInRange<int32_t>(PHONE_INDEX_MIN, PHONE_INDEX_MAX);
+    std::string macAddress = provider.ConsumeRandomLengthString(MAX_MAC_LENGTH);
+    connection->SetMacAddress(phoneIndex, macAddress);
 }
 
-void AudioSceneProcessorFunc(FuzzedDataProvider& provider)
+static void DoGetMacAddress(FuzzedDataProvider &provider)
 {
-    if (!IsServiceInited()) {
+    auto connection = GetBluetoothCallConnection();
+    if (connection == nullptr) {
         return;
     }
+    int32_t phoneIndex = provider.ConsumeIntegralInRange<int32_t>(PHONE_INDEX_MIN, PHONE_INDEX_MAX);
+    (void)connection->GetMacAddress(phoneIndex);
+}
 
-    std::shared_ptr<AudioSceneProcessor> audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
-    std::shared_ptr<AudioControlManager> audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
-    std::string phoneNum = provider.ConsumeRandomLengthString();
+static void DoGetDeviceName(FuzzedDataProvider &provider)
+{
+    auto connection = GetBluetoothCallConnection();
+    if (connection == nullptr) {
+        return;
+    }
+    int32_t phoneIndex = provider.ConsumeIntegralInRange<int32_t>(PHONE_INDEX_MIN, PHONE_INDEX_MAX);
+    (void)connection->GetDeviceName(phoneIndex);
+}
 
-    audioControlManager->IsNumberAllowed(phoneNum);
-    audioSceneProcessor->Init();
-    audioSceneProcessor->SwitchDialing();
-    audioSceneProcessor->SwitchCS();
-    audioSceneProcessor->SwitchIMS();
-    audioSceneProcessor->SwitchOTT();
-    audioSceneProcessor->SwitchHolding();
-    audioSceneProcessor->SwitchInactive();
+static void DoSetHfpConnected(FuzzedDataProvider &provider)
+{
+    auto connection = GetBluetoothCallConnection();
+    if (connection == nullptr) {
+        return;
+    }
+    bool isHfpConnected = provider.ConsumeBool();
+    connection->SetHfpConnected(isHfpConnected);
+}
+
+static void DoSetBtCallScoConnected(FuzzedDataProvider &provider)
+{
+    auto connection = GetBluetoothCallConnection();
+    if (connection == nullptr) {
+        return;
+    }
+    bool isBtCallScoConnected = provider.ConsumeBool();
+    std::string macAddress = provider.ConsumeRandomLengthString(MAX_MAC_LENGTH);
+    connection->SetMacAddress(0, macAddress);
+    connection->SetBtCallScoConnected(isBtCallScoConnected, macAddress);
+    (void)connection->GetBtCallScoConnected();
+}
+
+static void DoHfpDisConnectedEndBtCall(FuzzedDataProvider &provider)
+{
+    auto connection = GetBluetoothCallConnection();
+    if (connection == nullptr) {
+        return;
+    }
+    bool isSystemAbilityRemoved = provider.ConsumeBool();
+    connection->HfpDisConnectedEndBtCall(isSystemAbilityRemoved);
+}
+
+static void DoSetHfpContactName(FuzzedDataProvider &provider)
+{
+    auto connection = GetBluetoothCallConnection();
+    if (connection == nullptr) {
+        return;
+    }
+    std::string hfpPhoneNumber = provider.ConsumeRandomLengthString(MAX_PHONE_NUMBER_LENGTH);
+    std::string hfpContactName = provider.ConsumeRandomLengthString(MAX_CONTACT_NAME_LENGTH);
+    connection->SetHfpContactName(hfpPhoneNumber, hfpContactName);
+}
+
+static void DoGetHfpContactName(FuzzedDataProvider &provider)
+{
+    auto connection = GetBluetoothCallConnection();
+    if (connection == nullptr) {
+        return;
+    }
+    std::string hfpPhoneNumber = provider.ConsumeRandomLengthString(MAX_PHONE_NUMBER_LENGTH);
+    (void)connection->GetHfpContactName(hfpPhoneNumber);
+}
+
+static void DoSetHfpSubscriberNumber(FuzzedDataProvider &provider)
+{
+    auto connection = GetBluetoothCallConnection();
+    if (connection == nullptr) {
+        return;
+    }
+    std::string hfpSubscriberNumber = provider.ConsumeRandomLengthString(MAX_PHONE_NUMBER_LENGTH);
+    connection->SetHfpSubscriberNumber(hfpSubscriberNumber);
+    (void)connection->GetHfpSubscriberNumber();
+}
+
+static void DoSetSecondaryPhoneContactName(FuzzedDataProvider &provider)
+{
+    auto connection = GetBluetoothCallConnection();
+    if (connection == nullptr) {
+        return;
+    }
+    std::string phoneNumber = provider.ConsumeRandomLengthString(MAX_PHONE_NUMBER_LENGTH);
+    std::string contactName = provider.ConsumeRandomLengthString(MAX_CONTACT_NAME_LENGTH);
+    connection->SetSecondaryPhoneContactName(phoneNumber, contactName);
+}
+
+static void DoGetSecondaryPhoneContactName(FuzzedDataProvider &provider)
+{
+    auto connection = GetBluetoothCallConnection();
+    if (connection == nullptr) {
+        return;
+    }
+    std::string phoneNumber = provider.ConsumeRandomLengthString(MAX_PHONE_NUMBER_LENGTH);
+    (void)connection->GetSecondaryPhoneContactName(phoneNumber);
+}
+
+static void DoHandleBtConnectionStateChange(FuzzedDataProvider &provider)
+{
+    auto connection = GetBluetoothCallConnection();
+    if (connection == nullptr) {
+        return;
+    }
+    std::string macAddress = provider.ConsumeRandomLengthString(MAX_MAC_LENGTH);
+    Bluetooth::BluetoothRemoteDevice device(macAddress);
+    int32_t state = static_cast<int32_t>(provider.ConsumeIntegral<uint8_t>());
+    connection->HandleBtConnectionStateChange(device, state);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
-    if (data == nullptr || size == 0) {
+    if (data == nullptr) {
         return;
     }
     FuzzedDataProvider provider(data, size);
-    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMicStateChangeCallback();
-    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
-    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
-    AudioControlManagerFunc(provider);
-    AudioDeviceManagerFunc(provider);
-    AudioProxyFunc(provider);
-    AudioSceneProcessorFunc(provider);
+    uint8_t action = provider.ConsumeIntegralInRange<uint8_t>(0, TARGET_SIZE - 1);
+    switch (action) {
+        case BLUETOOTH_CALL_DIAL:
+            DoDial(provider);
+            break;
+        case BLUETOOTH_SET_MAC_ADDRESS:
+            DoSetMacAddress(provider);
+            break;
+        case BLUETOOTH_GET_MAC_ADDRESS:
+            DoGetMacAddress(provider);
+            break;
+        case BLUETOOTH_GET_DEVICE_NAME:
+            DoGetDeviceName(provider);
+            break;
+        case BLUETOOTH_SET_HFP_CONNECTED:
+            DoSetHfpConnected(provider);
+            break;
+        case BLUETOOTH_SET_BT_CALL_SCO_CONNECTED:
+            DoSetBtCallScoConnected(provider);
+            break;
+        case BLUETOOTH_HFP_DISCONNECTED_END_BT_CALL:
+            DoHfpDisConnectedEndBtCall(provider);
+            break;
+        case BLUETOOTH_SET_HFP_CONTACT_NAME:
+            DoSetHfpContactName(provider);
+            break;
+        case BLUETOOTH_GET_HFP_CONTACT_NAME:
+            DoGetHfpContactName(provider);
+            break;
+        case BLUETOOTH_SET_HFP_SUBSCRIBER_NUMBER:
+            DoSetHfpSubscriberNumber(provider);
+            break;
+        case BLUETOOTH_SET_SECONDARY_PHONE_CONTACT_NAME:
+            DoSetSecondaryPhoneContactName(provider);
+            break;
+        case BLUETOOTH_GET_SECONDARY_PHONE_CONTACT_NAME:
+            DoGetSecondaryPhoneContactName(provider);
+            break;
+        case BLUETOOTH_HANDLE_BT_CONNECTION_STATE_CHANGE:
+            DoHandleBtConnectionStateChange(provider);
+            break;
+        default:
+            break;
+    }
 }
+} // namespace Telephony
 } // namespace OHOS
 
 /* Fuzzer entry point */
@@ -196,8 +261,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;
     /* Run your code on data */
-    OHOS::DoSomethingInterestingWithMyAPI(data, size);
-    OHOS::DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
-    OHOS::DelayedSingleton<AudioControlManager>::DestroyInstance();
+    OHOS::Telephony::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }

@@ -20,11 +20,23 @@
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "audio_control_manager.h"
+#include "call_records_manager.h"
 #include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t AUDIO_DEVICE_NUM = 6;
+constexpr int32_t WAIT_TIME = 2;
+
+inline void CleanCallRecordsSubscription()
+{
+    static bool isCleaned = false;
+    if (isCleaned || !IsServiceInited()) {
+        return;
+    }
+    DelayedSingleton<CallRecordsManager>::GetInstance()->UnInit();
+    isCleaned = true;
+}
 
 void SetAudioDevice(FuzzedDataProvider &provider)
 {
@@ -73,6 +85,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;
+    OHOS::CleanCallRecordsSubscription();
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
