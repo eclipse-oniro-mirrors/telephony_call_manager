@@ -30,7 +30,7 @@ constexpr int32_t IMS_CONFIG_ITEM_NUM = 16;
 constexpr int32_t FEATURE_TYPE_NUM = 8;
 constexpr int32_t IMS_CALL_MODE_NUM = 8;
 constexpr int32_t OTT_EVENT_ID_NUM = 2;
-constexpr int32_t Ott_DETAILS_NUM = 8;
+constexpr int32_t OTT_DETAILS_NUM = 8;
 constexpr uint32_t IMS_API_TARGET_COUNT = 16;
 
 static void DoOnSetCallPreferenceMode(FuzzedDataProvider &provider)
@@ -156,7 +156,7 @@ static void DoOnSetVoIPCallInfo(FuzzedDataProvider &provider)
 
 static void DoOnReportOttCallDetailsInfo(FuzzedDataProvider &provider)
 {
-    int32_t vecCnt = provider.ConsumeIntegral<int32_t>() % Ott_DETAILS_NUM;
+    int32_t vecCnt = provider.ConsumeIntegral<int32_t>() % OTT_DETAILS_NUM;
     MessageParcel messageParcel;
     messageParcel.WriteInt32(vecCnt);
     for (int32_t i = 0; i < vecCnt; i++) {
