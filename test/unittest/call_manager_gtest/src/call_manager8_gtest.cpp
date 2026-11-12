@@ -997,6 +997,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoipCallState_0500, TestSize
     sptr<CallBase> incomingCall = new IMSCall(incomingInfo);
     incomingCall->SetCallType(CallType::TYPE_VOIP);
     incomingCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    // 前置校验: 确保两路 VoIP 的状态确实已写入, 否则后续断言失败无法区分是构造还是业务问题
+    ASSERT_EQ(activeCall->GetCallType(), CallType::TYPE_VOIP);
+    ASSERT_EQ(activeCall->GetTelCallState(), TelCallState::CALL_STATUS_ACTIVE);
+    ASSERT_EQ(incomingCall->GetCallType(), CallType::TYPE_VOIP);
+    ASSERT_EQ(incomingCall->GetTelCallState(), TelCallState::CALL_STATUS_INCOMING);
     CallObjectManager::callObjectPtrList_.push_back(incomingCall);
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     // 主列表两路 VoIP, 其中一路 INCOMING -> RINGING
