@@ -16,6 +16,7 @@ import("../../../callmanager.gni")
 CALL_MANAGER_PATH = "../../.."
 
 ohos_unittest("tel_call_manager_service_stub_gtest") {
+  use_exceptions = true
   install_enable = true
   subsystem_name = "telephony"
   part_name = "call_manager"
@@ -40,6 +41,7 @@ ohos_unittest("tel_call_manager_service_stub_gtest") {
     "${CALL_MANAGER_PATH}/services/call_report/include",
     "${CALL_MANAGER_PATH}/frameworks/native/include",
     "${CALL_MANAGER_PATH}/utils/include",
+    "${CALL_MANAGER_PATH}/test/unittest/stub",
   ]
   include_dirs += call_manager_include_dirs
 
