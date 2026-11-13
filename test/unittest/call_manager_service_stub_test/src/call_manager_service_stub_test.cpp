@@ -1878,7 +1878,7 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerServiceStub_OnGetVoipCallState_0
     MessageOption option;
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     int32_t code = static_cast<int32_t>(
-        CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_STATE);
+        CallManagerInterfaceCode::INTERFACE_GET_VOIP_STATE);
     int32_t result = stub->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, TELEPHONY_SUCCESS);
     EXPECT_EQ(reply.ReadInt32(), static_cast<int32_t>(CallStateToApp::CALL_STATE_IDLE));
