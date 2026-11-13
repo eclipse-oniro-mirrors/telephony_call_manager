@@ -1275,7 +1275,7 @@ int32_t CallManagerServiceProxy::SetVoIPCallState(int32_t state)
     }
     dataParcel.WriteInt32(state);
     MessageParcel replyParcel;
-    int32_t error = SendRequest(INTERFACE_SET_MEETIME_CALL_STATE, dataParcel, replyParcel);
+    int32_t error = SendRequest(INTERFACE_SET_VOIP_CALL_STATE, dataParcel, replyParcel);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("function SetVoIPCallState failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -1291,7 +1291,7 @@ int32_t CallManagerServiceProxy::GetVoIPCallState(int32_t &state)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     MessageParcel replyParcel;
-    int32_t error = SendRequest(INTERFACE_GET_MEETIME_CALL_STATE, dataParcel, replyParcel);
+    int32_t error = SendRequest(INTERFACE_GET_VOIP_CALL_STATE, dataParcel, replyParcel);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("function GetVoIPCallState failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -1311,7 +1311,7 @@ int32_t CallManagerServiceProxy::SetVoIPCallInfo(int32_t callId, int32_t state, 
     dataParcel.WriteInt32(state);
     dataParcel.WriteString(phoneNumber);
     MessageParcel replyParcel;
-    int32_t error = SendRequest(INTERFACE_SET_MEETIME_CALL_INFO, dataParcel, replyParcel);
+    int32_t error = SendRequest(INTERFACE_SET_VOIP_CALL_INFO, dataParcel, replyParcel);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("function SetVoIPCallInfo failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -1328,7 +1328,7 @@ int32_t CallManagerServiceProxy::GetVoIPCallInfo(int32_t &callId, int32_t &state
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     MessageParcel replyParcel;
-    int32_t error = SendRequest(INTERFACE_GET_MEETIME_CALL_INFO, dataParcel, replyParcel);
+    int32_t error = SendRequest(INTERFACE_GET_VOIP_CALL_INFO, dataParcel, replyParcel);
     if (error != ERR_NONE) {
         TELEPHONY_LOGE("function GetVoIPCallInfo failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -1341,7 +1341,7 @@ int32_t CallManagerServiceProxy::GetVoIPCallInfo(int32_t &callId, int32_t &state
 
 int32_t CallManagerServiceProxy::GetVoipCallState()
 {
-    return SendRequest(INTERFACE_GET_VOIP_CALL_STATE);
+    return SendRequest(INTERFACE_GET_VOIP_STATE);
 }
 
 sptr<IRemoteObject> CallManagerServiceProxy::GetProxyObjectPtr(CallManagerProxyType proxyType)
