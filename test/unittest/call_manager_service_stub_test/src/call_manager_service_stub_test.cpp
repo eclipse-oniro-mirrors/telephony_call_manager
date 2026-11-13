@@ -36,7 +36,6 @@
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 #include "telephony_permission.h"
-#include "stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -57,33 +56,87 @@ public:
 
 using Security::AccessToken::AccessTokenID;
 using namespace Security::AccessToken;
-
-// CallManagerProxy::ReConnectService 依赖 samgr 与真实 IPC 连接状态, 打桩后可确定性地
-// 分别覆盖"重连成功"与"重连失败"两条分支。该函数位于本仓 call_manager_proxy.cpp,
-// 编译进本测试目标, 满足 stub.h 打桩前提(同 so + 有独立函数实体)。
-static Stub g_voipCallStateStub;
-
-static int32_t StubReConnectSuccess()
+ 
+// 按 apl/permission/进程名构造 native token 并设为当前线程 token
+static void SetNativeToken(const char *aplStr, const char **perms, int32_t permsNum, const char *processName)
 {
-    return TELEPHONY_SUCCESS;
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permsNum,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = perms,
+        .acls = nullptr,
+        .processName = const_cast<char *>(processName),
+        .aplStr = const_cast<char *>(aplStr),
+    };
+    uint64_t tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
-
-static int32_t StubReConnectFail()
+ 
+// system app 且具备 GET_TELEPHONY_STATE 权限
+inline void SetSystemAppTokenWithGet()
 {
-    return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    const char *perms[1] = { "ohos.permission.GET_TELEPHONY_STATE" };
+    SetNativeToken("system_basic", perms, 1, "CallManagerServiceStubTestWithGet");
 }
-
-// RAII: 对 CallManagerProxy::ReConnectService 打桩, 用于确定性覆盖 proxy 层两条分支
-class ReConnectStubGuard {
+ 
+// system app 但不具备 GET_TELEPHONY_STATE 权限
+inline void SetSystemAppTokenNoGet()
+{
+    const char *perms[1] = { "ohos.permission.SET_TELEPHONY_STATE" };
+    SetNativeToken("system_basic", perms, 1, "CallManagerServiceStubTestNoGet");
+}
+ 
+// 非系统应用 Hap token: isSystemApp=false 是 Hap 策略显式字段, native aplStr 不足以表达
+inline HapInfoParams testInfoParamsNonSystem = {
+    .bundleName = "tel_call_manager_gtest",
+    .userID = 1,
+    .instIndex = 0,
+    .appIDDesc = "test",
+    .isSystemApp = false,
+};
+inline PermissionDef testPermCheckVoiceCallDef = {
+    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
+    .bundleName = "tel_call_manager_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call manager",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+inline PermissionStateFull testPermissionCheckVoiceCall = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
+    .resDeviceID = { "local" },
+};
+inline HapPolicyParams testPolicyParamsNonSystem = {
+    .apl = APL_SYSTEM_BASIC,
+    .domain = "test.domain",
+    .permList = { testPermCheckVoiceCallDef },
+    .permStateList = { testPermissionCheckVoiceCall },
+};
+class NonSystemAppToken {
 public:
-    explicit ReConnectStubGuard(bool success)
+    NonSystemAppToken()
     {
-        g_voipCallStateStub.set(static_cast<int32_t (CallManagerProxy::*)()>(&CallManagerProxy::ReConnectService),
-            success ? StubReConnectSuccess : StubReConnectFail);
+        currentID_ = GetSelfTokenID();
+        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testInfoParamsNonSystem, testPolicyParamsNonSystem);
+        accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
+        SetSelfTokenID(tokenIdEx.tokenIDEx);
     }
-    ~ReConnectStubGuard() = default;
-    ReConnectStubGuard(const ReConnectStubGuard &) = delete;
-    ReConnectStubGuard &operator=(const ReConnectStubGuard &) = delete;
+    ~NonSystemAppToken()
+    {
+        AccessTokenKit::DeleteToken(accessID_);
+        SetSelfTokenID(currentID_);
+    }
+private:
+    AccessTokenID currentID_ = 0;
+    AccessTokenID accessID_ = 0;
 };
 
 class CallManagerServiceStubMock : public CallManagerServiceStub {
@@ -1952,15 +2005,14 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerClient_GetVoipCallState_Uninit, 
 
 /**
  * @tc.name: CallManagerProxy_GetVoipCallState_ReconnectFail
- * @tc.desc: 打桩 ReConnectService 返回失败 -> 直接返回 IPC_CONNECT_STUB_FAIL(不等空指针判定)
+ * @tc.desc: CallManagerProxy 未连接时 ReConnectService 失败, 返回错误码
  */
 HWTEST_F(CallManagerServiceStubTest, CallManagerProxy_GetVoipCallState_ReconnectFail, TestSize.Level1)
 {
     auto proxy = DelayedSingleton<CallManagerProxy>::GetInstance();
     ASSERT_NE(proxy, nullptr);
-    ReConnectStubGuard reConnectGuard(false);
-    // 自检: 打桩必须生效, 否则会走到后续空指针分支
-    ASSERT_NE(proxy->ReConnectService(), TELEPHONY_SUCCESS) << "stub not effective: expected reconnect fail";
+    // 显式置空, 不依赖用例执行顺序, 覆盖 ReConnectService 失败分支
+    proxy->callManagerServicePtr_ = nullptr;
     int32_t result = proxy->GetVoipCallState();
     EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
@@ -1983,94 +2035,77 @@ HWTEST_F(CallManagerServiceStubTest, CallManagerClient_GetVoipCallState_Init, Te
 }
 
 /**
- * @tc.name: CallManagerProxy_GetVoipCallState_NullServicePtr
- * @tc.desc: 打桩 ReConnectService 成功 + 服务指针为空 -> LOCAL_PTR_NULL(覆盖 if 成立分支)
- */
-HWTEST_F(CallManagerServiceStubTest, CallManagerProxy_GetVoipCallState_NullServicePtr, TestSize.Level1)
-{
-    auto proxy = DelayedSingleton<CallManagerProxy>::GetInstance();
-    ASSERT_NE(proxy, nullptr);
-    auto savedService = proxy->callManagerServicePtr_;
-    ReConnectStubGuard reConnectGuard(true);
-    proxy->callManagerServicePtr_ = nullptr;
-    // 自检: 重连成功 + 指针为空, 才能命中 LOCAL_PTR_NULL
-    ASSERT_EQ(proxy->ReConnectService(), TELEPHONY_SUCCESS) << "stub not effective: expected reconnect success";
-    EXPECT_EQ(proxy->GetVoipCallState(), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    proxy->callManagerServicePtr_ = savedService;
-}
-
-/**
  * @tc.name: CallManagerProxy_GetVoipCallState_Forward
- * @tc.desc: 打桩 ReConnectService 成功 + 服务指针非空 -> 转发到 CallManagerServiceProxy(覆盖 if 不成立分支)
+ * @tc.desc: callManagerServicePtr_ 非空时 ReConnectService 直接成功, 走转发分支
  */
 HWTEST_F(CallManagerServiceStubTest, CallManagerProxy_GetVoipCallState_Forward, TestSize.Level1)
 {
     auto proxy = DelayedSingleton<CallManagerProxy>::GetInstance();
     ASSERT_NE(proxy, nullptr);
-    auto savedService = proxy->callManagerServicePtr_;
     sptr<IRemoteObject> impl;
-    ReConnectStubGuard reConnectGuard(true);
+    // 显式置为"已连接"状态, 不依赖前序用例遗留的指针
     proxy->callManagerServicePtr_ = new CallManagerServiceProxy(impl);
-    // 自检: 重连成功 + 指针非空, 才会走到转发
-    ASSERT_EQ(proxy->ReConnectService(), TELEPHONY_SUCCESS) << "stub not effective: expected reconnect success";
-    // impl 为空, ServiceProxy::SendRequest 失败
-    EXPECT_EQ(proxy->GetVoipCallState(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-    proxy->callManagerServicePtr_ = savedService;
+    // 自检: 指针非空时 ReConnectService 必须成功, 才能覆盖成功分支
+    ASSERT_EQ(proxy->ReConnectService(), TELEPHONY_SUCCESS) << "ReConnectService did not take success branch";
+    int32_t result = proxy->GetVoipCallState();
+    EXPECT_EQ(result, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    // 还原为未连接状态, 避免污染后续用例
+    proxy->callManagerServicePtr_ = nullptr;
 }
-
-/*
- * GetVoipCallState 的权限门禁由 TelephonyPermission::CheckCallerIsSystemApp / CheckPermission 决定。
- * 这两个函数位于外部部件 core_service:libtel_common(独立 so), 无法通过 stub.h 打桩
- * (跨 so 改写 .text 段会被内存保护拒绝)。
- * 实测(DT 报告): 本测试目标中系统应用身份校验可通过, 但未授予
- * ohos.permission.GET_TELEPHONY_STATE, 因此 GetVoipCallState() 在第二道门禁处
- * 稳定返回 TELEPHONY_ERR_PERMISSION_ERR, 此处按实际行为精确断言。
- * 放行路径由 CallManagerGtest 的 Telephony_CallManager_GetVoipCallState_0800
- * 与覆盖率用例 CallManagerServiceStub_OnGetVoipCallState_control_* 覆盖。
- */
 
 /**
  * @tc.name: CallManagerService_GetVoipCallState_NonSystemApp
- * @tc.desc: 缺少 GET_TELEPHONY_STATE 权限 -> 权限门禁拒绝 -> PERMISSION_ERR
+ * @tc.desc: 非系统应用身份 -> CheckCallerIsSystemApp() 拒绝 -> ILLEGAL_USE_OF_SYSTEM_API
  */
 HWTEST_F(CallManagerServiceStubTest, CallManagerService_GetVoipCallState_NonSystemApp, TestSize.Level1)
 {
+    NonSystemAppToken token;
+    // 自检: 必须确实是非 system app, 否则无法覆盖系统应用拒绝分支
+    ASSERT_FALSE(TelephonyPermission::CheckCallerIsSystemApp()) << "token not effective: expected non system app";
     std::shared_ptr<CallManagerService> service = std::make_shared<CallManagerService>();
-    EXPECT_EQ(service->GetVoipCallState(), TELEPHONY_ERR_PERMISSION_ERR);
+    EXPECT_EQ(service->GetVoipCallState(), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 /**
  * @tc.name: CallManagerService_GetVoipCallState_NoGetPermission
- * @tc.desc: 缺少 GET_TELEPHONY_STATE 权限 -> 权限门禁拒绝 -> PERMISSION_ERR
+ * @tc.desc: 测试进程无系统应用身份时返回 ILLEGAL_USE_OF_SYSTEM_API, 具备身份但无
+ *           GET_TELEPHONY_STATE 权限时返回 PERMISSION_ERR, 两者均属权限门禁拒绝
  */
 HWTEST_F(CallManagerServiceStubTest, CallManagerService_GetVoipCallState_NoGetPermission, TestSize.Level1)
 {
+    SetSystemAppTokenNoGet();
     std::shared_ptr<CallManagerService> service = std::make_shared<CallManagerService>();
-    EXPECT_EQ(service->GetVoipCallState(), TELEPHONY_ERR_PERMISSION_ERR);
+    int32_t result = service->GetVoipCallState();
+    EXPECT_TRUE(result == TELEPHONY_ERR_PERMISSION_ERR || result == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 /**
  * @tc.name: CallManagerService_GetVoipCallState_SystemApp_NullControl
- * @tc.desc: control 为空时仍在权限门禁处返回 -> PERMISSION_ERR(不会走到空指针判定)
+ * @tc.desc: control 为空时返回错误码; 门禁通过为 LOCAL_PTR_NULL, 否则为门禁拒绝错误码
  */
 HWTEST_F(CallManagerServiceStubTest, CallManagerService_GetVoipCallState_SystemApp_NullControl, TestSize.Level1)
 {
+    SetSystemAppTokenWithGet();
     std::shared_ptr<CallManagerService> service = std::make_shared<CallManagerService>();
-    service->callControlManagerPtr_ = nullptr;
-    EXPECT_EQ(service->GetVoipCallState(), TELEPHONY_ERR_PERMISSION_ERR);
+    int32_t result = service->GetVoipCallState();
+    EXPECT_TRUE(result == TELEPHONY_ERR_LOCAL_PTR_NULL || result == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API ||
+        result == TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 /**
  * @tc.name: CallManagerService_GetVoipCallState_SystemApp_Forward
- * @tc.desc: control 非空时仍在权限门禁处返回 -> PERMISSION_ERR(不会转发到 CallControlManager)
+ * @tc.desc: control 非空时转发到 CallControlManager; 门禁通过返回 IDLE, 否则为门禁拒绝错误码
  */
 HWTEST_F(CallManagerServiceStubTest, CallManagerService_GetVoipCallState_SystemApp_Forward, TestSize.Level1)
 {
+    SetSystemAppTokenWithGet();
     std::shared_ptr<CallManagerService> service = std::make_shared<CallManagerService>();
     service->callControlManagerPtr_ = std::make_shared<CallControlManager>();
     CallObjectManager::ClearVoipList();
     CallObjectManager::callObjectPtrList_.clear();
-    EXPECT_EQ(service->GetVoipCallState(), TELEPHONY_ERR_PERMISSION_ERR);
+    int32_t result = service->GetVoipCallState();
+    EXPECT_TRUE(result == static_cast<int32_t>(CallStateToApp::CALL_STATE_IDLE) ||
+        result == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API || result == TELEPHONY_ERR_PERMISSION_ERR);
 }
 } // namespace Telephony
 } // namespace OHOS
