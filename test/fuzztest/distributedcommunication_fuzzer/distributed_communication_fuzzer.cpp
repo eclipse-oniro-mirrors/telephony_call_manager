@@ -32,9 +32,10 @@ void TestCommonController(const std::shared_ptr<DistributedDataController> &cont
     int32_t intValue = provider.ConsumeIntegral<int32_t>();
     AudioDeviceType audioDevType = static_cast<AudioDeviceType>(
         provider.ConsumeIntegral<int32_t>() % static_cast<uint32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_PC));
-    std::string charStringValue = provider.ConsumeRandomLengthString().c_str();
+    std::string charStringValue = provider.ConsumeRandomLengthString();
     const char *charValue = charStringValue.c_str();
-    uint32_t uintValue = std::min(provider.ConsumeIntegral<uint32_t>(), static_cast<uint32_t>(charStringValue.size()));
+    uint32_t uintValue = std::min(provider.ConsumeIntegral<uint32_t>(),
+        static_cast<uint32_t>(charStringValue.size()));
     DialParaInfo dialParaInfo;
     sptr<OHOS::Telephony::CallBase> call = new IMSCall(dialParaInfo);
     DistributedDataType distributedDataType = static_cast<DistributedDataType>(

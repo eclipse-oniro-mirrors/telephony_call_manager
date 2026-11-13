@@ -23,6 +23,7 @@
 #include "call_ability_callback_proxy.h"
 #include "call_manager_callback.h"
 #include "call_manager_utils.h"
+#include "call_records_manager.h"
 #include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
@@ -37,7 +38,18 @@ constexpr int32_t VEDIO_STATE_NUM = 2;
 constexpr int32_t IMS_CALL_MODE_NUM = 5;
 constexpr int32_t CALL_SESSION_EVENT_ID_NUM = 4;
 constexpr int32_t VIDEO_REQUEST_RESULT_TYPE_NUM = 102;
+constexpr int32_t WAIT_TIME = 2;
 sptr<CallAbilityCallback> callAbilityCallbackPtr_ = nullptr;
+
+inline void CleanCallRecordsSubscription()
+{
+    static bool isCleaned = false;
+    if (isCleaned || !IsServiceInited()) {
+        return;
+    }
+    DelayedSingleton<CallRecordsManager>::GetInstance()->UnInit();
+    isCleaned = true;
+}
 
 bool ServiceInited()
 {
@@ -126,7 +138,7 @@ int32_t UpdateCallEvent(FuzzedDataProvider& provider)
     int32_t phoneLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     int32_t bundleLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
     memcpy_s(info.phoneNum, kMaxNumberLen, msg.c_str(), phoneLength);
-    memcpy_s(info.bundleName, kMaxBundleNameLen, msg.c_str(), bundleLength);
+    memcpy_s(info.bundleName, kMaxBundleNameLen + 1, msg.c_str(), bundleLength);
     int32_t length = sizeof(CallEventInfo);
     MessageParcel messageParcel;
     messageParcel.WriteInt32(length);
@@ -379,6 +391,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;
+    OHOS::CleanCallRecordsSubscription();
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;

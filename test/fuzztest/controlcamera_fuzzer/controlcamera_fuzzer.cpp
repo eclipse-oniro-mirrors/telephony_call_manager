@@ -19,11 +19,21 @@
 #include <cstdint>
 #define private public
 #include "addcalltoken_fuzzer.h"
+#include "call_records_manager.h"
 #include "surface_utils.h"
 #include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
+inline void CleanCallRecordsSubscription()
+{
+    static bool isCleaned = false;
+    if (isCleaned || !IsServiceInited()) {
+        return;
+    }
+    DelayedSingleton<CallRecordsManager>::GetInstance()->UnInit();
+    isCleaned = true;
+}
 
 int32_t ControlCamera(FuzzedDataProvider& provider)
 {
@@ -196,6 +206,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;
+    OHOS::CleanCallRecordsSubscription();
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
