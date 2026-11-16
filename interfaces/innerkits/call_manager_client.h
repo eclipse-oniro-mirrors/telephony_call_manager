@@ -620,6 +620,13 @@ public:
     int32_t GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber);
 
     /**
+     * @brief Get the call state of the VoIP calls in the call object list
+     *
+     * @return Returns the call state on success, others on failure.
+     */
+    int32_t GetVoipCallState();
+
+    /**
      * @brief Checks whether a device supports voice calls
      *
      * @return true on support voice calls, false on not support.

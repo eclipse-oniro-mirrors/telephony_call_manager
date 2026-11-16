@@ -724,6 +724,14 @@ public:
     int32_t GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber) override;
 
     /**
+     * GetVoipCallState
+     *
+     * @brief Get the call state of the VoIP calls in the call object list
+     * @return Returns the call state on success, others on failure.
+     */
+    int32_t GetVoipCallState() override;
+
+    /**
      * Handle special code from dialer.
      *
      * @param specialCode[in], special code

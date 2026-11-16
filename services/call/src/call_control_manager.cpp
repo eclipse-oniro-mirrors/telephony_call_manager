@@ -1772,6 +1772,18 @@ int32_t CallControlManager::GetVoIPCallState(int32_t &state)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallControlManager::GetVoipCallState()
+{
+    CallStateToApp callState = CallStateToApp::CALL_STATE_IDLE;
+    if (CallObjectManager::HasVoipCallExist()) {
+        callState = CallStateToApp::CALL_STATE_OFFHOOK;
+        if (CallObjectManager::IsCallExist(CallType::TYPE_VOIP, TelCallState::CALL_STATUS_INCOMING)) {
+            callState = CallStateToApp::CALL_STATE_RINGING;
+        }
+    }
+    return static_cast<int32_t>(callState);
+}
+
 void CallControlManager::CallStateObserve()
 {
     if (callStateListenerPtr_ == nullptr) {

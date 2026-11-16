@@ -261,6 +261,8 @@ void CallManagerServiceStub::InitImsServiceRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoIPCallInfo(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_INFO)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoIPCallInfo(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_STATE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoipCallState(data, reply); };
 #ifdef SUPPORT_RTT_CALL
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_RTT_CAPABILITY_SETTING)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetRttCapability(data, reply); };
@@ -1429,6 +1431,16 @@ int32_t CallManagerServiceStub::OnGetVoIPCallInfo(MessageParcel &data, MessagePa
     }
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("GetVoIPCallInfo fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnGetVoipCallState(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = GetVoipCallState();
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("GetVoipCallState fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;

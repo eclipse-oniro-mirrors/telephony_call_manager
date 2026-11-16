@@ -120,6 +120,7 @@ enum CallManagerInterfaceCode {
     INTERFACE_SET_REG_MMI_CODE_CALLBACK_STATE,
     INTERFACE_REJECT_CALL_WITH_TYPE,
     INTERFACE_MAKE_DIRECT_CALL,
+    INTERFACE_GET_VOIP_STATE,
 };
 } // end extern
 } // namespace Telephony

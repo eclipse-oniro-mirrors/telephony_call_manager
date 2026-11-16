@@ -93,6 +93,7 @@ public:
     MOCK_METHOD1(GetVoIPCallState, int32_t(int32_t &state));
     MOCK_METHOD3(SetVoIPCallInfo, int32_t(const int32_t callId, const int32_t state, const std::string phoneNumber));
     MOCK_METHOD3(GetVoIPCallInfo, int32_t(int32_t &callId, int32_t &state, std::string &phoneNumber));
+    MOCK_METHOD0(GetVoipCallState, int32_t());
     MOCK_METHOD1(GetProxyObjectPtr, sptr<IRemoteObject>(CallManagerProxyType proxyType));
     MOCK_METHOD0(ReportAudioDeviceInfo, int32_t());
     MOCK_METHOD1(CancelCallUpgrade, int32_t(int32_t callId));

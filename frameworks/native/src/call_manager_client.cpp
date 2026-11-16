@@ -765,6 +765,16 @@ int32_t CallManagerClient::GetVoIPCallState(int32_t &state)
     }
 }
 
+int32_t CallManagerClient::GetVoipCallState()
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->GetVoipCallState();
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 bool CallManagerClient::HasVoiceCapability()
 {
     char retValue[VOICECALL_CAP_VAL_LEN + 1] = {"true"};
