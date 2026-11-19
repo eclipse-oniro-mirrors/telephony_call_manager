@@ -32,6 +32,11 @@ constexpr int32_t IMS_CALL_MODE_NUM = 8;
 constexpr int32_t OTT_EVENT_ID_NUM = 2;
 constexpr int32_t OTT_DETAILS_NUM = 8;
 
+void DestoryServiceInstance()
+{
+    DelayedSingleton<CallManagerService>::GetInstance();
+}
+
 static void DoOnSetCallPreferenceMode(FuzzedDataProvider &provider)
 {
     int32_t slotId = provider.ConsumeIntegral<int32_t>() % SLOT_NUM;
@@ -277,6 +282,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    OHOS::IsServiceInited();
+    atexit(OHOS::DestoryServiceInstance);
+    return 0;
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;

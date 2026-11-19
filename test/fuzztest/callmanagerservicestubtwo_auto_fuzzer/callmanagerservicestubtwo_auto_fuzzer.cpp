@@ -32,6 +32,12 @@ constexpr int32_t RESTRICTION_MODE_NUM = 2;
 constexpr int32_t TRANSFER_TYPE_NUM = 8;
 constexpr int32_t TRANSFER_SETTING_NUM = 8;
 
+void DestoryServiceInstance()
+{
+    DelayedSingleton<CallManagerService>::GetInstance();
+}
+
+
 static void DoOnIsEmergencyPhoneNumber(FuzzedDataProvider &provider)
 {
     std::string number = provider.ConsumeRandomLengthString();
@@ -280,6 +286,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    OHOS::IsServiceInited();
+    atexit(OHOS::DestoryServiceInstance);
+    return 0;
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;

@@ -33,6 +33,11 @@ constexpr int32_t DIAL_TYPE_NUM = 3;
 constexpr int32_t CALL_TYPE_NUM = 5;
 constexpr int32_t REJECT_TYPE_NUM = 4;
 
+void DestoryServiceInstance()
+{
+    DelayedSingleton<CallManagerService>::GetInstance();
+}
+
 static void DoOnRegisterCallBack(FuzzedDataProvider &provider)
 {
     MessageParcel messageParcel;
@@ -275,6 +280,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    OHOS::IsServiceInited();
+    atexit(OHOS::DestoryServiceInstance);
+    return 0;
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;
