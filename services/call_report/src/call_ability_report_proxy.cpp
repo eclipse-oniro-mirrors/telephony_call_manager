@@ -546,8 +546,7 @@ int32_t CallAbilityReportProxy::ReportBtCallStateChange(int32_t callId, int32_t 
             }
         }
     }
-    TELEPHONY_LOGI("ReportBtCallStateChange success, callId:%{public}d, numActive:%{public}d, numHeld:%{public}d, "
-        "callState:%{public}d", callId, numActive, numHeld, callState);
+    TELEPHONY_LOGI("ReportBtCallStateChange success");
     return ret;
 }
 
