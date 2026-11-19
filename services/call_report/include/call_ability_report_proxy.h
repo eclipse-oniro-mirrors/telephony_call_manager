@@ -53,6 +53,8 @@ public:
     int32_t ReportCallDataUsageChange(const int64_t dataUsage);
     int32_t ReportCameraCapabilities(const CameraCapabilities &cameraCapabilities);
     int32_t ReportPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
+    int32_t ReportBtCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld, int32_t callState,
+        const std::string &number);
     void CacheMmiCodeInfo(const MmiCodeInfo &info);
     void SetRegMmiCodeCallbackState(bool isReg);
 #ifdef SUPPORT_RTT_CALL

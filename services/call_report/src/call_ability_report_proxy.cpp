@@ -190,6 +190,15 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
     }
 #endif
 
+    sptr<CallBase> btCallPtr = CallObjectManager::GetOneCallObject(info.callId);
+    if (btCallPtr != nullptr && btCallPtr->IsRemoteControlEnable()) {
+        int32_t numActive = CallObjectManager::GetCallCountForRemoteControl(TelCallState::CALL_STATUS_ACTIVE);
+        int32_t numHeld = CallObjectManager::GetCallCountForRemoteControl(TelCallState::CALL_STATUS_HOLDING);
+        std::string accountNumber(info.accountNumber);
+        ReportBtCallStateChange(static_cast<int32_t>(info.callId), numActive, numHeld,
+            static_cast<int32_t>(info.callState), accountNumber);
+    }
+
     std::lock_guard<ffrt::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
@@ -507,6 +516,27 @@ int32_t CallAbilityReportProxy::ReportPhoneStateChange(int32_t numActive, int32_
         }
     }
     TELEPHONY_LOGI("ReportPhoneStateChange success");
+    return ret;
+}
+
+int32_t CallAbilityReportProxy::ReportBtCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld,
+    int32_t callState, const std::string &number)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it)) {
+            ret = (*it)->OnBtCallStateChange(callId, numActive, numHeld, callState, number);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW("ReportBtCallStateChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
+                continue;
+            }
+        }
+    }
+    TELEPHONY_LOGI("ReportBtCallStateChange success, callId:%{public}d, numActive:%{public}d, numHeld:%{public}d, "
+        "callState:%{public}d", callId, numActive, numHeld, callState);
     return ret;
 }
 
