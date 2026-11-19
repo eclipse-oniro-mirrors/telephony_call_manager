@@ -140,6 +140,7 @@ void CallAbilityReportProxy::CallStateUpdated(
         TELEPHONY_LOGI("report answered state");
         info.callState = TelCallState::CALL_STATUS_ANSWERED;
     }
+    TryReportBtCallStateChange(info);
     ReportCallStateInfo(info);
 }
 
@@ -190,8 +191,6 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
     }
 #endif
 
-    TryReportBtCallStateChange(info);
-
     std::lock_guard<ffrt::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
@@ -211,6 +210,25 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
                    "videoState[%{public}d] rttState[%{public}d]",
         info.callId, info.callState, info.conferenceState, info.videoState, info.rttState);
     return ret;
+}
+
+void CallAbilityReportProxy::TryReportBtCallStateChange(const CallAttributeInfo &info)
+{
+    if (info.callState == TelCallState::CALL_STATUS_ANSWERED) {
+        return;
+    }
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(info.callId);
+    if (callPtr == nullptr) {
+        return;
+    }
+    if (callPtr->GetCallType() == CallType::TYPE_VOIP && !callPtr->IsRemoteControlEnable()) {
+        return;
+    }
+    int32_t numActive = CallObjectManager::GetCallCountForRemoteControl(TelCallState::CALL_STATUS_ACTIVE);
+    int32_t numHeld = CallObjectManager::GetCallCountForRemoteControl(TelCallState::CALL_STATUS_HOLDING);
+    std::string accountNumber(info.accountNumber);
+    ReportBtCallStateChange(static_cast<int32_t>(info.callId), numActive, numHeld,
+        static_cast<int32_t>(info.callState), accountNumber);
 }
 
 int32_t CallAbilityReportProxy::ReportMeeTimeStateInfo(const CallAttributeInfo &info)
@@ -531,22 +549,6 @@ int32_t CallAbilityReportProxy::ReportBtCallStateChange(int32_t callId, int32_t 
     TELEPHONY_LOGI("ReportBtCallStateChange success, callId:%{public}d, numActive:%{public}d, numHeld:%{public}d, "
         "callState:%{public}d", callId, numActive, numHeld, callState);
     return ret;
-}
-
-void CallAbilityReportProxy::TryReportBtCallStateChange(const CallAttributeInfo &info)
-{
-    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(info.callId);
-    if (callPtr == nullptr) {
-        return;
-    }
-    if (callPtr->GetCallType() == CallType::TYPE_VOIP && !callPtr->IsRemoteControlEnable()) {
-        return;
-    }
-    int32_t numActive = CallObjectManager::GetCallCountForRemoteControl(TelCallState::CALL_STATUS_ACTIVE);
-    int32_t numHeld = CallObjectManager::GetCallCountForRemoteControl(TelCallState::CALL_STATUS_HOLDING);
-    std::string accountNumber(info.accountNumber);
-    ReportBtCallStateChange(static_cast<int32_t>(info.callId), numActive, numHeld,
-        static_cast<int32_t>(info.callState), accountNumber);
 }
 
 void CallAbilityReportProxy::UpdateBtCallSlotId(CallAttributeInfo &info)
