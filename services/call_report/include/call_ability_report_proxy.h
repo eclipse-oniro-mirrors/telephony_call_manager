@@ -66,6 +66,7 @@ public:
 private:
     int32_t ReportCallEvent(const CallEventInfo &info);
     void UpdateBtCallSlotId(CallAttributeInfo &newInfo);
+    void TryReportBtCallStateChange(const CallAttributeInfo &info);
 
 private:
     std::list<sptr<ICallAbilityCallback>> callbackPtrList_;
