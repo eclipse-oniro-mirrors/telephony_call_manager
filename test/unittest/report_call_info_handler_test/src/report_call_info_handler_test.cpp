@@ -480,7 +480,7 @@ public:
         return detailInfo;
     }
  
-    ReportCallInfoHandler *handler_ = nullptr;
+    std::shared_ptr<ReportCallInfoHandler> handler_;
  
 private:
     int32_t savedProvisioned_ = 0;
