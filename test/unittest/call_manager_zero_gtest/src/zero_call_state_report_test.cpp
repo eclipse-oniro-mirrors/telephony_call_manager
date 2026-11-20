@@ -19,6 +19,7 @@
 #include <gtest/gtest.h>
 
 #include "call_ability_callback.h"
+#include "call_ability_callback_proxy.h"
 #include "call_ability_report_proxy.h"
 #include "call_manager_info.h"
 #include "call_object_manager.h"
@@ -51,7 +52,7 @@ public:
         lastNumHeld_ = numHeld;
         lastCallState_ = callState;
         lastNumber_ = number;
-        return TELEPHONY_SUCCESS;
+        return returnValue_;
     }
 
     void Reset()
@@ -62,6 +63,99 @@ public:
         lastNumHeld_ = 0;
         lastCallState_ = static_cast<int32_t>(TelCallState::CALL_STATUS_UNKNOWN);
         lastNumber_ = "";
+        returnValue_ = TELEPHONY_SUCCESS;
+    }
+
+    int32_t count_ = 0;
+    int32_t lastCallId_ = NOT_EXIST_CALL_ID;
+    int32_t lastNumActive_ = 0;
+    int32_t lastNumHeld_ = 0;
+    int32_t lastCallState_ = static_cast<int32_t>(TelCallState::CALL_STATUS_UNKNOWN);
+    std::string lastNumber_ = "";
+    int32_t returnValue_ = TELEPHONY_SUCCESS;
+};
+
+/**
+ * Mock process callback used to verify CallAbilityCallback forwards the state
+ * change to the registered manager callback.
+ */
+class MockManagerCallback : public CallManagerCallback {
+public:
+    int32_t OnCallDetailsChange(const CallAttributeInfo &info) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnCallEventChange(const CallEventInfo &info) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnCallDisconnectedCause(const DisconnectedDetails &details) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportMmiCodeResult(const MmiCodeInfo &info) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportAudioDeviceChange(const AudioDeviceInfo &info) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportPostDialDelay(const std::string &str) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnUpdateImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnCallSessionEventChange(const CallSessionEvent &callSessionEventOptions) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnCallDataUsageChange(const int64_t dataUsage) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnUpdateCameraCapabilities(const CameraCapabilities &cameraCapabilities) override
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld, int32_t callState,
+        const std::string &number) override
+    {
+        ++count_;
+        lastCallId_ = callId;
+        lastNumActive_ = numActive;
+        lastNumHeld_ = numHeld;
+        lastCallState_ = callState;
+        lastNumber_ = number;
+        return TELEPHONY_ERR_FAIL;
     }
 
     int32_t count_ = 0;
@@ -80,7 +174,8 @@ public:
     void SetUp() override;
     void TearDown() override;
 
-    static sptr<CallBase> CreateCall(CallType type, int32_t callId, TelCallState state);
+    static sptr<CallBase> CreateCall(CallType type, int32_t callId, TelCallState state,
+        const std::string &number = TEST_ACCOUNT_NUMBER);
     static CallAttributeInfo BuildInfo(int32_t callId, TelCallState state);
 
     std::shared_ptr<CallAbilityReportProxy> proxy_ = nullptr;
@@ -112,14 +207,15 @@ void ZeroCallStateReportTest::TearDown()
     proxy_ = nullptr;
 }
 
-sptr<CallBase> ZeroCallStateReportTest::CreateCall(CallType type, int32_t callId, TelCallState state)
+sptr<CallBase> ZeroCallStateReportTest::CreateCall(CallType type, int32_t callId, TelCallState state,
+    const std::string &number)
 {
     DialParaInfo dialInfo;
     dialInfo.callId = callId;
     dialInfo.callType = type;
     dialInfo.callState = state;
     dialInfo.accountId = 0;
-    dialInfo.number = TEST_ACCOUNT_NUMBER;
+    dialInfo.number = number;
     sptr<CallBase> call = nullptr;
     if (type == CallType::TYPE_VOIP) {
         call = new (std::nothrow) VoIPCall(dialInfo);
@@ -324,6 +420,188 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_012, TestSize.Level0
         static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE), TEST_ACCOUNT_NUMBER);
     EXPECT_EQ(ret, TELEPHONY_ERR_FAIL);
     EXPECT_EQ(callback_->count_, 0);
+}
+
+/**
+ * @tc.number   Telephony_CallStateReport_013
+ * @tc.name     test ability callback forwards state change to process callback
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_013, TestSize.Level0)
+{
+    CallAbilityCallback abilityCallback;
+    auto managerCallback = std::make_unique<MockManagerCallback>();
+    MockManagerCallback *managerPtr = managerCallback.get();
+    ASSERT_EQ(abilityCallback.SetProcessCallback(std::move(managerCallback)), TELEPHONY_SUCCESS);
+    int32_t ret = abilityCallback.OnCallStateChange(TEST_CALL_ID, 1, 0,
+        static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE), TEST_ACCOUNT_NUMBER);
+    EXPECT_EQ(ret, TELEPHONY_ERR_FAIL);
+    EXPECT_EQ(managerPtr->count_, 1);
+    EXPECT_EQ(managerPtr->lastCallId_, TEST_CALL_ID);
+    EXPECT_EQ(managerPtr->lastNumActive_, 1);
+    EXPECT_EQ(managerPtr->lastNumHeld_, 0);
+    EXPECT_EQ(managerPtr->lastCallState_, static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE));
+    EXPECT_EQ(managerPtr->lastNumber_, TEST_ACCOUNT_NUMBER);
+}
+
+/**
+ * @tc.number   Telephony_CallStateReport_014
+ * @tc.name     test ability callback without process callback returns success
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_014, TestSize.Level0)
+{
+    CallAbilityCallback abilityCallback;
+    int32_t ret = abilityCallback.OnCallStateChange(TEST_CALL_ID, 1, 0,
+        static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE), TEST_ACCOUNT_NUMBER);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallStateReport_015
+ * @tc.name     test stub dispatch without file descriptor writes result to reply
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_015, TestSize.Level0)
+{
+    MockAbilityCallback stub;
+    MessageParcel data;
+    MessageParcel reply;
+    ASSERT_TRUE(data.WriteInt32(TEST_CALL_ID));
+    ASSERT_TRUE(data.WriteInt32(1));
+    ASSERT_TRUE(data.WriteInt32(0));
+    ASSERT_TRUE(data.WriteInt32(static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE)));
+    ASSERT_TRUE(data.WriteString(TEST_ACCOUNT_NUMBER));
+    int32_t ret = stub.OnUpdateBtCallState(data, reply);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    EXPECT_EQ(stub.count_, 1);
+    EXPECT_EQ(stub.lastCallId_, TEST_CALL_ID);
+    EXPECT_EQ(stub.lastNumActive_, 1);
+    EXPECT_EQ(stub.lastNumHeld_, 0);
+    EXPECT_EQ(stub.lastCallState_, static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE));
+    EXPECT_EQ(stub.lastNumber_, TEST_ACCOUNT_NUMBER);
+    EXPECT_EQ(reply.ReadInt32(), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallStateReport_016
+ * @tc.name     test stub dispatch with file descriptor
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_016, TestSize.Level0)
+{
+    MockAbilityCallback stub;
+    MessageParcel data;
+    MessageParcel reply;
+    ASSERT_TRUE(data.WriteInt32(TEST_CALL_ID));
+    ASSERT_TRUE(data.WriteInt32(0));
+    ASSERT_TRUE(data.WriteInt32(0));
+    ASSERT_TRUE(data.WriteInt32(static_cast<int32_t>(TelCallState::CALL_STATUS_INCOMING)));
+    ASSERT_TRUE(data.WriteString(TEST_ACCOUNT_NUMBER));
+    ASSERT_TRUE(data.WriteFileDescriptor(0));
+    int32_t ret = stub.OnUpdateBtCallState(data, reply);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    EXPECT_EQ(stub.count_, 1);
+    EXPECT_EQ(stub.lastCallId_, TEST_CALL_ID);
+    EXPECT_EQ(stub.lastCallState_, static_cast<int32_t>(TelCallState::CALL_STATUS_INCOMING));
+    EXPECT_EQ(reply.ReadInt32(), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallStateReport_017
+ * @tc.name     test proxy returns ipc fail when remote is nullptr
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_017, TestSize.Level0)
+{
+    sptr<IRemoteObject> impl;
+    CallAbilityCallbackProxy callbackProxy(impl);
+    int32_t ret = callbackProxy.OnCallStateChange(TEST_CALL_ID, 1, 0,
+        static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE), TEST_ACCOUNT_NUMBER);
+    EXPECT_EQ(ret, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+/**
+ * @tc.number   Telephony_CallStateReport_018
+ * @tc.name     test proxy forwards state change to remote stub
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_018, TestSize.Level0)
+{
+    sptr<MockAbilityCallback> stub = new (std::nothrow) MockAbilityCallback();
+    ASSERT_NE(stub, nullptr);
+    stub->Reset();
+    CallAbilityCallbackProxy callbackProxy(stub);
+    int32_t ret = callbackProxy.OnCallStateChange(TEST_CALL_ID, 1, 0,
+        static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE), TEST_ACCOUNT_NUMBER);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    EXPECT_EQ(stub->count_, 1);
+    EXPECT_EQ(stub->lastCallId_, TEST_CALL_ID);
+    EXPECT_EQ(stub->lastNumActive_, 1);
+    EXPECT_EQ(stub->lastNumHeld_, 0);
+    EXPECT_EQ(stub->lastCallState_, static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE));
+    EXPECT_EQ(stub->lastNumber_, TEST_ACCOUNT_NUMBER);
+}
+
+/**
+ * @tc.number   Telephony_CallStateReport_019
+ * @tc.name     test report continues after a callback returns fail
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_019, TestSize.Level0)
+{
+    callback_->returnValue_ = TELEPHONY_ERR_FAIL;
+    sptr<MockAbilityCallback> secondCallback = new (std::nothrow) MockAbilityCallback();
+    ASSERT_NE(secondCallback, nullptr);
+    secondCallback->Reset();
+    proxy_->callbackPtrList_.emplace_back(secondCallback);
+    int32_t ret = proxy_->ReportCallStateChange(TEST_CALL_ID, 1, 0,
+        static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE), TEST_ACCOUNT_NUMBER);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    EXPECT_EQ(callback_->count_, 1);
+    EXPECT_EQ(secondCallback->count_, 1);
+}
+
+/**
+ * @tc.number   Telephony_CallStateReport_020
+ * @tc.name     test CallStateUpdated with nullptr call object does not report
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_020, TestSize.Level0)
+{
+    sptr<CallBase> call = nullptr;
+    proxy_->CallStateUpdated(call, TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_EQ(callback_->count_, 0);
+}
+
+/**
+ * @tc.number   Telephony_CallStateReport_021
+ * @tc.name     test CallStateUpdated truncates number at comma
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_021, TestSize.Level0)
+{
+    sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE,
+        "138,0000");
+    ASSERT_NE(call, nullptr);
+    proxy_->CallStateUpdated(call, TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_EQ(callback_->count_, 1);
+    EXPECT_EQ(callback_->lastNumber_, "138");
+}
+
+/**
+ * @tc.number   Telephony_CallStateReport_022
+ * @tc.name     test CallStateUpdated truncates number at semicolon
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_022, TestSize.Level0)
+{
+    sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE,
+        "139;0000");
+    ASSERT_NE(call, nullptr);
+    proxy_->CallStateUpdated(call, TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_EQ(callback_->count_, 1);
+    EXPECT_EQ(callback_->lastNumber_, "139");
 }
 }  // namespace Telephony
 }  // namespace OHOS
