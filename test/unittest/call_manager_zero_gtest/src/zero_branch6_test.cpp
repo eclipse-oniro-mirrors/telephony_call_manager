@@ -1092,8 +1092,14 @@ HWTEST_F(ZeroBranch5Test, Telephony_ApplicationStateObserver_001, TestSize.Level
 {
     ApplicationStateObserver applicationStateObserver;
     AppExecFwk::ProcessData processData;
+    processData.processName = "ui";
+    CallAttributeInfo voipInfo;
+    voipInfo.callId = 1;
+    voipInfo.callState = TelCallState::CALL_STATUS_ACTIVE;
+    ASSERT_EQ(CallObjectManager::AddOneVoipCallObject(voipInfo), TELEPHONY_SUCCESS);
+    ASSERT_TRUE(CallObjectManager::IsVoipCallExist());
     applicationStateObserver.OnProcessDied(processData);
-    ASSERT_NE(sizeof(processData), 0);
+    ASSERT_FALSE(CallObjectManager::IsVoipCallExist());
 }
 
 /**
