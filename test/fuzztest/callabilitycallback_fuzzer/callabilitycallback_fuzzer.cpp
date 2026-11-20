@@ -23,7 +23,6 @@
 #include "call_ability_callback_proxy.h"
 #include "call_manager_callback.h"
 #include "call_manager_utils.h"
-#include "call_records_manager.h"
 #include "fuzzer/FuzzedDataProvider.h"
 
 using namespace OHOS::Telephony;
@@ -41,14 +40,9 @@ constexpr int32_t VIDEO_REQUEST_RESULT_TYPE_NUM = 102;
 constexpr int32_t WAIT_TIME = 2;
 sptr<CallAbilityCallback> callAbilityCallbackPtr_ = nullptr;
 
-inline void CleanCallRecordsSubscription()
+void DestoryServiceInstance()
 {
-    static bool isCleaned = false;
-    if (isCleaned || !IsServiceInited()) {
-        return;
-    }
-    DelayedSingleton<CallRecordsManager>::GetInstance()->UnInit();
-    isCleaned = true;
+    DelayedSingleton<CallManagerService>::GetInstance();
 }
 
 bool ServiceInited()
@@ -388,10 +382,16 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    OHOS::IsServiceInited();
+    atexit(OHOS::DestoryServiceInstance);
+    return 0;
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;
-    OHOS::CleanCallRecordsSubscription();
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;

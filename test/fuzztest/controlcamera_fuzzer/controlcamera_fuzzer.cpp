@@ -25,14 +25,9 @@
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-inline void CleanCallRecordsSubscription()
+void DestoryServiceInstance()
 {
-    static bool isCleaned = false;
-    if (isCleaned || !IsServiceInited()) {
-        return;
-    }
-    DelayedSingleton<CallRecordsManager>::GetInstance()->UnInit();
-    isCleaned = true;
+    DelayedSingleton<CallManagerService>::GetInstance();
 }
 
 int32_t ControlCamera(FuzzedDataProvider& provider)
@@ -203,10 +198,16 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    OHOS::IsServiceInited();
+    atexit(OHOS::DestoryServiceInstance);
+    return 0;
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;
-    OHOS::CleanCallRecordsSubscription();
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;

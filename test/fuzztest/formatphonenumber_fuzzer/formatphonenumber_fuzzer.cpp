@@ -25,6 +25,11 @@ using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 2;
 
+void DestoryServiceInstance()
+{
+    DelayedSingleton<CallManagerService>::GetInstance();
+}
+
 int32_t GetMainCallId(FuzzedDataProvider& provider)
 {
     if (!IsServiceInited()) {
@@ -177,6 +182,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    OHOS::IsServiceInited();
+    atexit(OHOS::DestoryServiceInstance);
+    return 0;
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;

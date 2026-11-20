@@ -26,16 +26,6 @@
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-inline void CleanCallRecordsSubscription()
-{
-    static bool isCleaned = false;
-    if (isCleaned || !IsServiceInited()) {
-        return;
-    }
-    DelayedSingleton<CallRecordsManager>::GetInstance()->UnInit();
-    isCleaned = true;
-}
-
 constexpr int32_t BOOL_NUM = 2;
 constexpr int32_t CALL_TYPE_NUM = 4;
 constexpr int32_t RING_STATE_NUM = 2;
@@ -47,6 +37,11 @@ constexpr int32_t AUDIO_EVENT = 30;
 constexpr int32_t AUDIO_SCENE_NUM = 4;
 constexpr int32_t AUDIO_VOLUME_TYPE_NUM = 13;
 constexpr int32_t WAIT_TIME = 2;
+
+void DestoryServiceInstance()
+{
+    DelayedSingleton<CallManagerService>::GetInstance();
+}
 
 void AudioControlManagerFunc(FuzzedDataProvider& provider)
 {
@@ -204,10 +199,16 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    OHOS::IsServiceInited();
+    atexit(OHOS::DestoryServiceInstance);
+    return 0;
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;
-    OHOS::CleanCallRecordsSubscription();
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     OHOS::DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();

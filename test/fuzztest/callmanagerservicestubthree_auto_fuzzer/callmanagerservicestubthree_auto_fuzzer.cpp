@@ -29,6 +29,12 @@ namespace OHOS {
 constexpr int32_t AUDIO_DEVICE_NUM = 8;
 constexpr int32_t CONFERENCE_LIST_NUM = 3;
 
+void DestoryServiceInstance()
+{
+    DelayedSingleton<CallManagerService>::GetInstance();
+}
+
+
 static void DoOnCombineConference(FuzzedDataProvider &provider)
 {
     int32_t mainCallId = provider.ConsumeIntegral<int32_t>();
@@ -277,6 +283,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
+extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
+{
+    OHOS::IsServiceInited();
+    atexit(OHOS::DestoryServiceInstance);
+    return 0;
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;
