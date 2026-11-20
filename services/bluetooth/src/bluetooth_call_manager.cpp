@@ -32,8 +32,8 @@ BluetoothCallManager::~BluetoothCallManager() {}
 int32_t BluetoothCallManager::SendBtCallState(
     int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number)
 {
-    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateChange(ERR_ID, numActive, numHeld,
-        callState, number);
+    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportPhoneStateChange(numActive, numHeld, callState,
+        number);
     if (btConnection_ == nullptr) {
         TELEPHONY_LOGE("bluetooth connection nullptr");
         return TELEPHONY_ERROR;
