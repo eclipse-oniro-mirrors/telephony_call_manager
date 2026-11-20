@@ -603,5 +603,27 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_022, TestSize.Level0
     EXPECT_EQ(callback_->count_, 1);
     EXPECT_EQ(callback_->lastNumber_, "139");
 }
+
+/**
+ * @tc.number   Telephony_CallStateReport_023
+ * @tc.name     test OnUpdateBtCallState returns write reply fail when reply rejects writes
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_023, TestSize.Level0)
+{
+    MockAbilityCallback stub;
+    MessageParcel data;
+    MessageParcel reply;
+    ASSERT_TRUE(data.WriteInt32(TEST_CALL_ID));
+    ASSERT_TRUE(data.WriteInt32(1));
+    ASSERT_TRUE(data.WriteInt32(0));
+    ASSERT_TRUE(data.WriteInt32(static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE)));
+    ASSERT_TRUE(data.WriteString(TEST_ACCOUNT_NUMBER));
+    // Max capacity 0 makes the reply parcel reject writes, so WriteInt32 fails.
+    ASSERT_TRUE(reply.SetMaxCapacity(0));
+    int32_t ret = stub.OnUpdateBtCallState(data, reply);
+    EXPECT_EQ(ret, TELEPHONY_ERR_WRITE_REPLY_FAIL);
+    EXPECT_EQ(stub.count_, 1);
+}
 }  // namespace Telephony
 }  // namespace OHOS
