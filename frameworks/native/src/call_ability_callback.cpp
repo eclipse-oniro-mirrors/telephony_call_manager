@@ -171,12 +171,12 @@ int32_t CallAbilityCallback::OnPhoneStateChange(int32_t numActive, int32_t numHe
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallAbilityCallback::OnBtCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld, int32_t callState,
+int32_t CallAbilityCallback::OnCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld, int32_t callState,
     const std::string &number)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
-        return callbackPtr_->OnBtCallStateChange(callId, numActive, numHeld, callState, number);
+        return callbackPtr_->OnCallStateChange(callId, numActive, numHeld, callState, number);
     }
     return TELEPHONY_SUCCESS;
 }

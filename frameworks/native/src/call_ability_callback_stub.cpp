@@ -466,7 +466,7 @@ int32_t CallAbilityCallbackStub::OnUpdateBtCallState(MessageParcel &data, Messag
     int32_t numHeld = data.ReadInt32();
     int32_t callState = data.ReadInt32();
     std::string number = data.ReadString();
-    int32_t result = OnBtCallStateChange(callId, numActive, numHeld, callState, number);
+    int32_t result = OnCallStateChange(callId, numActive, numHeld, callState, number);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

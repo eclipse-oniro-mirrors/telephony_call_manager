@@ -37,12 +37,12 @@ constexpr int32_t NOT_EXIST_CALL_ID = 9999;
 const std::string TEST_ACCOUNT_NUMBER = "13800000000";
 
 /**
- * Record every OnBtCallStateChange callback so that both the trigger times
+ * Record every OnCallStateChange callback so that both the trigger times
  * and the reported parameters can be asserted.
  */
-class MockBtAbilityCallback : public CallAbilityCallback {
+class MockAbilityCallback : public CallAbilityCallback {
 public:
-    int32_t OnBtCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld, int32_t callState,
+    int32_t OnCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld, int32_t callState,
         const std::string &number) override
     {
         ++count_;
@@ -73,7 +73,7 @@ public:
 };
 }  // namespace
 
-class ZeroBtCallStateReportTest : public testing::Test {
+class ZeroCallStateReportTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -84,25 +84,25 @@ public:
     static CallAttributeInfo BuildInfo(int32_t callId, TelCallState state);
 
     std::shared_ptr<CallAbilityReportProxy> proxy_ = nullptr;
-    sptr<MockBtAbilityCallback> callback_ = nullptr;
+    sptr<MockAbilityCallback> callback_ = nullptr;
 };
 
-void ZeroBtCallStateReportTest::SetUpTestCase() {}
+void ZeroCallStateReportTest::SetUpTestCase() {}
 
-void ZeroBtCallStateReportTest::TearDownTestCase() {}
+void ZeroCallStateReportTest::TearDownTestCase() {}
 
-void ZeroBtCallStateReportTest::SetUp()
+void ZeroCallStateReportTest::SetUp()
 {
     proxy_ = DelayedSingleton<CallAbilityReportProxy>::GetInstance();
     ASSERT_NE(proxy_, nullptr);
-    callback_ = new (std::nothrow) MockBtAbilityCallback();
+    callback_ = new (std::nothrow) MockAbilityCallback();
     ASSERT_NE(callback_, nullptr);
     callback_->Reset();
     proxy_->callbackPtrList_.clear();
     proxy_->callbackPtrList_.emplace_back(callback_);
 }
 
-void ZeroBtCallStateReportTest::TearDown()
+void ZeroCallStateReportTest::TearDown()
 {
     if (proxy_ != nullptr) {
         proxy_->callbackPtrList_.clear();
@@ -112,7 +112,7 @@ void ZeroBtCallStateReportTest::TearDown()
     proxy_ = nullptr;
 }
 
-sptr<CallBase> ZeroBtCallStateReportTest::CreateCall(CallType type, int32_t callId, TelCallState state)
+sptr<CallBase> ZeroCallStateReportTest::CreateCall(CallType type, int32_t callId, TelCallState state)
 {
     DialParaInfo dialInfo;
     dialInfo.callId = callId;
@@ -132,7 +132,7 @@ sptr<CallBase> ZeroBtCallStateReportTest::CreateCall(CallType type, int32_t call
     return call;
 }
 
-CallAttributeInfo ZeroBtCallStateReportTest::BuildInfo(int32_t callId, TelCallState state)
+CallAttributeInfo ZeroCallStateReportTest::BuildInfo(int32_t callId, TelCallState state)
 {
     CallAttributeInfo info;
     info.callId = callId;
@@ -142,58 +142,58 @@ CallAttributeInfo ZeroBtCallStateReportTest::BuildInfo(int32_t callId, TelCallSt
 }
 
 /**
- * @tc.number   Telephony_BtCallStateReport_001
+ * @tc.number   Telephony_CallStateReport_001
  * @tc.name     test answered state is filtered
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_001, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_001, TestSize.Level0)
 {
     CallAttributeInfo info = BuildInfo(TEST_CALL_ID, TelCallState::CALL_STATUS_ANSWERED);
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
-    proxy_->TryReportBtCallStateChange(info);
+    proxy_->TryReportCallStateChange(info);
     EXPECT_EQ(callback_->count_, 0);
 }
 
 /**
- * @tc.number   Telephony_BtCallStateReport_002
+ * @tc.number   Telephony_CallStateReport_002
  * @tc.name     test call object not exist
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_002, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_002, TestSize.Level0)
 {
     CallAttributeInfo info = BuildInfo(NOT_EXIST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
-    proxy_->TryReportBtCallStateChange(info);
+    proxy_->TryReportCallStateChange(info);
     EXPECT_EQ(callback_->count_, 0);
 }
 
 /**
- * @tc.number   Telephony_BtCallStateReport_003
+ * @tc.number   Telephony_CallStateReport_003
  * @tc.name     test voip call without remote control is filtered
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_003, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_003, TestSize.Level0)
 {
     sptr<CallBase> call = CreateCall(CallType::TYPE_VOIP, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
     call->SetRemoteControl(false);
     CallAttributeInfo info = BuildInfo(TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
-    proxy_->TryReportBtCallStateChange(info);
+    proxy_->TryReportCallStateChange(info);
     EXPECT_EQ(callback_->count_, 0);
 }
 
 /**
- * @tc.number   Telephony_BtCallStateReport_004
+ * @tc.number   Telephony_CallStateReport_004
  * @tc.name     test voip call with remote control is reported
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_004, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_004, TestSize.Level0)
 {
     sptr<CallBase> call = CreateCall(CallType::TYPE_VOIP, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
     call->SetRemoteControl(true);
     CallAttributeInfo info = BuildInfo(TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
-    proxy_->TryReportBtCallStateChange(info);
+    proxy_->TryReportCallStateChange(info);
     EXPECT_EQ(callback_->count_, 1);
     EXPECT_EQ(callback_->lastCallId_, TEST_CALL_ID);
     EXPECT_EQ(callback_->lastCallState_, static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE));
@@ -201,27 +201,27 @@ HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_004, TestSize.Le
 }
 
 /**
- * @tc.number   Telephony_BtCallStateReport_005
+ * @tc.number   Telephony_CallStateReport_005
  * @tc.name     test cellular call is reported with real callId
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_005, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_005, TestSize.Level0)
 {
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
     CallAttributeInfo info = BuildInfo(TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
-    proxy_->TryReportBtCallStateChange(info);
+    proxy_->TryReportCallStateChange(info);
     EXPECT_EQ(callback_->count_, 1);
     EXPECT_EQ(callback_->lastCallId_, TEST_CALL_ID);
     EXPECT_EQ(callback_->lastCallState_, static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE));
 }
 
 /**
- * @tc.number   Telephony_BtCallStateReport_006
+ * @tc.number   Telephony_CallStateReport_006
  * @tc.name     test CallStateUpdated triggers bt call state report
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_006, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_006, TestSize.Level0)
 {
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
@@ -234,11 +234,11 @@ HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_006, TestSize.Le
 }
 
 /**
- * @tc.number   Telephony_BtCallStateReport_007
+ * @tc.number   Telephony_CallStateReport_007
  * @tc.name     test CallStateUpdated with answered state does not report
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_007, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_007, TestSize.Level0)
 {
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
@@ -248,11 +248,11 @@ HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_007, TestSize.Le
 }
 
 /**
- * @tc.number   Telephony_BtCallStateReport_008
+ * @tc.number   Telephony_CallStateReport_008
  * @tc.name     test ReportCallStateInfo no longer triggers bt call state report
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_008, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_008, TestSize.Level0)
 {
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
@@ -262,11 +262,11 @@ HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_008, TestSize.Le
 }
 
 /**
- * @tc.number   Telephony_BtCallStateReport_009
+ * @tc.number   Telephony_CallStateReport_009
  * @tc.name     test numActive and numHeld are counted correctly
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_009, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_009, TestSize.Level0)
 {
     sptr<CallBase> activeCall = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(activeCall, nullptr);
@@ -274,36 +274,36 @@ HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_009, TestSize.Le
         CreateCall(CallType::TYPE_IMS, TEST_CALL_ID_SECOND, TelCallState::CALL_STATUS_HOLDING);
     ASSERT_NE(holdCall, nullptr);
     CallAttributeInfo info = BuildInfo(TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
-    proxy_->TryReportBtCallStateChange(info);
+    proxy_->TryReportCallStateChange(info);
     EXPECT_EQ(callback_->count_, 1);
     EXPECT_EQ(callback_->lastNumActive_, 1);
     EXPECT_EQ(callback_->lastNumHeld_, 1);
 }
 
 /**
- * @tc.number   Telephony_BtCallStateReport_010
+ * @tc.number   Telephony_CallStateReport_010
  * @tc.name     test report when callback list is empty
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_010, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_010, TestSize.Level0)
 {
     proxy_->callbackPtrList_.clear();
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
     CallAttributeInfo info = BuildInfo(TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
-    proxy_->TryReportBtCallStateChange(info);
+    proxy_->TryReportCallStateChange(info);
     EXPECT_EQ(callback_->count_, 0);
 }
 
 /**
- * @tc.number   Telephony_BtCallStateReport_011
+ * @tc.number   Telephony_CallStateReport_011
  * @tc.name     test report skips nullptr callback and keeps valid callback
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_011, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_011, TestSize.Level0)
 {
     proxy_->callbackPtrList_.emplace_back(nullptr);
-    int32_t ret = proxy_->ReportBtCallStateChange(TEST_CALL_ID, 1, 0,
+    int32_t ret = proxy_->ReportCallStateChange(TEST_CALL_ID, 1, 0,
         static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE), TEST_ACCOUNT_NUMBER);
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
     EXPECT_EQ(callback_->count_, 1);
@@ -312,15 +312,15 @@ HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_011, TestSize.Le
 }
 
 /**
- * @tc.number   Telephony_BtCallStateReport_012
+ * @tc.number   Telephony_CallStateReport_012
  * @tc.name     test report with only nullptr callback returns fail
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBtCallStateReportTest, Telephony_BtCallStateReport_012, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_012, TestSize.Level0)
 {
     proxy_->callbackPtrList_.clear();
     proxy_->callbackPtrList_.emplace_back(nullptr);
-    int32_t ret = proxy_->ReportBtCallStateChange(TEST_CALL_ID, 1, 0,
+    int32_t ret = proxy_->ReportCallStateChange(TEST_CALL_ID, 1, 0,
         static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE), TEST_ACCOUNT_NUMBER);
     EXPECT_EQ(ret, TELEPHONY_ERR_FAIL);
     EXPECT_EQ(callback_->count_, 0);

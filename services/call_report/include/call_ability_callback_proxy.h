@@ -45,7 +45,7 @@ public:
     int32_t OnReportCameraCapabilities(const CameraCapabilities &cameraCapabilities) override;
     int32_t OnPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState,
         const std::string &number) override;
-    int32_t OnBtCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld, int32_t callState,
+    int32_t OnCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld, int32_t callState,
         const std::string &number) override;
 #ifdef SUPPORT_RTT_CALL
     int32_t OnReportRttCallEvtChanged(const RttEvent &info) override;

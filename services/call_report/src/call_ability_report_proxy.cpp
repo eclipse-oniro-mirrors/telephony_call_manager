@@ -140,7 +140,7 @@ void CallAbilityReportProxy::CallStateUpdated(
         TELEPHONY_LOGI("report answered state");
         info.callState = TelCallState::CALL_STATUS_ANSWERED;
     }
-    TryReportBtCallStateChange(info);
+    TryReportCallStateChange(info);
     ReportCallStateInfo(info);
 }
 
@@ -212,7 +212,7 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
     return ret;
 }
 
-void CallAbilityReportProxy::TryReportBtCallStateChange(const CallAttributeInfo &info)
+void CallAbilityReportProxy::TryReportCallStateChange(const CallAttributeInfo &info)
 {
     if (info.callState == TelCallState::CALL_STATUS_ANSWERED) {
         return;
@@ -227,7 +227,7 @@ void CallAbilityReportProxy::TryReportBtCallStateChange(const CallAttributeInfo 
     int32_t numActive = CallObjectManager::GetCallCountForRemoteControl(TelCallState::CALL_STATUS_ACTIVE);
     int32_t numHeld = CallObjectManager::GetCallCountForRemoteControl(TelCallState::CALL_STATUS_HOLDING);
     std::string accountNumber(info.accountNumber);
-    ReportBtCallStateChange(static_cast<int32_t>(info.callId), numActive, numHeld,
+    ReportCallStateChange(static_cast<int32_t>(info.callId), numActive, numHeld,
         static_cast<int32_t>(info.callState), accountNumber);
 }
 
@@ -530,7 +530,7 @@ int32_t CallAbilityReportProxy::ReportPhoneStateChange(int32_t numActive, int32_
     return ret;
 }
 
-int32_t CallAbilityReportProxy::ReportBtCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld,
+int32_t CallAbilityReportProxy::ReportCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld,
     int32_t callState, const std::string &number)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
@@ -538,15 +538,15 @@ int32_t CallAbilityReportProxy::ReportBtCallStateChange(int32_t callId, int32_t 
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
-            ret = (*it)->OnBtCallStateChange(callId, numActive, numHeld, callState, number);
+            ret = (*it)->OnCallStateChange(callId, numActive, numHeld, callState, number);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW("ReportBtCallStateChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                TELEPHONY_LOGW("ReportCallStateChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
                     ((*it)->GetBundleInfo()).c_str());
                 continue;
             }
         }
     }
-    TELEPHONY_LOGI("ReportBtCallStateChange success");
+    TELEPHONY_LOGI("ReportCallStateChange success");
     return ret;
 }
 

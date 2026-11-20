@@ -141,7 +141,7 @@ public:
      * @param number[in] phone number
      * @return Returns 0 on success, others on failure.
      */
-    virtual int32_t OnBtCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld, int32_t callState,
+    virtual int32_t OnCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld, int32_t callState,
         const std::string &number)
     {
         return 0;

@@ -384,7 +384,7 @@ int32_t CallAbilityCallbackProxy::OnPhoneStateChange(int32_t numActive, int32_t 
     return replyParcel.ReadInt32();
 }
 
-int32_t CallAbilityCallbackProxy::OnBtCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld,
+int32_t CallAbilityCallbackProxy::OnCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld,
     int32_t callState, const std::string &number)
 {
     MessageParcel dataParcel;

@@ -53,7 +53,7 @@ public:
     int32_t ReportCallDataUsageChange(const int64_t dataUsage);
     int32_t ReportCameraCapabilities(const CameraCapabilities &cameraCapabilities);
     int32_t ReportPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
-    int32_t ReportBtCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld, int32_t callState,
+    int32_t ReportCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld, int32_t callState,
         const std::string &number);
     void CacheMmiCodeInfo(const MmiCodeInfo &info);
     void SetRegMmiCodeCallbackState(bool isReg);
@@ -66,7 +66,7 @@ public:
 private:
     int32_t ReportCallEvent(const CallEventInfo &info);
     void UpdateBtCallSlotId(CallAttributeInfo &newInfo);
-    void TryReportBtCallStateChange(const CallAttributeInfo &info);
+    void TryReportCallStateChange(const CallAttributeInfo &info);
 
 private:
     std::list<sptr<ICallAbilityCallback>> callbackPtrList_;
