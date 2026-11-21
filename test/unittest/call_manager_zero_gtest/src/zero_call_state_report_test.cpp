@@ -239,7 +239,7 @@ CallAttributeInfo ZeroCallStateReportTest::BuildInfo(int32_t callId, TelCallStat
 
 /**
  * @tc.number   Telephony_CallStateReport_001
- * @tc.name     test answered state is filtered
+ * @tc.name     test answered state is reported with real callId
  * @tc.desc     Function test
  */
 HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_001, TestSize.Level0)
@@ -248,7 +248,9 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_001, TestSize.Level0
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
     proxy_->TryReportCallStateChange(info);
-    EXPECT_EQ(callback_->count_, 0);
+    EXPECT_EQ(callback_->count_, 1);
+    EXPECT_EQ(callback_->lastCallId_, TEST_CALL_ID);
+    EXPECT_EQ(callback_->lastCallState_, static_cast<int32_t>(TelCallState::CALL_STATUS_ANSWERED));
 }
 
 /**
@@ -331,7 +333,7 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_006, TestSize.Level0
 
 /**
  * @tc.number   Telephony_CallStateReport_007
- * @tc.name     test CallStateUpdated with answered state does not report
+ * @tc.name     test CallStateUpdated with answered state reports
  * @tc.desc     Function test
  */
 HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_007, TestSize.Level0)
@@ -340,7 +342,9 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_007, TestSize.Level0
     ASSERT_NE(call, nullptr);
     sptr<CallBase> callPtr = call;
     proxy_->CallStateUpdated(callPtr, TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_ANSWERED);
-    EXPECT_EQ(callback_->count_, 0);
+    EXPECT_EQ(callback_->count_, 1);
+    EXPECT_EQ(callback_->lastCallId_, TEST_CALL_ID);
+    EXPECT_EQ(callback_->lastCallState_, static_cast<int32_t>(TelCallState::CALL_STATUS_ANSWERED));
 }
 
 /**

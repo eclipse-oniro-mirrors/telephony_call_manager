@@ -214,9 +214,6 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
 
 void CallAbilityReportProxy::TryReportCallStateChange(const CallAttributeInfo &info)
 {
-    if (info.callState == TelCallState::CALL_STATUS_ANSWERED) {
-        return;
-    }
     sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(info.callId);
     if (callPtr == nullptr) {
         return;
