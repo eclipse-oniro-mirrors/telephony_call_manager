@@ -12,10 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// NOLINTBEGIN(readability-identifier-naming)
 #define private public
 #define protected public
-// NOLINTEND(readability-identifier-naming)
 
 #include <algorithm>
 #include <gtest/gtest.h>
