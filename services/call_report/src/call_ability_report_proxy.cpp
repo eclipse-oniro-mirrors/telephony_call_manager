@@ -15,6 +15,7 @@
 
 #include "call_ability_report_proxy.h"
 
+#include <cstring>
 #include <string_ex.h>
 
 #include "app_mgr_interface.h"

@@ -1126,7 +1126,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_ApplicationStateObserver_001, TestSize.Level
     applicationStateObserver.OnProcessDied(processData);
     ASSERT_FALSE(CallObjectManager::IsVoipCallExist());
     EXPECT_EQ(mockCallback->count_, 1);
-    EXPECT_EQ(mockCallback->lastCallId_, static_cast<int32_t>(ILLEGAL_CALLID));
+    EXPECT_EQ(mockCallback->lastCallId_, static_cast<int32_t>(ERR_ID));
     EXPECT_EQ(mockCallback->lastCallState_, static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE));
     reportProxy->callbackPtrList_.clear();
 }
