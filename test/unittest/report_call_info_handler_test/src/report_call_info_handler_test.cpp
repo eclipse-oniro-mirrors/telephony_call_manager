@@ -610,7 +610,6 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMixedDrop_0500
     ASSERT_EQ(delivered.callVec.size(), 2);
     EXPECT_EQ(delivered.callVec[0].state, TelCallState::CALL_STATUS_DIALING);
     EXPECT_EQ(delivered.callVec[1].state, TelCallState::CALL_STATUS_ALERTING);
-
 }
  
 /**
