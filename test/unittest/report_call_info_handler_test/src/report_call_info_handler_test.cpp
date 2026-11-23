@@ -496,6 +496,12 @@ private:
 HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMoDialing_0100, TestSize.Level1)
 {
     EnterOobe();
+    // Settings query fails in UT process, mocked INVALID value is kept
+    ASSERT_EQ(CallStatusManager::GetDevProvisioned(), DEVICE_PROVISION_INVALID);
+    // GetDevUserSetupCompleteValue() always refreshes the flag to VALID in UT, so
+    // assert the mocked static member directly
+    ASSERT_EQ(CallStatusManager::userSetupComplete_.load(), DEVICE_PROVISION_INVALID);
+
     CallDetailsInfo info;
     info.slotId = VALID_SLOT_ID;
     info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_DIALING, VALID_CALL_INDEX));
@@ -515,6 +521,11 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMoDialing_0100
 HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMoDisconnected_0200, TestSize.Level1)
 {
     EnterOobe();
+    // Settings query fails in UT process, mocked INVALID value is kept
+    ASSERT_EQ(CallStatusManager::GetDevProvisioned(), DEVICE_PROVISION_INVALID);
+    // GetDevUserSetupCompleteValue() always refreshes the flag to VALID in UT, so
+    // assert the mocked static member directly
+    ASSERT_EQ(CallStatusManager::userSetupComplete_.load(), DEVICE_PROVISION_INVALID);
     CallDetailsInfo info;
     info.slotId = VALID_SLOT_ID;
     info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_DISCONNECTED, VALID_CALL_INDEX));
@@ -572,6 +583,11 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeWaitingDrop_04
 HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMixedDrop_0500, TestSize.Level1)
 {
     EnterOobe();
+    // Settings query fails in UT process, mocked INVALID value is kept
+    ASSERT_EQ(CallStatusManager::GetDevProvisioned(), DEVICE_PROVISION_INVALID);
+    // GetDevUserSetupCompleteValue() always refreshes the flag to VALID in UT, so
+    // assert the mocked static member directly
+    ASSERT_EQ(CallStatusManager::userSetupComplete_.load(), DEVICE_PROVISION_INVALID);
     CallDetailsInfo info;
     info.slotId = VALID_SLOT_ID;
     info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_INCOMING, 2));
@@ -585,6 +601,16 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMixedDrop_0500
     EXPECT_EQ(info.callVec[0].state, TelCallState::CALL_STATUS_DIALING);
     EXPECT_EQ(info.callVec[1].state, TelCallState::CALL_STATUS_ALERTING);
     EXPECT_EQ(info.callVec[2].state, TelCallState::CALL_STATUS_DISCONNECTED);
+
+    // The mocked ffrt queue discards submitted tasks in UT, so the report never
+    // reaches HandleCallsReportInfo through UpdateCallsReportInfo; drive the manager
+    // directly with the surviving report to verify the kept items are processed.
+    ASSERT_EQ(handler_->callStatusManagerPtr_->HandleCallsReportInfo(info), TELEPHONY_SUCCESS);
+    CallDetailsInfo &delivered = handler_->callStatusManagerPtr_->callDetailsInfo_[VALID_SLOT_ID];
+    ASSERT_EQ(delivered.callVec.size(), 2);
+    EXPECT_EQ(delivered.callVec[0].state, TelCallState::CALL_STATUS_DIALING);
+    EXPECT_EQ(delivered.callVec[1].state, TelCallState::CALL_STATUS_ALERTING);
+
 }
  
 /**
