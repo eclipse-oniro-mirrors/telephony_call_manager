@@ -476,7 +476,7 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallAbilityCallbackStub_WithoutFileD
     ASSERT_TRUE(data.WriteInt32(0));
     ASSERT_TRUE(data.WriteInt32(static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE)));
     ASSERT_TRUE(data.WriteString(TEST_ACCOUNT_NUMBER));
-    int32_t ret = stub.OnUpdateBtCallState(data, reply);
+    int32_t ret = stub.OnUpdateCallState(data, reply);
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
     EXPECT_EQ(stub.count_, 1);
     EXPECT_EQ(stub.lastCallId_, TEST_CALL_ID);
@@ -503,7 +503,7 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallAbilityCallbackStub_WithFileDesc
     ASSERT_TRUE(data.WriteInt32(static_cast<int32_t>(TelCallState::CALL_STATUS_INCOMING)));
     ASSERT_TRUE(data.WriteString(TEST_ACCOUNT_NUMBER));
     ASSERT_TRUE(data.WriteFileDescriptor(0));
-    int32_t ret = stub.OnUpdateBtCallState(data, reply);
+    int32_t ret = stub.OnUpdateCallState(data, reply);
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
     EXPECT_EQ(stub.count_, 1);
     EXPECT_EQ(stub.lastCallId_, TEST_CALL_ID);
@@ -610,7 +610,7 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateUpdated_TruncateNumberAtSem
 
 /**
  * @tc.number   Telephony_CallAbilityCallbackStub_WriteReplyFail
- * @tc.name     test OnUpdateBtCallState returns write reply fail when reply rejects writes
+ * @tc.name     test OnUpdateCallState returns write reply fail when reply rejects writes
  * @tc.desc     Function test
  */
 HWTEST_F(ZeroCallStateReportTest, Telephony_CallAbilityCallbackStub_WriteReplyFail, TestSize.Level0)
@@ -625,7 +625,7 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallAbilityCallbackStub_WriteReplyFa
     ASSERT_TRUE(data.WriteString(TEST_ACCOUNT_NUMBER));
     // Max capacity 0 makes the reply parcel reject writes, so WriteInt32 fails.
     ASSERT_TRUE(reply.SetMaxCapacity(0));
-    int32_t ret = stub.OnUpdateBtCallState(data, reply);
+    int32_t ret = stub.OnUpdateCallState(data, reply);
     EXPECT_EQ(ret, TELEPHONY_ERR_WRITE_REPLY_FAIL);
     EXPECT_EQ(stub.count_, 1);
 }

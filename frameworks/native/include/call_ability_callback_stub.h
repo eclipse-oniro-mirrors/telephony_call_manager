@@ -51,7 +51,7 @@ private:
     int32_t OnUpdateCallDataUsageChange(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateCameraCapabilities(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdatePhoneState(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUpdateBtCallState(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateCallState(MessageParcel &data, MessageParcel &reply);
 #ifdef SUPPORT_RTT_CALL
     int32_t OnUpdateRttCallEvent(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateRttCallErrorReport(MessageParcel &data, MessageParcel &reply);

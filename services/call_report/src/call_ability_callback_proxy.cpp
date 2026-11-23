@@ -399,7 +399,7 @@ int32_t CallAbilityCallbackProxy::OnCallStateChange(int32_t callId, int32_t numA
     dataParcel.WriteInt32(callState);
     dataParcel.WriteString(number);
     int32_t error = SendRequest(static_cast<uint32_t>(
-        CallManagerCallAbilityInterfaceCode::UPDATE_BT_CALL_STATE), dataParcel,
+        CallManagerCallAbilityInterfaceCode::UPDATE_CALL_STATE), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;

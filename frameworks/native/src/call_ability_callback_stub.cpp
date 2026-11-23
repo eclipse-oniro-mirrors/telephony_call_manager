@@ -57,8 +57,8 @@ CallAbilityCallbackStub::CallAbilityCallbackStub()
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCameraCapabilities(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_PHONE_STATE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdatePhoneState(data, reply); };
-    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_BT_CALL_STATE)] =
-        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateBtCallState(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_STATE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallState(data, reply); };
 #ifdef SUPPORT_RTT_CALL
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::RTT_CALL_EVENT_CHANGE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateRttCallEvent(data, reply); };
@@ -455,7 +455,7 @@ int32_t CallAbilityCallbackStub::OnUpdatePhoneState(MessageParcel &data, Message
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallAbilityCallbackStub::OnUpdateBtCallState(MessageParcel &data, MessageParcel &reply)
+int32_t CallAbilityCallbackStub::OnUpdateCallState(MessageParcel &data, MessageParcel &reply)
 {
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGD("sent raw data is less than 32k");
