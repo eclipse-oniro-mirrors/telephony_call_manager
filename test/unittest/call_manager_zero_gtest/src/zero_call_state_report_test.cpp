@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// NOLINTBEGIN(readability-identifier-naming)
 #define private public
 #define protected public
+// NOLINTEND(readability-identifier-naming)
 
 #include <algorithm>
 #include <gtest/gtest.h>
@@ -238,11 +240,11 @@ CallAttributeInfo ZeroCallStateReportTest::BuildInfo(int32_t callId, TelCallStat
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_001
+ * @tc.number   Telephony_TryReportCallStateChange_AnsweredWithCallId
  * @tc.name     test answered state is reported with real callId
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_001, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_TryReportCallStateChange_AnsweredWithCallId, TestSize.Level0)
 {
     CallAttributeInfo info = BuildInfo(TEST_CALL_ID, TelCallState::CALL_STATUS_ANSWERED);
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
@@ -254,11 +256,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_001, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_002
+ * @tc.number   Telephony_TryReportCallStateChange_CallObjectNotExist
  * @tc.name     test call object not exist
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_002, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_TryReportCallStateChange_CallObjectNotExist, TestSize.Level0)
 {
     CallAttributeInfo info = BuildInfo(NOT_EXIST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     proxy_->TryReportCallStateChange(info);
@@ -266,11 +268,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_002, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_003
+ * @tc.number   Telephony_TryReportCallStateChange_VoipWithoutRemoteControl
  * @tc.name     test voip call without remote control is filtered
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_003, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_TryReportCallStateChange_VoipWithoutRemoteControl, TestSize.Level0)
 {
     sptr<CallBase> call = CreateCall(CallType::TYPE_VOIP, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
@@ -281,11 +283,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_003, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_004
+ * @tc.number   Telephony_TryReportCallStateChange_VoipWithRemoteControl
  * @tc.name     test voip call with remote control is reported
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_004, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_TryReportCallStateChange_VoipWithRemoteControl, TestSize.Level0)
 {
     sptr<CallBase> call = CreateCall(CallType::TYPE_VOIP, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
@@ -299,11 +301,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_004, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_005
+ * @tc.number   Telephony_TryReportCallStateChange_CellularWithCallId
  * @tc.name     test cellular call is reported with real callId
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_005, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_TryReportCallStateChange_CellularWithCallId, TestSize.Level0)
 {
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
@@ -315,11 +317,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_005, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_006
+ * @tc.number   Telephony_CallStateUpdated_TriggersReport
  * @tc.name     test CallStateUpdated triggers bt call state report
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_006, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateUpdated_TriggersReport, TestSize.Level0)
 {
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
@@ -332,11 +334,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_006, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_007
+ * @tc.number   Telephony_CallStateUpdated_AnsweredState
  * @tc.name     test CallStateUpdated with answered state reports
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_007, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateUpdated_AnsweredState, TestSize.Level0)
 {
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
@@ -348,11 +350,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_007, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_008
+ * @tc.number   Telephony_ReportCallStateInfo_NotTriggerReport
  * @tc.name     test ReportCallStateInfo no longer triggers bt call state report
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_008, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_ReportCallStateInfo_NotTriggerReport, TestSize.Level0)
 {
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(call, nullptr);
@@ -362,11 +364,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_008, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_009
+ * @tc.number   Telephony_TryReportCallStateChange_NumActiveAndNumHeld
  * @tc.name     test numActive and numHeld are counted correctly
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_009, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_TryReportCallStateChange_NumActiveAndNumHeld, TestSize.Level0)
 {
     sptr<CallBase> activeCall = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
     ASSERT_NE(activeCall, nullptr);
@@ -381,11 +383,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_009, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_010
+ * @tc.number   Telephony_TryReportCallStateChange_EmptyCallbackList
  * @tc.name     test report when callback list is empty
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_010, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_TryReportCallStateChange_EmptyCallbackList, TestSize.Level0)
 {
     proxy_->callbackPtrList_.clear();
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
@@ -396,11 +398,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_010, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_011
+ * @tc.number   Telephony_ReportCallStateChange_SkipNullptrCallback
  * @tc.name     test report skips nullptr callback and keeps valid callback
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_011, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_ReportCallStateChange_SkipNullptrCallback, TestSize.Level0)
 {
     proxy_->callbackPtrList_.emplace_back(nullptr);
     int32_t ret = proxy_->ReportCallStateChange(TEST_CALL_ID, 1, 0,
@@ -412,11 +414,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_011, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_012
+ * @tc.number   Telephony_ReportCallStateChange_OnlyNullptrCallback
  * @tc.name     test report with only nullptr callback returns fail
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_012, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_ReportCallStateChange_OnlyNullptrCallback, TestSize.Level0)
 {
     proxy_->callbackPtrList_.clear();
     proxy_->callbackPtrList_.emplace_back(nullptr);
@@ -427,11 +429,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_012, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_013
+ * @tc.number   Telephony_CallAbilityCallback_ForwardToProcessCallback
  * @tc.name     test ability callback forwards state change to process callback
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_013, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallAbilityCallback_ForwardToProcessCallback, TestSize.Level0)
 {
     CallAbilityCallback abilityCallback;
     auto managerCallback = std::make_unique<MockManagerCallback>();
@@ -449,11 +451,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_013, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_014
+ * @tc.number   Telephony_CallAbilityCallback_NoProcessCallback
  * @tc.name     test ability callback without process callback returns success
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_014, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallAbilityCallback_NoProcessCallback, TestSize.Level0)
 {
     CallAbilityCallback abilityCallback;
     int32_t ret = abilityCallback.OnCallStateChange(TEST_CALL_ID, 1, 0,
@@ -462,11 +464,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_014, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_015
+ * @tc.number   Telephony_CallAbilityCallbackStub_WithoutFileDescriptor
  * @tc.name     test stub dispatch without file descriptor writes result to reply
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_015, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallAbilityCallbackStub_WithoutFileDescriptor, TestSize.Level0)
 {
     MockAbilityCallback stub;
     MessageParcel data;
@@ -488,11 +490,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_015, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_016
+ * @tc.number   Telephony_CallAbilityCallbackStub_WithFileDescriptor
  * @tc.name     test stub dispatch with file descriptor
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_016, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallAbilityCallbackStub_WithFileDescriptor, TestSize.Level0)
 {
     MockAbilityCallback stub;
     MessageParcel data;
@@ -512,11 +514,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_016, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_017
+ * @tc.number   Telephony_CallAbilityCallbackProxy_NullRemote
  * @tc.name     test proxy returns ipc fail when remote is nullptr
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_017, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallAbilityCallbackProxy_NullRemote, TestSize.Level0)
 {
     sptr<IRemoteObject> impl;
     CallAbilityCallbackProxy callbackProxy(impl);
@@ -526,11 +528,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_017, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_018
+ * @tc.number   Telephony_CallAbilityCallbackProxy_ForwardToRemoteStub
  * @tc.name     test proxy forwards state change to remote stub
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_018, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallAbilityCallbackProxy_ForwardToRemoteStub, TestSize.Level0)
 {
     sptr<MockAbilityCallback> stub = new (std::nothrow) MockAbilityCallback();
     ASSERT_NE(stub, nullptr);
@@ -548,11 +550,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_018, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_019
+ * @tc.number   Telephony_ReportCallStateChange_ContinueAfterFail
  * @tc.name     test report continues after a callback returns fail
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_019, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_ReportCallStateChange_ContinueAfterFail, TestSize.Level0)
 {
     callback_->returnValue_ = TELEPHONY_ERR_FAIL;
     sptr<MockAbilityCallback> secondCallback = new (std::nothrow) MockAbilityCallback();
@@ -567,11 +569,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_019, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_020
+ * @tc.number   Telephony_CallStateUpdated_NullCallObject
  * @tc.name     test CallStateUpdated with nullptr call object does not report
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_020, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateUpdated_NullCallObject, TestSize.Level0)
 {
     sptr<CallBase> call = nullptr;
     proxy_->CallStateUpdated(call, TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_ACTIVE);
@@ -579,11 +581,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_020, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_021
+ * @tc.number   Telephony_CallStateUpdated_TruncateNumberAtComma
  * @tc.name     test CallStateUpdated truncates number at comma
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_021, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateUpdated_TruncateNumberAtComma, TestSize.Level0)
 {
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE,
         "138,0000");
@@ -594,11 +596,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_021, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_022
+ * @tc.number   Telephony_CallStateUpdated_TruncateNumberAtSemicolon
  * @tc.name     test CallStateUpdated truncates number at semicolon
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_022, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateUpdated_TruncateNumberAtSemicolon, TestSize.Level0)
 {
     sptr<CallBase> call = CreateCall(CallType::TYPE_IMS, TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE,
         "139;0000");
@@ -609,11 +611,11 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_022, TestSize.Level0
 }
 
 /**
- * @tc.number   Telephony_CallStateReport_023
+ * @tc.number   Telephony_CallAbilityCallbackStub_WriteReplyFail
  * @tc.name     test OnUpdateBtCallState returns write reply fail when reply rejects writes
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateReport_023, TestSize.Level0)
+HWTEST_F(ZeroCallStateReportTest, Telephony_CallAbilityCallbackStub_WriteReplyFail, TestSize.Level0)
 {
     MockAbilityCallback stub;
     MessageParcel data;

@@ -223,7 +223,7 @@ void CallAbilityReportProxy::TryReportCallStateChange(const CallAttributeInfo &i
     }
     int32_t numActive = CallObjectManager::GetCallCountForRemoteControl(TelCallState::CALL_STATUS_ACTIVE);
     int32_t numHeld = CallObjectManager::GetCallCountForRemoteControl(TelCallState::CALL_STATUS_HOLDING);
-    std::string accountNumber(info.accountNumber);
+    std::string accountNumber(info.accountNumber, strnlen(info.accountNumber, sizeof(info.accountNumber)));
     ReportCallStateChange(static_cast<int32_t>(info.callId), numActive, numHeld,
         static_cast<int32_t>(info.callState), accountNumber);
 }
@@ -534,7 +534,7 @@ int32_t CallAbilityReportProxy::ReportCallStateChange(int32_t callId, int32_t nu
     std::lock_guard<ffrt::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
-        if ((*it)) {
+        if ((*it) != nullptr) {
             ret = (*it)->OnCallStateChange(callId, numActive, numHeld, callState, number);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGW("ReportCallStateChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
@@ -543,7 +543,9 @@ int32_t CallAbilityReportProxy::ReportCallStateChange(int32_t callId, int32_t nu
             }
         }
     }
-    TELEPHONY_LOGI("ReportCallStateChange success");
+    if (ret == TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGI("ReportCallStateChange success");
+    }
     return ret;
 }
 
