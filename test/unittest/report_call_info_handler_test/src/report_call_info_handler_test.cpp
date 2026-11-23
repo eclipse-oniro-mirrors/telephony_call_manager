@@ -448,7 +448,7 @@ public:
         ASSERT_TRUE(handler_->callStatusManagerPtr_ != nullptr);
         CallObjectManager::callObjectPtrList_.clear();
     }
- 
+
     void TearDown() override
     {
         CallStatusManager::deviceProvisioned_ = savedProvisioned_;
@@ -456,21 +456,21 @@ public:
         CallObjectManager::callObjectPtrList_.clear();
         ReportCallInfoHandlerTest::TearDown();
     }
- 
+
     // Simulate OOBE in progress
     void EnterOobe()
     {
         CallStatusManager::deviceProvisioned_ = DEVICE_PROVISION_INVALID;
         CallStatusManager::userSetupComplete_ = DEVICE_PROVISION_INVALID;
     }
- 
+
     // Simulate OOBE completed
     void CompleteOobe()
     {
         CallStatusManager::deviceProvisioned_ = DEVICE_PROVISION_VALID;
         CallStatusManager::userSetupComplete_ = DEVICE_PROVISION_VALID;
     }
- 
+
     static CallDetailInfo MakeCsCallInfo(TelCallState state, int32_t index)
     {
         CallDetailInfo detailInfo;
@@ -479,9 +479,9 @@ public:
         detailInfo.index = index;
         return detailInfo;
     }
- 
+
     std::shared_ptr<ReportCallInfoHandler> handler_;
- 
+
 private:
     int32_t savedProvisioned_ = 0;
     int32_t savedSetupComplete_ = 0;
@@ -505,7 +505,7 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMoDialing_0100
     CallDetailsInfo info;
     info.slotId = VALID_SLOT_ID;
     info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_DIALING, VALID_CALL_INDEX));
- 
+
     int32_t ret = handler_->UpdateCallsReportInfo(info);
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
     ASSERT_EQ(info.callVec.size(), 1);
@@ -529,7 +529,7 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMoDisconnected
     CallDetailsInfo info;
     info.slotId = VALID_SLOT_ID;
     info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_DISCONNECTED, VALID_CALL_INDEX));
- 
+
     int32_t ret = handler_->UpdateCallsReportInfo(info);
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
     ASSERT_EQ(info.callVec.size(), 1);
@@ -549,7 +549,7 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeIncomingDrop_0
     CallDetailsInfo info;
     info.slotId = VALID_SLOT_ID;
     info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_INCOMING, VALID_CALL_INDEX));
- 
+
     int32_t ret = handler_->UpdateCallsReportInfo(info);
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
     EXPECT_TRUE(info.callVec.empty());
@@ -568,7 +568,7 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeWaitingDrop_04
     CallDetailsInfo info;
     info.slotId = VALID_SLOT_ID;
     info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_WAITING, VALID_CALL_INDEX));
- 
+
     int32_t ret = handler_->UpdateCallsReportInfo(info);
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
     EXPECT_TRUE(info.callVec.empty());
@@ -594,7 +594,7 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMixedDrop_0500
     info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_DIALING, VALID_CALL_INDEX));
     info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_ALERTING, VALID_CALL_INDEX));
     info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_DISCONNECTED, VALID_CALL_INDEX));
- 
+
     int32_t ret = handler_->UpdateCallsReportInfo(info);
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
     ASSERT_EQ(info.callVec.size(), 3);
@@ -625,7 +625,7 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeCompleteNotDro
     info.slotId = VALID_SLOT_ID;
     info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_INCOMING, 2));
     info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_DIALING, VALID_CALL_INDEX));
- 
+
     int32_t ret = handler_->UpdateCallsReportInfo(info);
     EXPECT_EQ(ret, TELEPHONY_SUCCESS);
     ASSERT_EQ(info.callVec.size(), 2);
