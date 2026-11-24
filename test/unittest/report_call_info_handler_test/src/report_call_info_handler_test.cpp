@@ -488,12 +488,12 @@ private:
 };
  
 /**
- * @tc.number   ReportCallInfoHandler_OobeMoDialing_0100
+ * @tc.number   ReportCallInfoHandler_OobeMoDialing
  * @tc.name     Test UpdateCallsReportInfo keeps MO dialing report in OOBE
  * @tc.desc     DT test - MO DIALING report is kept in OOBE, otherwise call index
  *              writeback fails and hangup never triggers (residual audio regression)
  */
-HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMoDialing_0100, TestSize.Level1)
+HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMoDialing, TestSize.Level1)
 {
     EnterOobe();
     // Settings query fails in UT process, mocked INVALID value is kept
@@ -513,12 +513,12 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMoDialing_0100
 }
  
 /**
- * @tc.number   ReportCallInfoHandler_OobeMoDisconnected_0200
+ * @tc.number   ReportCallInfoHandler_OobeMoDisconnected
  * @tc.name     Test UpdateCallsReportInfo keeps disconnected report in OOBE
  * @tc.desc     DT test - DISCONNECTED report is kept in OOBE, otherwise DisconnectedHandle
  *              is skipped and call audio keeps playing (residual audio regression)
  */
-HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMoDisconnected_0200, TestSize.Level1)
+HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMoDisconnected, TestSize.Level1)
 {
     EnterOobe();
     // Settings query fails in UT process, mocked INVALID value is kept
@@ -537,11 +537,11 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMoDisconnected
 }
  
 /**
- * @tc.number   ReportCallInfoHandler_OobeIncomingDrop_0300
+ * @tc.number   ReportCallInfoHandler_OobeIncomingDrop
  * @tc.name     Test UpdateCallsReportInfo still drops incoming report in OOBE
  * @tc.desc     DT test - INCOMING report is still dropped in OOBE, suppression unchanged
  */
-HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeIncomingDrop_0300, TestSize.Level1)
+HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeIncomingDrop, TestSize.Level1)
 {
     EnterOobe();
     // Settings query fails in UT process, mocked INVALID value is kept
@@ -556,11 +556,11 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeIncomingDrop_0
 }
  
 /**
- * @tc.number   ReportCallInfoHandler_OobeWaitingDrop_0400
+ * @tc.number   ReportCallInfoHandler_OobeWaitingDrop
  * @tc.name     Test UpdateCallsReportInfo still drops waiting report in OOBE
  * @tc.desc     DT test - WAITING report is still dropped in OOBE, suppression unchanged
  */
-HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeWaitingDrop_0400, TestSize.Level1)
+HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeWaitingDrop, TestSize.Level1)
 {
     EnterOobe();
     // Settings query fails in UT process, mocked INVALID value is kept
@@ -575,12 +575,12 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeWaitingDrop_04
 }
  
 /**
- * @tc.number   ReportCallInfoHandler_OobeMixedDrop_0500
+ * @tc.number   ReportCallInfoHandler_OobeMixedDrop
  * @tc.name     Test UpdateCallsReportInfo drops only incoming calls in mixed report in OOBE
  * @tc.desc     DT test - only INCOMING is dropped in mixed report in OOBE, MO and
  *              disconnected reports are kept in original order
  */
-HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMixedDrop_0500, TestSize.Level1)
+HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMixedDrop, TestSize.Level1)
 {
     EnterOobe();
     // Settings query fails in UT process, mocked INVALID value is kept
@@ -613,11 +613,11 @@ HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMixedDrop_0500
 }
  
 /**
- * @tc.number   ReportCallInfoHandler_OobeCompleteNotDrop_0600
+ * @tc.number   ReportCallInfoHandler_OobeCompleteNotDrop
  * @tc.name     Test UpdateCallsReportInfo drops nothing after OOBE complete
  * @tc.desc     DT test - no report is dropped after OOBE completes, INCOMING is delivered
  */
-HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeCompleteNotDrop_0600, TestSize.Level1)
+HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeCompleteNotDrop, TestSize.Level1)
 {
     CompleteOobe();
     CallDetailsInfo info;
