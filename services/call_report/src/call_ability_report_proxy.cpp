@@ -552,9 +552,6 @@ int32_t CallAbilityReportProxy::ReportCallStateChange(int32_t callId, int32_t nu
             }
         }
     }
-    if (ret == TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("ReportCallStateChange success");
-    }
     return ret;
 }
 
