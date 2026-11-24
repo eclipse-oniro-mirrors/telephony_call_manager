@@ -318,10 +318,6 @@ void CallNumberUtils::NumberLocationUpdate(const sptr<CallBase> &callObjectPtr)
 
 void CallNumberUtils::YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPtr)
 {
-    if (CallManagerUtils::GetSystemParameter("const.global.region", "CN") != "CN") {
-        TELEPHONY_LOGI("not the chinese version, no need to query markinfo.");
-        return;
-    }
     CallAttributeInfo info;
     callObjectPtr->GetCallAttributeInfo(info);
     TELEPHONY_LOGI("YellowPageAndMarkUpdate, callId[%{public}d]", info.callId);
