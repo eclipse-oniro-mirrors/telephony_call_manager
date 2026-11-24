@@ -280,8 +280,6 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
             TELEPHONY_LOGE("UpdateCallsReportInfo call not report in OOBE");
             return TELEPHONY_SUCCESS;
         }
-        TELEPHONY_LOGI("UpdateCallsReportInfo drop incoming call in OOBE, remain:%{public}zu",
-            info.callVec.size());
     }
 
     CallDetailsInfo callDetailsInfo;
