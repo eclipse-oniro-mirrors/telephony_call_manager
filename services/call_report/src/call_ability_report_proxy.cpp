@@ -219,6 +219,14 @@ void CallAbilityReportProxy::TryReportCallStateChange(const CallAttributeInfo &i
     if (callPtr == nullptr) {
         return;
     }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+    if (callPtr->IsTransferCallAndForbidden()) {
+        TELEPHONY_LOGI("TryReportCallStateChange IsTransferCallAndForbidden");
+        return;
+    }
+#endif
+
     if (callPtr->GetCallType() == CallType::TYPE_VOIP && !callPtr->IsRemoteControlEnable()) {
         return;
     }

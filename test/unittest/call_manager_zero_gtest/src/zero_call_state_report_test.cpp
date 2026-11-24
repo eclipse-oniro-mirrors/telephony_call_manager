@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 
+#include "bluetooth_call.h"
 #include "call_ability_callback.h"
 #include "call_ability_callback_proxy.h"
 #include "call_ability_report_proxy.h"
@@ -313,6 +314,31 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_TryReportCallStateChange_CellularWit
     EXPECT_EQ(callback_->lastCallId_, TEST_CALL_ID);
     EXPECT_EQ(callback_->lastCallState_, static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE));
 }
+
+#ifdef CALL_MANAGER_CALL_TRANSFER
+/**
+ * @tc.number   Telephony_TryReportCallStateChange_TransferForbidden
+ * @tc.name     test transfer call that is not allowed is filtered
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroCallStateReportTest, Telephony_TryReportCallStateChange_TransferForbidden, TestSize.Level0)
+{
+    DialParaInfo dialInfo;
+    dialInfo.callId = TEST_CALL_ID;
+    dialInfo.callType = CallType::TYPE_BLUETOOTH;
+    dialInfo.callState = TelCallState::CALL_STATUS_ACTIVE;
+    sptr<CallBase> call = new (std::nothrow) BluetoothCall(dialInfo, "00:11:22:33:44:55", 0);
+    ASSERT_NE(call, nullptr);
+    sptr<BluetoothCall> btCall = reinterpret_cast<BluetoothCall *>(call.GetRefPtr());
+    ASSERT_NE(btCall, nullptr);
+    btCall->SetIsTransferCall(true);
+    btCall->SetIsTransferCallAllow(false);
+    CallObjectManager::callObjectPtrList_.push_back(call);
+    CallAttributeInfo info = BuildInfo(TEST_CALL_ID, TelCallState::CALL_STATUS_ACTIVE);
+    proxy_->TryReportCallStateChange(info);
+    EXPECT_EQ(callback_->count_, 0);
+}
+#endif
 
 /**
  * @tc.number   Telephony_CallStateUpdated_TriggersReport
