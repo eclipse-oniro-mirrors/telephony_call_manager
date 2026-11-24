@@ -636,7 +636,7 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallStateUpdated_TruncateNumberAtSem
 
 /**
  * @tc.number   Telephony_CallAbilityCallbackStub_WriteReplyFail
- * @tc.name     test OnUpdateCallState returns write reply fail when reply rejects writes
+ * @tc.name     test OnUpdateCallState returns write reply fail for a read-only reply
  * @tc.desc     Function test
  */
 HWTEST_F(ZeroCallStateReportTest, Telephony_CallAbilityCallbackStub_WriteReplyFail, TestSize.Level0)
@@ -649,8 +649,8 @@ HWTEST_F(ZeroCallStateReportTest, Telephony_CallAbilityCallbackStub_WriteReplyFa
     ASSERT_TRUE(data.WriteInt32(0));
     ASSERT_TRUE(data.WriteInt32(static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE)));
     ASSERT_TRUE(data.WriteString(TEST_ACCOUNT_NUMBER));
-    // Max capacity 0 makes the reply parcel reject writes, so WriteInt32 fails.
-    ASSERT_TRUE(reply.SetMaxCapacity(0));
+    // A read-only parcel makes reply.WriteInt32 fail, which exercises the write-reply-fail branch.
+    ASSERT_TRUE(reply.ParseFrom(0, 0));
     int32_t ret = stub.OnUpdateCallState(data, reply);
     EXPECT_EQ(ret, TELEPHONY_ERR_WRITE_REPLY_FAIL);
     EXPECT_EQ(stub.count_, 1);
