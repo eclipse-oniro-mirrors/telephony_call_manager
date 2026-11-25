@@ -105,6 +105,25 @@ public:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) {}
 };
 
+/**
+ * Record OnCallStateChange so that process-died reporting can be asserted.
+ */
+class MockProcessDiedCallback : public CallAbilityCallback {
+public:
+    int32_t OnCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld, int32_t callState,
+        const std::string &number) override
+    {
+        ++count_;
+        lastCallId_ = callId;
+        lastCallState_ = callState;
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t count_ = 0;
+    int32_t lastCallId_ = 0;
+    int32_t lastCallState_ = 0;
+};
+
 class ZeroBranch5Test : public testing::Test {
 public:
     void SetUp();
@@ -1092,8 +1111,24 @@ HWTEST_F(ZeroBranch5Test, Telephony_ApplicationStateObserver_001, TestSize.Level
 {
     ApplicationStateObserver applicationStateObserver;
     AppExecFwk::ProcessData processData;
+    processData.processName = "ui";
+    CallAttributeInfo voipInfo;
+    voipInfo.callId = 1;
+    voipInfo.callState = TelCallState::CALL_STATUS_ACTIVE;
+    ASSERT_EQ(CallObjectManager::AddOneVoipCallObject(voipInfo), TELEPHONY_SUCCESS);
+    ASSERT_TRUE(CallObjectManager::IsVoipCallExist());
+    auto reportProxy = DelayedSingleton<CallAbilityReportProxy>::GetInstance();
+    ASSERT_NE(reportProxy, nullptr);
+    sptr<MockProcessDiedCallback> mockCallback = new (std::nothrow) MockProcessDiedCallback();
+    ASSERT_NE(mockCallback, nullptr);
+    reportProxy->callbackPtrList_.clear();
+    reportProxy->callbackPtrList_.emplace_back(mockCallback);
     applicationStateObserver.OnProcessDied(processData);
-    ASSERT_NE(sizeof(processData), 0);
+    ASSERT_FALSE(CallObjectManager::IsVoipCallExist());
+    EXPECT_EQ(mockCallback->count_, 1);
+    EXPECT_EQ(mockCallback->lastCallId_, static_cast<int32_t>(ERR_ID));
+    EXPECT_EQ(mockCallback->lastCallState_, static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE));
+    reportProxy->callbackPtrList_.clear();
 }
 
 /**

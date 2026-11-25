@@ -130,6 +130,22 @@ public:
     {
         return 0;
     }
+
+    /**
+     * @brief report bluetooth call state change
+     *
+     * @param callId[in] call id
+     * @param numActive[in] number of active calls
+     * @param numHeld[in] number of hold calls
+     * @param callState[in] call state
+     * @param number[in] phone number
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t OnCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld, int32_t callState,
+        const std::string &number)
+    {
+        return 0;
+    }
 };
 } // namespace Telephony
 } // namespace OHOS

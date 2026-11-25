@@ -15,6 +15,7 @@
 
 #include "app_state_observer.h"
 #include "bluetooth_call_manager.h"
+#include "call_ability_report_proxy.h"
 #include "iservice_registry.h"
 #include "telephony_log_wrapper.h"
 #include "i_call_ability_callback.h"
@@ -40,6 +41,8 @@ void ApplicationStateObserver::OnProcessDied(const AppExecFwk::ProcessData& proc
         DelayedSingleton<CallObjectManager>::GetInstance()->ClearVoipList();
         DelayedSingleton<BluetoothCallManager>::GetInstance()->
             SendBtCallState(0, 0, (int32_t)TelCallState::CALL_STATUS_IDLE, "");
+        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateChange(
+            ERR_ID, 0, 0, (int32_t)TelCallState::CALL_STATUS_IDLE, "");
     }
     auto callControlManager = DelayedSingleton<CallControlManager>::GetInstance();
     if (callControlManager != nullptr) {

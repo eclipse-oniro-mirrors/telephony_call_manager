@@ -38,6 +38,7 @@ enum CallManagerCallAbilityInterfaceCode {
     RTT_CALL_EVENT_CHANGE,
     RTT_CALL_ERROR_REPORT,
     RTT_CALL_SEND_MESSAGE,
+    UPDATE_CALL_STATE,
 };
 } // namespace Telephony
 } // namespace OHOS

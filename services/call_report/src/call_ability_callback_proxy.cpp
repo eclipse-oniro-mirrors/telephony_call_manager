@@ -384,6 +384,29 @@ int32_t CallAbilityCallbackProxy::OnPhoneStateChange(int32_t numActive, int32_t 
     return replyParcel.ReadInt32();
 }
 
+int32_t CallAbilityCallbackProxy::OnCallStateChange(int32_t callId, int32_t numActive, int32_t numHeld,
+    int32_t callState, const std::string &number)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option(MessageOption::TF_ASYNC);
+    if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(callId);
+    dataParcel.WriteInt32(numActive);
+    dataParcel.WriteInt32(numHeld);
+    dataParcel.WriteInt32(callState);
+    dataParcel.WriteString(number);
+    int32_t error = SendRequest(static_cast<uint32_t>(
+        CallManagerCallAbilityInterfaceCode::UPDATE_CALL_STATE), dataParcel,
+        replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
 #ifdef SUPPORT_RTT_CALL
 int32_t CallAbilityCallbackProxy::OnReportRttCallEvtChanged(const RttEvent &info)
 {
