@@ -55,6 +55,7 @@ private:
 #endif
     void ReportIncomingCallsDropChrEvents(
         const CallDetailsInfo &info, bool isDevProvisioned, bool isOobeComplete);
+    bool DropIncomingCallInfo(CallDetailsInfo &info);
 
 private:
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_;

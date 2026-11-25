@@ -276,8 +276,10 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
     bool isOobeComplete = CallStatusManager::GetDevUserSetupCompleteValue() == DEVICE_PROVISION_VALID;
     if (!isDevProvisioned || !isOobeComplete) {
         ReportIncomingCallsDropChrEvents(info, isDevProvisioned, isOobeComplete);
-        TELEPHONY_LOGE("UpdateCallsReportInfo call not report in OOBE");
-        return TELEPHONY_SUCCESS;
+        if (DropIncomingCallInfo(info)) {
+            TELEPHONY_LOGE("UpdateCallsReportInfo call not report in OOBE");
+            return TELEPHONY_SUCCESS;
+        }
     }
 
     CallDetailsInfo callDetailsInfo;
@@ -320,6 +322,20 @@ void ReportCallInfoHandler::ReportIncomingCallsDropChrEvents(
                 info.slotId, call.index, DROP_CALL_BY_OOBE);
         }
     }
+}
+
+bool ReportCallInfoHandler::DropIncomingCallInfo(CallDetailsInfo &info)
+{
+    auto iter = info.callVec.begin();
+    while (iter != info.callVec.end()) {
+        if (iter->state == TelCallState::CALL_STATUS_INCOMING ||
+            iter->state == TelCallState::CALL_STATUS_WAITING) {
+            iter = info.callVec.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
+    return info.callVec.empty();
 }
 
 int32_t ReportCallInfoHandler::UpdateDisconnectedCause(const DisconnectedDetails &details)

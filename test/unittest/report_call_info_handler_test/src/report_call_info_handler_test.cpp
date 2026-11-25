@@ -431,6 +431,207 @@ HWTEST_F(ReportCallInfoHandlerTest, ReportCallInfoHandler_BuildCallDetailsInfo_0
     EXPECT_EQ(callDetailsInfo.callVec[0].accountId, VALID_SLOT_ID);
 }
 
+/**
+ * Fixture for OOBE tests: saves/restores OOBE static states and clears the
+ * global call object list in SetUp/TearDown to keep tests isolated.
+ */
+class ReportCallInfoHandlerOobeTest : public ReportCallInfoHandlerTest {
+public:
+    void SetUp() override
+    {
+        ReportCallInfoHandlerTest::SetUp();
+        savedProvisioned_ = CallStatusManager::deviceProvisioned_;
+        savedSetupComplete_ = CallStatusManager::userSetupComplete_;
+        handler_ = DelayedSingleton<ReportCallInfoHandler>::GetInstance();
+        ASSERT_TRUE(handler_ != nullptr);
+        handler_->Init();
+        ASSERT_TRUE(handler_->callStatusManagerPtr_ != nullptr);
+        CallObjectManager::callObjectPtrList_.clear();
+    }
+
+    void TearDown() override
+    {
+        CallStatusManager::deviceProvisioned_ = savedProvisioned_;
+        CallStatusManager::userSetupComplete_ = savedSetupComplete_;
+        CallObjectManager::callObjectPtrList_.clear();
+        ReportCallInfoHandlerTest::TearDown();
+    }
+
+    // Simulate OOBE in progress
+    void EnterOobe()
+    {
+        CallStatusManager::deviceProvisioned_ = DEVICE_PROVISION_INVALID;
+        CallStatusManager::userSetupComplete_ = DEVICE_PROVISION_INVALID;
+    }
+
+    // Simulate OOBE completed
+    void CompleteOobe()
+    {
+        CallStatusManager::deviceProvisioned_ = DEVICE_PROVISION_VALID;
+        CallStatusManager::userSetupComplete_ = DEVICE_PROVISION_VALID;
+    }
+
+    static CallDetailInfo MakeCsCallInfo(TelCallState state, int32_t index)
+    {
+        CallDetailInfo detailInfo;
+        detailInfo.callType = CallType::TYPE_CS;
+        detailInfo.state = state;
+        detailInfo.index = index;
+        return detailInfo;
+    }
+
+    std::shared_ptr<ReportCallInfoHandler> handler_;
+
+private:
+    int32_t savedProvisioned_ = 0;
+    int32_t savedSetupComplete_ = 0;
+};
+ 
+/**
+ * @tc.number   ReportCallInfoHandler_OobeMoDialing
+ * @tc.name     Test UpdateCallsReportInfo keeps MO dialing report in OOBE
+ * @tc.desc     DT test - MO DIALING report is kept in OOBE, otherwise call index
+ *              writeback fails and hangup never triggers (residual audio regression)
+ */
+HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMoDialing, TestSize.Level1)
+{
+    EnterOobe();
+    // Settings query fails in UT process, mocked INVALID value is kept
+    ASSERT_EQ(CallStatusManager::GetDevProvisioned(), DEVICE_PROVISION_INVALID);
+    // GetDevUserSetupCompleteValue() always refreshes the flag to VALID in UT, so
+    // assert the mocked static member directly
+    ASSERT_EQ(CallStatusManager::userSetupComplete_.load(), DEVICE_PROVISION_INVALID);
+
+    CallDetailsInfo info;
+    info.slotId = VALID_SLOT_ID;
+    info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_DIALING, VALID_CALL_INDEX));
+
+    int32_t ret = handler_->UpdateCallsReportInfo(info);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    ASSERT_EQ(info.callVec.size(), 1);
+    EXPECT_EQ(info.callVec[0].state, TelCallState::CALL_STATUS_DIALING);
+}
+ 
+/**
+ * @tc.number   ReportCallInfoHandler_OobeMoDisconnected
+ * @tc.name     Test UpdateCallsReportInfo keeps disconnected report in OOBE
+ * @tc.desc     DT test - DISCONNECTED report is kept in OOBE, otherwise DisconnectedHandle
+ *              is skipped and call audio keeps playing (residual audio regression)
+ */
+HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMoDisconnected, TestSize.Level1)
+{
+    EnterOobe();
+    // Settings query fails in UT process, mocked INVALID value is kept
+    ASSERT_EQ(CallStatusManager::GetDevProvisioned(), DEVICE_PROVISION_INVALID);
+    // GetDevUserSetupCompleteValue() always refreshes the flag to VALID in UT, so
+    // assert the mocked static member directly
+    ASSERT_EQ(CallStatusManager::userSetupComplete_.load(), DEVICE_PROVISION_INVALID);
+    CallDetailsInfo info;
+    info.slotId = VALID_SLOT_ID;
+    info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_DISCONNECTED, VALID_CALL_INDEX));
+
+    int32_t ret = handler_->UpdateCallsReportInfo(info);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    ASSERT_EQ(info.callVec.size(), 1);
+    EXPECT_EQ(info.callVec[0].state, TelCallState::CALL_STATUS_DISCONNECTED);
+}
+ 
+/**
+ * @tc.number   ReportCallInfoHandler_OobeIncomingDrop
+ * @tc.name     Test UpdateCallsReportInfo still drops incoming report in OOBE
+ * @tc.desc     DT test - INCOMING report is still dropped in OOBE, suppression unchanged
+ */
+HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeIncomingDrop, TestSize.Level1)
+{
+    EnterOobe();
+    // Settings query fails in UT process, mocked INVALID value is kept
+    ASSERT_EQ(CallStatusManager::GetDevProvisioned(), DEVICE_PROVISION_INVALID);
+    CallDetailsInfo info;
+    info.slotId = VALID_SLOT_ID;
+    info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_INCOMING, VALID_CALL_INDEX));
+
+    int32_t ret = handler_->UpdateCallsReportInfo(info);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    EXPECT_TRUE(info.callVec.empty());
+}
+ 
+/**
+ * @tc.number   ReportCallInfoHandler_OobeWaitingDrop
+ * @tc.name     Test UpdateCallsReportInfo still drops waiting report in OOBE
+ * @tc.desc     DT test - WAITING report is still dropped in OOBE, suppression unchanged
+ */
+HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeWaitingDrop, TestSize.Level1)
+{
+    EnterOobe();
+    // Settings query fails in UT process, mocked INVALID value is kept
+    ASSERT_EQ(CallStatusManager::GetDevProvisioned(), DEVICE_PROVISION_INVALID);
+    CallDetailsInfo info;
+    info.slotId = VALID_SLOT_ID;
+    info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_WAITING, VALID_CALL_INDEX));
+
+    int32_t ret = handler_->UpdateCallsReportInfo(info);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    EXPECT_TRUE(info.callVec.empty());
+}
+ 
+/**
+ * @tc.number   ReportCallInfoHandler_OobeMixedDrop
+ * @tc.name     Test UpdateCallsReportInfo drops only incoming calls in mixed report in OOBE
+ * @tc.desc     DT test - only INCOMING is dropped in mixed report in OOBE, MO and
+ *              disconnected reports are kept in original order
+ */
+HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeMixedDrop, TestSize.Level1)
+{
+    EnterOobe();
+    // Settings query fails in UT process, mocked INVALID value is kept
+    ASSERT_EQ(CallStatusManager::GetDevProvisioned(), DEVICE_PROVISION_INVALID);
+    // GetDevUserSetupCompleteValue() always refreshes the flag to VALID in UT, so
+    // assert the mocked static member directly
+    ASSERT_EQ(CallStatusManager::userSetupComplete_.load(), DEVICE_PROVISION_INVALID);
+    CallDetailsInfo info;
+    info.slotId = VALID_SLOT_ID;
+    info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_INCOMING, 2));
+    info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_DIALING, VALID_CALL_INDEX));
+    info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_ALERTING, VALID_CALL_INDEX));
+    info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_DISCONNECTED, VALID_CALL_INDEX));
+
+    int32_t ret = handler_->UpdateCallsReportInfo(info);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    ASSERT_EQ(info.callVec.size(), 3);
+    EXPECT_EQ(info.callVec[0].state, TelCallState::CALL_STATUS_DIALING);
+    EXPECT_EQ(info.callVec[1].state, TelCallState::CALL_STATUS_ALERTING);
+    EXPECT_EQ(info.callVec[2].state, TelCallState::CALL_STATUS_DISCONNECTED);
+
+    // The mocked ffrt queue discards submitted tasks in UT, so the report never
+    // reaches HandleCallsReportInfo through UpdateCallsReportInfo; drive the manager
+    // directly with the surviving report to verify the kept items are processed.
+    ASSERT_EQ(handler_->callStatusManagerPtr_->HandleCallsReportInfo(info), TELEPHONY_SUCCESS);
+    CallDetailsInfo &delivered = handler_->callStatusManagerPtr_->callDetailsInfo_[VALID_SLOT_ID];
+    ASSERT_EQ(delivered.callVec.size(), 2);
+    EXPECT_EQ(delivered.callVec[0].state, TelCallState::CALL_STATUS_DIALING);
+    EXPECT_EQ(delivered.callVec[1].state, TelCallState::CALL_STATUS_ALERTING);
+}
+ 
+/**
+ * @tc.number   ReportCallInfoHandler_OobeCompleteNotDrop
+ * @tc.name     Test UpdateCallsReportInfo drops nothing after OOBE complete
+ * @tc.desc     DT test - no report is dropped after OOBE completes, INCOMING is delivered
+ */
+HWTEST_F(ReportCallInfoHandlerOobeTest, ReportCallInfoHandler_OobeCompleteNotDrop, TestSize.Level1)
+{
+    CompleteOobe();
+    CallDetailsInfo info;
+    info.slotId = VALID_SLOT_ID;
+    info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_INCOMING, 2));
+    info.callVec.push_back(MakeCsCallInfo(TelCallState::CALL_STATUS_DIALING, VALID_CALL_INDEX));
+
+    int32_t ret = handler_->UpdateCallsReportInfo(info);
+    EXPECT_EQ(ret, TELEPHONY_SUCCESS);
+    ASSERT_EQ(info.callVec.size(), 2);
+    EXPECT_EQ(info.callVec[0].state, TelCallState::CALL_STATUS_INCOMING);
+    EXPECT_EQ(info.callVec[1].state, TelCallState::CALL_STATUS_DIALING);
+}
+ 
 #ifdef SUPPORT_RTT_CALL
 /**
  * @tc.number   ReportCallInfoHandler_UpdateRttEventInfo_0100
